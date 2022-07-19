@@ -1,0 +1,566 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "NO:ON - Scheduling",
+    "description": "Make Board View for Web Practice",
+    "contact": {
+      "email": "noon.official.dev@gmail.com"
+    },
+    "version": "1.0.0"
+  },
+  "externalDocs": {
+    "description": "explore github of NO:ON",
+    "url": "https://github.com/NOON-official"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000/api"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Card",
+      "description": "operations of cards"
+    }
+  ],
+  "paths": {
+    "/card": {
+      "post": {
+        "tags": ["Card"],
+        "summary": "새로운 카드 생성",
+        "description": "생성된 카드 정보 반환",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "content": {
+                    "type": "string",
+                    "format": "300byte",
+                    "example": "라면 먹기"
+                  },
+                  "deadline": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2022-04-03T05:01:09.091Z"
+                  },
+                  "detail": {
+                    "type": "string",
+                    "format": "300byte",
+                    "example": "육개장으로"
+                  },
+                  "state": {
+                    "type": "integer",
+                    "example": 0
+                  }
+                },
+                "required": ["content", "deadline", "state"]
+              },
+              "examples": {
+                "0": {
+                  "summary": "카드 생성 예시1",
+                  "value": {
+                    "content": "라면 먹기",
+                    "deadline": "2022-04-03T05:01:09.091Z",
+                    "detail": "육개장으로",
+                    "state": 0
+                  }
+                },
+                "1": {
+                  "summary": "카드 생성 예시2",
+                  "value": {
+                    "content": "라면 먹기",
+                    "deadline": "2022-04-03T05:01:09.091Z",
+                    "state": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "카드 생성 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "카드 생성에 성공하였습니다"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Card"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "유효하지 않은 값",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "Response Body",
+                    "value": {
+                      "status": 400,
+                      "success": false,
+                      "message": "필수 항목을 모두 입력해주세요"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      },
+      "get": {
+        "tags": ["Card"],
+        "summary": "모든 카드 조회",
+        "description": "모든 카드 정보 반환",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "모든 카드 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "모든 카드 조회에 성공하였습니다"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {
+                        "card": [
+                          {
+                            "id": "XXDFAdgdS",
+                            "content": "라면 먹기",
+                            "deadline": "2022-04-03T05:01:09.091Z",
+                            "detail": "육개장으로",
+                            "state": 0,
+                            "createdAt": "2022-04-03T05:01:09.091Z",
+                            "updatedAt": "2022-04-03T05:01:09.091Z",
+                            "isDeleted": false
+                          },
+                          {
+                            "id": "aXDFdafS",
+                            "content": "운동하기",
+                            "deadline": "2022-04-03T05:01:09.091Z",
+                            "detail": "한강가서 러닝하기",
+                            "state": 2,
+                            "createdAt": "2022-04-03T05:01:09.091Z",
+                            "updatedAt": "2022-04-03T05:01:09.091Z",
+                            "isDeleted": false
+                          },
+                          {
+                            "id": "qXeqrtgdS",
+                            "content": "밥 해먹기",
+                            "deadline": "2022-04-03T05:01:09.091Z",
+                            "state": 1,
+                            "createdAt": "2022-04-03T05:01:09.091Z",
+                            "updatedAt": "2022-04-03T05:01:09.091Z",
+                            "isDeleted": false
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/card/{cardId}": {
+      "put": {
+        "tags": ["Card"],
+        "summary": "카드 상태 업데이트",
+        "description": "카드 상태 업데이트 후 해당 카드 정보 반환",
+        "parameters": [
+          {
+            "name": "cardId",
+            "in": "path",
+            "description": "카드 ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "currentState": {
+                    "type": "integer",
+                    "example": "0"
+                  },
+                  "newState": {
+                    "type": "integer",
+                    "example": "1"
+                  }
+                },
+                "required": ["currentState", "newState"]
+              },
+              "examples": {
+                "0": {
+                  "summary": "카드 상태 업데이트 예시",
+                  "value": {
+                    "currentState": "2",
+                    "newState": "1"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "카드 상태 업데이트 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "카드 상태 업데이트에 성공하였습니다"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Card"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400(1)": {
+            "$ref": "#/components/responses/NullValue"
+          },
+          "400(2)": {
+            "description": "1. Request Body의 카드 state가 [0, 1, 2]를 벗어나는 경우 \t\n 2. currentState와 newState가 같은 경우",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "Response Body",
+                    "value": {
+                      "status": 400,
+                      "success": false,
+                      "message": "유효하지 않은 카드 상태입니다"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Card"],
+        "summary": "카드 삭제",
+        "description": "삭제 후 모든 카드 정보 반환",
+        "parameters": [
+          {
+            "name": "cardId",
+            "in": "path",
+            "description": "카드 ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "카드 삭제 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "카드 삭제에 성공하였습니다"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {
+                        "card": [
+                          {
+                            "id": "XXDFAdgdS",
+                            "content": "라면 먹기",
+                            "deadline": "2022-04-03T05:01:09.091Z",
+                            "detail": "육개장으로",
+                            "state": 0,
+                            "createdAt": "2022-04-03T05:01:09.091Z",
+                            "updatedAt": "2022-04-03T05:01:09.091Z",
+                            "isDeleted": false
+                          },
+                          {
+                            "id": "aXDFdafS",
+                            "content": "운동하기",
+                            "deadline": "2022-04-03T05:01:09.091Z",
+                            "detail": "한강가서 러닝하기",
+                            "state": 2,
+                            "createdAt": "2022-04-03T05:01:09.091Z",
+                            "updatedAt": "2022-04-03T05:01:09.091Z",
+                            "isDeleted": false
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/OutOfValue"
+          },
+          "404": {
+            "description": "존재하지 않는 카드",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "Response Body",
+                    "value": {
+                      "status": 404,
+                      "success": false,
+                      "message": "존재하지 않는 카드입니다"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Card": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "90byte",
+            "example": "XXDFAdgdS"
+          },
+          "content": {
+            "type": "string",
+            "format": "300byte",
+            "example": "라면 먹기"
+          },
+          "deadline": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2022-04-03T05:01:09.091Z"
+          },
+          "detail": {
+            "type": "string",
+            "format": "300byte",
+            "example": "육개장으로"
+          },
+          "state": {
+            "type": "integer",
+            "default": 0,
+            "examples": {
+              "0": {
+                "summary": "to do",
+                "value": 0
+              },
+              "1": {
+                "summary": "in progress",
+                "value": 1
+              },
+              "2": {
+                "summary": "done",
+                "value": 2
+              }
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2022-04-03T05:01:09.091Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2022-04-03T05:01:09.091Z"
+          },
+          "isDeleted": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "examples": {
+          "1": {
+            "summary": "Response Body",
+            "value": {
+              "status": 500,
+              "success": false,
+              "message": "서버 내 오류"
+            }
+          }
+        }
+      },
+      "Success": {
+        "type": "object",
+        "required": ["status", "success", "message", "data"],
+        "properties": {
+          "status": {
+            "type": "integer"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object"
+          }
+        }
+      },
+      "Fail": {
+        "type": "object",
+        "required": ["status", "success", "message"],
+        "properties": {
+          "status": {
+            "type": "integer"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "responses": {
+      "NullValue": {
+        "description": "Request Body에 필요한 값이 없음",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Fail"
+            },
+            "examples": {
+              "1": {
+                "summary": "Response Body",
+                "value": {
+                  "status": 400,
+                  "success": false,
+                  "message": "필요한 값이 없습니다"
+                }
+              }
+            }
+          }
+        }
+      },
+      "OutOfValue": {
+        "description": "잘못된 파라미터",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Fail"
+            },
+            "examples": {
+              "1": {
+                "summary": "Response Body",
+                "value": {
+                  "status": 400,
+                  "success": false,
+                  "message": "파라미터 값이 잘못되었습니다"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalServerError": {
+        "description": "서버 내부 오류",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Fail"
+            },
+            "examples": {
+              "1": {
+                "summary": "Response Body",
+                "value": {
+                  "status": 500,
+                  "success": false,
+                  "message": "서버 내 오류"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
