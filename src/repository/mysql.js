@@ -1,8 +1,10 @@
 const convertSnakeToCamel = require('../lib/convertSnakeToCamel');
 
-const example = async (userId, location, client) => {
-  await client.query('UPDATE `user` SET photo=? WHERE id=?;', [location, userId]);
-  const [row] = await client.query('SELECT * FROM `user` WHERE id=?;', [userId]);
+const example = async (conn, email) => {
+  await conn.query('INSERT INTO `user` VALUES (?);', [email]);
+
+  // 'mysql2/promise'는 결과값을 배열로 반환
+  const [row] = await conn.query('SELECT * FROM `user`');
 
   return convertSnakeToCamel.keysToCamel(row[0]);
 };
