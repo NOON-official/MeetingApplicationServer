@@ -1,8 +1,8 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "NO:ON - Scheduling",
-    "description": "Make Board View for Web Practice",
+    "title": "Meetinghakgaeron",
+    "description": "the matching service for 2030's meeting by NO:ON",
     "contact": {
       "email": "noon.official.dev@gmail.com"
     },
@@ -19,69 +19,23 @@
   ],
   "tags": [
     {
-      "name": "Card",
-      "description": "operations of cards"
+      "name": "Service",
+      "description": "Meetinghakgaeron Service"
+    },
+    {
+      "name": "User",
+      "description": "user's team information"
     }
   ],
   "paths": {
-    "/card": {
-      "post": {
-        "tags": ["Card"],
-        "summary": "새로운 카드 생성",
-        "description": "생성된 카드 정보 반환",
-        "parameters": [],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "content": {
-                    "type": "string",
-                    "format": "300byte",
-                    "example": "라면 먹기"
-                  },
-                  "deadline": {
-                    "type": "string",
-                    "format": "date-time",
-                    "example": "2022-04-03T05:01:09.091Z"
-                  },
-                  "detail": {
-                    "type": "string",
-                    "format": "300byte",
-                    "example": "육개장으로"
-                  },
-                  "state": {
-                    "type": "integer",
-                    "example": 0
-                  }
-                },
-                "required": ["content", "deadline", "state"]
-              },
-              "examples": {
-                "0": {
-                  "summary": "카드 생성 예시1",
-                  "value": {
-                    "content": "라면 먹기",
-                    "deadline": "2022-04-03T05:01:09.091Z",
-                    "detail": "육개장으로",
-                    "state": 0
-                  }
-                },
-                "1": {
-                  "summary": "카드 생성 예시2",
-                  "value": {
-                    "content": "라면 먹기",
-                    "deadline": "2022-04-03T05:01:09.091Z",
-                    "state": 1
-                  }
-                }
-              }
-            }
-          }
-        },
+    "/service/count/weekly": {
+      "get": {
+        "tags": ["Service"],
+        "summary": "주간 매칭 건수 조회",
+        "description": "🌸 미팅학개론의 주간 매칭 성공 건수를 조회합니다.",
         "responses": {
           "200": {
-            "description": "카드 생성 성공",
+            "description": "주간 매칭 건수 조회 성공",
             "content": {
               "application/json": {
                 "schema": {
@@ -96,10 +50,198 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "카드 생성에 성공하였습니다"
+                      "example": "주간 매칭 건수 조회에 성공하였습니다"
                     },
                     "data": {
-                      "$ref": "#/components/schemas/Card"
+                      "type": "object",
+                      "example": {
+                        "weeklyCount": 23
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/user/ourteam": {
+      "post": {
+        "tags": ["User"],
+        "summary": "유저 정보 저장",
+        "description": "🌸 매칭을 신청하는 유저의 팀 정보를 저장합니다. \n * 유저 전화번호를 테이블 key값으로 사용해야하기 때문에 테스트 시에는 우선 임의의 전화번호를 보내주세요🙂 \n * 현재 뷰가 미완성이기 때문에 _firebaseUid, kakaoId_ 는 보내주시지 않으셔도 됩니다. (추후 뷰 확정 후 반영할 예정)",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "firebaseUid": {
+                    "type": "string",
+                    "format": "varchar(50)",
+                    "example": "ehxIlqyasdhtjtsaew3768aY2"
+                  },
+                  "kakaoId": {
+                    "type": "string",
+                    "format": "varchar(20)",
+                    "example": "m*yu1"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "format": "varchar(13)",
+                    "example": "010-1234-5678"
+                  },
+                  "gender": {
+                    "type": "string",
+                    "format": "varchar(2)",
+                    "example": "남성"
+                  },
+                  "num": {
+                    "type": "string",
+                    "format": "varchar(3)",
+                    "example": "3:3"
+                  },
+                  "age": {
+                    "type": "string",
+                    "format": "varchar(2)",
+                    "example": "25"
+                  },
+                  "job": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minitems": 1,
+                    "maxitems": 4,
+                    "example": ["대학생", "취준생"]
+                  },
+                  "university": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minitems": 1,
+                    "maxitems": 3,
+                    "example": ["가천대", "한국외대", "동덕여대"]
+                  },
+                  "role": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minitems": 1,
+                    "maxitems": 4,
+                    "example": ["깍두기", "사회자", "비주얼"]
+                  },
+                  "area": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minitems": 1,
+                    "maxitems": 4,
+                    "example": ["강남", "홍대", "수원"]
+                  },
+                  "day": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minitems": 1,
+                    "maxitems": 7,
+                    "example": ["월", "토", "일"]
+                  },
+                  "appearance": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minitems": 1,
+                    "maxitems": 5,
+                    "example": ["고양이", "강아지"]
+                  },
+                  "mbti": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minitems": 1,
+                    "maxitems": 16,
+                    "example": ["ISFP", "ENTP"]
+                  },
+                  "fashion": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minitems": 1,
+                    "maxitems": 10,
+                    "example": ["캐주얼", "비즈니스", "베이직", "아메카지"]
+                  }
+                },
+                "required": [
+                  "phone",
+                  "gender",
+                  "num",
+                  "age",
+                  "job",
+                  "university",
+                  "role",
+                  "area",
+                  "day",
+                  "appearance",
+                  "mbti",
+                  "fashion"
+                ]
+              },
+              "examples": {
+                "0": {
+                  "summary": "유저 정보 저장 요청 예시",
+                  "value": {
+                    "firebaseUid": "ehxIlqyasdhtjtsaew3768aY2",
+                    "kakaoId": "m*yu1",
+                    "phone": "010-1234-5678",
+                    "gender": "남성",
+                    "num": "3:3",
+                    "age": "25",
+                    "job": ["대학생", "취준생"],
+                    "university": ["가천대", "한국외대", "동덕여대"],
+                    "role": ["깍두기", "사회자", "비주얼"],
+                    "area": ["강남", "홍대", "수원"],
+                    "day": ["월", "토", "일"],
+                    "appearance": ["고양이", "강아지"],
+                    "mbti": ["ISFP", "ENTP"],
+                    "fashion": ["캐주얼", "비즈니스", "베이직", "아메카지"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "유저 정보 저장 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "유저 정보 저장에 성공하였습니다"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/User"
                     }
                   }
                 }
@@ -130,116 +272,127 @@
             "$ref": "#/components/responses/InternalServerError"
           }
         }
-      },
-      "get": {
-        "tags": ["Card"],
-        "summary": "모든 카드 조회",
-        "description": "모든 카드 정보 반환",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "모든 카드 조회 성공",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "모든 카드 조회에 성공하였습니다"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {
-                        "card": [
-                          {
-                            "id": "XXDFAdgdS",
-                            "content": "라면 먹기",
-                            "deadline": "2022-04-03T05:01:09.091Z",
-                            "detail": "육개장으로",
-                            "state": 0,
-                            "createdAt": "2022-04-03T05:01:09.091Z",
-                            "updatedAt": "2022-04-03T05:01:09.091Z",
-                            "isDeleted": false
-                          },
-                          {
-                            "id": "aXDFdafS",
-                            "content": "운동하기",
-                            "deadline": "2022-04-03T05:01:09.091Z",
-                            "detail": "한강가서 러닝하기",
-                            "state": 2,
-                            "createdAt": "2022-04-03T05:01:09.091Z",
-                            "updatedAt": "2022-04-03T05:01:09.091Z",
-                            "isDeleted": false
-                          },
-                          {
-                            "id": "qXeqrtgdS",
-                            "content": "밥 해먹기",
-                            "deadline": "2022-04-03T05:01:09.091Z",
-                            "state": 1,
-                            "createdAt": "2022-04-03T05:01:09.091Z",
-                            "updatedAt": "2022-04-03T05:01:09.091Z",
-                            "isDeleted": false
-                          }
-                        ]
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        }
       }
     },
-    "/card/{cardId}": {
-      "put": {
-        "tags": ["Card"],
-        "summary": "카드 상태 업데이트",
-        "description": "카드 상태 업데이트 후 해당 카드 정보 반환",
-        "parameters": [
-          {
-            "name": "cardId",
-            "in": "path",
-            "description": "카드 ID",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+    "/user/preference": {
+      "post": {
+        "tags": ["User"],
+        "summary": "유저 선호 정보 저장",
+        "description": "🌸 매칭을 신청하는 유저의 선호 정보를 저장합니다. \n\n ✨중요: 유저 정보 저장 API(api/user/ourteam)를 먼저 호출하신 다음, **성공 response를 받은 후** 본 API를 호출해주세요! \n * 유저 전화번호를 테이블 key값으로 사용해야하기 때문에 테스트 시에는 우선 임의의 전화번호를 보내주세요🙂 \n * 현재 뷰가 미완성이기 때문에 _appearance, mbti, fashion_ 은 보내주시지 않으셔도 됩니다. (추후 뷰 확정 후 반영할 예정)",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
                 "properties": {
-                  "currentState": {
-                    "type": "integer",
+                  "phone": {
+                    "type": "string",
+                    "format": "varchar(13)",
+                    "example": "010-1234-5678"
+                  },
+                  "age": {
+                    "type": "string",
+                    "format": "varchar(2)",
+                    "example": "25"
+                  },
+                  "job": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minitems": 1,
+                    "maxitems": 4,
+                    "example": ["대학생", "취준생"]
+                  },
+                  "exceptedUniv": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minitems": 1,
+                    "maxitems": 3,
+                    "example": ["가천대", "한국외대", "동덕여대"]
+                  },
+                  "includedUniv": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minitems": 1,
+                    "maxitems": 3,
+                    "example": ["가천대", "한국외대", "동덕여대"]
+                  },
+                  "gamePercent": {
+                    "type": "string",
+                    "format": "varchar(3)",
+                    "example": "78"
+                  },
+                  "sweetPercent": {
+                    "type": "string",
+                    "format": "varchar(3)",
+                    "example": "100"
+                  },
+                  "funPercent": {
+                    "type": "string",
+                    "format": "varchar(3)",
                     "example": "0"
                   },
-                  "newState": {
-                    "type": "integer",
-                    "example": "1"
+                  "appearance": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minitems": 1,
+                    "maxitems": 5,
+                    "example": ["고양이", "강아지"]
+                  },
+                  "mbti": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minitems": 1,
+                    "maxitems": 16,
+                    "example": ["ISFP", "ENTP"]
+                  },
+                  "fashion": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minitems": 1,
+                    "maxitems": 10,
+                    "example": ["캐주얼", "베이직"]
                   }
                 },
-                "required": ["currentState", "newState"]
+                "required": [
+                  "phone",
+                  "age",
+                  "job",
+                  "exceptedUniv",
+                  "includedUniv",
+                  "gamePercent",
+                  "sweetPercent",
+                  "funPercent",
+                  "appearance",
+                  "mbti",
+                  "fashion"
+                ]
               },
               "examples": {
                 "0": {
-                  "summary": "카드 상태 업데이트 예시",
+                  "summary": "유저 선호 정보 저장 요청 예시",
                   "value": {
-                    "currentState": "2",
-                    "newState": "1"
+                    "phone": "010-1234-5678",
+                    "age": "25",
+                    "job": ["대학생", "취준생"],
+                    "exceptedUniv": ["가천대", "한국외대", "동덕여대"],
+                    "includedUniv": ["가천대", "한국외대", "동덕여대"],
+                    "gamePercent": "78",
+                    "sweetPercent": "100",
+                    "funPercent": "0",
+                    "appearance": ["고양이", "강아지"],
+                    "mbti": ["ISFP", "ENTP"],
+                    "fashion": ["캐주얼", "베이직"]
                   }
                 }
               }
@@ -248,7 +401,7 @@
         },
         "responses": {
           "200": {
-            "description": "카드 상태 업데이트 성공",
+            "description": "유저 선호 정보 저장 성공",
             "content": {
               "application/json": {
                 "schema": {
@@ -263,21 +416,18 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "카드 상태 업데이트에 성공하였습니다"
+                      "example": "유저 선호 정보 저장에 성공하였습니다"
                     },
                     "data": {
-                      "$ref": "#/components/schemas/Card"
+                      "$ref": "#/components/schemas/Preference"
                     }
                   }
                 }
               }
             }
           },
-          "400(1)": {
-            "$ref": "#/components/responses/NullValue"
-          },
-          "400(2)": {
-            "description": "1. Request Body의 카드 state가 [0, 1, 2]를 벗어나는 경우 \t\n 2. currentState와 newState가 같은 경우",
+          "400": {
+            "description": "유효하지 않은 값",
             "content": {
               "application/json": {
                 "schema": {
@@ -289,89 +439,15 @@
                     "value": {
                       "status": 400,
                       "success": false,
-                      "message": "유효하지 않은 카드 상태입니다"
+                      "message": "필수 항목을 모두 입력해주세요"
                     }
                   }
                 }
               }
             }
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        }
-      },
-      "delete": {
-        "tags": ["Card"],
-        "summary": "카드 삭제",
-        "description": "삭제 후 모든 카드 정보 반환",
-        "parameters": [
-          {
-            "name": "cardId",
-            "in": "path",
-            "description": "카드 ID",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "카드 삭제 성공",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "카드 삭제에 성공하였습니다"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {
-                        "card": [
-                          {
-                            "id": "XXDFAdgdS",
-                            "content": "라면 먹기",
-                            "deadline": "2022-04-03T05:01:09.091Z",
-                            "detail": "육개장으로",
-                            "state": 0,
-                            "createdAt": "2022-04-03T05:01:09.091Z",
-                            "updatedAt": "2022-04-03T05:01:09.091Z",
-                            "isDeleted": false
-                          },
-                          {
-                            "id": "aXDFdafS",
-                            "content": "운동하기",
-                            "deadline": "2022-04-03T05:01:09.091Z",
-                            "detail": "한강가서 러닝하기",
-                            "state": 2,
-                            "createdAt": "2022-04-03T05:01:09.091Z",
-                            "updatedAt": "2022-04-03T05:01:09.091Z",
-                            "isDeleted": false
-                          }
-                        ]
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/OutOfValue"
           },
           "404": {
-            "description": "존재하지 않는 카드",
+            "description": "존재하지 않는 유저",
             "content": {
               "application/json": {
                 "schema": {
@@ -383,7 +459,7 @@
                     "value": {
                       "status": 404,
                       "success": false,
-                      "message": "존재하지 않는 카드입니다"
+                      "message": "존재하지 않는 유저입니다"
                     }
                   }
                 }
@@ -399,43 +475,138 @@
   },
   "components": {
     "schemas": {
-      "Card": {
+      "Service": {
+        "type": "object",
+        "properties": {
+          "weeklyCount": {
+            "type": "integer",
+            "example": 23
+          }
+        }
+      },
+      "User": {
         "type": "object",
         "properties": {
           "id": {
-            "type": "string",
-            "format": "90byte",
-            "example": "XXDFAdgdS"
+            "type": "integer",
+            "example": 1
           },
-          "content": {
+          "firebaseUid": {
             "type": "string",
-            "format": "300byte",
-            "example": "라면 먹기"
+            "format": "varchar(50)",
+            "example": "ehxIlqyasdhtjtsaew3768aY2"
           },
-          "deadline": {
+          "kakaoId": {
             "type": "string",
-            "format": "date-time",
-            "example": "2022-04-03T05:01:09.091Z"
+            "format": "varchar(20)",
+            "example": "m*yu1"
           },
-          "detail": {
+          "phone": {
             "type": "string",
-            "format": "300byte",
-            "example": "육개장으로"
+            "format": "varchar(13)",
+            "example": "010-1234-5678"
+          },
+          "gender": {
+            "type": "string",
+            "format": "varchar(2)",
+            "example": "남성"
+          },
+          "num": {
+            "type": "string",
+            "format": "varchar(3)",
+            "example": "3:3"
+          },
+          "age": {
+            "type": "string",
+            "format": "varchar(2)",
+            "example": "25"
+          },
+          "job": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minitems": 1,
+            "maxitems": 4,
+            "example": ["대학생", "취준생"]
+          },
+          "university": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minitems": 1,
+            "maxitems": 3,
+            "example": ["가천대", "한국외대", "동덕여대"]
+          },
+          "role": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minitems": 1,
+            "maxitems": 4,
+            "example": ["깍두기", "사회자", "비주얼"]
+          },
+          "area": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minitems": 1,
+            "maxitems": 4,
+            "example": ["강남", "홍대", "수원"]
+          },
+          "day": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minitems": 1,
+            "maxitems": 7,
+            "example": ["월", "토", "일"]
+          },
+          "appearance": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minitems": 1,
+            "maxitems": 5,
+            "example": ["고양이", "강아지"]
+          },
+          "mbti": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minitems": 1,
+            "maxitems": 16,
+            "example": ["ISFP", "ENTP"]
+          },
+          "fashion": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minitems": 1,
+            "maxitems": 10,
+            "example": ["캐주얼", "비즈니스", "베이직", "아메카지"]
           },
           "state": {
             "type": "integer",
             "default": 0,
             "examples": {
               "0": {
-                "summary": "to do",
+                "summary": "매칭 전",
                 "value": 0
               },
               "1": {
-                "summary": "in progress",
+                "summary": "매칭 중 (수락 전)",
                 "value": 1
               },
               "2": {
-                "summary": "done",
+                "summary": "매칭 완료",
                 "value": 2
               }
             }
@@ -449,20 +620,104 @@
             "type": "string",
             "format": "date-time",
             "example": "2022-04-03T05:01:09.091Z"
-          },
-          "isDeleted": {
-            "type": "boolean",
-            "default": false
           }
-        },
-        "examples": {
-          "1": {
-            "summary": "Response Body",
-            "value": {
-              "status": 500,
-              "success": false,
-              "message": "서버 내 오류"
-            }
+        }
+      },
+      "Preference": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "phone": {
+            "type": "string",
+            "format": "varchar(13)",
+            "example": "010-1234-5678"
+          },
+          "age": {
+            "type": "string",
+            "format": "varchar(2)",
+            "example": "25"
+          },
+          "job": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minitems": 1,
+            "maxitems": 4,
+            "example": ["대학생", "취준생"]
+          },
+          "exceptedUniv": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minitems": 1,
+            "maxitems": 3,
+            "example": ["가천대", "한국외대", "동덕여대"]
+          },
+          "includedUniv": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minitems": 1,
+            "maxitems": 3,
+            "example": ["가천대", "한국외대", "동덕여대"]
+          },
+          "gamePercent": {
+            "type": "string",
+            "format": "varchar(3)",
+            "example": "78"
+          },
+          "sweetPercent": {
+            "type": "string",
+            "format": "varchar(3)",
+            "example": "100"
+          },
+          "funPercent": {
+            "type": "string",
+            "format": "varchar(3)",
+            "example": "0"
+          },
+          "appearance": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minitems": 1,
+            "maxitems": 5,
+            "example": ["고양이", "강아지"]
+          },
+          "mbti": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minitems": 1,
+            "maxitems": 16,
+            "example": ["ISFP", "ENTP"]
+          },
+          "fashion": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minitems": 1,
+            "maxitems": 10,
+            "example": ["캐주얼", "베이직"]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2022-04-03T05:01:09.091Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2022-04-03T05:01:09.091Z"
           }
         }
       },
@@ -515,26 +770,6 @@
                   "status": 400,
                   "success": false,
                   "message": "필요한 값이 없습니다"
-                }
-              }
-            }
-          }
-        }
-      },
-      "OutOfValue": {
-        "description": "잘못된 파라미터",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/Fail"
-            },
-            "examples": {
-              "1": {
-                "summary": "Response Body",
-                "value": {
-                  "status": 400,
-                  "success": false,
-                  "message": "파라미터 값이 잘못되었습니다"
                 }
               }
             }
