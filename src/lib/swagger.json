@@ -73,7 +73,7 @@
       "post": {
         "tags": ["User"],
         "summary": "유저 정보 저장",
-        "description": "🌸 매칭을 신청하는 유저의 팀 정보를 저장합니다. \n * 유저 전화번호를 테이블 key값으로 사용해야하기 때문에 테스트 시에는 우선 임의의 전화번호를 보내주세요🙂 \n * 현재 뷰가 미완성이기 때문에 _firebaseUid, kakaoId_ 는 보내주시지 않으셔도 됩니다. (추후 뷰 확정 후 반영할 예정)",
+        "description": "🌸 매칭을 신청하는 유저의 팀 정보를 저장합니다.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -278,16 +278,15 @@
       "post": {
         "tags": ["User"],
         "summary": "유저 선호 정보 저장",
-        "description": "🌸 매칭을 신청하는 유저의 선호 정보를 저장합니다. \n\n ✨중요: 유저 정보 저장 API(api/user/ourteam)를 먼저 호출하신 다음, **성공 response를 받은 후** 본 API를 호출해주세요! \n * 유저 전화번호를 테이블 key값으로 사용해야하기 때문에 테스트 시에는 우선 임의의 전화번호를 보내주세요🙂 \n * 현재 뷰가 미완성이기 때문에 _appearance, mbti, fashion_ 은 보내주시지 않으셔도 됩니다. (추후 뷰 확정 후 반영할 예정)",
+        "description": "🌸 매칭을 신청하는 유저의 선호 정보를 저장합니다. \n\n ✨중요: 유저 정보 저장 API(api/user/ourteam)를 먼저 호출하신 다음, **성공 response를 받은 후** 본 API를 호출해주세요! \n * 유저 정보 저장 후 자동으로 생성되는 id를 테이블 key값으로 사용하기 때문에 유저 정보 저장 API(api/user/ourteam)의 response에 담겨있는 id 값을 본 API 호출 시 함께 보내주시면 됩니다!🙂 \n ",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
                 "properties": {
-                  "phone": {
-                    "type": "string",
-                    "format": "varchar(13)",
-                    "example": "010-1234-5678"
+                  "id": {
+                    "type": "integer",
+                    "example": 1
                   },
                   "age": {
                     "type": "string",
@@ -365,7 +364,7 @@
                   }
                 },
                 "required": [
-                  "phone",
+                  "id",
                   "age",
                   "job",
                   "exceptedUniv",
@@ -382,7 +381,7 @@
                 "0": {
                   "summary": "유저 선호 정보 저장 요청 예시",
                   "value": {
-                    "phone": "010-1234-5678",
+                    "id": 1,
                     "age": "25",
                     "job": ["대학생", "취준생"],
                     "exceptedUniv": ["가천대", "한국외대", "동덕여대"],
@@ -630,10 +629,9 @@
             "type": "integer",
             "example": 1
           },
-          "phone": {
-            "type": "string",
-            "format": "varchar(13)",
-            "example": "010-1234-5678"
+          "userId": {
+            "type": "integer",
+            "example": 1
           },
           "age": {
             "type": "string",
