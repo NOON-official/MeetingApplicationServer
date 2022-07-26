@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 
-router.use('/user', require('./user'));
-router.use('/service', require('./service'));
+router.post('/ourteam', require('./userOurteamPOST'));
 
 module.exports = router;
