@@ -14,4 +14,5 @@ module.exports = {
   // 유저
   SAVE_USER_SUCCESS: '유저 정보 저장에 성공하였습니다',
   SAVE_USER_PREFERENCE_SUCCESS: '유저 선호 정보 저장에 성공하였습니다',
+  NO_USER: '존재하지 않는 유저입니다',
 };
