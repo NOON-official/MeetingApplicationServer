@@ -5,8 +5,10 @@ const pool = require('../../repository/db');
 const sql = require('../../repository/mysql');
 
 module.exports = async (req, res) => {
+  let conn;
+
   try {
-    const conn = await pool.getConnection(); // pool에서 connction 빌려오기
+    conn = await pool.getConnection(); // pool에서 connction 빌려오기
 
     const weeklyCount = await sql.getWeeklyCount(conn); // query 결과값 저장
 

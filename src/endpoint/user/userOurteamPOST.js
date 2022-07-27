@@ -30,8 +30,10 @@ module.exports = async (req, res) => {
     fashion,
   };
 
+  let conn;
+
   try {
-    const conn = await pool.getConnection(); // pool에서 connction 빌려오기
+    conn = await pool.getConnection(); // pool에서 connction 빌려오기
 
     const result = await sql.saveUserOurteam(conn, params); // query 결과값 저장
 
