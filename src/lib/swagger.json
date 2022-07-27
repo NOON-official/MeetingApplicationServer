@@ -622,7 +622,7 @@
           }
         }
       },
-      "Preference": {
+      "UserPreference": {
         "type": "object",
         "properties": {
           "id": {
