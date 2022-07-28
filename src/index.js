@@ -1,8 +1,9 @@
 const { createApp } = require('./app');
+const urlConfig = require('./config/urlConfig');
 
 async function main() {
   const app = await createApp({
-    baseURL: 'http://localhost:5000',
+    baseURL: urlConfig.url,
     port: 5000,
   });
   app.start();
