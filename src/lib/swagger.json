@@ -1,12 +1,12 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "Meetinghakgaeron",
+    "title": "미팅학개론",
     "description": "the matching service for 2030's meeting by NO:ON",
     "contact": {
       "email": "noon.official.dev@gmail.com"
     },
-    "version": "1.0.0"
+    "version": "1.0.1"
   },
   "externalDocs": {
     "description": "explore github of NO:ON",
@@ -15,6 +15,9 @@
   "servers": [
     {
       "url": "http://localhost:5000/api"
+    },
+    {
+      "url": "http://3.39.207.215:5000/api"
     }
   ],
   "tags": [
@@ -23,19 +26,23 @@
       "description": "Meetinghakgaeron Service"
     },
     {
+      "name": "Auth",
+      "description": "auth for user"
+    },
+    {
       "name": "User",
       "description": "user's team information"
     }
   ],
   "paths": {
-    "/service/count/weekly": {
+    "/service/count/team": {
       "get": {
         "tags": ["Service"],
-        "summary": "주간 매칭 건수 조회",
-        "description": "🌸 미팅학개론의 주간 매칭 성공 건수를 조회합니다.",
+        "summary": "대기중인 팀 수 조회",
+        "description": "🌸 미팅학개론의 대기중인 팀 수를 조회합니다.",
         "responses": {
           "200": {
-            "description": "주간 매칭 건수 조회 성공",
+            "description": "대기중인 팀 수 조회 성공",
             "content": {
               "application/json": {
                 "schema": {
@@ -50,13 +57,338 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "주간 매칭 건수 조회에 성공하였습니다"
+                      "example": "대기중인 팀 수 조회에 성공하였습니다"
                     },
                     "data": {
                       "type": "object",
                       "example": {
-                        "weeklyCount": 23
+                        "waitingTeam": 12
                       }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/auth/kakao/callback": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "카카오 로그인",
+        "description": "🌸 카카오 로그인 후 Access Token, Refresh Token과 함께 유저 정보를 반환합니다.",
+        "responses": {
+          "200(1)": {
+            "description": "회원가입 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "회원가입에 성공하였습니다"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {
+                        "user": {
+                          "accessToken": "adja;kldhj;a.dasjlh;kadjlh;akjh;j.adjlhk;aejh",
+                          "birthday": "",
+                          "createdAt": "2022-08-15T11:13:16.000Z",
+                          "gender": "female",
+                          "id": 1,
+                          "isDeleted": 0,
+                          "kakaoUid": 111281217,
+                          "nickname": "얄루",
+                          "phone": null,
+                          "refreshToken": "adsjg;ldgjk.jdagl;kjad;lgkjad.da;gkljad;lgj",
+                          "updatedAt": "2022-08-15T11:13:16.000Z"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "200(2)": {
+            "description": "로그인 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "로그인에 성공하였습니다"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {
+                        "user": {
+                          "accessToken": "adja;kldhj;a.dasjlh;kadjlh;akjh;j.adjlhk;aejh",
+                          "birthday": "",
+                          "createdAt": "2022-08-15T11:13:16.000Z",
+                          "gender": "female",
+                          "id": 1,
+                          "isDeleted": 0,
+                          "kakaoUid": 111281217,
+                          "nickname": "얄루",
+                          "phone": null,
+                          "refreshToken": "adsjg;ldgjk.jdagl;kjad;lgkjad.da;gkljad;lgj",
+                          "updatedAt": "2022-08-15T11:13:16.000Z"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "카카오 인가코드가 없는 경우",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "Response Body",
+                    "value": {
+                      "status": 400,
+                      "success": false,
+                      "message": "인가코드가 없습니다"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "토큰 재발급",
+        "description": "🌸 토큰을 재발급합니다. \n\n 복잡해보이지만 에러코드가 200, 400, 401인 경우로 분류하여 401인 경우 모두 새로 로그인하도록 처리해주면 됩니다! (로그인 페이지로 이동시키기)",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "schema": {
+              "type": "string",
+              "format": "Bearer {token}",
+              "example": "Bearer addagkjdagjdakg.djagkjdgkadjgk.ajdkglajdlgkj"
+            },
+            "required": true,
+            "description": "Access Token"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "grant_type": {
+                    "type": "string",
+                    "example": "refresh_token",
+                    "description": "고정값"
+                  },
+                  "refresh_token": {
+                    "type": "string",
+                    "format": "text",
+                    "example": "addagkjdagjdakg.djagkjdgkadjgk.ajdkglajdlgkj"
+                  },
+                  "userId": {
+                    "type": "integer",
+                    "example": 1
+                  }
+                },
+                "required": ["grant_type", "refresh_token", "userId"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "토큰 재발급 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "토큰 재발급에 성공하였습니다"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {
+                        "user": {
+                          "accessToken": "adja;kldhj;a.dasjlh;kadjlh;akjh;j.adjlhk;aejh",
+                          "birthday": "",
+                          "createdAt": "2022-08-15T11:13:16.000Z",
+                          "gender": "female",
+                          "id": 1,
+                          "isDeleted": 0,
+                          "kakaoUid": 111281217,
+                          "nickname": "얄루",
+                          "phone": null,
+                          "refreshToken": "adsjg;ldgjk.jdagl;kjad;lgkjad.da;gkljad;lgj",
+                          "updatedAt": "2022-08-15T11:13:16.000Z"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "유효한 토큰",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "Response Body",
+                    "value": {
+                      "status": 400,
+                      "success": false,
+                      "message": "만료되지 않은 토큰입니다"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401(1)": {
+            "description": "토큰 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "Response Body",
+                    "value": {
+                      "status": 401,
+                      "success": false,
+                      "message": "토큰이 없습니다"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401(2)": {
+            "description": "허가 유형 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "Response Body",
+                    "value": {
+                      "status": 401,
+                      "success": false,
+                      "message": "올바르지 않은 허가 유형입니다"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401(3)": {
+            "description": "유저 아이디 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "Response Body",
+                    "value": {
+                      "status": 401,
+                      "success": false,
+                      "message": "유저 아이디가 없습니다"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401(4)": {
+            "description": "유효하지 않은 토큰",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "Response Body",
+                    "value": {
+                      "status": 401,
+                      "success": false,
+                      "message": "토큰이 유효하지 않습니다"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401(5)": {
+            "description": "만료된 토큰",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "Response Body",
+                    "value": {
+                      "status": 401,
+                      "success": false,
+                      "message": "토큰이 만료되었습니다"
                     }
                   }
                 }
@@ -73,26 +405,28 @@
       "post": {
         "tags": ["User"],
         "summary": "유저 정보 저장",
-        "description": "🌸 매칭을 신청하는 유저의 팀 정보를 저장합니다.",
+        "description": "🌸 매칭을 신청하는 유저의 팀 정보를 저장합니다. \n\n카카오 로그인에 성공한 후 발급되는 토큰과 함께 본 API를 호출해주시면 됩니다! \n\n에러1. 토큰이 만료된 경우 api/auth/refresh 호출하여 토큰 재발급 후 다시 호출 \n\n에러2. 토큰이 유효하지 않은 경우 재로그인 해주시면 됩니다!",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "schema": {
+              "type": "string",
+              "format": "Bearer {token}",
+              "example": "Bearer addagkjdagjdakg.djagkjdgkadjgk.ajdkglajdlgkj"
+            },
+            "required": true,
+            "description": "Access Token"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
                 "properties": {
-                  "firebaseUid": {
-                    "type": "string",
-                    "format": "varchar(50)",
-                    "example": "ehxIlqyasdhtjtsaew3768aY2"
-                  },
-                  "kakaoId": {
-                    "type": "string",
-                    "format": "varchar(20)",
-                    "example": "m*yu1"
-                  },
-                  "phone": {
-                    "type": "string",
-                    "format": "varchar(13)",
-                    "example": "010-1234-5678"
+                  "userId": {
+                    "type": "integer",
+                    "example": "1"
                   },
                   "gender": {
                     "type": "string",
@@ -108,6 +442,11 @@
                     "type": "string",
                     "format": "varchar(2)",
                     "example": "25"
+                  },
+                  "intro": {
+                    "type": "string",
+                    "format": "text",
+                    "example": "안녕하세요. 저희는~"
                   },
                   "job": {
                     "type": "array",
@@ -125,16 +464,7 @@
                     },
                     "minitems": 1,
                     "maxitems": 3,
-                    "example": ["가천대", "한국외대", "동덕여대"]
-                  },
-                  "role": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    },
-                    "minitems": 1,
-                    "maxitems": 4,
-                    "example": ["깍두기", "사회자", "비주얼"]
+                    "example": ["경희대학교", "서울시립대학교", "다른 학교에요"]
                   },
                   "area": {
                     "type": "array",
@@ -143,7 +473,7 @@
                     },
                     "minitems": 1,
                     "maxitems": 4,
-                    "example": ["강남", "홍대", "수원"]
+                    "example": ["홍대/합정", "강남", "건대"]
                   },
                   "day": {
                     "type": "array",
@@ -152,7 +482,7 @@
                     },
                     "minitems": 1,
                     "maxitems": 7,
-                    "example": ["월", "토", "일"]
+                    "example": ["월요일", "토요일", "일요일"]
                   },
                   "appearance": {
                     "type": "array",
@@ -161,7 +491,7 @@
                     },
                     "minitems": 1,
                     "maxitems": 5,
-                    "example": ["고양이", "강아지"]
+                    "example": ["고양이상", "강아지상"]
                   },
                   "mbti": {
                     "type": "array",
@@ -180,43 +510,32 @@
                     "minitems": 1,
                     "maxitems": 10,
                     "example": ["캐주얼", "비즈니스", "베이직", "아메카지"]
+                  },
+                  "role": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minitems": 1,
+                    "maxitems": 4,
+                    "example": ["깍두기", "사회자", "비주얼"]
                   }
                 },
                 "required": [
-                  "phone",
+                  "userId",
                   "gender",
                   "num",
                   "age",
+                  "intro",
                   "job",
                   "university",
-                  "role",
                   "area",
                   "day",
                   "appearance",
                   "mbti",
-                  "fashion"
+                  "fashion",
+                  "role"
                 ]
-              },
-              "examples": {
-                "0": {
-                  "summary": "유저 정보 저장 요청 예시",
-                  "value": {
-                    "firebaseUid": "ehxIlqyasdhtjtsaew3768aY2",
-                    "kakaoId": "m*yu1",
-                    "phone": "010-1234-5678",
-                    "gender": "남성",
-                    "num": "3:3",
-                    "age": "25",
-                    "job": ["대학생", "취준생"],
-                    "university": ["가천대", "한국외대", "동덕여대"],
-                    "role": ["깍두기", "사회자", "비주얼"],
-                    "area": ["강남", "홍대", "수원"],
-                    "day": ["월", "토", "일"],
-                    "appearance": ["고양이", "강아지"],
-                    "mbti": ["ISFP", "ENTP"],
-                    "fashion": ["캐주얼", "비즈니스", "베이직", "아메카지"]
-                  }
-                }
               }
             }
           }
@@ -241,14 +560,17 @@
                       "example": "유저 정보 저장에 성공하였습니다"
                     },
                     "data": {
-                      "$ref": "#/components/schemas/User"
+                      "type": "object",
+                      "example": {
+                        "ourteamId": 2
+                      }
                     }
                   }
                 }
               }
             }
           },
-          "400": {
+          "400(1)": {
             "description": "유효하지 않은 값",
             "content": {
               "application/json": {
@@ -268,6 +590,86 @@
               }
             }
           },
+          "400(2)": {
+            "description": "토큰 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "Response Body",
+                    "value": {
+                      "status": 400,
+                      "success": false,
+                      "message": "토큰이 없습니다"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401(1)": {
+            "description": "유효하지 않은 토큰",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "Response Body",
+                    "value": {
+                      "status": 401,
+                      "success": false,
+                      "message": "토큰이 유효하지 않습니다"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401(2)": {
+            "description": "만료된 토큰",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "Response Body",
+                    "value": {
+                      "status": 401,
+                      "success": false,
+                      "message": "토큰이 만료되었습니다"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "존재하지 않는 유저",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "Response Body",
+                    "value": {
+                      "status": 404,
+                      "success": false,
+                      "message": "존재하지 않는 유저입니다"
+                    }
+                  }
+                }
+              }
+            }
+          },
           "500": {
             "$ref": "#/components/responses/InternalServerError"
           }
@@ -278,20 +680,28 @@
       "post": {
         "tags": ["User"],
         "summary": "유저 선호 정보 저장",
-        "description": "🌸 매칭을 신청하는 유저의 선호 정보를 저장합니다. \n\n ✨중요: 유저 정보 저장 API(api/user/ourteam)를 먼저 호출하신 다음, **성공 response를 받은 후** 본 API를 호출해주세요! \n * 유저 정보 저장 후 자동으로 생성되는 id를 테이블 key값으로 사용하기 때문에 유저 정보 저장 API(api/user/ourteam)의 response에 담겨있는 id 값을 본 API 호출 시 함께 보내주시면 됩니다!🙂 \n ",
+        "description": "🌸 매칭을 신청하는 유저의 선호 정보를 저장합니다. \n\n ✨중요: 유저 정보 저장 API(api/user/ourteam)를 먼저 호출하신 다음, **성공 response를 받은 후(status:200)** 본 API를 호출해주세요! \n *  유저 정보 저장 API(api/user/ourteam)의 response에 담겨있는 ourteamId 값을 본 API 호출 시 함께 보내주시면 됩니다. \n * 성공 response의 data는 현재 쓰이는 곳이 없어서 임시로 success=true를 반환합니다!",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "schema": {
+              "type": "string",
+              "format": "Bearer {token}",
+              "example": "Bearer addagkjdagjdakg.djagkjdgkadjgk.ajdkglajdlgkj"
+            },
+            "required": true,
+            "description": "Access Token"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
                 "properties": {
-                  "id": {
+                  "ourteamId": {
                     "type": "integer",
-                    "example": 1
-                  },
-                  "age": {
-                    "type": "string",
-                    "format": "varchar(2)",
-                    "example": "25"
+                    "example": 2
                   },
                   "job": {
                     "type": "array",
@@ -302,98 +712,31 @@
                     "maxitems": 4,
                     "example": ["대학생", "취준생"]
                   },
-                  "exceptedUniv": {
+                  "age": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minitems": 2,
+                    "maxitems": 2,
+                    "example": ["21", "25"]
+                  },
+                  "sameUniversity": {
+                    "type": "integer",
+                    "example": 1,
+                    "description": "0: 같은 학교는 싫어요, 1: 상관 없어요"
+                  },
+                  "vibe": {
                     "type": "array",
                     "items": {
                       "type": "string"
                     },
                     "minitems": 1,
-                    "maxitems": 3,
-                    "example": ["가천대", "한국외대", "동덕여대"]
-                  },
-                  "includedUniv": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    },
-                    "minitems": 1,
-                    "maxitems": 3,
-                    "example": ["가천대", "한국외대", "동덕여대"]
-                  },
-                  "gamePercent": {
-                    "type": "string",
-                    "format": "varchar(3)",
-                    "example": "78"
-                  },
-                  "sweetPercent": {
-                    "type": "string",
-                    "format": "varchar(3)",
-                    "example": "100"
-                  },
-                  "funPercent": {
-                    "type": "string",
-                    "format": "varchar(3)",
-                    "example": "0"
-                  },
-                  "appearance": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    },
-                    "minitems": 1,
-                    "maxitems": 5,
-                    "example": ["고양이", "강아지"]
-                  },
-                  "mbti": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    },
-                    "minitems": 1,
-                    "maxitems": 16,
-                    "example": ["ISFP", "ENTP"]
-                  },
-                  "fashion": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    },
-                    "minitems": 1,
-                    "maxitems": 10,
-                    "example": ["캐주얼", "베이직"]
+                    "maxitems": 7,
+                    "example": ["대화가 좋아요", "재미"]
                   }
                 },
-                "required": [
-                  "id",
-                  "age",
-                  "job",
-                  "exceptedUniv",
-                  "includedUniv",
-                  "gamePercent",
-                  "sweetPercent",
-                  "funPercent",
-                  "appearance",
-                  "mbti",
-                  "fashion"
-                ]
-              },
-              "examples": {
-                "0": {
-                  "summary": "유저 선호 정보 저장 요청 예시",
-                  "value": {
-                    "id": 1,
-                    "age": "25",
-                    "job": ["대학생", "취준생"],
-                    "exceptedUniv": ["가천대", "한국외대", "동덕여대"],
-                    "includedUniv": ["가천대", "한국외대", "동덕여대"],
-                    "gamePercent": "78",
-                    "sweetPercent": "100",
-                    "funPercent": "0",
-                    "appearance": ["고양이", "강아지"],
-                    "mbti": ["ISFP", "ENTP"],
-                    "fashion": ["캐주얼", "베이직"]
-                  }
-                }
+                "required": ["ourteamId", "job", "age", "same", "sameUniversity", "vibe"]
               }
             }
           }
@@ -418,14 +761,17 @@
                       "example": "유저 선호 정보 저장에 성공하였습니다"
                     },
                     "data": {
-                      "$ref": "#/components/schemas/Preference"
+                      "type": "object",
+                      "example": {
+                        "success": true
+                      }
                     }
                   }
                 }
               }
             }
           },
-          "400": {
+          "400(1)": {
             "description": "유효하지 않은 값",
             "content": {
               "application/json": {
@@ -439,6 +785,247 @@
                       "status": 400,
                       "success": false,
                       "message": "필수 항목을 모두 입력해주세요"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400(2)": {
+            "description": "토큰 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "Response Body",
+                    "value": {
+                      "status": 400,
+                      "success": false,
+                      "message": "토큰이 없습니다"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401(1)": {
+            "description": "유효하지 않은 토큰",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "Response Body",
+                    "value": {
+                      "status": 401,
+                      "success": false,
+                      "message": "토큰이 유효하지 않습니다"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401(2)": {
+            "description": "만료된 토큰",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "Response Body",
+                    "value": {
+                      "status": 401,
+                      "success": false,
+                      "message": "토큰이 만료되었습니다"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "존재하지 않는 유저",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "Response Body",
+                    "value": {
+                      "status": 404,
+                      "success": false,
+                      "message": "존재하지 않는 유저입니다"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/user/phone": {
+      "post": {
+        "tags": ["User"],
+        "summary": "유저 핸드폰 번호 저장",
+        "description": "🌸 매칭을 신청하는 유저의 핸드폰 번호를 저장합니다.",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "schema": {
+              "type": "string",
+              "format": "Bearer {token}",
+              "example": "Bearer addagkjdagjdakg.djagkjdgkadjgk.ajdkglajdlgkj"
+            },
+            "required": true,
+            "description": "Access Token"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "userId": {
+                    "type": "integer",
+                    "example": 1
+                  },
+                  "phone": {
+                    "type": "string",
+                    "format": "varchar(13)"
+                  }
+                },
+                "required": ["ourteamId", "phone"]
+              },
+              "examples": {
+                "1": {
+                  "value": { "userId": 1, "phone": "01012345678" }
+                },
+                "2": {
+                  "value": { "userId": 1, "phone": "010-1234-5678" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "유저 핸드폰 번호 저장 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "유저 핸드폰 번호 저장에 성공하였습니다"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {
+                        "success": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400(1)": {
+            "description": "유효하지 않은 값",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "Response Body",
+                    "value": {
+                      "status": 400,
+                      "success": false,
+                      "message": "필수 항목을 모두 입력해주세요"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400(2)": {
+            "description": "토큰 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "Response Body",
+                    "value": {
+                      "status": 400,
+                      "success": false,
+                      "message": "토큰이 없습니다"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401(1)": {
+            "description": "유효하지 않은 토큰",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "Response Body",
+                    "value": {
+                      "status": 401,
+                      "success": false,
+                      "message": "토큰이 유효하지 않습니다"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401(2)": {
+            "description": "만료된 토큰",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "Response Body",
+                    "value": {
+                      "status": 401,
+                      "success": false,
+                      "message": "토큰이 만료되었습니다"
                     }
                   }
                 }
@@ -477,245 +1064,9 @@
       "Service": {
         "type": "object",
         "properties": {
-          "weeklyCount": {
+          "waitingTeam": {
             "type": "integer",
-            "example": 23
-          }
-        }
-      },
-      "User": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "example": 1
-          },
-          "firebaseUid": {
-            "type": "string",
-            "format": "varchar(50)",
-            "example": "ehxIlqyasdhtjtsaew3768aY2"
-          },
-          "kakaoId": {
-            "type": "string",
-            "format": "varchar(20)",
-            "example": "m*yu1"
-          },
-          "phone": {
-            "type": "string",
-            "format": "varchar(13)",
-            "example": "010-1234-5678"
-          },
-          "gender": {
-            "type": "string",
-            "format": "varchar(2)",
-            "example": "남성"
-          },
-          "num": {
-            "type": "string",
-            "format": "varchar(3)",
-            "example": "3:3"
-          },
-          "age": {
-            "type": "string",
-            "format": "varchar(2)",
-            "example": "25"
-          },
-          "job": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "minitems": 1,
-            "maxitems": 4,
-            "example": ["대학생", "취준생"]
-          },
-          "university": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "minitems": 1,
-            "maxitems": 3,
-            "example": ["가천대", "한국외대", "동덕여대"]
-          },
-          "role": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "minitems": 1,
-            "maxitems": 4,
-            "example": ["깍두기", "사회자", "비주얼"]
-          },
-          "area": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "minitems": 1,
-            "maxitems": 4,
-            "example": ["강남", "홍대", "수원"]
-          },
-          "day": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "minitems": 1,
-            "maxitems": 7,
-            "example": ["월", "토", "일"]
-          },
-          "appearance": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "minitems": 1,
-            "maxitems": 5,
-            "example": ["고양이", "강아지"]
-          },
-          "mbti": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "minitems": 1,
-            "maxitems": 16,
-            "example": ["ISFP", "ENTP"]
-          },
-          "fashion": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "minitems": 1,
-            "maxitems": 10,
-            "example": ["캐주얼", "비즈니스", "베이직", "아메카지"]
-          },
-          "state": {
-            "type": "integer",
-            "default": 0,
-            "examples": {
-              "0": {
-                "summary": "매칭 전",
-                "value": 0
-              },
-              "1": {
-                "summary": "매칭 중 (수락 전)",
-                "value": 1
-              },
-              "2": {
-                "summary": "매칭 완료",
-                "value": 2
-              }
-            }
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2022-04-03T05:01:09.091Z"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2022-04-03T05:01:09.091Z"
-          }
-        }
-      },
-      "UserPreference": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "example": 1
-          },
-          "userId": {
-            "type": "integer",
-            "example": 1
-          },
-          "age": {
-            "type": "string",
-            "format": "varchar(2)",
-            "example": "25"
-          },
-          "job": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "minitems": 1,
-            "maxitems": 4,
-            "example": ["대학생", "취준생"]
-          },
-          "exceptedUniv": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "minitems": 1,
-            "maxitems": 3,
-            "example": ["가천대", "한국외대", "동덕여대"]
-          },
-          "includedUniv": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "minitems": 1,
-            "maxitems": 3,
-            "example": ["가천대", "한국외대", "동덕여대"]
-          },
-          "gamePercent": {
-            "type": "string",
-            "format": "varchar(3)",
-            "example": "78"
-          },
-          "sweetPercent": {
-            "type": "string",
-            "format": "varchar(3)",
-            "example": "100"
-          },
-          "funPercent": {
-            "type": "string",
-            "format": "varchar(3)",
-            "example": "0"
-          },
-          "appearance": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "minitems": 1,
-            "maxitems": 5,
-            "example": ["고양이", "강아지"]
-          },
-          "mbti": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "minitems": 1,
-            "maxitems": 16,
-            "example": ["ISFP", "ENTP"]
-          },
-          "fashion": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "minitems": 1,
-            "maxitems": 10,
-            "example": ["캐주얼", "베이직"]
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2022-04-03T05:01:09.091Z"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2022-04-03T05:01:09.091Z"
+            "example": 12
           }
         }
       },
