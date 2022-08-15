@@ -2,7 +2,7 @@ const util = require('../../lib/util');
 const statusCode = require('../../constants/statusCode');
 const responseMessage = require('../../constants/responseMessage');
 const pool = require('../../repository/db');
-const sql = require('../../repository/mysql');
+const { userPreferenceDB } = require('../../repository');
 
 module.exports = async (req, res) => {
   const { id, age, gamePercent, sweetPercent, funPercent } = req.body;
@@ -32,7 +32,7 @@ module.exports = async (req, res) => {
   try {
     conn = await pool.getConnection(); // pool에서 connction 빌려오기
 
-    const result = await sql.saveUserPreference(conn, params); // query 결과값 저장
+    const result = await userPreferenceDB.saveUserPreference(conn, params); // query 결과값 저장
 
     // 유저가 존재하지 않는 경우
     if (!result) {

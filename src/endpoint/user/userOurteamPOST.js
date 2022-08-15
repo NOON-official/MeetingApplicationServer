@@ -2,7 +2,7 @@ const util = require('../../lib/util');
 const statusCode = require('../../constants/statusCode');
 const responseMessage = require('../../constants/responseMessage');
 const pool = require('../../repository/db');
-const sql = require('../../repository/mysql');
+const { userDB } = require('../../repository');
 
 module.exports = async (req, res) => {
   const { firebaseUid, kakaoId, phone, gender, num, age } = req.body;
@@ -35,7 +35,7 @@ module.exports = async (req, res) => {
   try {
     conn = await pool.getConnection(); // pool에서 connction 빌려오기
 
-    const result = await sql.saveUserOurteam(conn, params); // query 결과값 저장
+    const result = await userDB.saveUserOurteam(conn, params); // query 결과값 저장
 
     res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.SAVE_USER_SUCCESS, result));
   } catch (error) {
