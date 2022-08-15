@@ -13,7 +13,7 @@ const checkUser = async (req, res, next) => {
 
   // Access Token이 없는 경우
   if (!accessToken)
-    return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN_EMPTY));
+    return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.TOKEN_EMPTY));
 
   let conn;
   try {
@@ -43,8 +43,7 @@ const checkUser = async (req, res, next) => {
     // 유저 id를 이용해 조회
     const user = await userDB.getUserById(conn, userId);
 
-    if (!user)
-      return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.NO_USER));
+    if (!user) return res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, responseMessage.NO_USER));
 
     // 조회한 유저 객체를 req.user에 담아서 next()를 이용해 다음 middleware로 전달
     // 다음 middleware는 req.user에 담긴 유저 정보 활용 가능

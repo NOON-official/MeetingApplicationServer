@@ -62,7 +62,7 @@ module.exports = async (req, response) => {
               }
               return response
                 .status(statusCode.OK)
-                .send(util.success(statusCode.OK, responseMessage.CREATE_USER_SUCCESS, newUser));
+                .send(util.success(statusCode.OK, responseMessage.CREATE_USER_SUCCESS, { user: newUser }));
             }
             // DB에 해당 유저가 있으면 로그인 API 호출
             else {
