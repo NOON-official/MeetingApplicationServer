@@ -24,6 +24,10 @@ module.exports = async (req, res) => {
       .send(util.fail(statusCode.UNAUTHORIZED, responseMessage.INVALID_GRANT_TYPE));
   }
 
+  if (!userId) {
+    return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.NO_USER_ID));
+  }
+
   let conn;
   try {
     conn = await pool.getConnection();
