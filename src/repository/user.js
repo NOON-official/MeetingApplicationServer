@@ -85,6 +85,12 @@ const getUserById = async (conn, userId) => {
   return convertSnakeToCamel.keysToCamel(row[0]);
 };
 
+const getIsMatchingByUserId = async (conn, userId) => {
+  const [row] = await conn.query('SELECT * FROM `user_ourteam` WHERE user_id = (?) and is_deleted = false;', [userId]);
+  if (!row[0]) return false;
+  else return true;
+};
+
 module.exports = {
   saveUserOurteam,
   getUserByKakaoUid,
@@ -92,4 +98,5 @@ module.exports = {
   getRefreshTokenByUserId,
   saveRefreshToken,
   getUserById,
+  getIsMatchingByUserId,
 };

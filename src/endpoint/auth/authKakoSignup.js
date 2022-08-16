@@ -26,6 +26,7 @@ module.exports = async (kakaoUser) => {
 
     user.refreshToken = refreshToken;
     user.accessToken = accessToken;
+    user.isMatching = false;
 
     // 토큰과 함께 유저 정보를 반환
     return user;
