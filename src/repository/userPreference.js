@@ -1,38 +1,29 @@
 const convertSnakeToCamel = require('../lib/convertSnakeToCamel');
 
+const getIsMatchingByOurteamId = async (conn, ourteamId) => {
+  const [row] = await conn.query('SELECT * FROM `ourteam_preference` WHERE ourteam_id = (?);', [ourteamId]);
+  if (!row[0]) return false;
+  else return true;
+};
+
 const saveUserPreference = async (conn, params) => {
-  // 해당 유저가 존재하는지 확인
-  const [user] = await conn.query('SELECT * FROM `user` WHERE id = (?)', [params.id]);
-
-  // 유저가 존재하지 않는 경우
-  if (!user[0]) return 0;
-
   await conn.query(
-    'INSERT INTO `user_preference` (user_id, age, job, excepted_univ, included_univ, game_percent, sweet_percent, fun_percent, appearance, mbti, fashion) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);',
-    [
-      params.id,
-      params.age,
-      JSON.stringify(params.job),
-      JSON.stringify(params.exceptedUniv),
-      JSON.stringify(params.includedUniv),
-      params.gamePercent,
-      params.sweetPercent,
-      params.funPercent,
-      JSON.stringify(params.appearance),
-      JSON.stringify(params.mbti),
-      JSON.stringify(params.fashion),
-    ],
+    'INSERT INTO `ourteam_preference` (ourteam_id, start_age, end_age, same_university) VALUES (?, ?, ?, ?);',
+    [params.ourteamId, params.age[0], params.age[1], params.sameUniversity],
   );
 
-  // 가장 마지막에 저장한 유저 선호 정보 id 가져오기 (== 마지막 auto_increment id)
-  [newUserPrefernceId] = await conn.query('SELECT LAST_INSERT_ID();');
-  newUserPrefernceId = newUserPrefernceId[0]['LAST_INSERT_ID()'];
+  // 배열 자료형 params를 테이블에 저장
+  await conn.query('INSERT INTO `ourteam_preference_job` (ourteam_id, preference_job) VALUES ?;', [
+    params.job.map((j) => [params.ourteamId, j]),
+  ]);
+  await conn.query('INSERT INTO `ourteam_preference_vibe` (ourteam_id, preference_vibe) VALUES ?;', [
+    params.vibe.map((v) => [params.ourteamId, v]),
+  ]);
 
-  const [row] = await conn.query('SELECT * FROM `user_preference` WHERE id = (?)', [newUserPrefernceId]);
-
-  return convertSnakeToCamel.keysToCamel(row[0]);
+  return true;
 };
 
 module.exports = {
+  getIsMatchingByOurteamId,
   saveUserPreference,
 };

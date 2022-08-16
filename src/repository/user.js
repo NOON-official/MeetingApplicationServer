@@ -100,6 +100,12 @@ const saveUserPhone = async (conn, userId, phone) => {
   return true;
 };
 
+const getOurteamByOurteamId = async (conn, ourteamId) => {
+  const [row] = await conn.query('SELECT * FROM `user_ourteam` WHERE id = (?) and is_deleted = false;', [ourteamId]);
+
+  return convertSnakeToCamel.keysToCamel(row[0]);
+};
+
 module.exports = {
   saveUserOurteam,
   getUserByKakaoUid,
@@ -109,4 +115,5 @@ module.exports = {
   getUserById,
   getIsMatchingByUserId,
   saveUserPhone,
+  getOurteamByOurteamId,
 };

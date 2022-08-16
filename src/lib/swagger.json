@@ -1067,7 +1067,7 @@
               }
             }
           },
-          "404": {
+          "404(1)": {
             "description": "존재하지 않는 유저",
             "content": {
               "application/json": {
@@ -1081,6 +1081,26 @@
                       "status": 404,
                       "success": false,
                       "message": "존재하지 않는 유저입니다"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404(2)": {
+            "description": "존재하지 않는 우리팀",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "NO_OURTEAM",
+                    "value": {
+                      "status": 404,
+                      "success": false,
+                      "message": "우리팀 정보가 존재하지 않습니다"
                     }
                   }
                 }

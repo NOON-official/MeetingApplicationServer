@@ -26,4 +26,5 @@ module.exports = {
   SAVE_USER_PHONE_SUCCESS: '유저 핸드폰 번호 저장에 성공하였습니다',
   NO_USER: '존재하지 않는 유저입니다',
   IS_MATCHING_USER: '매칭 진행중인 유저입니다',
+  NO_OURTEAM: '우리팀 정보가 존재하지 않습니다',
 };
