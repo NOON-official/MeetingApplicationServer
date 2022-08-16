@@ -104,17 +104,14 @@
                       "type": "object",
                       "example": {
                         "user": {
-                          "accessToken": "adja;kldhj;a.dasjlh;kadjlh;akjh;j.adjlhk;aejh",
-                          "birthday": "",
-                          "createdAt": "2022-08-15T11:13:16.000Z",
-                          "gender": "female",
                           "id": 1,
-                          "isDeleted": 0,
                           "kakaoUid": 111281217,
                           "nickname": "얄루",
                           "phone": null,
-                          "refreshToken": "adsjg;ldgjk.jdagl;kjad;lgkjad.da;gkljad;lgj",
-                          "updatedAt": "2022-08-15T11:13:16.000Z"
+                          "gender": "female",
+                          "birthday": "",
+                          "accessToken": "adja;kldhj;a.dasjlh;kadjlh;akjh;j.adjlhk;aejh",
+                          "refreshToken": "adsjg;ldgjk.jdagl;kjad;lgkjad.da;gkljad;lgj"
                         }
                       }
                     }
@@ -145,17 +142,14 @@
                       "type": "object",
                       "example": {
                         "user": {
-                          "accessToken": "adja;kldhj;a.dasjlh;kadjlh;akjh;j.adjlhk;aejh",
-                          "birthday": "",
-                          "createdAt": "2022-08-15T11:13:16.000Z",
-                          "gender": "female",
                           "id": 1,
-                          "isDeleted": 0,
                           "kakaoUid": 111281217,
                           "nickname": "얄루",
                           "phone": null,
-                          "refreshToken": "adsjg;ldgjk.jdagl;kjad;lgkjad.da;gkljad;lgj",
-                          "updatedAt": "2022-08-15T11:13:16.000Z"
+                          "gender": "female",
+                          "birthday": "",
+                          "accessToken": "adja;kldhj;a.dasjlh;kadjlh;akjh;j.adjlhk;aejh",
+                          "refreshToken": "adsjg;ldgjk.jdagl;kjad;lgkjad.da;gkljad;lgj"
                         }
                       }
                     }
@@ -256,17 +250,14 @@
                       "type": "object",
                       "example": {
                         "user": {
-                          "accessToken": "adja;kldhj;a.dasjlh;kadjlh;akjh;j.adjlhk;aejh",
-                          "birthday": "",
-                          "createdAt": "2022-08-15T11:13:16.000Z",
-                          "gender": "female",
                           "id": 1,
-                          "isDeleted": 0,
                           "kakaoUid": 111281217,
                           "nickname": "얄루",
                           "phone": null,
-                          "refreshToken": "adsjg;ldgjk.jdagl;kjad;lgkjad.da;gkljad;lgj",
-                          "updatedAt": "2022-08-15T11:13:16.000Z"
+                          "gender": "female",
+                          "birthday": "",
+                          "accessToken": "adja;kldhj;a.dasjlh;kadjlh;akjh;j.adjlhk;aejh",
+                          "refreshToken": "adsjg;ldgjk.jdagl;kjad;lgkjad.da;gkljad;lgj"
                         }
                       }
                     }

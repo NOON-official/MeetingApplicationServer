@@ -25,13 +25,19 @@ const saveUserOurteam = async (conn, params) => {
   [newUserId] = await conn.query('SELECT LAST_INSERT_ID();');
   newUserId = newUserId[0]['LAST_INSERT_ID()'];
 
-  const [row] = await conn.query('SELECT * FROM `user` WHERE id = (?)', [newUserId]);
+  const [row] = await conn.query(
+    'SELECT (id, kakao_uid, nickname, phone, gender, birthday, refresh_token) FROM `user` WHERE id = (?) and is_deleted = false;',
+    [newUserId],
+  );
 
   return convertSnakeToCamel.keysToCamel(row[0]);
 };
 
 const getUserByKakaoUid = async (conn, kakaoUid) => {
-  const [row] = await conn.query('SELECT * FROM `user` WHERE kakao_uid = (?)', [kakaoUid]);
+  const [row] = await conn.query(
+    'SELECT (id, kakao_uid, nickname, phone, gender, birthday, refresh_token) FROM `user` WHERE kakao_uid = (?) and is_deleted = false;',
+    [kakaoUid],
+  );
 
   return convertSnakeToCamel.keysToCamel(row[0]);
 };
@@ -48,7 +54,10 @@ const saveUser = async (conn, kakaoUid, properties, kakaoAccount) => {
   [newUserId] = await conn.query('SELECT LAST_INSERT_ID();');
   newUserId = newUserId[0]['LAST_INSERT_ID()'];
 
-  const [row] = await conn.query('SELECT * FROM `user` WHERE id = (?)', [newUserId]);
+  const [row] = await conn.query(
+    'SELECT (id, kakao_uid, nickname, phone, gender, birthday, refresh_token) FROM `user` WHERE id = (?) and is_deleted = false;',
+    [newUserId],
+  );
 
   return convertSnakeToCamel.keysToCamel(row[0]);
 };
@@ -68,7 +77,10 @@ const saveRefreshToken = async (conn, refreshToken, userId) => {
 };
 
 const getUserById = async (conn, userId) => {
-  const [row] = await conn.query('SELECT * FROM `user` WHERE id = (?)', [userId]);
+  const [row] = await conn.query(
+    'SELECT (id, kakao_uid, nickname, phone, gender, birthday, refresh_token) FROM `user` WHERE id = (?) and is_deleted = false;',
+    [userId],
+  );
 
   return convertSnakeToCamel.keysToCamel(row[0]);
 };
