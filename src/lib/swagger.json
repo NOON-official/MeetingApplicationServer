@@ -109,7 +109,8 @@
                           "nickname": "얄루",
                           "phone": null,
                           "gender": "female",
-                          "birthday": "",
+                          "birthday": null,
+                          "isMatching": false,
                           "accessToken": "adja;kldhj;a.dasjlh;kadjlh;akjh;j.adjlhk;aejh",
                           "refreshToken": "adsjg;ldgjk.jdagl;kjad;lgkjad.da;gkljad;lgj"
                         }
@@ -147,7 +148,8 @@
                           "nickname": "얄루",
                           "phone": null,
                           "gender": "female",
-                          "birthday": "",
+                          "birthday": null,
+                          "isMatching": false,
                           "accessToken": "adja;kldhj;a.dasjlh;kadjlh;akjh;j.adjlhk;aejh",
                           "refreshToken": "adsjg;ldgjk.jdagl;kjad;lgkjad.da;gkljad;lgj"
                         }
@@ -167,11 +169,189 @@
                 },
                 "examples": {
                   "1": {
-                    "summary": "Response Body",
+                    "summary": "NO_CODE",
                     "value": {
                       "status": 400,
                       "success": false,
                       "message": "인가코드가 없습니다"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/auth/phone": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "유저 핸드폰 번호 저장",
+        "description": "🌸 매칭을 신청하는 유저의 핸드폰 번호를 저장합니다. \n\n * 카카오 로그인 후 본 API를 호출해주시면 됩니다!",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "schema": {
+              "type": "string",
+              "format": "Bearer {token}",
+              "example": "Bearer addagkjdagjdakg.djagkjdgkadjgk.ajdkglajdlgkj"
+            },
+            "required": true,
+            "description": "Access Token"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "userId": {
+                    "type": "integer",
+                    "example": 1
+                  },
+                  "phone": {
+                    "type": "string",
+                    "format": "varchar(13)"
+                  }
+                },
+                "required": ["ourteamId", "phone"]
+              },
+              "examples": {
+                "1": {
+                  "value": { "userId": 1, "phone": "01012345678" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "유저 핸드폰 번호 저장 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "유저 핸드폰 번호 저장에 성공하였습니다"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {
+                        "success": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400(1)": {
+            "description": "유효하지 않은 값",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "Bad Request",
+                    "value": {
+                      "status": 400,
+                      "success": false,
+                      "message": "필수 항목을 모두 입력해주세요"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400(2)": {
+            "description": "토큰 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "TOKEN_EMPTY",
+                    "value": {
+                      "status": 400,
+                      "success": false,
+                      "message": "토큰이 없습니다"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401(1)": {
+            "description": "유효하지 않은 토큰",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "TOKEN_INVALID",
+                    "value": {
+                      "status": 401,
+                      "success": false,
+                      "message": "토큰이 유효하지 않습니다"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401(2)": {
+            "description": "만료된 토큰",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "TOKEN_EXPIRED",
+                    "value": {
+                      "status": 401,
+                      "success": false,
+                      "message": "토큰이 만료되었습니다"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "존재하지 않는 유저",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "NO_USER",
+                    "value": {
+                      "status": 404,
+                      "success": false,
+                      "message": "존재하지 않는 유저입니다"
                     }
                   }
                 }
@@ -255,7 +435,8 @@
                           "nickname": "얄루",
                           "phone": null,
                           "gender": "female",
-                          "birthday": "",
+                          "birthday": null,
+                          "isMatching": false,
                           "accessToken": "adja;kldhj;a.dasjlh;kadjlh;akjh;j.adjlhk;aejh",
                           "refreshToken": "adsjg;ldgjk.jdagl;kjad;lgkjad.da;gkljad;lgj"
                         }
@@ -275,7 +456,7 @@
                 },
                 "examples": {
                   "1": {
-                    "summary": "Response Body",
+                    "summary": "NOT_EXPIRED_TOKEN",
                     "value": {
                       "status": 400,
                       "success": false,
@@ -295,7 +476,7 @@
                 },
                 "examples": {
                   "1": {
-                    "summary": "Response Body",
+                    "summary": "TOKEN_EMPTY",
                     "value": {
                       "status": 401,
                       "success": false,
@@ -315,7 +496,7 @@
                 },
                 "examples": {
                   "1": {
-                    "summary": "Response Body",
+                    "summary": "INVALID_GRANT_TYPE",
                     "value": {
                       "status": 401,
                       "success": false,
@@ -335,7 +516,7 @@
                 },
                 "examples": {
                   "1": {
-                    "summary": "Response Body",
+                    "summary": "NO_USER_ID",
                     "value": {
                       "status": 401,
                       "success": false,
@@ -355,7 +536,7 @@
                 },
                 "examples": {
                   "1": {
-                    "summary": "Response Body",
+                    "summary": "TOKEN_INVALID",
                     "value": {
                       "status": 401,
                       "success": false,
@@ -375,7 +556,7 @@
                 },
                 "examples": {
                   "1": {
-                    "summary": "Response Body",
+                    "summary": "TOKEN_EXPIRED",
                     "value": {
                       "status": 401,
                       "success": false,
@@ -455,7 +636,7 @@
                     },
                     "minitems": 1,
                     "maxitems": 3,
-                    "example": ["경희대학교", "서울시립대학교", "다른 학교에요"]
+                    "example": ["경희대", "서울시립대", "기타 학교"]
                   },
                   "area": {
                     "type": "array",
@@ -464,7 +645,7 @@
                     },
                     "minitems": 1,
                     "maxitems": 4,
-                    "example": ["홍대/합정", "강남", "건대"]
+                    "example": ["홍대/합정", "강남", "상관없음"]
                   },
                   "day": {
                     "type": "array",
@@ -500,7 +681,7 @@
                     },
                     "minitems": 1,
                     "maxitems": 10,
-                    "example": ["캐주얼", "비즈니스", "베이직", "아메카지"]
+                    "example": ["베이직", "캐주얼"]
                   },
                   "role": {
                     "type": "array",
@@ -570,7 +751,7 @@
                 },
                 "examples": {
                   "1": {
-                    "summary": "Response Body",
+                    "summary": "NULL_VALUE",
                     "value": {
                       "status": 400,
                       "success": false,
@@ -582,6 +763,26 @@
             }
           },
           "400(2)": {
+            "description": "이미 매칭 진행중인 유저인 경우",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "Bad Request",
+                    "value": {
+                      "status": 400,
+                      "success": false,
+                      "message": "매칭 진행중인 유저입니다"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400(3)": {
             "description": "토큰 없음",
             "content": {
               "application/json": {
@@ -590,7 +791,7 @@
                 },
                 "examples": {
                   "1": {
-                    "summary": "Response Body",
+                    "summary": "TOKEN_EMPTY",
                     "value": {
                       "status": 400,
                       "success": false,
@@ -610,7 +811,7 @@
                 },
                 "examples": {
                   "1": {
-                    "summary": "Response Body",
+                    "summary": "TOKEN_INVALID",
                     "value": {
                       "status": 401,
                       "success": false,
@@ -630,7 +831,7 @@
                 },
                 "examples": {
                   "1": {
-                    "summary": "Response Body",
+                    "summary": "TOKEN_EXPIRED",
                     "value": {
                       "status": 401,
                       "success": false,
@@ -650,7 +851,7 @@
                 },
                 "examples": {
                   "1": {
-                    "summary": "Response Body",
+                    "summary": "NO_USER",
                     "value": {
                       "status": 404,
                       "success": false,
@@ -671,7 +872,7 @@
       "post": {
         "tags": ["User"],
         "summary": "유저 선호 정보 저장",
-        "description": "🌸 매칭을 신청하는 유저의 선호 정보를 저장합니다. \n\n ✨중요: 유저 정보 저장 API(api/user/ourteam)를 먼저 호출하신 다음, **성공 response를 받은 후(status:200)** 본 API를 호출해주세요! \n *  유저 정보 저장 API(api/user/ourteam)의 response에 담겨있는 ourteamId 값을 본 API 호출 시 함께 보내주시면 됩니다. \n * 성공 response의 data는 현재 쓰이는 곳이 없어서 임시로 success=true를 반환합니다!",
+        "description": "🌸 매칭을 신청하는 유저의 선호 정보를 저장합니다. \n\n ✨중요: 유저 정보 저장 API(api/user/ourteam)를 먼저 호출하신 다음, **성공 response를 받은 후(status:200)** 본 API를 호출해주세요! \n *  유저 정보 저장 API(api/user/ourteam)의 response에 담겨있는 ourteamId 값을 본 API 호출 시 함께 보내주시면 됩니다. \n * 성공 response에 담겨있는 isMatching=true으로 유저데이터를 갱신해주셔야합니다!",
         "parameters": [
           {
             "in": "header",
@@ -690,6 +891,10 @@
             "application/json": {
               "schema": {
                 "properties": {
+                  "userId": {
+                    "type": "integer",
+                    "example": 1
+                  },
                   "ourteamId": {
                     "type": "integer",
                     "example": 2
@@ -754,7 +959,7 @@
                     "data": {
                       "type": "object",
                       "example": {
-                        "success": true
+                        "isMatching": true
                       }
                     }
                   }
@@ -771,7 +976,7 @@
                 },
                 "examples": {
                   "1": {
-                    "summary": "Response Body",
+                    "summary": "NULL_VALUE",
                     "value": {
                       "status": 400,
                       "success": false,
@@ -783,6 +988,26 @@
             }
           },
           "400(2)": {
+            "description": "이미 매칭 진행중인 유저인 경우",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "Bad Request",
+                    "value": {
+                      "status": 400,
+                      "success": false,
+                      "message": "매칭 진행중인 유저입니다"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400(3)": {
             "description": "토큰 없음",
             "content": {
               "application/json": {
@@ -791,7 +1016,7 @@
                 },
                 "examples": {
                   "1": {
-                    "summary": "Response Body",
+                    "summary": "TOKEN_EMPTY",
                     "value": {
                       "status": 400,
                       "success": false,
@@ -811,7 +1036,7 @@
                 },
                 "examples": {
                   "1": {
-                    "summary": "Response Body",
+                    "summary": "TOKEN_INVALID",
                     "value": {
                       "status": 401,
                       "success": false,
@@ -831,7 +1056,7 @@
                 },
                 "examples": {
                   "1": {
-                    "summary": "Response Body",
+                    "summary": "TOKEN_EXPIRED",
                     "value": {
                       "status": 401,
                       "success": false,
@@ -851,188 +1076,7 @@
                 },
                 "examples": {
                   "1": {
-                    "summary": "Response Body",
-                    "value": {
-                      "status": 404,
-                      "success": false,
-                      "message": "존재하지 않는 유저입니다"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        }
-      }
-    },
-    "/user/phone": {
-      "post": {
-        "tags": ["User"],
-        "summary": "유저 핸드폰 번호 저장",
-        "description": "🌸 매칭을 신청하는 유저의 핸드폰 번호를 저장합니다.",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "schema": {
-              "type": "string",
-              "format": "Bearer {token}",
-              "example": "Bearer addagkjdagjdakg.djagkjdgkadjgk.ajdkglajdlgkj"
-            },
-            "required": true,
-            "description": "Access Token"
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "userId": {
-                    "type": "integer",
-                    "example": 1
-                  },
-                  "phone": {
-                    "type": "string",
-                    "format": "varchar(13)"
-                  }
-                },
-                "required": ["ourteamId", "phone"]
-              },
-              "examples": {
-                "1": {
-                  "value": { "userId": 1, "phone": "01012345678" }
-                },
-                "2": {
-                  "value": { "userId": 1, "phone": "010-1234-5678" }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "유저 핸드폰 번호 저장 성공",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "유저 핸드폰 번호 저장에 성공하였습니다"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {
-                        "success": true
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400(1)": {
-            "description": "유효하지 않은 값",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Fail"
-                },
-                "examples": {
-                  "1": {
-                    "summary": "Response Body",
-                    "value": {
-                      "status": 400,
-                      "success": false,
-                      "message": "필수 항목을 모두 입력해주세요"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400(2)": {
-            "description": "토큰 없음",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Fail"
-                },
-                "examples": {
-                  "1": {
-                    "summary": "Response Body",
-                    "value": {
-                      "status": 400,
-                      "success": false,
-                      "message": "토큰이 없습니다"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401(1)": {
-            "description": "유효하지 않은 토큰",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Fail"
-                },
-                "examples": {
-                  "1": {
-                    "summary": "Response Body",
-                    "value": {
-                      "status": 401,
-                      "success": false,
-                      "message": "토큰이 유효하지 않습니다"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401(2)": {
-            "description": "만료된 토큰",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Fail"
-                },
-                "examples": {
-                  "1": {
-                    "summary": "Response Body",
-                    "value": {
-                      "status": 401,
-                      "success": false,
-                      "message": "토큰이 만료되었습니다"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "존재하지 않는 유저",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Fail"
-                },
-                "examples": {
-                  "1": {
-                    "summary": "Response Body",
+                    "summary": "NO_USER",
                     "value": {
                       "status": 404,
                       "success": false,
@@ -1105,7 +1149,7 @@
             },
             "examples": {
               "1": {
-                "summary": "Response Body",
+                "summary": "NULL_VALUE",
                 "value": {
                   "status": 400,
                   "success": false,
@@ -1125,7 +1169,7 @@
             },
             "examples": {
               "1": {
-                "summary": "Response Body",
+                "summary": "INTERNAL_SERVER_ERROR",
                 "value": {
                   "status": 500,
                   "success": false,
