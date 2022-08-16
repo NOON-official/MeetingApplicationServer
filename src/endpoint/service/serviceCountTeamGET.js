@@ -10,11 +10,11 @@ module.exports = async (req, res) => {
   try {
     conn = await pool.getConnection(); // pool에서 connction 빌려오기
 
-    const weeklyCount = await serviceDB.getWeeklyCount(conn); // query 결과값 저장
+    const waitingTeam = await serviceDB.getWaitingTeam(conn); // query 결과값 저장
 
     res.status(statusCode.OK).send(
-      util.success(statusCode.OK, responseMessage.GET_WEEKLY_COUNT_SUCCESS, {
-        weeklyCount,
+      util.success(statusCode.OK, responseMessage.GET_TEAM_COUNT_SUCCESS, {
+        waitingTeam,
       }),
     );
   } catch (error) {

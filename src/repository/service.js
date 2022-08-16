@@ -1,13 +1,13 @@
 const convertSnakeToCamel = require('../lib/convertSnakeToCamel');
 
-const getWeeklyCount = async (conn) => {
+const getWaitingTeam = async (conn) => {
   // 'mysql2/promise'는 결과값을 배열로 반환
-  const [row] = await conn.query('SELECT weekly_count FROM service;');
-  result = row[0]['weekly_count'];
+  const [row] = await conn.query('SELECT waiting_team FROM service;');
+  result = row[0]['waiting_team'];
 
   return convertSnakeToCamel.keysToCamel(result);
 };
 
 module.exports = {
-  getWeeklyCount,
+  getWaitingTeam,
 };

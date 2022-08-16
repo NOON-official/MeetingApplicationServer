@@ -18,7 +18,6 @@ module.exports = {
   LOGIN_USER_SUCCESS: '로그인에 성공하였습니다',
 
   // 미팅학개론
-  GET_WEEKLY_COUNT_SUCCESS: '주간 매칭 건수 조회에 성공하였습니다',
   GET_TEAM_COUNT_SUCCESS: '대기중인 팀 수 조회에 성공하였습니다',
 
   // 유저

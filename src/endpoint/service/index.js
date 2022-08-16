@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
 
-router.get('/count/weekly', require('./serviceCountWeeklyGET'));
+router.get('/count/team', require('./serviceCountTeamGET'));
 
 module.exports = router;
