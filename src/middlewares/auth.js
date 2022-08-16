@@ -9,7 +9,11 @@ const { TOKEN_INVALID, TOKEN_EXPIRED } = require('../constants/jwt');
 const checkUser = async (req, res, next) => {
   // request headers에 담긴 Access Token 추출
   // "Authorizaiton":"Bearer {token}" 형태
-  const accessToken = req.headers.authorization.split('Bearer ')[1];
+  let accessToken = null;
+
+  if (!!req.headers.authorization) {
+    accessToken = req.headers.authorization.split('Bearer ')[1];
+  }
 
   // Access Token이 없는 경우
   if (!accessToken)
