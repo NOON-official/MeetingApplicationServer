@@ -9,7 +9,10 @@ const { TOKEN_INVALID, TOKEN_EXPIRED } = require('../../constants/jwt');
 
 module.exports = async (req, res) => {
   // Access Token과 Refresh Token 추출
-  const accessToken = req.headers.authorization.split('Bearer ')[1];
+  let accessToken = null;
+  if (!!req.headers.authorization) {
+    accessToken = req.headers.authorization.split('Bearer ')[1];
+  }
   const grantType = req.body.grant_type;
   const refreshToken = req.body.refresh_token;
   const userId = req.body.userId;
@@ -61,14 +64,20 @@ module.exports = async (req, res) => {
       }
       // 2. Access Token 만료 & Refresh Token 유효 => Access Token 재발급
       else {
-        let user = userDB.getUserById(conn, decoded.id);
+        let user = await userDB.getUserById(conn, decoded.id);
+
         const newAccessToken = jwtHandlers.accessToken.sign(user);
 
+        const isMatching = await userDB.getIsMatchingByUserId(conn, decoded.id);
+
+        user.isMatching = isMatching;
         user.accessToken = newAccessToken;
         user.refreshToken = refreshToken;
 
         // 새로 발급한 Access Token과 함께 유저 정보를 반환
-        return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.REFRESH_TOKEN_SUCCESS, user));
+        return res
+          .status(statusCode.OK)
+          .send(util.success(statusCode.OK, responseMessage.REFRESH_TOKEN_SUCCESS, { user }));
       }
     }
     // 3. Access Token 유효 => 재발급 필요X

@@ -7,7 +7,7 @@ const { TOKEN_INVALID, TOKEN_EXPIRED } = require('../constants/jwt');
 const secretKey = process.env.JWT_SECRET;
 const accessTokenOptions = {
   algorithm: 'HS256',
-  expiresIn: '1h', // Access Token 기한
+  expiresIn: 30 * 60, // Access Token 기한: 30분 (초 단위)
   issuer: 'meetinghakgaeron',
 };
 
