@@ -95,6 +95,11 @@ const getIsMatchingByUserId = async (conn, userId) => {
   else return true;
 };
 
+const saveUserPhone = async (conn, userId, phone) => {
+  await conn.query('UPDATE `user` SET phone = (?) WHERE id = (?);', [phone, userId]);
+  return true;
+};
+
 module.exports = {
   saveUserOurteam,
   getUserByKakaoUid,
@@ -103,4 +108,5 @@ module.exports = {
   saveRefreshToken,
   getUserById,
   getIsMatchingByUserId,
+  saveUserPhone,
 };
