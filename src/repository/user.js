@@ -26,7 +26,7 @@ const saveUserOurteam = async (conn, params) => {
   newUserId = newUserId[0]['LAST_INSERT_ID()'];
 
   const [row] = await conn.query(
-    'SELECT (id, kakao_uid, nickname, phone, gender, birthday, refresh_token) FROM `user` WHERE id = (?) and is_deleted = false;',
+    'SELECT id, kakao_uid, nickname, phone, gender, birthday, refresh_token FROM `user` WHERE id = (?) and is_deleted = false;',
     [newUserId],
   );
 
@@ -35,7 +35,7 @@ const saveUserOurteam = async (conn, params) => {
 
 const getUserByKakaoUid = async (conn, kakaoUid) => {
   const [row] = await conn.query(
-    'SELECT (id, kakao_uid, nickname, phone, gender, birthday, refresh_token) FROM `user` WHERE kakao_uid = (?) and is_deleted = false;',
+    'SELECT id, kakao_uid, nickname, phone, gender, birthday, refresh_token FROM `user` WHERE kakao_uid = (?) and is_deleted = false;',
     [kakaoUid],
   );
 
@@ -46,8 +46,8 @@ const saveUser = async (conn, kakaoUid, properties, kakaoAccount) => {
   await conn.query('INSERT INTO `user` (kakao_uid, nickname, birthday, gender) VALUES (?, ?, ?, ?);', [
     kakaoUid,
     properties.nickname,
-    !!kakaoAccount && !!kakaoAccount.birthday ? kakaoAccount.birthday : '',
-    !!kakaoAccount && !!kakaoAccount.gender ? kakaoAccount.gender : '',
+    !!kakaoAccount && !!kakaoAccount.birthday ? kakaoAccount.birthday : null,
+    !!kakaoAccount && !!kakaoAccount.gender ? kakaoAccount.gender : null,
   ]);
 
   // 가장 마지막에 저장한 유저 id 가져오기 (== 마지막 auto_increment id)
@@ -55,7 +55,7 @@ const saveUser = async (conn, kakaoUid, properties, kakaoAccount) => {
   newUserId = newUserId[0]['LAST_INSERT_ID()'];
 
   const [row] = await conn.query(
-    'SELECT (id, kakao_uid, nickname, phone, gender, birthday, refresh_token) FROM `user` WHERE id = (?) and is_deleted = false;',
+    'SELECT id, kakao_uid, nickname, phone, gender, birthday, refresh_token FROM `user` WHERE id = (?) and is_deleted = false;',
     [newUserId],
   );
 
@@ -78,7 +78,7 @@ const saveRefreshToken = async (conn, refreshToken, userId) => {
 
 const getUserById = async (conn, userId) => {
   const [row] = await conn.query(
-    'SELECT (id, kakao_uid, nickname, phone, gender, birthday, refresh_token) FROM `user` WHERE id = (?) and is_deleted = false;',
+    'SELECT id, kakao_uid, nickname, phone, gender, birthday, refresh_token FROM `user` WHERE id = (?) and is_deleted = false;',
     [userId],
   );
 
