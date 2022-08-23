@@ -298,6 +298,26 @@
               }
             }
           },
+          "400(3)": {
+            "description": "이미 매칭 진행중인 유저인 경우",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "Bad Request",
+                    "value": {
+                      "status": 400,
+                      "success": false,
+                      "message": "매칭 진행중인 유저입니다"
+                    }
+                  }
+                }
+              }
+            }
+          },
           "401(1)": {
             "description": "유효하지 않은 토큰",
             "content": {

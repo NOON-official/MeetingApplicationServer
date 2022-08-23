@@ -22,6 +22,14 @@ module.exports = async (req, res) => {
       return res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, responseMessage.NO_USER));
     }
 
+    // 현재 매칭 진행중인 유저인 경우
+    const isMatching = await userDB.getIsMatchingByUserId(conn, userId);
+    if (isMatching === true) {
+      return res
+        .status(statusCode.BAD_REQUEST)
+        .send(util.fail(statusCode.BAD_REQUEST, responseMessage.IS_MATCHING_USER));
+    }
+
     const result = await userDB.saveUserPhone(conn, userId, phone);
 
     res
