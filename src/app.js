@@ -2,20 +2,27 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const printer = require('./lib/printer');
-const swaggerUi = require('swagger-ui-express');
-const swaggerDocument = require('./lib/swagger');
 
 async function createApp(config) {
   const app = express();
 
-  app.use(morgan('dev'));
+  // 개발용 라이브러리
+  if (process.env.NODE_ENV !== 'production') {
+    const swaggerUi = require('swagger-ui-express');
+    const swaggerDocument = require('./lib/swagger');
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, { explorer: true }));
+  }
+
+  if (process.env.NODE_ENV !== 'production') {
+    app.use(morgan('dev'));
+  } else {
+    app.use(morgan('combined'));
+  }
   app.use(cors());
 
   app.use(express.json());
 
   app.use('/api', require('./endpoint'));
-
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, { explorer: true }));
 
   app.use('*', (req, res) => {
     res.status(404).json({ message: '올바르지 않은 경로입니다.' });
