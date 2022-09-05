@@ -34,9 +34,6 @@ const saveUserOurteam = async (conn, params) => {
     params.role.map((r) => [newOurteamId, r]),
   ]);
 
-  // 대기중인 팀 수 증가
-  await conn.query('UPDATE `service` SET waiting_team = waiting_team + 1;');
-
   return convertSnakeToCamel.keysToCamel(newOurteamId);
 };
 
