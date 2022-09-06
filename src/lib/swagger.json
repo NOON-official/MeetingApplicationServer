@@ -17,7 +17,7 @@
       "url": "http://localhost:5000/api"
     },
     {
-      "url": "http://meetingo.me:5000/api"
+      "url": "https://meetingo.me:5000/api"
     }
   ],
   "tags": [
@@ -309,6 +309,7 @@
                           "phone": null,
                           "gender": "female",
                           "birthday": null,
+                          "isAdmin": false,
                           "accessToken": "adja;kldhj;a.dasjlh;kadjlh;akjh;j.adjlhk;aejh",
                           "refreshToken": "adsjg;ldgjk.jdagl;kjad;lgkjad.da;gkljad;lgj"
                         }
@@ -347,6 +348,7 @@
                           "phone": null,
                           "gender": "female",
                           "birthday": null,
+                          "isAdmin": false,
                           "accessToken": "adja;kldhj;a.dasjlh;kadjlh;akjh;j.adjlhk;aejh",
                           "refreshToken": "adsjg;ldgjk.jdagl;kjad;lgkjad.da;gkljad;lgj"
                         }
@@ -449,81 +451,6 @@
         }
       }
     },
-    "/auth/phone": {
-      "post": {
-        "tags": ["Auth"],
-        "summary": "유저 핸드폰 번호 저장 및 수정",
-        "description": "🌸 매칭을 신청하는 유저의 핸드폰 번호를 저장 및 수정합니다. \n\n * 카카오 로그인 후 본 API를 호출해주시면 됩니다!",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "schema": {
-              "type": "string",
-              "format": "Bearer {token}",
-              "example": "Bearer addagkjdagjdakg.djagkjdgkadjgk.ajdkglajdlgkj"
-            },
-            "required": true,
-            "description": "Access Token"
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "userId": {
-                    "type": "integer",
-                    "example": 1
-                  },
-                  "phone": {
-                    "type": "string",
-                    "format": "varchar(13)"
-                  }
-                },
-                "required": ["ourteamId", "phone"]
-              },
-              "examples": {
-                "1": {
-                  "value": { "userId": 1, "phone": "01012345678" }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "유저 핸드폰 번호 저장 성공",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "유저 핸드폰 번호 저장에 성공하였습니다"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {
-                        "phone": "01012345678"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/auth/refresh": {
       "post": {
         "tags": ["Auth"],
@@ -596,6 +523,7 @@
                           "phone": null,
                           "gender": "female",
                           "birthday": null,
+                          "isAdmin": false,
                           "accessToken": "adja;kldhj;a.dasjlh;kadjlh;akjh;j.adjlhk;aejh",
                           "refreshToken": "adsjg;ldgjk.jdagl;kjad;lgkjad.da;gkljad;lgj"
                         }
@@ -732,11 +660,86 @@
         }
       }
     },
+    "/user/phone": {
+      "post": {
+        "tags": ["User"],
+        "summary": "유저 핸드폰 번호 저장 및 수정",
+        "description": "🌸 매칭을 신청하는 유저의 핸드폰 번호를 저장 및 수정합니다. \n\n * 카카오 로그인 후 본 API를 호출해주시면 됩니다!",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "schema": {
+              "type": "string",
+              "format": "Bearer {token}",
+              "example": "Bearer addagkjdagjdakg.djagkjdgkadjgk.ajdkglajdlgkj"
+            },
+            "required": true,
+            "description": "Access Token"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "userId": {
+                    "type": "integer",
+                    "example": 1
+                  },
+                  "phone": {
+                    "type": "string",
+                    "format": "varchar(13)"
+                  }
+                },
+                "required": ["ourteamId", "phone"]
+              },
+              "examples": {
+                "1": {
+                  "value": { "userId": 1, "phone": "01012345678" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "유저 핸드폰 번호 저장 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "유저 핸드폰 번호 저장에 성공하였습니다"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {
+                        "phone": "01012345678"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/user/{userId}": {
       "get": {
         "tags": ["User"],
         "summary": "유저 정보 조회",
-        "description": "🌸 유저의 이름과 전화번호를 조회합니다.",
+        "description": "🌸 유저의 이름과 전화번호를 조회합니다. \n\n * isAdmin의 값으로 관리자 여부를 1차 체크해주시면 됩니다. (서버에서 추가 확인O)",
         "parameters": [
           {
             "in": "header",
@@ -785,8 +788,9 @@
                         "user": {
                           "id": 1,
                           "nickname": "얄루",
+                          "phone": "01012345678",
                           "gender": "female",
-                          "phone": "01012345678"
+                          "isAdmin": "false"
                         }
                       }
                     }
@@ -798,11 +802,11 @@
         }
       }
     },
-    "/user/apply": {
+    "/team": {
       "post": {
-        "tags": ["User"],
-        "summary": "유저 매칭 신청 정보 저장",
-        "description": "🌸 유저의 매칭 신청 정보를 저장합니다. (우리팀 정보 + 우리팀 선호 정보) \n\n카카오 로그인에 성공한 후 발급되는 토큰과 함께 본 API를 호출해주시면 됩니다! \n\n 성공 response를 받은 후 유저 매칭 상태를 **진행중**으로 업데이트해주셔야합니다!",
+        "tags": ["Team"],
+        "summary": "팀 매칭 신청 정보 저장",
+        "description": "🌸 팀의 매칭 신청 정보를 저장합니다. (우리팀 정보 + 우리팀 선호 정보) \n\n카카오 로그인에 성공한 후 발급되는 토큰과 함께 본 API를 호출해주시면 됩니다!",
         "parameters": [
           {
             "in": "header",
@@ -828,30 +832,30 @@
                   "ourteam": {
                     "type": "object",
                     "example": {
-                      "gender": "남성",
-                      "num": "3:3",
+                      "gender": 1,
+                      "num": 2,
                       "age": "25",
                       "height": "170",
                       "drink": "2",
                       "intro": "안녕하세요. 저희는~",
-                      "job": ["대학생", "취준생"],
-                      "university": ["경희대", "서울시립대", "기타 학교"],
-                      "area": ["홍대/합정", "강남", "상관없음"],
-                      "day": ["월요일", "토요일", "일요일"],
-                      "appearance": ["고양이상", "강아지상"],
-                      "mbti": ["ISFP", "ENTP"],
-                      "fashion": ["베이직", "캐주얼"],
-                      "role": ["깍두기", "사회자", "비주얼"]
+                      "job": [1, 3],
+                      "university": [1, 256, 400],
+                      "area": [2, 4, 1],
+                      "day": [1, 6, 7],
+                      "appearance": [1, 2],
+                      "mbti": [1, 3, 16],
+                      "fashion": [1, 2, 5],
+                      "role": [2, 4]
                     }
                   },
                   "ourteamPreference": {
                     "type": "object",
                     "example": {
-                      "job": ["대학생", "취준생"],
+                      "job": [1, 2],
                       "age": ["21", "25"],
                       "height": ["170", "180"],
-                      "sameUniversity": 1,
-                      "vibe": ["대화가 좋아요", "재미"]
+                      "sameUniversity": 2,
+                      "vibe": [4, 5]
                     }
                   }
                 }
@@ -883,27 +887,27 @@
                       "example": {
                         "ourteam": {
                           "ourteamId": 2,
-                          "gender": "남성",
-                          "num": "3:3",
+                          "gender": 1,
+                          "num": 2,
                           "age": "25",
                           "height": "170",
                           "drink": "2",
                           "intro": "안녕하세요. 저희는~",
-                          "job": ["대학생", "취준생"],
-                          "university": ["경희대", "서울시립대", "기타 학교"],
-                          "area": ["홍대/합정", "강남", "상관없음"],
-                          "day": ["월요일", "토요일", "일요일"],
-                          "appearance": ["고양이상", "강아지상"],
-                          "mbti": ["ISFP", "ENTP"],
-                          "fashion": ["베이직", "캐주얼"],
-                          "role": ["깍두기", "사회자", "비주얼"]
+                          "job": [1, 3],
+                          "university": [1, 256, 400],
+                          "area": [2, 4, 1],
+                          "day": [1, 6, 7],
+                          "appearance": [1, 2],
+                          "mbti": [1, 3, 16],
+                          "fashion": [1, 2, 5],
+                          "role": [2, 4]
                         },
                         "ourteamPreference": {
-                          "job": ["대학생", "취준생"],
+                          "job": [1, 2],
                           "age": ["21", "25"],
                           "height": ["170", "180"],
-                          "sameUniversity": 1,
-                          "vibe": ["대화가 좋아요", "재미"]
+                          "sameUniversity": 2,
+                          "vibe": [4, 5]
                         }
                       }
                     }
@@ -935,9 +939,9 @@
         }
       },
       "put": {
-        "tags": ["User"],
-        "summary": "유저 매칭 신청 정보 수정",
-        "description": "🌸 유저의 매칭 신청 정보를 수정합니다. \n\n request body에는 변경이 필요한 property만 보내주시면 됩니다.",
+        "tags": ["Team"],
+        "summary": "팀 매칭 신청 정보 수정",
+        "description": "🌸 팀의 매칭 신청 정보를 수정합니다. \n\n request body에는 변경이 필요한 property만 보내주시면 됩니다.",
         "parameters": [
           {
             "in": "header",
@@ -964,13 +968,13 @@
                     "type": "object",
                     "example": {
                       "intro": "안녕하세요. 저희는~",
-                      "university": ["경희대", "서울시립대"]
+                      "university": [1, 55]
                     }
                   },
                   "ourteamPreference": {
                     "type": "object",
                     "example": {
-                      "sameUniversity": 0
+                      "sameUniversity": 1
                     }
                   }
                 }
@@ -1002,27 +1006,27 @@
                       "example": {
                         "ourteam": {
                           "ourteamId": 2,
-                          "gender": "남성",
-                          "num": "3:3",
+                          "gender": 1,
+                          "num": 2,
                           "age": "25",
                           "height": "170",
                           "drink": "2",
                           "intro": "안녕하세요. 저희는~",
-                          "job": ["대학생", "취준생"],
-                          "university": ["경희대", "서울시립대"],
-                          "area": ["홍대/합정", "강남", "상관없음"],
-                          "day": ["월요일", "토요일", "일요일"],
-                          "appearance": ["고양이상", "강아지상"],
-                          "mbti": ["ISFP", "ENTP"],
-                          "fashion": ["베이직", "캐주얼"],
-                          "role": ["깍두기", "사회자", "비주얼"]
+                          "job": [1, 3],
+                          "university": [1, 55],
+                          "area": [2, 4, 1],
+                          "day": [1, 6, 7],
+                          "appearance": [1, 2],
+                          "mbti": [1, 3, 16],
+                          "fashion": [1, 2, 5],
+                          "role": [2, 4]
                         },
                         "ourteamPreference": {
-                          "job": ["대학생", "취준생"],
+                          "job": [1, 2],
                           "age": ["21", "25"],
                           "height": ["170", "180"],
-                          "sameUniversity": 0,
-                          "vibe": ["대화가 좋아요", "재미"]
+                          "sameUniversity": 1,
+                          "vibe": [4, 5]
                         }
                       }
                     }
@@ -1054,11 +1058,11 @@
         }
       }
     },
-    "/user/apply/status/{userId}": {
+    "/team/ourteam-id/{userId}": {
       "get": {
-        "tags": ["User"],
-        "summary": "유저 매칭 상태 조회",
-        "description": "🌸 유저의 매칭 상태를 조회합니다. \n\n각각의 상태에 따라 [매칭 조회] 페이지에 들어갔을 때의 화면을 핸들링해주시면 됩니다. \n\n * 매칭 신청 전: -1 \n\n * 매칭중(==찾는 중): 0 \n\n * 매칭 완료(==성공 -> 매칭 결과 조회 가능): 1 \n\n * 매칭 실패: 2",
+        "tags": ["Team"],
+        "summary": "유저의 (매칭 진행중인) 우리팀 아이디 조회",
+        "description": "🌸 로그인한 유저의 _매칭 진행중인_ 우리팀 아이디를 조회합니다. \n\n * 우리팀 정보 조회 및 수정, [매칭 조회] 페이지 화면 핸들링시 활용하시면 됩니다. \n\n * 매칭 진행중인 팀 정보가 없는 경우 -1을 반환합니다. [매칭 조회] 페이지에서 해당 화면 처리해주시면 됩니다.",
         "parameters": [
           {
             "in": "header",
@@ -1084,7 +1088,7 @@
         ],
         "responses": {
           "200": {
-            "description": "유저 매칭 상태 조회 성공",
+            "description": "유저 우리팀 아이디 조회 성공",
             "content": {
               "application/json": {
                 "schema": {
@@ -1099,12 +1103,12 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "유저 매칭 상태 조회에 성공하였습니다"
+                      "example": "유저의 우리팀 아이디 조회에 성공하였습니다"
                     },
                     "data": {
                       "type": "object",
                       "example": {
-                        "matchingStatus": -1
+                        "ourteamId": -1
                       }
                     }
                   }
@@ -1115,11 +1119,277 @@
         }
       }
     },
-    "/user/apply/result/{ourteamId}": {
+    "/team/partner-team-id/{ourteamId}": {
       "get": {
-        "tags": ["User"],
+        "tags": ["Team"],
+        "summary": "우리팀의 상대팀 아이디 조회",
+        "description": "🌸 매칭 성공 후 우리팀의 상대팀 아이디를 조회합니다. \n\n * 매칭 결과 페이지에서 상대팀 정보 조회 시 본 API 호출 후 [GET] /team/{teamId} API를 호출해주시면 됩니다.",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "schema": {
+              "type": "string",
+              "format": "Bearer {token}",
+              "example": "Bearer addagkjdagjdakg.djagkjdgkadjgk.ajdkglajdlgkj"
+            },
+            "required": true,
+            "description": "Access Token"
+          },
+          {
+            "in": "path",
+            "name": "ourteamId",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            },
+            "required": true,
+            "description": "우리팀 id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "상대팀 아이디 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "우리팀의 상대팀 아이디 조회에 성공하였습니다"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {
+                        "partnerTeamId": 1
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400(1)": {
+            "description": "매칭 신청 정보가 없는 경우",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "NO_APPLY",
+                    "value": {
+                      "status": 400,
+                      "success": false,
+                      "message": "해당 유저의 매칭 신청 정보가 없습니다"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400(2)": {
+            "description": "매칭된 상대팀 정보가 없는 경우",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "NO_PARTNER_TEAM",
+                    "value": {
+                      "status": 400,
+                      "success": false,
+                      "message": "상대팀 정보가 없습니다"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/team/{teamId}": {
+      "get": {
+        "tags": ["Team"],
+        "summary": "팀의 매칭 신청 정보 조회",
+        "description": "🌸 팀의 매칭 신청 정보를 조회합니다. \n\n * 우리팀 정보 조회 및 수정, 상대팀 정보 조회 시 활용하시면 됩니다.",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "schema": {
+              "type": "string",
+              "format": "Bearer {token}",
+              "example": "Bearer addagkjdagjdakg.djagkjdgkadjgk.ajdkglajdlgkj"
+            },
+            "required": true,
+            "description": "Access Token"
+          },
+          {
+            "in": "path",
+            "name": "teamId",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            },
+            "required": true,
+            "description": "우리팀 id 또는 상대팀 id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "팀 매칭 신청 정보 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "팀 매칭 신청 정보 조회에 성공하였습니다"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {
+                        "ourteam": {
+                          "ourteamId": 2,
+                          "gender": 1,
+                          "num": 2,
+                          "age": "25",
+                          "height": "170",
+                          "drink": "2",
+                          "intro": "안녕하세요. 저희는~",
+                          "job": [1, 3],
+                          "university": [1, 55],
+                          "area": [2, 4, 1],
+                          "day": [1, 6, 7],
+                          "appearance": [1, 2],
+                          "mbti": [1, 3, 16],
+                          "fashion": [1, 2, 5],
+                          "role": [2, 4]
+                        },
+                        "ourteamPreference": {
+                          "job": [1, 2],
+                          "age": ["21", "25"],
+                          "height": ["170", "180"],
+                          "sameUniversity": 1,
+                          "vibe": [4, 5]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "매칭 신청 정보가 없는 경우",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "NO_APPLY",
+                    "value": {
+                      "status": 400,
+                      "success": false,
+                      "message": "해당 팀의 매칭 신청 정보가 없습니다"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/team/status/{ourteamId}": {
+      "get": {
+        "tags": ["Team"],
+        "summary": "우리팀 매칭 상태 조회",
+        "description": "🌸 우리팀의 매칭 상태를 조회합니다. \n\n각각의 상태에 따라 [매칭 조회] 페이지에 들어갔을 때의 화면을 핸들링해주시면 됩니다. \n\n * 매칭중(==찾는 중): 0 \n\n * 매칭 완료(==성공 -> 매칭 결과 조회 가능): 1 \n\n * 매칭 실패: 2",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "schema": {
+              "type": "string",
+              "format": "Bearer {token}",
+              "example": "Bearer addagkjdagjdakg.djagkjdgkadjgk.ajdkglajdlgkj"
+            },
+            "required": true,
+            "description": "Access Token"
+          },
+          {
+            "in": "path",
+            "name": "ourteamId",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            },
+            "required": true,
+            "description": "우리팀 id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "팀 매칭 상태 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "팀 매칭 상태 조회에 성공하였습니다"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {
+                        "matchingStatus": 0
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/team/result/{ourteamId}": {
+      "get": {
+        "tags": ["Team"],
         "summary": "우리팀 매칭 결과 조회",
-        "description": "🌸 우리팀 매칭 결과를 조회합니다. \n\n 현재는 연락처 정보만 반환합니다.",
+        "description": "🌸 우리팀 매칭 결과를 조회합니다. \n\n * 현재는 연락처 정보만 반환합니다.",
         "parameters": [
           {
             "in": "header",
@@ -1167,302 +1437,6 @@
                       "example": {
                         "chatLink": "https://open.kakao.com/~"
                       }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/team/{userId}": {
-      "get": {
-        "tags": ["Team"],
-        "summary": "유저의 우리팀 아이디 조회",
-        "description": "🌸 로그인한 유저의 우리팀 아이디를 조회합니다. \n\n 우리팀 정보 조회 및 수정 시 본 API 호출 후 [GET] /user/apply/{teamId} API를 호출해주시면 됩니다.",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "schema": {
-              "type": "string",
-              "format": "Bearer {token}",
-              "example": "Bearer addagkjdagjdakg.djagkjdgkadjgk.ajdkglajdlgkj"
-            },
-            "required": true,
-            "description": "Access Token"
-          },
-          {
-            "in": "path",
-            "name": "userId",
-            "schema": {
-              "type": "string",
-              "example": "1"
-            },
-            "required": true,
-            "description": "유저 id"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "유저 우리팀 아이디 조회 성공",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "유저의 우리팀 아이디 조회에 성공하였습니다"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {
-                        "ourteamId": 1
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "매칭 신청 정보가 없는 경우",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Fail"
-                },
-                "examples": {
-                  "1": {
-                    "summary": "NO_APPLY",
-                    "value": {
-                      "status": 400,
-                      "success": false,
-                      "message": "해당 유저의 매칭 신청 정보가 없습니다"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/team/{userId}/{ourteamId}": {
-      "get": {
-        "tags": ["Team"],
-        "summary": "우리팀의 상대팀 아이디 조회",
-        "description": "🌸 매칭 성공 후 우리팀의 상대팀 아이디를 조회합니다. \n\n 매칭 결과 페이지에서 상대팀 정보 조회 시 본 API 호출 후 [GET] /user/apply/{teamId} API를 호출해주시면 됩니다.",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "schema": {
-              "type": "string",
-              "format": "Bearer {token}",
-              "example": "Bearer addagkjdagjdakg.djagkjdgkadjgk.ajdkglajdlgkj"
-            },
-            "required": true,
-            "description": "Access Token"
-          },
-          {
-            "in": "path",
-            "name": "userId",
-            "schema": {
-              "type": "string",
-              "example": "1"
-            },
-            "required": true,
-            "description": "유저 id"
-          },
-          {
-            "in": "path",
-            "name": "ourteamId",
-            "schema": {
-              "type": "string",
-              "example": "1"
-            },
-            "required": true,
-            "description": "우리팀 id"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "상대팀 아이디 조회 성공",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "우리팀의 상대팀 아이디 조회에 성공하였습니다"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {
-                        "matchedTeamId": 1
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400(1)": {
-            "description": "매칭 신청 정보가 없는 경우",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Fail"
-                },
-                "examples": {
-                  "1": {
-                    "summary": "NO_APPLY",
-                    "value": {
-                      "status": 400,
-                      "success": false,
-                      "message": "해당 유저의 매칭 신청 정보가 없습니다"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400(2)": {
-            "description": "매칭된 상대팀 정보가 없는 경우",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Fail"
-                },
-                "examples": {
-                  "1": {
-                    "summary": "NO_MATCHED_TEAM",
-                    "value": {
-                      "status": 400,
-                      "success": false,
-                      "message": "상대팀 정보가 없습니다"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/team/{teamId}": {
-      "get": {
-        "tags": ["Team"],
-        "summary": "해당 팀의 매칭 신청 정보 조회",
-        "description": "🌸 해당 팀의 매칭 신청 정보를 조회합니다. \n\n 우리팀 정보 조회 및 수정, 상대팀 정보 조회 시 활용하시면 됩니다.",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "schema": {
-              "type": "string",
-              "format": "Bearer {token}",
-              "example": "Bearer addagkjdagjdakg.djagkjdgkadjgk.ajdkglajdlgkj"
-            },
-            "required": true,
-            "description": "Access Token"
-          },
-          {
-            "in": "path",
-            "name": "teamId",
-            "schema": {
-              "type": "string",
-              "example": "1"
-            },
-            "required": true,
-            "description": "우리팀 id 또는 상대팀 id"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "팀 매칭 신청 정보 조회 성공",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "팀 매칭 신청 정보 조회에 성공하였습니다"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {
-                        "ourteam": {
-                          "ourteamId": 1,
-                          "gender": "남성",
-                          "num": "3:3",
-                          "age": "25",
-                          "height": "170",
-                          "drink": "2",
-                          "intro": "안녕하세요. 저희는~",
-                          "job": ["대학생", "취준생"],
-                          "university": ["경희대", "서울시립대", "기타 학교"],
-                          "area": ["홍대/합정", "강남", "상관없음"],
-                          "day": ["월요일", "토요일", "일요일"],
-                          "appearance": ["고양이상", "강아지상"],
-                          "mbti": ["ISFP", "ENTP"],
-                          "fashion": ["베이직", "캐주얼"],
-                          "role": ["깍두기", "사회자", "비주얼"]
-                        },
-                        "ourteamPreference": {
-                          "job": ["대학생", "취준생"],
-                          "age": ["21", "25"],
-                          "height": ["170", "180"],
-                          "sameUniversity": 1,
-                          "vibe": ["대화가 좋아요", "재미"]
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "매칭 신청 정보가 없는 경우",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Fail"
-                },
-                "examples": {
-                  "1": {
-                    "summary": "NO_APPLY",
-                    "value": {
-                      "status": 400,
-                      "success": false,
-                      "message": "해당 팀의 매칭 신청 정보가 없습니다"
                     }
                   }
                 }
