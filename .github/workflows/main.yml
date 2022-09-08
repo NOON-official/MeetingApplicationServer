@@ -17,10 +17,9 @@ jobs:
           username: ${{ secrets.USER_NAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            export NVM_DIR=~/.nvm
-            source ~/.nvm/nvm.sh
             cd ~/server
             sudo git pull origin prod
+            sudo su
             sudo npm install
             sudo npm run prod
             sudo pm2 restart 0
