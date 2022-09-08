@@ -1,0 +1,25 @@
+name: deploy
+
+on:
+  push:
+    branches:
+      - prod  # 브랜치에서 push 이벤트가 일어났을 때 실행
+
+jobs:
+  AUTO_DEPLOY:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: multiple command
+      - uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secret.HOST }}
+        username: ${{ secret.USER_NAME }}
+        key: $${{ secret.SSH_KEY }}
+        script: |
+          cd ~/server
+          git pull origin prod
+          npm install
+          npm run prod
+          pm2 restart 0
+        
