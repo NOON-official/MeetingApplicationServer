@@ -17,10 +17,9 @@ jobs:
           username: ${{ secrets.USER_NAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            sudo su
             cd ~/server
-            git pull origin prod
-            npm install
-            npm run prod
-            pm2 restart 0
+            sudo git pull origin prod
+            sudo npm install
+            sudo npm run prod
+            sudo pm2 restart 0
         
