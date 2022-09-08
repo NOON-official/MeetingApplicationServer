@@ -17,6 +17,7 @@ jobs:
           username: ${{ secrets.USER_NAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
+            sudo su
             cd ~/server
             git pull origin prod
             npm install
