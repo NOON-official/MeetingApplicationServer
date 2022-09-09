@@ -1,7 +1,7 @@
 const jwtHandlers = require('../../lib/jwtHandlers');
 const jwt = require('jsonwebtoken');
 const pool = require('../../repository/db');
-const { userDB } = require('../../repository');
+const { userDB, teamDB } = require('../../repository');
 const util = require('../../lib/util');
 const statusCode = require('../../constants/statusCode');
 const responseMessage = require('../../constants/responseMessage');
@@ -68,7 +68,7 @@ module.exports = async (req, res) => {
 
         const newAccessToken = jwtHandlers.accessToken.sign(user);
 
-        const isMatching = await userDB.getIsMatchingByUserId(conn, decoded.id);
+        const isMatching = await teamDB.getIsMatchingByUserId(conn, decoded.id);
 
         user.isMatching = isMatching;
         user.accessToken = newAccessToken;

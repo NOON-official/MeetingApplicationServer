@@ -2,7 +2,7 @@ const util = require('../../lib/util');
 const statusCode = require('../../constants/statusCode');
 const responseMessage = require('../../constants/responseMessage');
 const pool = require('../../repository/db');
-const { userDB } = require('../../repository');
+const { userDB, teamDB } = require('../../repository');
 
 // 유저 정보 저장
 module.exports = async (req, res) => {
@@ -42,14 +42,14 @@ module.exports = async (req, res) => {
     }
 
     // 현재 매칭 진행중인 유저인 경우
-    const isMatching = await userDB.getIsMatchingByUserId(conn, userId);
+    const isMatching = await teamDB.getIsMatchingByUserId(conn, userId);
     if (isMatching === true) {
       return res
         .status(statusCode.BAD_REQUEST)
         .send(util.fail(statusCode.BAD_REQUEST, responseMessage.IS_MATCHING_USER));
     }
 
-    const ourteamId = await userDB.saveUserOurteam(conn, params); // query 결과값 저장
+    const ourteamId = await teamDB.saveUserOurteam(conn, params); // query 결과값 저장
 
     res
       .status(statusCode.OK)
