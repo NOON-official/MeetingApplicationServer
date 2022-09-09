@@ -74,6 +74,17 @@ const getWaitingTeam = async (conn) => {
   return convertSnakeToCamel.keysToCamel(row[0]['waiting_team']);
 };
 
+const getOurteamIdByUserId = async (conn, userId) => {
+  const [row] = await conn.query('SELECT id FROM `user_ourteam` WHERE user_id=(?) and is_deleted=false;', [userId]);
+
+  // 매칭 진행중인 팀 정보가 없는 경우
+  if (!row[0]) {
+    return -1;
+  }
+
+  return convertSnakeToCamel.keysToCamel(row[0]['id']);
+};
+
 module.exports = {
   saveUserOurteam,
   getIsMatchingByUserId,
@@ -81,4 +92,5 @@ module.exports = {
   getMaleApplyNum,
   getFemaleApplyNum,
   getWaitingTeam,
+  getOurteamIdByUserId,
 };
