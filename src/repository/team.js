@@ -49,8 +49,27 @@ const getOurteamByOurteamId = async (conn, ourteamId) => {
   return convertSnakeToCamel.keysToCamel(row[0]);
 };
 
+// 현재의 경우 is_deleted=false인 경우 모두 신청 인원에 포함
+const getMaleApplyNum = async (conn) => {
+  const [row] = await conn.query(
+    'SELECT COUNT(*) AS male_apply_num FROM `user_ourteam` WHERE gender=1 AND is_deleted=false;',
+  );
+
+  return convertSnakeToCamel.keysToCamel(row[0]['male_apply_num']);
+};
+
+const getFemaleApplyNum = async (conn) => {
+  const [row] = await conn.query(
+    'SELECT COUNT(*) AS female_apply_num FROM `user_ourteam` WHERE gender=2 AND is_deleted=false;',
+  );
+
+  return convertSnakeToCamel.keysToCamel(row[0]['female_apply_num']);
+};
+
 module.exports = {
   saveUserOurteam,
   getIsMatchingByUserId,
   getOurteamByOurteamId,
+  getMaleApplyNum,
+  getFemaleApplyNum,
 };
