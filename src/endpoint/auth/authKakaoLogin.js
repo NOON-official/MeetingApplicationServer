@@ -1,5 +1,5 @@
 const pool = require('../../repository/db');
-const { userDB } = require('../../repository');
+const { userDB, teamDB } = require('../../repository');
 const jwt = require('../../lib/jwtHandlers');
 
 module.exports = async (kakaoUser) => {
@@ -25,7 +25,7 @@ module.exports = async (kakaoUser) => {
 
     // 발급한 Refresh Token을 DB에 저장
     await userDB.saveRefreshToken(conn, refreshToken, user.id);
-    const isMatching = await userDB.getIsMatchingByUserId(conn, user.id);
+    const isMatching = await teamDB.getIsMatchingByUserId(conn, user.id);
 
     user.refreshToken = refreshToken;
     user.accessToken = accessToken;

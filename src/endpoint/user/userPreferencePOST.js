@@ -2,7 +2,7 @@ const util = require('../../lib/util');
 const statusCode = require('../../constants/statusCode');
 const responseMessage = require('../../constants/responseMessage');
 const pool = require('../../repository/db');
-const { userDB, userPreferenceDB } = require('../../repository');
+const { teamDB, userDB, userPreferenceDB } = require('../../repository');
 
 // 유저 선호 정보 저장
 module.exports = async (req, res) => {
@@ -34,7 +34,7 @@ module.exports = async (req, res) => {
     }
 
     // 우리팀 정보가 없는 경우
-    const ourteam = await userDB.getOurteamByOurteamId(conn, ourteamId);
+    const ourteam = await teamDB.getOurteamByOurteamId(conn, ourteamId);
     if (!ourteam) {
       return res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, responseMessage.NO_OURTEAM));
     }
@@ -48,7 +48,7 @@ module.exports = async (req, res) => {
     }
 
     await userPreferenceDB.saveUserPreference(conn, params); // 유저 선호 정보 저장
-    const isMatching = await userDB.getIsMatchingByUserId(conn, userId);
+    const isMatching = await teamDB.getIsMatchingByUserId(conn, userId);
 
     res
       .status(statusCode.OK)

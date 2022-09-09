@@ -1,5 +1,5 @@
 const pool = require('../../repository/db');
-const { userDB } = require('../../repository');
+const { teamDB, userDB } = require('../../repository');
 const util = require('../../lib/util');
 const statusCode = require('../../constants/statusCode');
 const responseMessage = require('../../constants/responseMessage');
@@ -23,7 +23,7 @@ module.exports = async (req, res) => {
     }
 
     // 현재 매칭 진행중인 유저인 경우
-    const isMatching = await userDB.getIsMatchingByUserId(conn, userId);
+    const isMatching = await teamDB.getIsMatchingByUserId(conn, userId);
     if (isMatching === true) {
       return res
         .status(statusCode.BAD_REQUEST)
