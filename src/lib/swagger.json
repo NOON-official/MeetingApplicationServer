@@ -534,7 +534,27 @@
               }
             }
           },
-          "400": {
+          "400(1)": {
+            "description": "request body의 유저 id와 토큰의 유저 id가 일치하지 않는 경우",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "INVALID_USER",
+                    "value": {
+                      "status": 400,
+                      "success": false,
+                      "message": "잘못된 유저 정보입니다"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400(2)": {
             "description": "유효한 토큰",
             "content": {
               "application/json": {
