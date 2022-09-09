@@ -45,7 +45,7 @@ const saveRefreshToken = async (conn, refreshToken, userId) => {
 
 const getUserById = async (conn, userId) => {
   const [row] = await conn.query(
-    'SELECT id, kakao_uid, nickname, phone, gender, birthday, refresh_token FROM `user` WHERE id = (?) and is_deleted = false;',
+    'SELECT id, kakao_uid, nickname, phone, gender, birthday, is_admin, refresh_token FROM `user` WHERE id = (?) and is_deleted = false;',
     [userId],
   );
 
@@ -57,6 +57,13 @@ const saveUserPhone = async (conn, userId, phone) => {
   return true;
 };
 
+const deleteUserByUserId = async (conn, userId) => {
+  await conn.query('UPDATE `user` SET refresh_token=null, is_deleted = true WHERE id = (?);', [userId]);
+  await conn.query('UPDATE `user_ourteam` SET is_deleted = true WHERE user_id = (?);', [userId]);
+
+  return true;
+};
+
 module.exports = {
   getUserByKakaoUid,
   saveUser,
@@ -64,4 +71,5 @@ module.exports = {
   saveRefreshToken,
   getUserById,
   saveUserPhone,
+  deleteUserByUserId,
 };
