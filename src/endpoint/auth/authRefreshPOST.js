@@ -68,9 +68,6 @@ module.exports = async (req, res) => {
 
         const newAccessToken = jwtHandlers.accessToken.sign(user);
 
-        const isMatching = await teamDB.getIsMatchingByUserId(conn, decoded.id);
-
-        user.isMatching = isMatching;
         user.accessToken = newAccessToken;
         user.refreshToken = refreshToken;
 
