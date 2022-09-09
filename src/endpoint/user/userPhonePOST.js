@@ -4,7 +4,7 @@ const util = require('../../lib/util');
 const statusCode = require('../../constants/statusCode');
 const responseMessage = require('../../constants/responseMessage');
 
-// 유저 핸드폰 번호 저장
+// 유저 핸드폰 번호 저장 및 수정
 module.exports = async (req, res) => {
   const { userId, phone } = req.body;
 
@@ -22,19 +22,16 @@ module.exports = async (req, res) => {
       return res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, responseMessage.NO_USER));
     }
 
-    // 현재 매칭 진행중인 유저인 경우
-    const isMatching = await teamDB.getIsMatchingByUserId(conn, userId);
-    if (isMatching === true) {
-      return res
-        .status(statusCode.BAD_REQUEST)
-        .send(util.fail(statusCode.BAD_REQUEST, responseMessage.IS_MATCHING_USER));
+    // 잘못된 유저 id인 경우
+    if (userId != req.user.id) {
+      return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.INVALID_USER));
     }
 
     const result = await userDB.saveUserPhone(conn, userId, phone);
 
-    res
-      .status(statusCode.OK)
-      .send(util.success(statusCode.OK, responseMessage.SAVE_USER_PHONE_SUCCESS, { success: result }));
+    if (result === true) {
+      res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.SAVE_USER_PHONE_SUCCESS, { phone }));
+    }
   } catch (error) {
     return res
       .status(statusCode.INTERNAL_SERVER_ERROR)
