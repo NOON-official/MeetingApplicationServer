@@ -6,6 +6,7 @@ module.exports = {
   TOKEN_INVALID: '토큰이 유효하지 않습니다',
   TOKEN_EXPIRED: '토큰이 만료되었습니다',
   NO_USER_ID: '유저 아이디가 없습니다',
+  INVALID_USER: '잘못된 유저 정보입니다',
   NO_USER: '존재하지 않는 유저입니다',
   INTERNAL_SERVER_ERROR: '서버 내 오류',
 
@@ -18,7 +19,6 @@ module.exports = {
   CREATE_USER_SUCCESS: '회원가입에 성공하였습니다',
   LOGIN_USER_SUCCESS: '로그인에 성공하였습니다',
   DELETE_USER_SUCCESS: '유저 회원탈퇴에 성공하였습니다',
-  INVALID_USER: '잘못된 유저 정보입니다',
   NOT_EXPIRED_TOKEN: '만료되지 않은 토큰입니다',
   INVALID_GRANT_TYPE: '올바르지 않은 허가 유형입니다',
   REFRESH_TOKEN_SUCCESS: '토큰 재발급에 성공하였습니다',

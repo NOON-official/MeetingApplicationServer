@@ -172,6 +172,26 @@
               }
             }
           },
+          "401(4)": {
+            "description": "request body 또는 request parameter의 유저 id와 토큰의 유저 id가 일치하지 않는 경우",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "INVALID_USER",
+                    "value": {
+                      "status": 401,
+                      "success": false,
+                      "message": "잘못된 유저 정보입니다"
+                    }
+                  }
+                }
+              }
+            }
+          },
           "404": {
             "description": "존재하지 않는 유저",
             "content": {
@@ -534,27 +554,7 @@
               }
             }
           },
-          "400(1)": {
-            "description": "request body의 유저 id와 토큰의 유저 id가 일치하지 않는 경우",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Fail"
-                },
-                "examples": {
-                  "1": {
-                    "summary": "INVALID_USER",
-                    "value": {
-                      "status": 400,
-                      "success": false,
-                      "message": "잘못된 유저 정보입니다"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400(2)": {
+          "400": {
             "description": "유효한 토큰",
             "content": {
               "application/json": {
@@ -575,26 +575,6 @@
             }
           },
           "401(1)": {
-            "description": "토큰 없음",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Fail"
-                },
-                "examples": {
-                  "1": {
-                    "summary": "TOKEN_EMPTY",
-                    "value": {
-                      "status": 401,
-                      "success": false,
-                      "message": "토큰이 없습니다"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401(2)": {
             "description": "허가 유형 없음",
             "content": {
               "application/json": {
@@ -613,69 +593,6 @@
                 }
               }
             }
-          },
-          "401(3)": {
-            "description": "유저 아이디 없음",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Fail"
-                },
-                "examples": {
-                  "1": {
-                    "summary": "NO_USER_ID",
-                    "value": {
-                      "status": 401,
-                      "success": false,
-                      "message": "유저 아이디가 없습니다"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401(4)": {
-            "description": "유효하지 않은 토큰",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Fail"
-                },
-                "examples": {
-                  "1": {
-                    "summary": "TOKEN_INVALID",
-                    "value": {
-                      "status": 401,
-                      "success": false,
-                      "message": "토큰이 유효하지 않습니다"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401(5)": {
-            "description": "만료된 토큰",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Fail"
-                },
-                "examples": {
-                  "1": {
-                    "summary": "TOKEN_EXPIRED",
-                    "value": {
-                      "status": 401,
-                      "success": false,
-                      "message": "토큰이 만료되었습니다"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
           }
         }
       }
