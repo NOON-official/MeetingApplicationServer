@@ -1,5 +1,5 @@
 const pool = require('../../repository/db');
-const { userDB, teamDB } = require('../../repository');
+const { userDB } = require('../../repository');
 const jwt = require('../../lib/jwtHandlers');
 
 module.exports = async (kakaoUser) => {

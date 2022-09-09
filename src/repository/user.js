@@ -64,6 +64,15 @@ const deleteUserByUserId = async (conn, userId) => {
   return true;
 };
 
+const getUserInfoByUserId = async (conn, userId) => {
+  const [row] = await conn.query(
+    'SELECT id, nickname, phone, gender, is_admin FROM `user` WHERE id = (?) and is_deleted = false;',
+    [userId],
+  );
+
+  return convertSnakeToCamel.keysToCamel(row[0]);
+};
+
 module.exports = {
   getUserByKakaoUid,
   saveUser,
@@ -72,4 +81,5 @@ module.exports = {
   getUserById,
   saveUserPhone,
   deleteUserByUserId,
+  getUserInfoByUserId,
 };

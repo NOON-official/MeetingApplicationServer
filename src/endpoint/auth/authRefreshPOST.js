@@ -1,7 +1,7 @@
 const jwtHandlers = require('../../lib/jwtHandlers');
 const jwt = require('jsonwebtoken');
 const pool = require('../../repository/db');
-const { userDB, teamDB } = require('../../repository');
+const { userDB } = require('../../repository');
 const util = require('../../lib/util');
 const statusCode = require('../../constants/statusCode');
 const responseMessage = require('../../constants/responseMessage');
