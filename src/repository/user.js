@@ -2,7 +2,7 @@ const convertSnakeToCamel = require('../lib/convertSnakeToCamel');
 
 const getUserByKakaoUid = async (conn, kakaoUid) => {
   const [row] = await conn.query(
-    'SELECT id, kakao_uid, nickname, phone, gender, birthday, refresh_token FROM `user` WHERE kakao_uid = (?) and is_deleted = false;',
+    'SELECT id, kakao_uid, nickname, phone, gender, birthday, is_admin, refresh_token FROM `user` WHERE kakao_uid = (?) and is_deleted = false;',
     [kakaoUid],
   );
 
@@ -22,7 +22,7 @@ const saveUser = async (conn, kakaoUid, properties, kakaoAccount) => {
   newUserId = newUserId[0]['LAST_INSERT_ID()'];
 
   const [row] = await conn.query(
-    'SELECT id, kakao_uid, nickname, phone, gender, birthday, refresh_token FROM `user` WHERE id = (?) and is_deleted = false;',
+    'SELECT id, kakao_uid, nickname, phone, gender, birthday, is_admin, refresh_token FROM `user` WHERE id = (?) and is_deleted = false;',
     [newUserId],
   );
 
