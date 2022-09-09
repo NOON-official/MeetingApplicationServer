@@ -66,10 +66,19 @@ const getFemaleApplyNum = async (conn) => {
   return convertSnakeToCamel.keysToCamel(row[0]['female_apply_num']);
 };
 
+// 대기중인 팀 수 조회
+// 현재 is_delete=false인 경우 모두 대기중인 팀으로 간주
+const getWaitingTeam = async (conn) => {
+  const [row] = await conn.query('SELECT COUNT(*) AS waiting_team FROM `user_ourteam` WHERE is_deleted=false;');
+
+  return convertSnakeToCamel.keysToCamel(row[0]['waiting_team']);
+};
+
 module.exports = {
   saveUserOurteam,
   getIsMatchingByUserId,
   getOurteamByOurteamId,
   getMaleApplyNum,
   getFemaleApplyNum,
+  getWaitingTeam,
 };
