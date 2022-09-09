@@ -1,13 +1,11 @@
 const convertSnakeToCamel = require('../lib/convertSnakeToCamel');
 
 const saveUserOurteam = async (conn, params) => {
-  await conn.query('INSERT INTO `user_ourteam` (user_id, gender, num, age, intro) VALUES (?, ?, ?, ?, ?);', [
-    params.userId,
-    params.gender,
-    params.num,
-    params.age,
-    params.intro,
-  ]);
+  // 1. 우리팀 정보 저장
+  await conn.query(
+    'INSERT INTO `user_ourteam` (user_id, gender, num, age, height, drink, intro) VALUES (?, ?, ?, ?, ?, ?, ?);',
+    [params.userId, params.gender, params.num, params.age, params.height, params.drink, params.intro],
+  );
 
   [newOurteamId] = await conn.query('SELECT LAST_INSERT_ID();');
   newOurteamId = newOurteamId[0]['LAST_INSERT_ID()'];
@@ -32,6 +30,27 @@ const saveUserOurteam = async (conn, params) => {
   ]);
   await conn.query('INSERT INTO `ourteam_role` (ourteam_id, role) VALUES ?;', [
     params.role.map((r) => [newOurteamId, r]),
+  ]);
+
+  // 2. 우리팀 선호 정보 저장
+  await conn.query(
+    'INSERT INTO `ourteam_preference` (ourteam_id, start_age, end_age, start_height, end_height, same_university) VALUES (?, ?, ?, ?, ?, ?);',
+    [
+      newOurteamId,
+      params.preferenceAge[0],
+      params.preferenceAge[1],
+      params.preferenceHeight[0],
+      params.preferenceHeight[1],
+      params.sameUniversity,
+    ],
+  );
+
+  // 배열 자료형 params를 테이블에 저장
+  await conn.query('INSERT INTO `ourteam_preference_job` (ourteam_id, preference_job) VALUES ?;', [
+    params.preferenceJob.map((j) => [newOurteamId, j]),
+  ]);
+  await conn.query('INSERT INTO `ourteam_preference_vibe` (ourteam_id, preference_vibe) VALUES ?;', [
+    params.vibe.map((v) => [newOurteamId, v]),
   ]);
 
   return convertSnakeToCamel.keysToCamel(newOurteamId);
@@ -74,6 +93,17 @@ const getWaitingTeam = async (conn) => {
   return convertSnakeToCamel.keysToCamel(row[0]['waiting_team']);
 };
 
+const getOurteamIdByUserId = async (conn, userId) => {
+  const [row] = await conn.query('SELECT id FROM `user_ourteam` WHERE user_id=(?) and is_deleted=false;', [userId]);
+
+  // 매칭 진행중인 팀 정보가 없는 경우
+  if (!row[0]) {
+    return -1;
+  }
+
+  return convertSnakeToCamel.keysToCamel(row[0]['id']);
+};
+
 module.exports = {
   saveUserOurteam,
   getIsMatchingByUserId,
@@ -81,4 +111,5 @@ module.exports = {
   getMaleApplyNum,
   getFemaleApplyNum,
   getWaitingTeam,
+  getOurteamIdByUserId,
 };
