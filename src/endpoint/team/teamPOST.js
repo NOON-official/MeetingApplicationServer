@@ -26,6 +26,11 @@ module.exports = async (req, res) => {
     vibe,
   ];
 
+  // 잘못된 유저 id인 경우
+  if (userId != req.user.id) {
+    return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.INVALID_USER));
+  }
+
   if (
     !userId ||
     !gender ||
