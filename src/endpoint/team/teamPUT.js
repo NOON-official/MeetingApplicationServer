@@ -4,9 +4,12 @@ const responseMessage = require('../../constants/responseMessage');
 const pool = require('../../repository/db');
 const { userDB, teamDB } = require('../../repository');
 
-// 팀 매칭 신청 정보 저장
+// 팀 매칭 신청 정보 수정
 module.exports = async (req, res) => {
-  const { userId } = req.body;
+  const { ourteamId } = req.body;
+  if (!ourteamId)
+    return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+
   const { gender, num, age, height, drink, intro } = req.body.ourteam;
   const { job, university, area, day, appearance, mbti, fashion, role } = req.body.ourteam; // 배열 자료형
   const { sameUniversity } = req.body.ourteamPreference;
@@ -26,13 +29,7 @@ module.exports = async (req, res) => {
     vibe,
   ];
 
-  // 잘못된 유저 id인 경우
-  if (userId != req.user.id) {
-    return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.INVALID_USER));
-  }
-
   if (
-    !userId ||
     !gender ||
     !num ||
     !age ||
@@ -47,7 +44,7 @@ module.exports = async (req, res) => {
     return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
 
   const params = {
-    userId,
+    ourteamId,
     gender,
     num,
     age,
@@ -74,24 +71,40 @@ module.exports = async (req, res) => {
   try {
     conn = await pool.getConnection();
 
+    const userId = await teamDB.getUserIdByOurteamId(conn, ourteamId);
+
+    // 잘못된 유저 id인 경우
+    if (userId != req.user.id) {
+      return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.INVALID_USER));
+    }
+
     // 유저가 없는 경우
     const user = await userDB.getUserById(conn, userId);
     if (!user) {
       return res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, responseMessage.NO_USER));
     }
 
-    // 현재 매칭 진행중인 유저인 경우
-    const isMatching = await teamDB.getOurteamIdByUserId(conn, userId);
-    if (isMatching !== -1) {
-      return res
-        .status(statusCode.BAD_REQUEST)
-        .send(util.fail(statusCode.BAD_REQUEST, responseMessage.IS_MATCHING_USER));
+    const matchingStatus = await teamDB.getOurteamStatusByOurteamId(conn, ourteamId);
+
+    console.log(matchingStatus);
+    // 해당 팀 정보가 없는 경우
+    if (matchingStatus === -1) {
+      return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_APPLY));
     }
 
-    const ourteamId = await teamDB.saveUserOurteam(conn, params);
-    const ourteam = await teamDB.getOurteamByOurteamId(conn, ourteamId);
+    // 이미 매칭 결과가 나온 팀인 경우
+    if (matchingStatus !== 0) {
+      return res
+        .status(statusCode.BAD_REQUEST)
+        .send(util.fail(statusCode.BAD_REQUEST, responseMessage.IS_MATCHED_USER));
+    }
 
-    res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.SAVE_USER_APPLY_SUCCESS, ourteam));
+    const updatedOurteamId = await teamDB.updateUserOurteam(conn, params);
+    const updatedOurteam = await teamDB.getOurteamByOurteamId(conn, updatedOurteamId);
+
+    res
+      .status(statusCode.OK)
+      .send(util.success(statusCode.OK, responseMessage.UPDATE_USER_APPLY_SUCCESS, updatedOurteam));
   } catch (error) {
     return res
       .status(statusCode.INTERNAL_SERVER_ERROR)
