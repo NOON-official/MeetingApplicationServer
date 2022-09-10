@@ -89,8 +89,9 @@ module.exports = async (req, res) => {
     }
 
     const ourteamId = await teamDB.saveUserOurteam(conn, params);
+    const ourteam = await teamDB.getOurteamByOurteamId(conn, ourteamId);
 
-    res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.SAVE_USER_APPLY_SUCCESS, { ourteamId }));
+    res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.SAVE_USER_APPLY_SUCCESS, ourteam));
   } catch (error) {
     return res
       .status(statusCode.INTERNAL_SERVER_ERROR)
