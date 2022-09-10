@@ -1408,8 +1408,30 @@
                     "data": {
                       "type": "object",
                       "example": {
-                        "chatLink": "https://open.kakao.com/~"
+                        "matchingResult": {
+                          "chatLink": "https://open.kakao.com/~"
+                        }
                       }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "매칭 결과가 없는 경우",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "NO_RESULT",
+                    "value": {
+                      "status": 400,
+                      "success": false,
+                      "message": "해당 팀의 매칭 결과가 없습니다"
                     }
                   }
                 }

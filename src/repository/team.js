@@ -305,6 +305,17 @@ const getPartnerTeamIdByOurteamId = async (conn, ourteamId) => {
   return row[0]['partner_team_id'];
 };
 
+const getMatchingResultByOurteamId = async (conn, ourteamId) => {
+  const [row] = await conn.query('SELECT chat_link FROM `match_team` WHERE (team_a_id=(?) OR team_b_id=(?));', [
+    ourteamId,
+    ourteamId,
+  ]);
+
+  if (!row[0]) return 0;
+
+  return convertSnakeToCamel.keysToCamel(row[0]);
+};
+
 module.exports = {
   saveUserOurteam,
   updateUserOurteam,
@@ -317,4 +328,5 @@ module.exports = {
   getUserIdByOurteamId,
   getOurteamStatusByOurteamId,
   getPartnerTeamIdByOurteamId,
+  getMatchingResultByOurteamId,
 };
