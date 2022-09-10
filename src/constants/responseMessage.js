@@ -43,4 +43,5 @@ module.exports = {
   GET_PARTNER_TEAM_ID_SUCCESS: '우리팀의 상대팀 아이디 조회에 성공하였습니다',
   NO_PARTNER_TEAM: '상대팀 정보가 없습니다',
   GET_MATCHING_RESULT_SUCCESS: '매칭 결과 조회에 성공하였습니다',
+  NO_RESULT: '해당 팀의 매칭 결과가 없습니다',
 };
