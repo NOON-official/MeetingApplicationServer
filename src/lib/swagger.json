@@ -878,7 +878,7 @@
       "put": {
         "tags": ["Team"],
         "summary": "팀 매칭 신청 정보 수정",
-        "description": "🌸 팀의 매칭 신청 정보를 수정합니다. \n\n request body에는 변경이 필요한 property만 보내주시면 됩니다.",
+        "description": "🌸 팀의 매칭 신청 정보를 수정합니다. \n\n * 수정된 정보를 포함한 모든 값을 전부 보내주시면 됩니다. \n\n * matchingStatus가 0(매칭중)인 경우에만 수정 버튼을 활성화해주시면 됩니다. \n\n * (추후 변경이 필요한 property만 받도록 수정하겠습니다!)",
         "parameters": [
           {
             "in": "header",
@@ -904,14 +904,30 @@
                   "ourteam": {
                     "type": "object",
                     "example": {
+                      "gender": 1,
+                      "num": 2,
+                      "age": "25",
+                      "height": "170",
+                      "drink": "2",
                       "intro": "안녕하세요. 저희는~",
-                      "university": [1, 55]
+                      "job": [1, 3],
+                      "university": [1, 256, 400],
+                      "area": [2, 4, 1],
+                      "day": [1, 6, 7],
+                      "appearance": [1, 2],
+                      "mbti": [1, 3, 16],
+                      "fashion": [1, 2, 5],
+                      "role": [2, 4]
                     }
                   },
                   "ourteamPreference": {
                     "type": "object",
                     "example": {
-                      "sameUniversity": 1
+                      "job": [1, 2],
+                      "age": ["21", "25"],
+                      "height": ["170", "180"],
+                      "sameUniversity": 2,
+                      "vibe": [4, 5]
                     }
                   }
                 }
@@ -972,7 +988,7 @@
               }
             }
           },
-          "400": {
+          "400(1)": {
             "description": "매칭 신청 정보가 없는 경우",
             "content": {
               "application/json": {
@@ -986,6 +1002,26 @@
                       "status": 400,
                       "success": false,
                       "message": "해당 유저의 매칭 신청 정보가 없습니다"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400(2)": {
+            "description": "이미 매칭 완료된 유저인 경우",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "IS_MATCHED_USER",
+                    "value": {
+                      "status": 400,
+                      "success": false,
+                      "message": "이미 매칭 완료된 유저입니다"
                     }
                   }
                 }

@@ -32,6 +32,7 @@ module.exports = {
   SAVE_USER_PREFERENCE_SUCCESS: '유저 선호 정보 저장에 성공하였습니다',
   SAVE_USER_APPLY_SUCCESS: '유저 매칭 신청 정보 저장에 성공하였습니다',
   IS_MATCHING_USER: '매칭 진행중인 유저입니다',
+  IS_MATCHED_USER: '이미 매칭 완료된 유저입니다',
   NO_OURTEAM: '우리팀 정보가 존재하지 않습니다',
   GET_TEAM_APPLY_SUCCESS: '팀 매칭 신청 정보 조회에 성공하였습니다',
   UPDATE_USER_APPLY_SUCCESS: '유저 매칭 신청 정보 수정에 성공하였습니다',
