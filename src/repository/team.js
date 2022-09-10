@@ -201,10 +201,12 @@ const getOurteamByOurteamId = async (conn, ourteamId) => {
     'SELECT id AS ourteam_id, gender, num, age, height, drink, intro FROM `user_ourteam` WHERE id = (?) and is_deleted = false;',
     [ourteamId],
   );
+  if (!row[0]) return 0;
   ourteam = row[0];
 
   // 우리팀 직업
   [row] = await conn.query('SELECT JSON_ARRAYAGG(job) AS job  FROM `ourteam_job` WHERE ourteam_id = (?);', [ourteamId]);
+  if (!row[0]['job']) return 0;
   ourteam.job = row[0]['job'];
 
   // 우리팀 대학교
@@ -212,16 +214,19 @@ const getOurteamByOurteamId = async (conn, ourteamId) => {
     'SELECT JSON_ARRAYAGG(university) AS university  FROM `ourteam_university` WHERE ourteam_id = (?);',
     [ourteamId],
   );
+  if (!row[0]['university']) return 0;
   ourteam.university = row[0]['university'];
 
   // 우리팀 지역
   [row] = await conn.query('SELECT JSON_ARRAYAGG(area) AS area  FROM `ourteam_area` WHERE ourteam_id = (?);', [
     ourteamId,
   ]);
+  if (!row[0]['area']) return 0;
   ourteam.area = row[0]['area'];
 
   // 우리팀 요일
   [row] = await conn.query('SELECT JSON_ARRAYAGG(day) AS day  FROM `ourteam_day` WHERE ourteam_id = (?);', [ourteamId]);
+  if (!row[0]['day']) return 0;
   ourteam.day = row[0]['day'];
 
   // 우리팀 외모
@@ -229,24 +234,28 @@ const getOurteamByOurteamId = async (conn, ourteamId) => {
     'SELECT JSON_ARRAYAGG(appearance) AS appearance  FROM `ourteam_appearance` WHERE ourteam_id = (?);',
     [ourteamId],
   );
+  if (!row[0]['appearance']) return 0;
   ourteam.appearance = row[0]['appearance'];
 
   // 우리팀 MBTI
   [row] = await conn.query('SELECT JSON_ARRAYAGG(mbti) AS mbti  FROM `ourteam_mbti` WHERE ourteam_id = (?);', [
     ourteamId,
   ]);
+  if (!row[0]['mbti']) return 0;
   ourteam.mbti = row[0]['mbti'];
 
   // 우리팀 패션
   [row] = await conn.query('SELECT JSON_ARRAYAGG(fashion) AS fashion  FROM `ourteam_fashion` WHERE ourteam_id = (?);', [
     ourteamId,
   ]);
+  if (!row[0]['fashion']) return 0;
   ourteam.fashion = row[0]['fashion'];
 
   // 우리팀 구성원
   [row] = await conn.query('SELECT JSON_ARRAYAGG(role) AS role  FROM `ourteam_role` WHERE ourteam_id = (?);', [
     ourteamId,
   ]);
+  if (!row[0]['role']) return 0;
   ourteam.role = row[0]['role'];
 
   ourteam = convertSnakeToCamel.keysToCamel(ourteam);
@@ -257,12 +266,14 @@ const getOurteamByOurteamId = async (conn, ourteamId) => {
     'SELECT JSON_ARRAYAGG(preference_job) AS preference_job  FROM `ourteam_preference_job` WHERE ourteam_id = (?);',
     [ourteamId],
   );
+  if (!row[0]['preference_job']) return 0;
   ourteamPreference.job = row[0]['preference_job'];
 
   [row] = await conn.query(
     'SELECT start_age, end_age, start_height, end_height, same_university FROM `ourteam_preference` WHERE ourteam_id = (?);',
     [ourteamId],
   );
+  if (!row[0]) return 0;
 
   // 우리팀 선호 나이
   ourteamPreference.age = [row[0]['start_age'], row[0]['end_age']];
@@ -277,9 +288,21 @@ const getOurteamByOurteamId = async (conn, ourteamId) => {
     'SELECT JSON_ARRAYAGG(preference_vibe) AS preference_vibe  FROM `ourteam_preference_vibe` WHERE ourteam_id = (?);',
     [ourteamId],
   );
+  if (!row[0]['preference_vibe']) return 0;
   ourteamPreference.vibe = row[0]['preference_vibe'];
 
   return convertSnakeToCamel.keysToCamel({ ourteam, ourteamPreference });
+};
+
+const getPartnerTeamIdByOurteamId = async (conn, ourteamId) => {
+  const [row] = await conn.query(
+    'SELECT IF(team_a_id=(?), team_b_id, team_a_id) AS partner_team_id FROM `match_team` WHERE (team_a_id=(?) OR team_b_id=(?))',
+    [ourteamId, ourteamId, ourteamId],
+  );
+
+  if (!row[0]) return -1;
+
+  return row[0]['partner_team_id'];
 };
 
 module.exports = {
@@ -293,4 +316,5 @@ module.exports = {
   getOurteamIdByUserId,
   getUserIdByOurteamId,
   getOurteamStatusByOurteamId,
+  getPartnerTeamIdByOurteamId,
 };
