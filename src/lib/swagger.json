@@ -417,17 +417,6 @@
         "description": "🌸 가입한 유저 정보를 모두 삭제합니다. \n\n * 현재는 soft delete",
         "parameters": [
           {
-            "in": "header",
-            "name": "authorization",
-            "schema": {
-              "type": "string",
-              "format": "Bearer {token}",
-              "example": "Bearer addagkjdagjdakg.djagkjdgkadjgk.ajdkglajdlgkj"
-            },
-            "required": true,
-            "description": "Access Token"
-          },
-          {
             "in": "path",
             "name": "userId",
             "schema": {
@@ -438,6 +427,7 @@
             "description": "유저 id"
           }
         ],
+        "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
             "description": "유저 회원탈퇴 성공",
@@ -476,19 +466,7 @@
         "tags": ["Auth"],
         "summary": "토큰 재발급",
         "description": "🌸 토큰을 재발급합니다. \n\n 복잡해보이지만 에러코드가 200, 400, 401인 경우로 분류하여 401인 경우 모두 새로 로그인하도록 처리해주면 됩니다! (로그인 페이지로 이동시키기)",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "schema": {
-              "type": "string",
-              "format": "Bearer {token}",
-              "example": "Bearer addagkjdagjdakg.djagkjdgkadjgk.ajdkglajdlgkj"
-            },
-            "required": true,
-            "description": "Access Token"
-          }
-        ],
+        "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "content": {
             "application/json": {
@@ -602,19 +580,7 @@
         "tags": ["User"],
         "summary": "유저 핸드폰 번호 저장 및 수정",
         "description": "🌸 매칭을 신청하는 유저의 핸드폰 번호를 저장 및 수정합니다. \n\n * 카카오 로그인 후 본 API를 호출해주시면 됩니다!",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "schema": {
-              "type": "string",
-              "format": "Bearer {token}",
-              "example": "Bearer addagkjdagjdakg.djagkjdgkadjgk.ajdkglajdlgkj"
-            },
-            "required": true,
-            "description": "Access Token"
-          }
-        ],
+        "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "content": {
             "application/json": {
@@ -679,17 +645,6 @@
         "description": "🌸 유저의 이름과 전화번호를 조회합니다. \n\n * isAdmin의 값으로 관리자 여부를 1차 체크해주시면 됩니다. (서버에서 추가 확인O)",
         "parameters": [
           {
-            "in": "header",
-            "name": "authorization",
-            "schema": {
-              "type": "string",
-              "format": "Bearer {token}",
-              "example": "Bearer addagkjdagjdakg.djagkjdgkadjgk.ajdkglajdlgkj"
-            },
-            "required": true,
-            "description": "Access Token"
-          },
-          {
             "in": "path",
             "name": "userId",
             "schema": {
@@ -700,6 +655,7 @@
             "description": "유저 id"
           }
         ],
+        "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
             "description": "유저 정보 조회 성공",
@@ -744,19 +700,7 @@
         "tags": ["Team"],
         "summary": "팀 매칭 신청 정보 저장",
         "description": "🌸 팀의 매칭 신청 정보를 저장합니다. (우리팀 정보 + 우리팀 선호 정보) \n\n카카오 로그인에 성공한 후 발급되는 토큰과 함께 본 API를 호출해주시면 됩니다!",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "schema": {
-              "type": "string",
-              "format": "Bearer {token}",
-              "example": "Bearer addagkjdagjdakg.djagkjdgkadjgk.ajdkglajdlgkj"
-            },
-            "required": true,
-            "description": "Access Token"
-          }
-        ],
+        "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "content": {
             "application/json": {
@@ -879,19 +823,7 @@
         "tags": ["Team"],
         "summary": "팀 매칭 신청 정보 수정",
         "description": "🌸 팀의 매칭 신청 정보를 수정합니다. \n\n * 수정된 정보를 포함한 모든 값을 전부 보내주시면 됩니다. \n\n * matchingStatus가 0(매칭중)인 경우에만 수정 버튼을 활성화해주시면 됩니다. \n\n * (추후 변경이 필요한 property만 받도록 수정하겠습니다!)",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "schema": {
-              "type": "string",
-              "format": "Bearer {token}",
-              "example": "Bearer addagkjdagjdakg.djagkjdgkadjgk.ajdkglajdlgkj"
-            },
-            "required": true,
-            "description": "Access Token"
-          }
-        ],
+        "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1038,17 +970,6 @@
         "description": "🌸 로그인한 유저의 _매칭 진행중인_ 우리팀 아이디를 조회합니다. \n\n * 우리팀 정보 조회 및 수정, [매칭 조회] 페이지 화면 핸들링시 활용하시면 됩니다. \n\n * 매칭 진행중인 팀 정보가 없는 경우 -1을 반환합니다. [매칭 조회] 페이지에서 해당 화면 처리해주시면 됩니다.",
         "parameters": [
           {
-            "in": "header",
-            "name": "authorization",
-            "schema": {
-              "type": "string",
-              "format": "Bearer {token}",
-              "example": "Bearer addagkjdagjdakg.djagkjdgkadjgk.ajdkglajdlgkj"
-            },
-            "required": true,
-            "description": "Access Token"
-          },
-          {
             "in": "path",
             "name": "userId",
             "schema": {
@@ -1059,6 +980,7 @@
             "description": "유저 id"
           }
         ],
+        "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
             "description": "유저 우리팀 아이디 조회 성공",
@@ -1099,17 +1021,6 @@
         "description": "🌸 매칭 성공 후 우리팀의 상대팀 아이디를 조회합니다. \n\n * 매칭 결과 페이지에서 상대팀 정보 조회 시 본 API 호출 후 [GET] /team/{teamId} API를 호출해주시면 됩니다.",
         "parameters": [
           {
-            "in": "header",
-            "name": "authorization",
-            "schema": {
-              "type": "string",
-              "format": "Bearer {token}",
-              "example": "Bearer addagkjdagjdakg.djagkjdgkadjgk.ajdkglajdlgkj"
-            },
-            "required": true,
-            "description": "Access Token"
-          },
-          {
             "in": "path",
             "name": "ourteamId",
             "schema": {
@@ -1120,6 +1031,7 @@
             "description": "우리팀 id"
           }
         ],
+        "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
             "description": "상대팀 아이디 조회 성공",
@@ -1200,17 +1112,6 @@
         "description": "🌸 팀의 매칭 신청 정보를 조회합니다. \n\n * 우리팀 정보 조회 및 수정, 상대팀 정보 조회 시 활용하시면 됩니다.",
         "parameters": [
           {
-            "in": "header",
-            "name": "authorization",
-            "schema": {
-              "type": "string",
-              "format": "Bearer {token}",
-              "example": "Bearer addagkjdagjdakg.djagkjdgkadjgk.ajdkglajdlgkj"
-            },
-            "required": true,
-            "description": "Access Token"
-          },
-          {
             "in": "path",
             "name": "teamId",
             "schema": {
@@ -1221,6 +1122,7 @@
             "description": "우리팀 id 또는 상대팀 id"
           }
         ],
+        "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
             "description": "팀 매칭 신청 정보 조회 성공",
@@ -1304,17 +1206,6 @@
         "description": "🌸 우리팀의 매칭 상태를 조회합니다. \n\n각각의 상태에 따라 [매칭 조회] 페이지에 들어갔을 때의 화면을 핸들링해주시면 됩니다. \n\n * 매칭중(==찾는 중): 0 \n\n * 매칭 완료(==성공 -> 매칭 결과 조회 가능): 1 \n\n * 매칭 실패: 2",
         "parameters": [
           {
-            "in": "header",
-            "name": "authorization",
-            "schema": {
-              "type": "string",
-              "format": "Bearer {token}",
-              "example": "Bearer addagkjdagjdakg.djagkjdgkadjgk.ajdkglajdlgkj"
-            },
-            "required": true,
-            "description": "Access Token"
-          },
-          {
             "in": "path",
             "name": "ourteamId",
             "schema": {
@@ -1325,6 +1216,7 @@
             "description": "우리팀 id"
           }
         ],
+        "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
             "description": "팀 매칭 상태 조회 성공",
@@ -1365,17 +1257,6 @@
         "description": "🌸 우리팀 매칭 결과를 조회합니다. \n\n * 현재는 연락처 정보만 반환합니다.",
         "parameters": [
           {
-            "in": "header",
-            "name": "authorization",
-            "schema": {
-              "type": "string",
-              "format": "Bearer {token}",
-              "example": "Bearer addagkjdagjdakg.djagkjdgkadjgk.ajdkglajdlgkj"
-            },
-            "required": true,
-            "description": "Access Token"
-          },
-          {
             "in": "path",
             "name": "ourteamId",
             "schema": {
@@ -1386,6 +1267,7 @@
             "description": "우리팀 id"
           }
         ],
+        "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
             "description": "매칭 결과 조회 성공",
@@ -1533,6 +1415,13 @@
             "type": "string"
           }
         }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       }
     },
     "responses": {
