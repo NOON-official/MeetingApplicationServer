@@ -7,5 +7,6 @@ router.put('/', checkUser, require('./teamPUT'));
 router.get('/ourteam-id/:userId', checkUser, require('./teamOurteamIdUserIdGET'));
 router.get('/partner-team-id/:ourteamId', checkUser, require('./teamPartnerTeamIdOurteamIdGET.js'));
 router.get('/:teamId', checkUser, require('./teamTeamIdGET.js'));
+router.get('/status/:ourteamId', checkUser, require('./teamStatusOurteamIdGET.js'));
 
 module.exports = router;
