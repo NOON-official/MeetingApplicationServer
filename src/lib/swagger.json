@@ -192,6 +192,26 @@
               }
             }
           },
+          "403": {
+            "description": "권한이 없는 경우",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "FORBIDDEN",
+                    "value": {
+                      "status": 403,
+                      "success": false,
+                      "message": "잘못된 접근입니다"
+                    }
+                  }
+                }
+              }
+            }
+          },
           "404": {
             "description": "존재하지 않는 유저",
             "content": {
