@@ -296,7 +296,7 @@ const getOurteamByOurteamId = async (conn, ourteamId) => {
 
 const getPartnerTeamIdByOurteamId = async (conn, ourteamId) => {
   const [row] = await conn.query(
-    'SELECT IF(team_a_id=(?), team_b_id, team_a_id) AS partner_team_id FROM `match_team` WHERE (team_a_id=(?) OR team_b_id=(?))',
+    'SELECT IF(male_team_id=(?), female_team_id, male_team_id) AS partner_team_id FROM `match_team` WHERE (male_team_id=(?) OR female_team_id=(?))',
     [ourteamId, ourteamId, ourteamId],
   );
 
@@ -306,7 +306,7 @@ const getPartnerTeamIdByOurteamId = async (conn, ourteamId) => {
 };
 
 const getMatchingResultByOurteamId = async (conn, ourteamId) => {
-  const [row] = await conn.query('SELECT chat_link FROM `match_team` WHERE (team_a_id=(?) OR team_b_id=(?));', [
+  const [row] = await conn.query('SELECT chat_link FROM `match_team` WHERE (male_team_id=(?) OR female_team_id=(?));', [
     ourteamId,
     ourteamId,
   ]);

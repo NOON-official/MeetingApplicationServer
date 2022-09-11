@@ -7,6 +7,7 @@ module.exports = {
   TOKEN_EXPIRED: '토큰이 만료되었습니다',
   NO_USER_ID: '유저 아이디가 없습니다',
   INVALID_USER: '잘못된 유저 정보입니다',
+  FORBIDDEN: '잘못된 접근입니다',
   NO_USER: '존재하지 않는 유저입니다',
   INTERNAL_SERVER_ERROR: '서버 내 오류',
 
@@ -44,4 +45,16 @@ module.exports = {
   NO_PARTNER_TEAM: '상대팀 정보가 없습니다',
   GET_MATCHING_RESULT_SUCCESS: '매칭 결과 조회에 성공하였습니다',
   NO_RESULT: '해당 팀의 매칭 결과가 없습니다',
+
+  // Admin
+  ADMIN_NO_RESULT: '조회 결과가 없습니다',
+  GET_MALE_TEAM_APPLY_SUCCESS: '남자팀 매칭 신청 정보 전체 조회에 성공하였습니다',
+  GET_FEMALE_TEAM_APPLY_SUCCESS: '여자팀 매칭 신청 정보 전체 조회에 성공하였습니다',
+  GET_MATCHING_SUCCESS_MALE_TEAM_SUCCESS: '매칭 완료된 남자팀 정보 전체 조회에 성공하였습니다',
+  GET_MATCHING_SUCCESS_FEMALE_TEAM_SUCCESS: '매칭 완료된 여자팀 정보 전체 조회에 성공하였습니다',
+  GET_MATCHING_FAIL_MALE_TEAM_SUCCESS: '매칭 실패한 남자팀 정보 전체 조회에 성공하였습니다',
+  GET_MATCHING_FAIL_FEMALE_TEAM_SUCCESS: '매칭 실패한 여자팀 정보 전체 조회에 성공하였습니다',
+  MATCH_TEAM_SUCCESS: '팀 매칭하기에 성공하였습니다',
+  DELETE_MATCHING_SUCCESS: '매칭 정보 삭제하기에 성공하였습니다',
+  UPDATE_SERVICE_APPLY_STATUS_SUCCESS: '서비스 매칭 신청 가능 상태 변경에 성공하였습니다',
 };
