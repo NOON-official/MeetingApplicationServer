@@ -1,4 +1,5 @@
 const convertSnakeToCamel = require('../lib/convertSnakeToCamel');
+const { toArrayOfString, toArrayOfNumber } = require('../lib/convertArrayToString');
 
 const saveUserOurteam = async (conn, params) => {
   // 1. 우리팀 정보 저장
@@ -11,46 +12,40 @@ const saveUserOurteam = async (conn, params) => {
   newOurteamId = newOurteamId[0]['LAST_INSERT_ID()'];
 
   // 배열 자료형 params 테이블에 저장
-  await conn.query('INSERT INTO `ourteam_job` (ourteam_id, job) VALUES ?;', [params.job.map((j) => [newOurteamId, j])]);
-  await conn.query('INSERT INTO `ourteam_university` (ourteam_id, university) VALUES ?;', [
-    params.university.map((u) => [newOurteamId, u]),
+  await conn.query('INSERT INTO `ourteam_job` (ourteam_id, job) VALUES (?, ?);', [newOurteamId, params.job]);
+  await conn.query('INSERT INTO `ourteam_university` (ourteam_id, university) VALUES (?, ?);', [
+    newOurteamId,
+    params.university,
   ]);
-  await conn.query('INSERT INTO `ourteam_area` (ourteam_id, area) VALUES ?;', [
-    params.area.map((a) => [newOurteamId, a]),
+  await conn.query('INSERT INTO `ourteam_area` (ourteam_id, area) VALUES (?, ?);', [newOurteamId, params.area]);
+  await conn.query('INSERT INTO `ourteam_day` (ourteam_id, day) VALUES (?, ?);', [newOurteamId, params.day]);
+  await conn.query('INSERT INTO `ourteam_appearance` (ourteam_id, appearance) VALUES (?, ?);', [
+    newOurteamId,
+    params.appearance,
   ]);
-  await conn.query('INSERT INTO `ourteam_day` (ourteam_id, day) VALUES ?;', [params.day.map((d) => [newOurteamId, d])]);
-  await conn.query('INSERT INTO `ourteam_appearance` (ourteam_id, appearance) VALUES ?;', [
-    params.appearance.map((a) => [newOurteamId, a]),
+  await conn.query('INSERT INTO `ourteam_mbti` (ourteam_id, mbti) VALUES (?, ?);', [newOurteamId, params.mbti]);
+  await conn.query('INSERT INTO `ourteam_fashion` (ourteam_id, fashion) VALUES (?, ?);', [
+    newOurteamId,
+    params.fashion,
   ]);
-  await conn.query('INSERT INTO `ourteam_mbti` (ourteam_id, mbti) VALUES ?;', [
-    params.mbti.map((m) => [newOurteamId, m]),
-  ]);
-  await conn.query('INSERT INTO `ourteam_fashion` (ourteam_id, fashion) VALUES ?;', [
-    params.fashion.map((f) => [newOurteamId, f]),
-  ]);
-  await conn.query('INSERT INTO `ourteam_role` (ourteam_id, role) VALUES ?;', [
-    params.role.map((r) => [newOurteamId, r]),
-  ]);
+  await conn.query('INSERT INTO `ourteam_role` (ourteam_id, role) VALUES (?, ?);', [newOurteamId, params.role]);
 
   // 2. 우리팀 선호 정보 저장
-  await conn.query(
-    'INSERT INTO `ourteam_preference` (ourteam_id, start_age, end_age, start_height, end_height, same_university) VALUES (?, ?, ?, ?, ?, ?);',
-    [
-      newOurteamId,
-      params.preferenceAge[0],
-      params.preferenceAge[1],
-      params.preferenceHeight[0],
-      params.preferenceHeight[1],
-      params.sameUniversity,
-    ],
-  );
+  await conn.query('INSERT INTO `ourteam_preference` (ourteam_id, age, height, same_university) VALUES (?, ?, ?, ?);', [
+    newOurteamId,
+    params.preferenceAge,
+    params.preferenceHeight,
+    params.sameUniversity,
+  ]);
 
   // 배열 자료형 params를 테이블에 저장
-  await conn.query('INSERT INTO `ourteam_preference_job` (ourteam_id, preference_job) VALUES ?;', [
-    params.preferenceJob.map((j) => [newOurteamId, j]),
+  await conn.query('INSERT INTO `ourteam_preference_job` (ourteam_id, preference_job) VALUES (?, ?);', [
+    newOurteamId,
+    params.preferenceJob,
   ]);
-  await conn.query('INSERT INTO `ourteam_preference_vibe` (ourteam_id, preference_vibe) VALUES ?;', [
-    params.vibe.map((v) => [newOurteamId, v]),
+  await conn.query('INSERT INTO `ourteam_preference_vibe` (ourteam_id, preference_vibe) VALUES (?, ?);', [
+    newOurteamId,
+    params.vibe,
   ]);
 
   return convertSnakeToCamel.keysToCamel(newOurteamId);
@@ -63,65 +58,41 @@ const updateUserOurteam = async (conn, params) => {
     [params.gender, params.num, params.age, params.height, params.drink, params.intro, params.ourteamId],
   );
 
-  // 기존의 배열 자료형 데이터 삭제
-  await conn.query('DELETE FROM `ourteam_job` WHERE ourteam_id=(?);', [params.ourteamId]);
-  await conn.query('DELETE FROM `ourteam_university` WHERE ourteam_id=(?);', [params.ourteamId]);
-  await conn.query('DELETE FROM `ourteam_area` WHERE ourteam_id=(?);', [params.ourteamId]);
-  await conn.query('DELETE FROM `ourteam_day` WHERE ourteam_id=(?);', [params.ourteamId]);
-  await conn.query('DELETE FROM `ourteam_appearance` WHERE ourteam_id=(?);', [params.ourteamId]);
-  await conn.query('DELETE FROM `ourteam_mbti` WHERE ourteam_id=(?);', [params.ourteamId]);
-  await conn.query('DELETE FROM `ourteam_fashion` WHERE ourteam_id=(?);', [params.ourteamId]);
-  await conn.query('DELETE FROM `ourteam_role` WHERE ourteam_id=(?);', [params.ourteamId]);
-
-  // 배열 자료형 params 테이블에 저장
-  await conn.query('INSERT INTO `ourteam_job` (ourteam_id, job) VALUES ?;', [
-    params.job.map((j) => [params.ourteamId, j]),
+  // 배열 타입 데이터 업데이트
+  await conn.query('UPDATE `ourteam_job` SET job=(?) WHERE ourteam_id=(?);', [params.job, params.ourteamId]);
+  await conn.query('UPDATE `ourteam_university` SET university=(?) WHERE ourteam_id=(?);', [
+    params.university,
+    params.ourteamId,
   ]);
-  await conn.query('INSERT INTO `ourteam_university` (ourteam_id, university) VALUES ?;', [
-    params.university.map((u) => [params.ourteamId, u]),
+  await conn.query('UPDATE `ourteam_area` SET area=(?) WHERE ourteam_id=(?);', [params.area, params.ourteamId]);
+  await conn.query('UPDATE `ourteam_day` SET day=(?) WHERE ourteam_id=(?);', [params.day, params.ourteamId]);
+  await conn.query('UPDATE `ourteam_appearance` SET appearance=(?) WHERE ourteam_id=(?);', [
+    params.appearance,
+    params.ourteamId,
   ]);
-  await conn.query('INSERT INTO `ourteam_area` (ourteam_id, area) VALUES ?;', [
-    params.area.map((a) => [params.ourteamId, a]),
+  await conn.query('UPDATE `ourteam_mbti` SET mbti=(?) WHERE ourteam_id=(?);', [params.mbti, params.ourteamId]);
+  await conn.query('UPDATE `ourteam_fashion` SET fashion=(?) WHERE ourteam_id=(?);', [
+    params.fashion,
+    params.ourteamId,
   ]);
-  await conn.query('INSERT INTO `ourteam_day` (ourteam_id, day) VALUES ?;', [
-    params.day.map((d) => [params.ourteamId, d]),
-  ]);
-  await conn.query('INSERT INTO `ourteam_appearance` (ourteam_id, appearance) VALUES ?;', [
-    params.appearance.map((a) => [params.ourteamId, a]),
-  ]);
-  await conn.query('INSERT INTO `ourteam_mbti` (ourteam_id, mbti) VALUES ?;', [
-    params.mbti.map((m) => [params.ourteamId, m]),
-  ]);
-  await conn.query('INSERT INTO `ourteam_fashion` (ourteam_id, fashion) VALUES ?;', [
-    params.fashion.map((f) => [params.ourteamId, f]),
-  ]);
-  await conn.query('INSERT INTO `ourteam_role` (ourteam_id, role) VALUES ?;', [
-    params.role.map((r) => [params.ourteamId, r]),
-  ]);
+  await conn.query('UPDATE `ourteam_role` SET role=(?) WHERE ourteam_id=(?);', [params.role, params.ourteamId]);
 
   // 2. 우리팀 선호 정보 업데이트
-  await conn.query(
-    'UPDATE `ourteam_preference` SET start_age=(?), end_age=(?), start_height=(?), end_height=(?), same_university=(?) WHERE ourteam_id=(?);',
-    [
-      params.preferenceAge[0],
-      params.preferenceAge[1],
-      params.preferenceHeight[0],
-      params.preferenceHeight[1],
-      params.sameUniversity,
-      params.ourteamId,
-    ],
-  );
-
-  // 기존의 배열 자료형 데이터 삭제
-  await conn.query('DELETE FROM `ourteam_preference_job` WHERE ourteam_id=(?);', [params.ourteamId]);
-  await conn.query('DELETE FROM `ourteam_preference_vibe` WHERE ourteam_id=(?);', [params.ourteamId]);
-
-  // 배열 자료형 params를 테이블에 저장
-  await conn.query('INSERT INTO `ourteam_preference_job` (ourteam_id, preference_job) VALUES ?;', [
-    params.preferenceJob.map((j) => [params.ourteamId, j]),
+  await conn.query('UPDATE `ourteam_preference` SET age=(?), height=(?), same_university=(?) WHERE ourteam_id=(?);', [
+    params.preferenceAge,
+    params.preferenceHeight,
+    params.sameUniversity,
+    params.ourteamId,
   ]);
-  await conn.query('INSERT INTO `ourteam_preference_vibe` (ourteam_id, preference_vibe) VALUES ?;', [
-    params.vibe.map((v) => [params.ourteamId, v]),
+
+  // 배열 타입 데이터 업데이트
+  await conn.query('UPDATE `ourteam_preference_job` SET preference_job=(?) WHERE ourteam_id=(?);', [
+    params.preferenceJob,
+    params.ourteamId,
+  ]);
+  await conn.query('UPDATE `ourteam_preference_vibe` SET preference_vibe=(?) WHERE ourteam_id=(?);', [
+    params.vibe,
+    params.ourteamId,
   ]);
 
   return convertSnakeToCamel.keysToCamel(params.ourteamId);
@@ -205,91 +176,72 @@ const getOurteamByOurteamId = async (conn, ourteamId) => {
   ourteam = row[0];
 
   // 우리팀 직업
-  [row] = await conn.query('SELECT JSON_ARRAYAGG(job) AS job  FROM `ourteam_job` WHERE ourteam_id = (?);', [ourteamId]);
+  [row] = await conn.query('SELECT job  FROM `ourteam_job` WHERE ourteam_id = (?);', [ourteamId]);
   if (!row[0]['job']) return 0;
-  ourteam.job = row[0]['job'];
+  ourteam.job = toArrayOfNumber(row[0]['job']);
 
   // 우리팀 대학교
-  [row] = await conn.query(
-    'SELECT JSON_ARRAYAGG(university) AS university  FROM `ourteam_university` WHERE ourteam_id = (?);',
-    [ourteamId],
-  );
+  [row] = await conn.query('SELECT university  FROM `ourteam_university` WHERE ourteam_id = (?);', [ourteamId]);
   if (!row[0]['university']) return 0;
-  ourteam.university = row[0]['university'];
+  ourteam.university = toArrayOfNumber(row[0]['university']);
 
   // 우리팀 지역
-  [row] = await conn.query('SELECT JSON_ARRAYAGG(area) AS area  FROM `ourteam_area` WHERE ourteam_id = (?);', [
-    ourteamId,
-  ]);
+  [row] = await conn.query('SELECT area  FROM `ourteam_area` WHERE ourteam_id = (?);', [ourteamId]);
   if (!row[0]['area']) return 0;
-  ourteam.area = row[0]['area'];
+  ourteam.area = toArrayOfNumber(row[0]['area']);
 
   // 우리팀 요일
-  [row] = await conn.query('SELECT JSON_ARRAYAGG(day) AS day  FROM `ourteam_day` WHERE ourteam_id = (?);', [ourteamId]);
+  [row] = await conn.query('SELECT day  FROM `ourteam_day` WHERE ourteam_id = (?);', [ourteamId]);
   if (!row[0]['day']) return 0;
-  ourteam.day = row[0]['day'];
+  ourteam.day = toArrayOfNumber(row[0]['day']);
 
   // 우리팀 외모
-  [row] = await conn.query(
-    'SELECT JSON_ARRAYAGG(appearance) AS appearance  FROM `ourteam_appearance` WHERE ourteam_id = (?);',
-    [ourteamId],
-  );
+  [row] = await conn.query('SELECT appearance  FROM `ourteam_appearance` WHERE ourteam_id = (?);', [ourteamId]);
   if (!row[0]['appearance']) return 0;
-  ourteam.appearance = row[0]['appearance'];
+  ourteam.appearance = toArrayOfNumber(row[0]['appearance']);
 
   // 우리팀 MBTI
-  [row] = await conn.query('SELECT JSON_ARRAYAGG(mbti) AS mbti  FROM `ourteam_mbti` WHERE ourteam_id = (?);', [
-    ourteamId,
-  ]);
+  [row] = await conn.query('SELECT mbti  FROM `ourteam_mbti` WHERE ourteam_id = (?);', [ourteamId]);
   if (!row[0]['mbti']) return 0;
-  ourteam.mbti = row[0]['mbti'];
+  ourteam.mbti = toArrayOfNumber(row[0]['mbti']);
 
   // 우리팀 패션
-  [row] = await conn.query('SELECT JSON_ARRAYAGG(fashion) AS fashion  FROM `ourteam_fashion` WHERE ourteam_id = (?);', [
-    ourteamId,
-  ]);
+  [row] = await conn.query('SELECT fashion  FROM `ourteam_fashion` WHERE ourteam_id = (?);', [ourteamId]);
   if (!row[0]['fashion']) return 0;
-  ourteam.fashion = row[0]['fashion'];
+  ourteam.fashion = toArrayOfNumber(row[0]['fashion']);
 
   // 우리팀 구성원
-  [row] = await conn.query('SELECT JSON_ARRAYAGG(role) AS role  FROM `ourteam_role` WHERE ourteam_id = (?);', [
-    ourteamId,
-  ]);
+  [row] = await conn.query('SELECT role  FROM `ourteam_role` WHERE ourteam_id = (?);', [ourteamId]);
   if (!row[0]['role']) return 0;
-  ourteam.role = row[0]['role'];
+  ourteam.role = toArrayOfNumber(row[0]['role']);
 
   ourteam = convertSnakeToCamel.keysToCamel(ourteam);
 
   // 2. 우리팀 선호 정보
   // 우리팀 선호 직업
-  [row] = await conn.query(
-    'SELECT JSON_ARRAYAGG(preference_job) AS preference_job  FROM `ourteam_preference_job` WHERE ourteam_id = (?);',
-    [ourteamId],
-  );
+  [row] = await conn.query('SELECT preference_job  FROM `ourteam_preference_job` WHERE ourteam_id = (?);', [ourteamId]);
   if (!row[0]['preference_job']) return 0;
-  ourteamPreference.job = row[0]['preference_job'];
+  ourteamPreference.job = toArrayOfNumber(row[0]['preference_job']);
 
-  [row] = await conn.query(
-    'SELECT start_age, end_age, start_height, end_height, same_university FROM `ourteam_preference` WHERE ourteam_id = (?);',
-    [ourteamId],
-  );
+  [row] = await conn.query('SELECT age, height, same_university FROM `ourteam_preference` WHERE ourteam_id = (?);', [
+    ourteamId,
+  ]);
   if (!row[0]) return 0;
 
   // 우리팀 선호 나이
-  ourteamPreference.age = [row[0]['start_age'], row[0]['end_age']];
+  ourteamPreference.age = toArrayOfString(row[0]['age']);
 
   // 우리팀 선호 키
-  ourteamPreference.height = [row[0]['start_height'], row[0]['end_height']];
+  ourteamPreference.height = toArrayOfString(row[0]['height']);
 
   // 같은 학교
   ourteamPreference.sameUniversity = row[0]['same_university'];
 
-  [row] = await conn.query(
-    'SELECT JSON_ARRAYAGG(preference_vibe) AS preference_vibe  FROM `ourteam_preference_vibe` WHERE ourteam_id = (?);',
-    [ourteamId],
-  );
+  [row] = await conn.query('SELECT preference_vibe  FROM `ourteam_preference_vibe` WHERE ourteam_id = (?);', [
+    ourteamId,
+  ]);
   if (!row[0]['preference_vibe']) return 0;
-  ourteamPreference.vibe = row[0]['preference_vibe'];
+  ourteamPreference.vibe = toArrayOfNumber(row[0]['preference_vibe']);
 
   return convertSnakeToCamel.keysToCamel({ ourteam, ourteamPreference });
 };

@@ -1,6 +1,7 @@
 const util = require('../../lib/util');
 const statusCode = require('../../constants/statusCode');
 const responseMessage = require('../../constants/responseMessage');
+const { toString } = require('../../lib/convertArrayToString');
 const pool = require('../../repository/db');
 const { userDB, teamDB } = require('../../repository');
 
@@ -54,19 +55,19 @@ module.exports = async (req, res) => {
     height,
     drink,
     intro,
-    job,
-    university,
-    area,
-    day,
-    appearance,
-    mbti,
-    fashion,
-    role,
+    job: toString(job),
+    university: toString(university),
+    area: toString(area),
+    day: toString(day),
+    appearance: toString(appearance),
+    mbti: toString(mbti),
+    fashion: toString(fashion),
+    role: toString(role),
     sameUniversity,
-    preferenceJob,
-    preferenceAge,
-    preferenceHeight,
-    vibe,
+    preferenceJob: toString(preferenceJob),
+    preferenceAge: toString(preferenceAge),
+    preferenceHeight: toString(preferenceHeight),
+    vibe: toString(vibe),
   };
 
   let conn;
