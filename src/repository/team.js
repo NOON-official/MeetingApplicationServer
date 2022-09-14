@@ -268,6 +268,16 @@ const getMatchingResultByOurteamId = async (conn, ourteamId) => {
   return convertSnakeToCamel.keysToCamel(row[0]);
 };
 
+// 성별, 인원수 조건에 맞는 매칭 전인 팀 리스트 조회
+const getTeamByAdmin = async (conn, genderId, numId) => {
+  const [row] = await conn.query(
+    'SELECT uo.id AS ourteam_id, u.id AS user_id, u.phone, uo.gender, uo.num, uo.age, uo.height, uo.drink, uo.intro, oj.job, ou.university, oa.area, od.day, oap.appearance, om.mbti, ofa.fashion, oro.role, opj.preference_job, op.age AS preference_age, op.height AS preference_height, op.same_university, opv.preference_vibe FROM `user_ourteam` uo INNER JOIN `user` u ON uo.user_id = u.id INNER JOIN `ourteam_job` oj ON uo.id = oj.ourteam_id INNER JOIN `ourteam_university` ou ON uo.id = ou.ourteam_id INNER JOIN `ourteam_area` oa ON uo.id = oa.ourteam_id INNER JOIN `ourteam_day` od ON uo.id = od.ourteam_id INNER JOIN `ourteam_appearance` oap ON uo.id = oap.ourteam_id INNER JOIN `ourteam_mbti` om ON uo.id = om.ourteam_id INNER JOIN `ourteam_fashion` ofa ON uo.id = ofa.ourteam_id INNER JOIN `ourteam_role` oro ON uo.id = oro.ourteam_id INNER JOIN `ourteam_preference` op ON uo.id = op.ourteam_id INNER JOIN `ourteam_preference_job` opj ON uo.id = opj.ourteam_id INNER JOIN `ourteam_preference_vibe` opv ON uo.id = opv.ourteam_id WHERE u.is_deleted = false AND uo.gender = (?) AND uo.num = (?) AND uo.state = 0 AND uo.is_deleted = false ORDER BY uo.updated_at ASC, uo.age ASC;',
+    [genderId, numId],
+  );
+
+  return convertSnakeToCamel.keysToCamel(row);
+};
+
 module.exports = {
   saveUserOurteam,
   updateUserOurteam,
@@ -281,4 +291,5 @@ module.exports = {
   getOurteamStatusByOurteamId,
   getPartnerTeamIdByOurteamId,
   getMatchingResultByOurteamId,
+  getTeamByAdmin,
 };
