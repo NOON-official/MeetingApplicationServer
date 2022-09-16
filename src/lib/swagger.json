@@ -2074,6 +2074,26 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "이미 매칭된 유저인 경우",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "ALREADY_MATCHED_USER",
+                    "value": {
+                      "status": 400,
+                      "success": false,
+                      "message": "이미 매칭 완료된 유저입니다"
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }

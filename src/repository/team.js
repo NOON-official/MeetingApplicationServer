@@ -280,7 +280,7 @@ const getTeamByAdmin = async (conn, genderId, numId) => {
 
 const getSuccessMaleTeamByAdmin = async (conn, genderId) => {
   const [row] = await conn.query(
-    'SELECT uo.id AS ourteam_id, mt.female_team_id AS partner_team_id, u.id AS user_id, u.phone, uo.gender, uo.num, uo.age, uo.height, uo.drink, uo.intro, oj.job, ou.university, oa.area, od.day, oap.appearance, om.mbti, ofa.fashion, oro.role, opj.preference_job, op.age AS preference_age, op.height AS preference_height, op.same_university, opv.preference_vibe FROM `user_ourteam` uo INNER JOIN `user` u ON uo.user_id = u.id INNER JOIN `ourteam_job` oj ON uo.id = oj.ourteam_id INNER JOIN `ourteam_university` ou ON uo.id = ou.ourteam_id INNER JOIN `ourteam_area` oa ON uo.id = oa.ourteam_id INNER JOIN `ourteam_day` od ON uo.id = od.ourteam_id INNER JOIN `ourteam_appearance` oap ON uo.id = oap.ourteam_id INNER JOIN `ourteam_mbti` om ON uo.id = om.ourteam_id INNER JOIN `ourteam_fashion` ofa ON uo.id = ofa.ourteam_id INNER JOIN `ourteam_role` oro ON uo.id = oro.ourteam_id INNER JOIN `ourteam_preference` op ON uo.id = op.ourteam_id INNER JOIN `ourteam_preference_job` opj ON uo.id = opj.ourteam_id INNER JOIN `ourteam_preference_vibe` opv ON uo.id = opv.ourteam_id INNER JOIN `match_team` mt ON uo.id = mt.male_team_id WHERE u.is_deleted = false AND uo.gender = (?) AND uo.state = 1 AND uo.is_deleted = false ORDER BY uo.updated_at ASC',
+    'SELECT uo.id AS ourteam_id, mt.female_team_id AS partner_team_id, u.id AS user_id, u.phone, uo.gender, uo.num, uo.age, uo.height, uo.drink, uo.intro, oj.job, ou.university, oa.area, od.day, oap.appearance, om.mbti, ofa.fashion, oro.role, opj.preference_job, op.age AS preference_age, op.height AS preference_height, op.same_university, opv.preference_vibe FROM `user_ourteam` uo INNER JOIN `user` u ON uo.user_id = u.id INNER JOIN `ourteam_job` oj ON uo.id = oj.ourteam_id INNER JOIN `ourteam_university` ou ON uo.id = ou.ourteam_id INNER JOIN `ourteam_area` oa ON uo.id = oa.ourteam_id INNER JOIN `ourteam_day` od ON uo.id = od.ourteam_id INNER JOIN `ourteam_appearance` oap ON uo.id = oap.ourteam_id INNER JOIN `ourteam_mbti` om ON uo.id = om.ourteam_id INNER JOIN `ourteam_fashion` ofa ON uo.id = ofa.ourteam_id INNER JOIN `ourteam_role` oro ON uo.id = oro.ourteam_id INNER JOIN `ourteam_preference` op ON uo.id = op.ourteam_id INNER JOIN `ourteam_preference_job` opj ON uo.id = opj.ourteam_id INNER JOIN `ourteam_preference_vibe` opv ON uo.id = opv.ourteam_id INNER JOIN `match_team` mt ON uo.id = mt.male_team_id WHERE u.is_deleted = false AND mt.is_deleted = false AND uo.gender = (?) AND uo.state = 1 AND uo.is_deleted = false ORDER BY uo.updated_at ASC',
     [genderId],
   );
 
@@ -289,7 +289,7 @@ const getSuccessMaleTeamByAdmin = async (conn, genderId) => {
 
 const getSuccessFemaleTeamByAdmin = async (conn, genderId) => {
   const [row] = await conn.query(
-    'SELECT uo.id AS ourteam_id, mt.male_team_id AS partner_team_id, u.id AS user_id, u.phone, uo.gender, uo.num, uo.age, uo.height, uo.drink, uo.intro, oj.job, ou.university, oa.area, od.day, oap.appearance, om.mbti, ofa.fashion, oro.role, opj.preference_job, op.age AS preference_age, op.height AS preference_height, op.same_university, opv.preference_vibe FROM `user_ourteam` uo INNER JOIN `user` u ON uo.user_id = u.id INNER JOIN `ourteam_job` oj ON uo.id = oj.ourteam_id INNER JOIN `ourteam_university` ou ON uo.id = ou.ourteam_id INNER JOIN `ourteam_area` oa ON uo.id = oa.ourteam_id INNER JOIN `ourteam_day` od ON uo.id = od.ourteam_id INNER JOIN `ourteam_appearance` oap ON uo.id = oap.ourteam_id INNER JOIN `ourteam_mbti` om ON uo.id = om.ourteam_id INNER JOIN `ourteam_fashion` ofa ON uo.id = ofa.ourteam_id INNER JOIN `ourteam_role` oro ON uo.id = oro.ourteam_id INNER JOIN `ourteam_preference` op ON uo.id = op.ourteam_id INNER JOIN `ourteam_preference_job` opj ON uo.id = opj.ourteam_id INNER JOIN `ourteam_preference_vibe` opv ON uo.id = opv.ourteam_id INNER JOIN `match_team` mt ON uo.id = mt.female_team_id WHERE u.is_deleted = false AND uo.gender = (?) AND uo.state = 1 AND uo.is_deleted = false ORDER BY uo.updated_at ASC',
+    'SELECT uo.id AS ourteam_id, mt.male_team_id AS partner_team_id, u.id AS user_id, u.phone, uo.gender, uo.num, uo.age, uo.height, uo.drink, uo.intro, oj.job, ou.university, oa.area, od.day, oap.appearance, om.mbti, ofa.fashion, oro.role, opj.preference_job, op.age AS preference_age, op.height AS preference_height, op.same_university, opv.preference_vibe FROM `user_ourteam` uo INNER JOIN `user` u ON uo.user_id = u.id INNER JOIN `ourteam_job` oj ON uo.id = oj.ourteam_id INNER JOIN `ourteam_university` ou ON uo.id = ou.ourteam_id INNER JOIN `ourteam_area` oa ON uo.id = oa.ourteam_id INNER JOIN `ourteam_day` od ON uo.id = od.ourteam_id INNER JOIN `ourteam_appearance` oap ON uo.id = oap.ourteam_id INNER JOIN `ourteam_mbti` om ON uo.id = om.ourteam_id INNER JOIN `ourteam_fashion` ofa ON uo.id = ofa.ourteam_id INNER JOIN `ourteam_role` oro ON uo.id = oro.ourteam_id INNER JOIN `ourteam_preference` op ON uo.id = op.ourteam_id INNER JOIN `ourteam_preference_job` opj ON uo.id = opj.ourteam_id INNER JOIN `ourteam_preference_vibe` opv ON uo.id = opv.ourteam_id INNER JOIN `match_team` mt ON uo.id = mt.female_team_id WHERE u.is_deleted = false AND mt.is_deleted = false AND uo.gender = (?) AND uo.state = 1 AND uo.is_deleted = false ORDER BY uo.updated_at ASC',
     [genderId],
   );
 
@@ -303,6 +303,30 @@ const getFailTeamByAdmin = async (conn, genderId) => {
   );
 
   return convertSnakeToCamel.keysToCamel(row);
+};
+
+const matchTeam = async (conn, maleTeamId, femaleTeamId, chatLink) => {
+  const [row1] = await conn.query(
+    'SELECT male_team_id FROM `match_team` WHERE male_team_id=(?) and is_deleted=false;',
+    [maleTeamId],
+  );
+  const [row2] = await conn.query(
+    'SELECT female_team_id FROM `match_team` WHERE female_team_id=(?) and is_deleted=false;',
+    [femaleTeamId],
+  );
+
+  // 둘 중 한 명이 이미 매칭된 유저인 경우
+  if (!!row1[0] || !!row2[0]) {
+    return false;
+  }
+
+  await conn.query('INSERT INTO `match_team` (male_team_id, female_team_id, chat_link) VALUES (?, ?, ?);', [
+    maleTeamId,
+    femaleTeamId,
+    chatLink,
+  ]);
+
+  return true;
 };
 
 module.exports = {
@@ -322,4 +346,5 @@ module.exports = {
   getSuccessMaleTeamByAdmin,
   getSuccessFemaleTeamByAdmin,
   getFailTeamByAdmin,
+  matchTeam,
 };
