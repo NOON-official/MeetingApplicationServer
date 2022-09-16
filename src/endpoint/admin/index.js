@@ -12,7 +12,8 @@ router.get('/team/matching/success/female', checkUser, checkAdmin, require('./ad
 router.get('/team/matching/fail/male', checkUser, checkAdmin, require('./adminTeamMatchingFailMale'));
 router.get('/team/matching/fail/female', checkUser, checkAdmin, require('./adminTeamMatchingFailFemale'));
 router.post('/team/match', checkUser, checkAdmin, require('./adminTeamMatchPOST'));
-router.post('/team/close', checkUser, checkAdmin, require('./adminTeamClosePOST'));
+router.post('/close/matching', checkUser, checkAdmin, require('./adminCloseMatchingPOST'));
+router.post('/close/team', checkUser, checkAdmin, require('./adminCloseTeamPOST'));
 router.put('/apply/status', checkUser, checkAdmin, require('./adminApplyStatusPUT'));
 
 module.exports = router;
