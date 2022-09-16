@@ -329,6 +329,27 @@ const matchTeam = async (conn, maleTeamId, femaleTeamId, chatLink) => {
   return true;
 };
 
+const closeTeam = async (conn, maleTeamId, femaleTeamId) => {
+  const [row] = await conn.query(
+    'SELECT * FROM `match_team` WHERE male_team_id=(?) AND female_team_id=(?) and is_deleted=false;',
+    [maleTeamId, femaleTeamId],
+  );
+
+  // 매칭 정보가 없는 경우
+  if (!row[0]) {
+    return false;
+  }
+
+  await conn.query('UPDATE `match_team` SET is_deleted=true WHERE male_team_id=(?) AND female_team_id=(?);', [
+    maleTeamId,
+    femaleTeamId,
+  ]);
+  await conn.query('UPDATE `user_ourteam` SET is_deleted=true WHERE id=(?);', [maleTeamId]);
+  await conn.query('UPDATE `user_ourteam` SET is_deleted=true WHERE id=(?);', [femaleTeamId]);
+
+  return true;
+};
+
 module.exports = {
   saveUserOurteam,
   updateUserOurteam,
@@ -347,4 +368,5 @@ module.exports = {
   getSuccessFemaleTeamByAdmin,
   getFailTeamByAdmin,
   matchTeam,
+  closeTeam,
 };

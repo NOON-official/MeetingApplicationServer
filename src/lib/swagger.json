@@ -2151,6 +2151,26 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "해당 매칭 정보가 없는 경우",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "ADMIN_NO_RESULT",
+                    "value": {
+                      "status": 400,
+                      "success": false,
+                      "message": "조회 결과가 없습니다"
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }

@@ -12,5 +12,6 @@ router.get('/team/matching/success/female', checkUser, checkAdmin, require('./ad
 router.get('/team/matching/fail/male', checkUser, checkAdmin, require('./adminTeamMatchingFailMale'));
 router.get('/team/matching/fail/female', checkUser, checkAdmin, require('./adminTeamMatchingFailFemale'));
 router.post('/team/match', checkUser, checkAdmin, require('./adminTeamMatchPOST'));
+router.post('/team/close', checkUser, checkAdmin, require('./adminTeamClosePOST'));
 
 module.exports = router;
