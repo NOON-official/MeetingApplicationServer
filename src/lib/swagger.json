@@ -1025,7 +1025,6 @@
                     "data": {
                       "type": "object",
                       "example": {
-                        "userId": 1,
                         "ourteam": {
                           "ourteamId": 2,
                           "gender": 1,
@@ -1057,7 +1056,7 @@
               }
             }
           },
-          "400(1)": {
+          "400": {
             "description": "매칭 신청 정보가 없는 경우",
             "content": {
               "application/json": {
@@ -1071,26 +1070,6 @@
                       "status": 400,
                       "success": false,
                       "message": "해당 유저의 매칭 신청 정보가 없습니다"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400(2)": {
-            "description": "이미 매칭 완료된 유저인 경우",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Fail"
-                },
-                "examples": {
-                  "1": {
-                    "summary": "IS_MATCHED_USER",
-                    "value": {
-                      "status": 400,
-                      "success": false,
-                      "message": "이미 매칭 완료된 유저입니다"
                     }
                   }
                 }

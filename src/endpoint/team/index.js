@@ -9,5 +9,6 @@ router.get('/partner-team-id/:ourteamId', checkUser, require('./teamPartnerTeamI
 router.get('/:teamId', checkUser, require('./teamTeamIdGET'));
 router.get('/status/:ourteamId', checkUser, require('./teamStatusOurteamIdGET'));
 router.get('/result/:ourteamId', checkUser, require('./teamResultOurteamIdGET'));
+router.put('/reapply', checkUser, require('./teamReapplyPUT'));
 
 module.exports = router;
