@@ -9,5 +9,7 @@ router.get('/team/female/2', checkUser, checkAdmin, require('./adminTeamFemale2G
 router.get('/team/female/3', checkUser, checkAdmin, require('./adminTeamFemale3GET'));
 router.get('/team/matching/success/male', checkUser, checkAdmin, require('./adminTeamMatchingSuccessMale'));
 router.get('/team/matching/success/female', checkUser, checkAdmin, require('./adminTeamMatchingSuccessFemale'));
+router.get('/team/matching/fail/male', checkUser, checkAdmin, require('./adminTeamMatchingFailMale'));
+router.get('/team/matching/fail/female', checkUser, checkAdmin, require('./adminTeamMatchingFailFemale'));
 
 module.exports = router;
