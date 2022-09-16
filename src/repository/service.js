@@ -30,8 +30,18 @@ const getFemaleLimitNum = async (conn) => {
   return convertSnakeToCamel.keysToCamel(result);
 };
 
+const updateApplyStatus = async (conn, maleIsLimited, maleLimitNum, femaleIsLimited, femaleLimitNum) => {
+  await conn.query(
+    'UPDATE `service` SET male_is_limited=(?), male_limit_num=(?), female_is_limited=(?), female_limit_num=(?);',
+    [maleIsLimited, maleLimitNum, femaleIsLimited, femaleLimitNum],
+  );
+
+  return true;
+};
+
 module.exports = {
   getApplyIsLimited,
   getMaleLimitNum,
   getFemaleLimitNum,
+  updateApplyStatus,
 };
