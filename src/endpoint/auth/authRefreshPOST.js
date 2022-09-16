@@ -7,6 +7,7 @@ const statusCode = require('../../constants/statusCode');
 const responseMessage = require('../../constants/responseMessage');
 const { TOKEN_INVALID, TOKEN_EXPIRED } = require('../../constants/jwt');
 
+// 토큰 재발급
 module.exports = async (req, res) => {
   // Access Token과 Refresh Token 추출
   let accessToken = null;
@@ -43,6 +44,11 @@ module.exports = async (req, res) => {
         .send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN_INVALID));
     }
 
+    // 잘못된 유저 id인 경유
+    if (decoded.id != userId) {
+      return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.INVALID_USER));
+    }
+
     // Access Token 해독 및 인증
     const decodedAccessToken = jwtHandlers.accessToken.verify(accessToken);
     const decodedRefreshToken = await jwtHandlers.refreshToken.verify(refreshToken, userId);
@@ -68,9 +74,6 @@ module.exports = async (req, res) => {
 
         const newAccessToken = jwtHandlers.accessToken.sign(user);
 
-        const isMatching = await userDB.getIsMatchingByUserId(conn, decoded.id);
-
-        user.isMatching = isMatching;
         user.accessToken = newAccessToken;
         user.refreshToken = refreshToken;
 

@@ -25,11 +25,9 @@ module.exports = async (kakaoUser) => {
 
     // 발급한 Refresh Token을 DB에 저장
     await userDB.saveRefreshToken(conn, refreshToken, user.id);
-    const isMatching = await userDB.getIsMatchingByUserId(conn, user.id);
 
     user.refreshToken = refreshToken;
     user.accessToken = accessToken;
-    user.isMatching = isMatching;
 
     // 토큰과 함께 유저 정보를 반환
     return user;
