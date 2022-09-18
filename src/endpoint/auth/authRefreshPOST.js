@@ -10,12 +10,9 @@ const { TOKEN_INVALID, TOKEN_EXPIRED } = require('../../constants/jwt');
 // 토큰 재발급
 module.exports = async (req, res) => {
   // Access Token과 Refresh Token 추출
-  let accessToken = null;
-  if (!!req.headers.authorization) {
-    accessToken = req.headers.authorization.split('Bearer ')[1];
-  }
+  const accessToken = req.signedCookies.access;
   const grantType = req.body.grant_type;
-  const refreshToken = req.body.refresh_token;
+  const refreshToken = req.signedCookies.refresh;
   const userId = req.body.userId;
 
   if (!accessToken || !refreshToken) {
@@ -74,10 +71,26 @@ module.exports = async (req, res) => {
 
         const newAccessToken = jwtHandlers.accessToken.sign(user);
 
-        user.accessToken = newAccessToken;
-        user.refreshToken = refreshToken;
+        // 토큰을 cookie에 저장
+        const expiryDate = new Date(Date.now() + 60 * 60 * 1000 * 24 * 14); // 14일
 
-        // 새로 발급한 Access Token과 함께 유저 정보를 반환
+        // access token
+        res.cookie('access', newAccessToken, {
+          expires: expiryDate,
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production' ? true : false, // https로만 쿠키 통신 가능
+          signed: true,
+        });
+
+        // refresh token
+        res.cookie('refresh', refreshToken, {
+          expires: expiryDate,
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production' ? true : false, // https로만 쿠키 통신 가능
+          signed: true,
+        });
+
+        // 유저 정보를 반환
         return res
           .status(statusCode.OK)
           .send(util.success(statusCode.OK, responseMessage.REFRESH_TOKEN_SUCCESS, { user }));
