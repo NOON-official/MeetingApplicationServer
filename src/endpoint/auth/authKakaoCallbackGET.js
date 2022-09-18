@@ -53,26 +53,66 @@ module.exports = async (req, response) => {
 
             // DB에 해당 유저가 없으면 회원가입 API 호출
             if (!user) {
-              const newUser = await authKakaoSignup(kakaoUser);
+              const { user: newUser, accessToken, refreshToken } = await authKakaoSignup(kakaoUser);
 
               if (!newUser) {
                 return response
                   .status(statusCode.INTERNAL_SERVER_ERROR)
                   .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
               }
+
+              // 토큰을 cookie에 저장
+              const expiryDate = new Date(Date.now() + 60 * 60 * 1000 * 24 * 14); // 14일
+
+              // access token
+              response.cookie('access', accessToken, {
+                expires: expiryDate,
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production' ? true : false, // https로만 쿠키 통신 가능
+                signed: true,
+              });
+
+              // refresh token
+              response.cookie('refresh', refreshToken, {
+                expires: expiryDate,
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production' ? true : false, // https로만 쿠키 통신 가능
+                signed: true,
+              });
+
               return response
                 .status(statusCode.OK)
                 .send(util.success(statusCode.OK, responseMessage.CREATE_USER_SUCCESS, { user: newUser }));
             }
             // DB에 해당 유저가 있으면 로그인 API 호출
             else {
-              const loginUser = await authKakaoLogin(kakaoUser);
+              const { user: loginUser, accessToken, refreshToken } = await authKakaoLogin(kakaoUser);
 
-              if (!loginUser) {
+              if (!loginUser || !accessToken || !refreshToken) {
                 return response
                   .status(statusCode.INTERNAL_SERVER_ERROR)
                   .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
               }
+
+              // 토큰을 cookie에 저장
+              const expiryDate = new Date(Date.now() + 60 * 60 * 1000 * 24 * 14); // 14일
+
+              // access token
+              response.cookie('access', accessToken, {
+                expires: expiryDate,
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production' ? true : false, // https로만 쿠키 통신 가능
+                signed: true,
+              });
+
+              // refresh token
+              response.cookie('refresh', refreshToken, {
+                expires: expiryDate,
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production' ? true : false, // https로만 쿠키 통신 가능
+                signed: true,
+              });
+
               return response
                 .status(statusCode.OK)
                 .send(util.success(statusCode.OK, responseMessage.LOGIN_USER_SUCCESS, { user: loginUser }));
