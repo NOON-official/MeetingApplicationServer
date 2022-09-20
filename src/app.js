@@ -2,9 +2,13 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const printer = require('./lib/printer');
+const cookieParser = require('cookie-parser');
+const urlConfig = require('./config/urlConfig');
 
 async function createApp(config) {
   const app = express();
+
+  app.use(cookieParser(process.env.COOKIE_SECRET, { signed: true })); // 쿠키 암호화
 
   // 개발용 라이브러리
   if (process.env.NODE_ENV !== 'production') {
@@ -18,7 +22,14 @@ async function createApp(config) {
   } else {
     app.use(morgan('combined'));
   }
-  app.use(cors());
+
+  // Cookie 사용을 위한 cors option 설정
+  app.use(
+    cors({
+      origin: urlConfig.clientUrl,
+      credentials: true,
+    }),
+  );
 
   app.use(express.json());
 

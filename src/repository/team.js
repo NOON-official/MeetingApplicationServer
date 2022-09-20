@@ -298,7 +298,7 @@ const getSuccessFemaleTeamByAdmin = async (conn, genderId) => {
 
 const getFailTeamByAdmin = async (conn, genderId) => {
   const [row] = await conn.query(
-    'SELECT uo.id AS ourteam_id, u.id AS user_id, u.phone, uo.gender, uo.num, uo.age, uo.height, uo.drink, uo.intro, oj.job, ou.university, oa.area, od.day, oap.appearance, om.mbti, ofa.fashion, oro.role, opj.preference_job, op.age AS preference_age, op.height AS preference_height, op.same_university, opv.preference_vibe FROM `user_ourteam` uo INNER JOIN `user` u ON uo.user_id = u.id INNER JOIN `ourteam_job` oj ON uo.id = oj.ourteam_id INNER JOIN `ourteam_university` ou ON uo.id = ou.ourteam_id INNER JOIN `ourteam_area` oa ON uo.id = oa.ourteam_id INNER JOIN `ourteam_day` od ON uo.id = od.ourteam_id INNER JOIN `ourteam_appearance` oap ON uo.id = oap.ourteam_id INNER JOIN `ourteam_mbti` om ON uo.id = om.ourteam_id INNER JOIN `ourteam_fashion` ofa ON uo.id = ofa.ourteam_id INNER JOIN `ourteam_role` oro ON uo.id = oro.ourteam_id INNER JOIN `ourteam_preference` op ON uo.id = op.ourteam_id INNER JOIN `ourteam_preference_job` opj ON uo.id = opj.ourteam_id INNER JOIN `ourteam_preference_vibe` opv ON uo.id = opv.ourteam_id WHERE u.is_deleted = false AND uo.gender = (?) AND uo.state = 2 AND uo.is_deleted = false ORDER BY uo.updated_at ASC;',
+    'SELECT uo.id AS ourteam_id, u.id AS user_id, u.phone, uo.gender, uo.num, uo.age, uo.height, uo.drink, uo.intro, oj.job, ou.university, oa.area, od.day, oap.appearance, om.mbti, ofa.fashion, oro.role, opj.preference_job, op.age AS preference_age, op.height AS preference_height, op.same_university, opv.preference_vibe, uo.updated_at FROM `user_ourteam` uo INNER JOIN `user` u ON uo.user_id = u.id INNER JOIN `ourteam_job` oj ON uo.id = oj.ourteam_id INNER JOIN `ourteam_university` ou ON uo.id = ou.ourteam_id INNER JOIN `ourteam_area` oa ON uo.id = oa.ourteam_id INNER JOIN `ourteam_day` od ON uo.id = od.ourteam_id INNER JOIN `ourteam_appearance` oap ON uo.id = oap.ourteam_id INNER JOIN `ourteam_mbti` om ON uo.id = om.ourteam_id INNER JOIN `ourteam_fashion` ofa ON uo.id = ofa.ourteam_id INNER JOIN `ourteam_role` oro ON uo.id = oro.ourteam_id INNER JOIN `ourteam_preference` op ON uo.id = op.ourteam_id INNER JOIN `ourteam_preference_job` opj ON uo.id = opj.ourteam_id INNER JOIN `ourteam_preference_vibe` opv ON uo.id = opv.ourteam_id WHERE u.is_deleted = false AND uo.gender = (?) AND uo.state = 2 AND uo.is_deleted = false ORDER BY uo.updated_at ASC;',
     [genderId],
   );
 
@@ -329,7 +329,7 @@ const matchTeam = async (conn, maleTeamId, femaleTeamId, chatLink) => {
   return true;
 };
 
-const closeTeam = async (conn, maleTeamId, femaleTeamId) => {
+const closeMatching = async (conn, maleTeamId, femaleTeamId) => {
   const [row] = await conn.query(
     'SELECT * FROM `match_team` WHERE male_team_id=(?) AND female_team_id=(?) and is_deleted=false;',
     [maleTeamId, femaleTeamId],
@@ -346,6 +346,36 @@ const closeTeam = async (conn, maleTeamId, femaleTeamId) => {
   ]);
   await conn.query('UPDATE `user_ourteam` SET is_deleted=true WHERE id=(?);', [maleTeamId]);
   await conn.query('UPDATE `user_ourteam` SET is_deleted=true WHERE id=(?);', [femaleTeamId]);
+
+  return true;
+};
+
+const closeTeam = async (conn, ourteamId) => {
+  const [row] = await conn.query('SELECT * FROM `user_ourteam` WHERE id=(?) AND state=2 AND is_deleted=false;', [
+    ourteamId,
+  ]);
+
+  // 매칭 정보가 없는 경우
+  if (!row[0]) {
+    return false;
+  }
+
+  await conn.query('UPDATE `user_ourteam` SET is_deleted=true WHERE id=(?);', [ourteamId]);
+
+  return true;
+};
+
+const updateTeamReapply = async (conn, ourteamId) => {
+  const [row] = await conn.query('SELECT * FROM `user_ourteam` WHERE id=(?) AND state=2 AND is_deleted=false;', [
+    ourteamId,
+  ]);
+
+  // 매칭 실패 정보가 없는 경우
+  if (!row[0]) {
+    return false;
+  }
+
+  await conn.query('UPDATE `user_ourteam` SET state=0 WHERE id=(?);', [ourteamId]);
 
   return true;
 };
@@ -368,5 +398,7 @@ module.exports = {
   getSuccessFemaleTeamByAdmin,
   getFailTeamByAdmin,
   matchTeam,
+  closeMatching,
   closeTeam,
+  updateTeamReapply,
 };

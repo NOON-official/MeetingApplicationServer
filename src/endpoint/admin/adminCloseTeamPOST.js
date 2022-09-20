@@ -4,11 +4,11 @@ const util = require('../../lib/util');
 const statusCode = require('../../constants/statusCode');
 const responseMessage = require('../../constants/responseMessage');
 
-// 매칭 성공한 팀 삭제하기
+// 매칭 실패한 팀정보 삭제하기
 module.exports = async (req, res) => {
-  const { maleTeamId, femaleTeamId } = req.body;
+  const { ourteamId } = req.body;
 
-  if (!maleTeamId || !femaleTeamId) {
+  if (!ourteamId) {
     return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
   }
 
@@ -16,7 +16,7 @@ module.exports = async (req, res) => {
   try {
     conn = await pool.getConnection();
 
-    const success = await teamDB.closeTeam(conn, maleTeamId, femaleTeamId);
+    const success = await teamDB.closeTeam(conn, ourteamId);
 
     if (success === false) {
       return res

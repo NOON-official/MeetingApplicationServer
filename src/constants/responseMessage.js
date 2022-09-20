@@ -45,6 +45,7 @@ module.exports = {
   NO_PARTNER_TEAM: '상대팀 정보가 없습니다',
   GET_MATCHING_RESULT_SUCCESS: '매칭 결과 조회에 성공하였습니다',
   NO_RESULT: '해당 팀의 매칭 결과가 없습니다',
+  REAPPLY_SUCCESS: '팀 매칭 재신청에 성공하였습니다',
 
   // Admin
   ADMIN_NO_RESULT: '조회 결과가 없습니다',
