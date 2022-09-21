@@ -23,6 +23,7 @@ module.exports = {
   NOT_EXPIRED_TOKEN: '만료되지 않은 토큰입니다',
   INVALID_GRANT_TYPE: '올바르지 않은 허가 유형입니다',
   REFRESH_TOKEN_SUCCESS: '토큰 재발급에 성공하였습니다',
+  SIGNOUT_USER_SUCCESS: '유저 로그아웃에 성공하였습니다',
 
   // User
   SAVE_USER_PHONE_SUCCESS: '유저 핸드폰 번호 저장에 성공하였습니다',
