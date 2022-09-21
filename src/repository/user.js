@@ -73,6 +73,12 @@ const getUserInfoByUserId = async (conn, userId) => {
   return convertSnakeToCamel.keysToCamel(row[0]);
 };
 
+const signoutUserByUserId = async (conn, userId) => {
+  await conn.query('UPDATE `user` SET refresh_token=null WHERE id = (?);', [userId]);
+
+  return true;
+};
+
 module.exports = {
   getUserByKakaoUid,
   saveUser,
@@ -82,4 +88,5 @@ module.exports = {
   saveUserPhone,
   deleteUserByUserId,
   getUserInfoByUserId,
+  signoutUserByUserId,
 };
