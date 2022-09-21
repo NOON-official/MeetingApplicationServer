@@ -19,8 +19,8 @@ jobs:
           script: |
             cd ~/server
             sudo su
-            sudo git pull origin prod
-            sudo npm install
-            sudo npm run prod
-            sudo pm2 restart 0
+            git pull origin prod
+            npm install
+            npm run prod
+            pm2 restart 0
         
