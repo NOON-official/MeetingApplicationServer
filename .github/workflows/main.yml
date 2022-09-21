@@ -18,9 +18,5 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd ~/server
-            sudo su
-            sudo git pull origin prod
-            sudo npm install
-            sudo npm run prod
-            sudo pm2 restart 0
+            ./deploy.sh
         
