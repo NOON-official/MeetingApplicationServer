@@ -45,7 +45,7 @@ const saveRefreshToken = async (conn, refreshToken, userId) => {
 
 const getUserById = async (conn, userId) => {
   const [row] = await conn.query(
-    'SELECT id, kakao_uid, nickname, phone, gender, birthday, is_admin, refresh_token FROM `user` WHERE id = (?) and is_deleted = false;',
+    'SELECT id, kakao_uid, nickname, phone, gender, birthday, is_admin FROM `user` WHERE id = (?) and is_deleted = false;',
     [userId],
   );
 

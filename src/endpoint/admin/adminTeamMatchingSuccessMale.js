@@ -40,6 +40,9 @@ module.exports = async (req, res) => {
           n[k] = toArrayOfNumber(v);
         } else if (stringCheckList.includes(k)) {
           n[k] = toArrayOfString(v);
+        } else if (k === 'updatedAt') {
+          tmp = new Date(v);
+          n[k] = `${tmp.getFullYear()}.${tmp.getMonth()}.${tmp.getDay()} ${tmp.getHours()}:${tmp.getMinutes()}`;
         } else {
           n[k] = v;
         }
