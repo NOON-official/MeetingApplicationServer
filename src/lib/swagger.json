@@ -540,17 +540,12 @@
                     "example": "refresh_token",
                     "description": "고정값"
                   },
-                  "refresh_token": {
-                    "type": "string",
-                    "format": "text",
-                    "example": "addagkjdagjdakg.djagkjdgkadjgk.ajdkglajdlgkj"
-                  },
                   "userId": {
                     "type": "integer",
                     "example": 1
                   }
                 },
-                "required": ["grant_type", "refresh_token", "userId"]
+                "required": ["grant_type", "userId"]
               }
             }
           }
@@ -584,9 +579,7 @@
                           "phone": null,
                           "gender": "female",
                           "birthday": null,
-                          "isAdmin": false,
-                          "accessToken": "adja;kldhj;a.dasjlh;kadjlh;akjh;j.adjlhk;aejh",
-                          "refreshToken": "adsjg;ldgjk.jdagl;kjad;lgkjad.da;gkljad;lgj"
+                          "isAdmin": false
                         }
                       }
                     }
@@ -1514,6 +1507,7 @@
                           {
                             "ourteamId": 2,
                             "userId": 1,
+                            "nickname": "미팅이",
                             "phone": "01012345678",
                             "gender": 1,
                             "num": 1,
@@ -1533,7 +1527,8 @@
                             "preferenceAge": ["21", "25"],
                             "preferenceHeight": ["170", "180"],
                             "sameUniversity": 1,
-                            "preferenceVibe": [4, 5]
+                            "preferenceVibe": [4, 5],
+                            "updatedAt": "2022.8.5 11:42"
                           }
                         ]
                       }
@@ -1598,6 +1593,7 @@
                           {
                             "ourteamId": 2,
                             "userId": 1,
+                            "nickname": "미팅이",
                             "phone": "01012345678",
                             "gender": 1,
                             "num": 2,
@@ -1617,7 +1613,8 @@
                             "preferenceAge": ["21", "25"],
                             "preferenceHeight": ["170", "180"],
                             "sameUniversity": 1,
-                            "preferenceVibe": [4, 5]
+                            "preferenceVibe": [4, 5],
+                            "updatedAt": "2022.8.5 11:42"
                           }
                         ]
                       }
@@ -1682,6 +1679,7 @@
                           {
                             "ourteamId": 2,
                             "userId": 1,
+                            "nickname": "미팅이",
                             "phone": "01012345678",
                             "gender": 2,
                             "num": 1,
@@ -1701,7 +1699,8 @@
                             "preferenceAge": ["21", "25"],
                             "preferenceHeight": ["170", "180"],
                             "sameUniversity": 1,
-                            "preferenceVibe": [4, 5]
+                            "preferenceVibe": [4, 5],
+                            "updatedAt": "2022.8.5 11:42"
                           }
                         ]
                       }
@@ -1766,6 +1765,7 @@
                           {
                             "ourteamId": 2,
                             "userId": 1,
+                            "nickname": "미팅이",
                             "phone": "01012345678",
                             "gender": 2,
                             "num": 2,
@@ -1785,7 +1785,8 @@
                             "preferenceAge": ["21", "25"],
                             "preferenceHeight": ["170", "180"],
                             "sameUniversity": 1,
-                            "preferenceVibe": [4, 5]
+                            "preferenceVibe": [4, 5],
+                            "updatedAt": "2022.8.5 11:42"
                           }
                         ]
                       }
@@ -1851,6 +1852,7 @@
                             "ourteamId": 2,
                             "partnerTeamId": 3,
                             "userId": 1,
+                            "nickname": "미팅이",
                             "phone": "01012345678",
                             "gender": 1,
                             "num": 2,
@@ -1870,7 +1872,8 @@
                             "preferenceAge": ["21", "25"],
                             "preferenceHeight": ["170", "180"],
                             "sameUniversity": 1,
-                            "preferenceVibe": [4, 5]
+                            "preferenceVibe": [4, 5],
+                            "updatedAt": "2022.8.5 11:42"
                           }
                         ]
                       }
@@ -1936,6 +1939,7 @@
                             "ourteamId": 2,
                             "partnerTeamId": 3,
                             "userId": 1,
+                            "nickname": "미팅이",
                             "phone": "01012345678",
                             "gender": 1,
                             "num": 2,
@@ -1955,7 +1959,8 @@
                             "preferenceAge": ["21", "25"],
                             "preferenceHeight": ["170", "180"],
                             "sameUniversity": 1,
-                            "preferenceVibe": [4, 5]
+                            "preferenceVibe": [4, 5],
+                            "updatedAt": "2022.8.5 11:42"
                           }
                         ]
                       }
@@ -2020,6 +2025,7 @@
                           {
                             "ourteamId": 2,
                             "userId": 1,
+                            "nickname": "미팅이",
                             "phone": "01012345678",
                             "gender": 1,
                             "num": 2,
@@ -2105,6 +2111,7 @@
                           {
                             "ourteamId": 2,
                             "userId": 1,
+                            "nickname": "미팅이",
                             "phone": "01012345678",
                             "gender": 1,
                             "num": 2,
