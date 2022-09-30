@@ -460,7 +460,7 @@
       "get": {
         "tags": ["Auth"],
         "summary": "유저 로그아웃",
-        "description": "🌸 유저를 로그아웃시킵니다. \n\n * cookie에 저장된 access token과 refresh token을 삭제합니다. \n\n * 로그아웃 후 메인페이지로 redirect 해주시면 됩니다! \n\n * 로그아웃도 __로그인된 유저일 때__ 가능하므로 토큰이 만료됐을 경우 401에러가 갈 수 있습니다. 이럴 경우 refresh 후 로그아웃 해주시면 됩니다. ",
+        "description": "🌸 유저를 로그아웃시킵니다. \n\n * cookie에 저장된 access token과 refresh token을 삭제합니다. \n\n * 로그아웃 후 메인페이지로 redirect 해주시면 됩니다!",
         "parameters": [
           {
             "in": "path",
@@ -471,8 +471,7 @@
             },
             "required": true,
             "description": "유저 id"
-          },
-          { "in": "cookie", "name": "access", "schema": { "type": "string" } }
+          }
         ],
         "responses": {
           "200": {
@@ -595,12 +594,6 @@
                 "schema": {
                   "type": "string",
                   "example": "access=adja;kldhj;a.dasjlh;kadjlh;akjh;j.adjlhk;aejh; Path=/; HttpOnly"
-                }
-              },
-              "Set-Cookie (refresh)": {
-                "schema": {
-                  "type": "string",
-                  "example": "refresh=adja;kldhj;a.dasjlh;kadjlh;akjh;j.adjlhk;aejh; Path=/; HttpOnly"
                 }
               }
             },
