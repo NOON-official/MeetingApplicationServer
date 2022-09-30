@@ -11,11 +11,6 @@ module.exports = async (req, res) => {
     return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.OUT_OF_VALUE));
   }
 
-  // 로그인한 유저 id와 로그아웃하려는 유저 id가 다른 경우
-  if (userId != req.user.id) {
-    return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.INVALID_USER));
-  }
-
   let conn;
 
   try {
