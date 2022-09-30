@@ -10,6 +10,7 @@ module.exports = {
   FORBIDDEN: '잘못된 접근입니다',
   NO_USER: '존재하지 않는 유저입니다',
   INTERNAL_SERVER_ERROR: '서버 내 오류',
+  ACCESS_TOKEN_EXPIRED: '액세스 토큰이 만료되었습니다',
 
   // Service
   GET_TEAM_COUNT_SUCCESS: '대기중인 팀 수 조회에 성공하였습니다',
