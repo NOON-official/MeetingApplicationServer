@@ -71,19 +71,13 @@ module.exports = async (req, res) => {
 
         const newAccessToken = jwtHandlers.accessToken.sign(user);
 
-        // 토큰을 cookie에 저장
+        // 기존의 access 토큰을 지운 후 재발급한 토큰을 cookie에 저장
         const expiryDate = new Date(Date.now() + 60 * 60 * 1000 * 24 * 14); // 14일
+
+        res.clearCookie('access');
 
         // access token
         res.cookie('access', newAccessToken, {
-          expires: expiryDate,
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production' ? true : false, // https로만 쿠키 통신 가능
-          signed: true,
-        });
-
-        // refresh token
-        res.cookie('refresh', refreshToken, {
           expires: expiryDate,
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production' ? true : false, // https로만 쿠키 통신 가능

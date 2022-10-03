@@ -24,7 +24,7 @@ const checkUser = async (req, res, next) => {
     if (decodedToken === TOKEN_EXPIRED)
       return res
         .status(statusCode.UNAUTHORIZED)
-        .send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN_EXPIRED));
+        .send(util.fail(statusCode.UNAUTHORIZED, responseMessage.ACCESS_TOKEN_EXPIRED));
     //토큰이 유효하지 않은 경우
     if (decodedToken === TOKEN_INVALID)
       return res
