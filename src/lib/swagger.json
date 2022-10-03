@@ -2290,6 +2290,79 @@
         }
       }
     },
+    "/admin/team/fail": {
+      "post": {
+        "tags": ["Admin"],
+        "summary": "팀 매칭 실패 처리하기",
+        "parameters": [{ "in": "cookie", "name": "access", "schema": { "type": "string" } }],
+        "description": "해당 팀 매칭 상태를 실패로 처리합니다. (state=2)",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "ourteamId": {
+                    "type": "integer",
+                    "example": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "팀 매칭 실패 처리 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "팀 매칭 실패 처리에 성공하였습니다"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {
+                        "success": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "해당 매칭 정보가 없는 경우",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "ADMIN_NO_RESULT",
+                    "value": {
+                      "status": 400,
+                      "success": false,
+                      "message": "조회 결과가 없습니다"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/admin/close/matching": {
       "post": {
         "tags": ["Admin"],

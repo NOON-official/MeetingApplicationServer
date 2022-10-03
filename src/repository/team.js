@@ -380,6 +380,21 @@ const updateTeamReapply = async (conn, ourteamId) => {
   return true;
 };
 
+const failTeam = async (conn, ourteamId) => {
+  const [row] = await conn.query('SELECT * FROM `user_ourteam` WHERE id=(?) AND state=0 AND is_deleted=false;', [
+    ourteamId,
+  ]);
+
+  // 매칭중인 팀 정보가 없는 경우
+  if (!row[0]) {
+    return false;
+  }
+
+  await conn.query('UPDATE `user_ourteam` SET state=2 WHERE id=(?);', [ourteamId]);
+
+  return true;
+};
+
 module.exports = {
   saveUserOurteam,
   updateUserOurteam,
@@ -401,4 +416,5 @@ module.exports = {
   closeMatching,
   closeTeam,
   updateTeamReapply,
+  failTeam,
 };
