@@ -64,4 +64,5 @@ module.exports = {
   ALREADY_MATCHED_USER: '이미 매칭 완료된 유저입니다',
   DELETE_MATCHING_SUCCESS: '매칭 정보 삭제하기에 성공하였습니다',
   UPDATE_SERVICE_APPLY_STATUS_SUCCESS: '서비스 매칭 신청 가능 상태 변경에 성공하였습니다',
+  GET_SERVICE_APPLY_STATUS_SUCCESS: '서비스 매칭 신청 가능 상태 조회에 성공하였습니다',
 };

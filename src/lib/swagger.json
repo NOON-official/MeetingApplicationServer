@@ -2514,6 +2514,48 @@
       }
     },
     "/admin/apply/status": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "서비스 매칭 신청 가능 상태 조회",
+        "description": "🌸 서비스 매칭 신청 가능 상태를 조회합니다.",
+        "parameters": [{ "in": "cookie", "name": "access", "schema": { "type": "string" } }],
+        "responses": {
+          "200": {
+            "description": "서비스 매칭 신청 가능 상태 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "서비스 매칭 신청 가능 상태 조회에 성공하였습니다"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {
+                        "applyStatus": {
+                          "maleIsLimited": true,
+                          "maleLimitNum": 50,
+                          "femaleIsLimited": false,
+                          "femaleLimitNum": 1
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
       "put": {
         "tags": ["Admin"],
         "summary": "서비스 매칭 신청 가능 상태 변경",
@@ -2526,7 +2568,7 @@
                 "properties": {
                   "maleIsLimited": {
                     "type": "boolean",
-                    "example": true
+                    "example": 1
                   },
                   "maleLimitNum": {
                     "type": "integer",
@@ -2534,7 +2576,7 @@
                   },
                   "femaleIsLimited": {
                     "type": "boolean",
-                    "example": false
+                    "example": 0
                   },
                   "femaleLimitNum": {
                     "type": "integer",
