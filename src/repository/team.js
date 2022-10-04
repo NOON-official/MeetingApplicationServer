@@ -326,6 +326,9 @@ const matchTeam = async (conn, maleTeamId, femaleTeamId, chatLink) => {
     chatLink,
   ]);
 
+  await conn.query('UPDATE `user_ourteam` SET state=1 WHERE id=(?);', [maleTeamId]);
+  await conn.query('UPDATE `user_ourteam` SET state=1 WHERE id=(?);', [femaleTeamId]);
+
   return true;
 };
 
