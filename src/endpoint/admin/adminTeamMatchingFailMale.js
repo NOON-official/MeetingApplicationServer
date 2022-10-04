@@ -42,7 +42,7 @@ module.exports = async (req, res) => {
           n[k] = toArrayOfString(v);
         } else if (k === 'updatedAt') {
           tmp = new Date(v);
-          n[k] = `${tmp.getFullYear()}.${tmp.getMonth()}.${tmp.getDay()} ${tmp.getHours()}:${tmp.getMinutes()}`;
+          n[k] = `${tmp.getFullYear()}.${tmp.getMonth() + 1}.${tmp.getDate()} ${tmp.getHours()}:${tmp.getMinutes()}`;
         } else {
           n[k] = v;
         }
