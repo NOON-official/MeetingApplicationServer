@@ -39,9 +39,18 @@ const updateApplyStatus = async (conn, maleIsLimited, maleLimitNum, femaleIsLimi
   return true;
 };
 
+const getApplyStatus = async (conn) => {
+  const [row] = await conn.query('SELECT * FROM `service`;');
+
+  if (!row[0]) return false;
+
+  return convertSnakeToCamel.keysToCamel(row[0]);
+};
+
 module.exports = {
   getApplyIsLimited,
   getMaleLimitNum,
   getFemaleLimitNum,
   updateApplyStatus,
+  getApplyStatus,
 };
