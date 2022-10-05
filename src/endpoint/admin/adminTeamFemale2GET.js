@@ -11,7 +11,7 @@ module.exports = async (req, res) => {
 
   try {
     conn = await pool.getConnection();
-    let femaleTeam = await teamDB.getTeamByAdmin(conn, 2, 1); // 여자, 2:2
+    let femaleTeam = await teamDB.getTeamByAdmin(conn, 2, 2); // 여자, 2:2
 
     // 결과가 없는 경우
     if (!femaleTeam || femaleTeam.length === 0) {
