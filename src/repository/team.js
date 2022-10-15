@@ -398,6 +398,54 @@ const failTeam = async (conn, ourteamId) => {
   return true;
 };
 
+const revertMatchTeam = async (conn, maleTeamId, femaleTeamId) => {
+  const [row1] = await conn.query(
+    // 매칭 정보
+    'SELECT * FROM `match_team` WHERE male_team_id=(?) AND female_team_id=(?) AND is_deleted=false;',
+    [maleTeamId, femaleTeamId],
+  );
+
+  // 남자팀 정보
+  const [row2] = await conn.query('SELECT * FROM `user_ourteam` WHERE id=(?) AND state=1 AND is_deleted=false;', [
+    maleTeamId,
+  ]);
+
+  // 여자팀 정보
+  const [row3] = await conn.query('SELECT * FROM `user_ourteam` WHERE id=(?) AND state=1 AND is_deleted=false;', [
+    femaleTeamId,
+  ]);
+
+  // 매칭 정보가 없거나, 해당 팀 정보가 없는 경우
+  if (!row1[0] || !row2[0] || !row3[0]) {
+    return false;
+  }
+
+  await conn.query('UPDATE `user_ourteam` SET state=0 WHERE id=(?) AND is_deleted=false;', [maleTeamId]);
+  await conn.query('UPDATE `user_ourteam` SET state=0 WHERE id=(?) AND is_deleted=false;', [femaleTeamId]);
+
+  await conn.query('DELETE FROM `match_team` WHERE male_team_id=(?) AND female_team_id=(?) AND is_deleted=false;', [
+    maleTeamId,
+    femaleTeamId,
+  ]);
+
+  return true;
+};
+
+const revertFailTeam = async (conn, ourteamId) => {
+  const [row] = await conn.query('SELECT * FROM `user_ourteam` WHERE id=(?) AND state=2 AND is_deleted=false;', [
+    ourteamId,
+  ]);
+
+  // 매칭실패한 팀 정보가 없는 경우
+  if (!row[0]) {
+    return false;
+  }
+
+  await conn.query('UPDATE `user_ourteam` SET state=0 WHERE id=(?);', [ourteamId]);
+
+  return true;
+};
+
 module.exports = {
   saveUserOurteam,
   updateUserOurteam,
@@ -420,4 +468,6 @@ module.exports = {
   closeTeam,
   updateTeamReapply,
   failTeam,
+  revertMatchTeam,
+  revertFailTeam,
 };
