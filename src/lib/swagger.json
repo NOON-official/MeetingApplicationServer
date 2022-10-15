@@ -2288,6 +2288,81 @@
             }
           }
         }
+      },
+      "put": {
+        "tags": ["Admin"],
+        "summary": "팀 매칭 완료에서 매칭중으로 되돌리기",
+        "parameters": [{ "in": "cookie", "name": "access", "schema": { "type": "string" } }],
+        "description": "매칭 완료로 처리된 팀 상태를 매칭중 상태로 변경합니다. (state 1 -> 0 & match_team 테이블 내 정보 삭제)",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "maleTeamId": {
+                    "type": "integer",
+                    "example": 1
+                  },
+                  "femaleTeamId": {
+                    "type": "integer",
+                    "example": 2
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "팀 매칭 완료에서 매칭중으로 되돌리기 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "팀 매칭 완료에서 매칭중으로 되돌리기에 성공하였습니다"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {
+                        "success": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "해당 매칭 정보가 없는 경우",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "ADMIN_NO_RESULT",
+                    "value": {
+                      "status": 400,
+                      "success": false,
+                      "message": "조회 결과가 없습니다"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/admin/team/fail": {
@@ -2328,6 +2403,77 @@
                     "message": {
                       "type": "string",
                       "example": "팀 매칭 실패 처리에 성공하였습니다"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {
+                        "success": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "해당 매칭 정보가 없는 경우",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "ADMIN_NO_RESULT",
+                    "value": {
+                      "status": 400,
+                      "success": false,
+                      "message": "조회 결과가 없습니다"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Admin"],
+        "summary": "팀 매칭 실패에서 매칭중으로 되돌리기",
+        "parameters": [{ "in": "cookie", "name": "access", "schema": { "type": "string" } }],
+        "description": "매칭 실패로 처리된 팀 상태를 매칭중 상태로 변경합니다. (state 2 -> 0)",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "ourteamId": {
+                    "type": "integer",
+                    "example": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "팀 매칭 실패에서 매칭중으로 되돌리기 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "팀 매칭 실패에서 매칭중으로 되돌리기에 성공하였습니다"
                     },
                     "data": {
                       "type": "object",
