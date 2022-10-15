@@ -18,5 +18,6 @@ router.put('/apply/status', checkUser, checkAdmin, require('./adminApplyStatusPU
 router.post('/team/fail', checkUser, checkAdmin, require('./adminTeamFailPOST'));
 router.get('/apply/status', checkUser, checkAdmin, require('./adminApplyStatusGET'));
 router.put('/team/match', checkUser, checkAdmin, require('./adminTeamMatchPUT'));
+router.put('/team/fail', checkUser, checkAdmin, require('./adminTeamFailPUT'));
 
 module.exports = router;

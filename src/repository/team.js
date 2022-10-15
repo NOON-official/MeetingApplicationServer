@@ -431,6 +431,21 @@ const revertMatchTeam = async (conn, maleTeamId, femaleTeamId) => {
   return true;
 };
 
+const revertFailTeam = async (conn, ourteamId) => {
+  const [row] = await conn.query('SELECT * FROM `user_ourteam` WHERE id=(?) AND state=2 AND is_deleted=false;', [
+    ourteamId,
+  ]);
+
+  // 매칭실패한 팀 정보가 없는 경우
+  if (!row[0]) {
+    return false;
+  }
+
+  await conn.query('UPDATE `user_ourteam` SET state=0 WHERE id=(?);', [ourteamId]);
+
+  return true;
+};
+
 module.exports = {
   saveUserOurteam,
   updateUserOurteam,
@@ -454,4 +469,5 @@ module.exports = {
   updateTeamReapply,
   failTeam,
   revertMatchTeam,
+  revertFailTeam,
 };
