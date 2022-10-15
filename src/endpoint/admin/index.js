@@ -17,5 +17,6 @@ router.post('/close/team', checkUser, checkAdmin, require('./adminCloseTeamPOST'
 router.put('/apply/status', checkUser, checkAdmin, require('./adminApplyStatusPUT'));
 router.post('/team/fail', checkUser, checkAdmin, require('./adminTeamFail'));
 router.get('/apply/status', checkUser, checkAdmin, require('./adminApplyStatusGET'));
+router.put('/team/match', checkUser, checkAdmin, require('./adminTeamMatchPUT'));
 
 module.exports = router;
