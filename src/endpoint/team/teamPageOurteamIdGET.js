@@ -4,7 +4,7 @@ const responseMessage = require('../../constants/responseMessage');
 const pool = require('../../repository/db');
 const { teamDB } = require('../../repository');
 
-// 우리팀 매칭 결과 조회
+// 우리팀 매칭 상태 조회 - 페이지 번호
 module.exports = async (req, res) => {
   const { ourteamId } = req.params;
 
@@ -24,17 +24,15 @@ module.exports = async (req, res) => {
       return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.INVALID_USER));
     }
 
-    const partnerTeamId = await teamDB.getPartnerTeamIdByOurteamId(conn, ourteamId);
+    const pageNum = await teamDB.getOurteamPageByOurteamId(conn, ourteamId);
 
-    const matchingResult = await teamDB.getMatchingResultByTeamId(conn, partnerTeamId);
-
-    if (!matchingResult) {
-      return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_RESULT));
+    if (!pageNum || pageNum === -1) {
+      return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_APPLY));
     }
 
     res
       .status(statusCode.OK)
-      .send(util.success(statusCode.OK, responseMessage.GET_MATCHING_RESULT_SUCCESS, { matchingResult }));
+      .send(util.success(statusCode.OK, responseMessage.GET_TEAM_MATCHING_PAGE_SUCCESS, { pageNum }));
   } catch (error) {
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)

@@ -29,6 +29,7 @@ module.exports = {
   // User
   SAVE_USER_PHONE_SUCCESS: '유저 핸드폰 번호 저장에 성공하였습니다',
   GET_USER_SUCCESS: '유저 정보 조회에 성공하였습니다',
+  SAVE_USER_PRIVACY_SUCCESS: '유저 개인 정보 저장 및 수정에 성공하였습니다',
 
   // Team
   SAVE_USER_SUCCESS: '유저 정보 저장에 성공하였습니다',
@@ -48,6 +49,7 @@ module.exports = {
   GET_MATCHING_RESULT_SUCCESS: '매칭 결과 조회에 성공하였습니다',
   NO_RESULT: '해당 팀의 매칭 결과가 없습니다',
   REAPPLY_SUCCESS: '팀 매칭 재신청에 성공하였습니다',
+  GET_TEAM_MATCHING_PAGE_SUCCESS: '팀 매칭 상태 페이지 조회에 성공하였습니다',
 
   // Admin
   ADMIN_NO_RESULT: '조회 결과가 없습니다',

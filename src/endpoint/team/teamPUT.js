@@ -11,36 +11,22 @@ module.exports = async (req, res) => {
   if (!ourteamId)
     return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
 
-  const { gender, num, age, height, drink, intro } = req.body.ourteam;
-  const { job, university, area, day, appearance, mbti, fashion, role } = req.body.ourteam; // 배열 자료형
+  const { gender, num, age, drink, intro } = req.body.ourteam;
+  const { job, university, area, day, appearance, mbti, role } = req.body.ourteam; // 배열 자료형
   const { sameUniversity } = req.body.ourteamPreference;
-  const { job: preferenceJob, age: preferenceAge, height: preferenceHeight, vibe } = req.body.ourteamPreference; // 배열 자료형
-  const arrays = [
-    job,
-    university,
-    area,
-    day,
-    appearance,
-    mbti,
-    fashion,
-    role,
-    preferenceJob,
-    preferenceAge,
-    preferenceHeight,
-    vibe,
-  ];
+  const { job: preferenceJob, age: preferenceAge, vibe } = req.body.ourteamPreference; // 배열 자료형
+  const arrays = [job, university, area, day, appearance, mbti, role, preferenceJob, preferenceAge, vibe];
 
   if (
     !gender ||
     !num ||
     !age ||
-    !height ||
     !drink ||
     !intro ||
     !sameUniversity ||
     !arrayChecker(arrays) ||
     !(preferenceAge.length == 2) ||
-    !(preferenceHeight.length == 2)
+    !(day.length >= 2)
   )
     return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
 
@@ -49,7 +35,6 @@ module.exports = async (req, res) => {
     gender,
     num,
     age,
-    height,
     drink,
     intro,
     job: toString(job),
@@ -58,12 +43,10 @@ module.exports = async (req, res) => {
     day: toString(day),
     appearance: toString(appearance),
     mbti: toString(mbti),
-    fashion: toString(fashion),
     role: toString(role),
     sameUniversity,
     preferenceJob: toString(preferenceJob),
     preferenceAge: toString(preferenceAge),
-    preferenceHeight: toString(preferenceHeight),
     vibe: toString(vibe),
   };
 
@@ -87,14 +70,13 @@ module.exports = async (req, res) => {
 
     const matchingStatus = await teamDB.getOurteamStatusByOurteamId(conn, ourteamId);
 
-    console.log(matchingStatus);
     // 해당 팀 정보가 없는 경우
     if (matchingStatus === -1) {
       return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_APPLY));
     }
 
     // 이미 매칭 결과가 나온 팀인 경우
-    if (matchingStatus !== 0) {
+    if (!(matchingStatus == 0 || matchingStatus == 1)) {
       return res
         .status(statusCode.BAD_REQUEST)
         .send(util.fail(statusCode.BAD_REQUEST, responseMessage.IS_MATCHED_USER));

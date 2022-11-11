@@ -3,10 +3,14 @@ const { toArrayOfString, toArrayOfNumber } = require('../lib/convertArrayToStrin
 
 const saveUserOurteam = async (conn, params) => {
   // 1. 우리팀 정보 저장
-  await conn.query(
-    'INSERT INTO `user_ourteam` (user_id, gender, num, age, height, drink, intro) VALUES (?, ?, ?, ?, ?, ?, ?);',
-    [params.userId, params.gender, params.num, params.age, params.height, params.drink, params.intro],
-  );
+  await conn.query('INSERT INTO `user_ourteam` (user_id, gender, num, age, drink, intro) VALUES (?, ?, ?, ?, ?, ?);', [
+    params.userId,
+    params.gender,
+    params.num,
+    params.age,
+    params.drink,
+    params.intro,
+  ]);
 
   [newOurteamId] = await conn.query('SELECT LAST_INSERT_ID();');
   newOurteamId = newOurteamId[0]['LAST_INSERT_ID()'];
@@ -24,17 +28,12 @@ const saveUserOurteam = async (conn, params) => {
     params.appearance,
   ]);
   await conn.query('INSERT INTO `ourteam_mbti` (ourteam_id, mbti) VALUES (?, ?);', [newOurteamId, params.mbti]);
-  await conn.query('INSERT INTO `ourteam_fashion` (ourteam_id, fashion) VALUES (?, ?);', [
-    newOurteamId,
-    params.fashion,
-  ]);
   await conn.query('INSERT INTO `ourteam_role` (ourteam_id, role) VALUES (?, ?);', [newOurteamId, params.role]);
 
   // 2. 우리팀 선호 정보 저장
-  await conn.query('INSERT INTO `ourteam_preference` (ourteam_id, age, height, same_university) VALUES (?, ?, ?, ?);', [
+  await conn.query('INSERT INTO `ourteam_preference` (ourteam_id, age, same_university) VALUES (?, ?, ?);', [
     newOurteamId,
     params.preferenceAge,
-    params.preferenceHeight,
     params.sameUniversity,
   ]);
 
@@ -54,8 +53,8 @@ const saveUserOurteam = async (conn, params) => {
 const updateUserOurteam = async (conn, params) => {
   // 1. 우리팀 정보 업데이트
   await conn.query(
-    'UPDATE `user_ourteam` SET gender=(?), num=(?), age=(?), height=(?), drink=(?), intro=(?) WHERE id=(?);',
-    [params.gender, params.num, params.age, params.height, params.drink, params.intro, params.ourteamId],
+    'UPDATE `user_ourteam` SET gender=(?), num=(?), age=(?), drink=(?), intro=(?), state=0, page_num=3 WHERE id=(?);',
+    [params.gender, params.num, params.age, params.drink, params.intro, params.ourteamId],
   );
 
   // 배열 타입 데이터 업데이트
@@ -71,16 +70,11 @@ const updateUserOurteam = async (conn, params) => {
     params.ourteamId,
   ]);
   await conn.query('UPDATE `ourteam_mbti` SET mbti=(?) WHERE ourteam_id=(?);', [params.mbti, params.ourteamId]);
-  await conn.query('UPDATE `ourteam_fashion` SET fashion=(?) WHERE ourteam_id=(?);', [
-    params.fashion,
-    params.ourteamId,
-  ]);
   await conn.query('UPDATE `ourteam_role` SET role=(?) WHERE ourteam_id=(?);', [params.role, params.ourteamId]);
 
   // 2. 우리팀 선호 정보 업데이트
-  await conn.query('UPDATE `ourteam_preference` SET age=(?), height=(?), same_university=(?) WHERE ourteam_id=(?);', [
+  await conn.query('UPDATE `ourteam_preference` SET age=(?), same_university=(?) WHERE ourteam_id=(?);', [
     params.preferenceAge,
-    params.preferenceHeight,
     params.sameUniversity,
     params.ourteamId,
   ]);
@@ -169,7 +163,7 @@ const getOurteamByOurteamId = async (conn, ourteamId) => {
 
   // 1. 우리팀 정보
   [row] = await conn.query(
-    'SELECT id AS ourteam_id, gender, num, age, height, drink, intro FROM `user_ourteam` WHERE id = (?) and is_deleted = false;',
+    'SELECT id AS ourteam_id, gender, num, age, drink, intro FROM `user_ourteam` WHERE id = (?) and is_deleted = false;',
     [ourteamId],
   );
   if (!row[0]) return 0;
@@ -205,11 +199,6 @@ const getOurteamByOurteamId = async (conn, ourteamId) => {
   if (!row[0]['mbti']) return 0;
   ourteam.mbti = toArrayOfNumber(row[0]['mbti']);
 
-  // 우리팀 패션
-  [row] = await conn.query('SELECT fashion  FROM `ourteam_fashion` WHERE ourteam_id = (?);', [ourteamId]);
-  if (!row[0]['fashion']) return 0;
-  ourteam.fashion = toArrayOfNumber(row[0]['fashion']);
-
   // 우리팀 구성원
   [row] = await conn.query('SELECT role  FROM `ourteam_role` WHERE ourteam_id = (?);', [ourteamId]);
   if (!row[0]['role']) return 0;
@@ -223,16 +212,13 @@ const getOurteamByOurteamId = async (conn, ourteamId) => {
   if (!row[0]['preference_job']) return 0;
   ourteamPreference.job = toArrayOfNumber(row[0]['preference_job']);
 
-  [row] = await conn.query('SELECT age, height, same_university FROM `ourteam_preference` WHERE ourteam_id = (?);', [
+  [row] = await conn.query('SELECT age, same_university FROM `ourteam_preference` WHERE ourteam_id = (?);', [
     ourteamId,
   ]);
   if (!row[0]) return 0;
 
   // 우리팀 선호 나이
   ourteamPreference.age = toArrayOfString(row[0]['age']);
-
-  // 우리팀 선호 키
-  ourteamPreference.height = toArrayOfString(row[0]['height']);
 
   // 같은 학교
   ourteamPreference.sameUniversity = row[0]['same_university'];
@@ -257,11 +243,11 @@ const getPartnerTeamIdByOurteamId = async (conn, ourteamId) => {
   return row[0]['partner_team_id'];
 };
 
-const getMatchingResultByOurteamId = async (conn, ourteamId) => {
-  const [row] = await conn.query('SELECT chat_link FROM `match_team` WHERE (male_team_id=(?) OR female_team_id=(?));', [
-    ourteamId,
-    ourteamId,
-  ]);
+const getMatchingResultByTeamId = async (conn, teamId) => {
+  const [row] = await conn.query(
+    'SELECT kakao_id FROM `user` u INNER JOIN `user_ourteam` uo ON u.id = uo.user_id WHERE uo.id = (?);',
+    [teamId],
+  );
 
   if (!row[0]) return 0;
 
@@ -369,16 +355,14 @@ const closeTeam = async (conn, ourteamId) => {
 };
 
 const updateTeamReapply = async (conn, ourteamId) => {
-  const [row] = await conn.query('SELECT * FROM `user_ourteam` WHERE id=(?) AND state=2 AND is_deleted=false;', [
-    ourteamId,
-  ]);
+  const [row] = await conn.query('SELECT * FROM `user_ourteam` WHERE id=(?) AND is_deleted=false;', [ourteamId]);
 
-  // 매칭 실패 정보가 없는 경우
+  // 매칭 정보가 없는 경우
   if (!row[0]) {
     return false;
   }
 
-  await conn.query('UPDATE `user_ourteam` SET state=0 WHERE id=(?);', [ourteamId]);
+  await conn.query('UPDATE `user_ourteam` SET state=0, page_num=3 WHERE id=(?);', [ourteamId]);
 
   return true;
 };
@@ -446,6 +430,17 @@ const revertFailTeam = async (conn, ourteamId) => {
   return true;
 };
 
+const getOurteamPageByOurteamId = async (conn, ourteamId) => {
+  const [row] = await conn.query('SELECT page_num FROM `user_ourteam` WHERE id=(?) and is_deleted=false;', [ourteamId]);
+
+  // 해당 팀 정보가 없는 경우
+  if (!row[0]) {
+    return -1;
+  }
+
+  return convertSnakeToCamel.keysToCamel(row[0]['page_num']);
+};
+
 module.exports = {
   saveUserOurteam,
   updateUserOurteam,
@@ -458,7 +453,7 @@ module.exports = {
   getUserIdByOurteamId,
   getOurteamStatusByOurteamId,
   getPartnerTeamIdByOurteamId,
-  getMatchingResultByOurteamId,
+  getMatchingResultByTeamId,
   getTeamByAdmin,
   getSuccessMaleTeamByAdmin,
   getSuccessFemaleTeamByAdmin,
@@ -470,4 +465,5 @@ module.exports = {
   failTeam,
   revertMatchTeam,
   revertFailTeam,
+  getOurteamPageByOurteamId,
 };

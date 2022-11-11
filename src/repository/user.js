@@ -2,7 +2,7 @@ const convertSnakeToCamel = require('../lib/convertSnakeToCamel');
 
 const getUserByKakaoUid = async (conn, kakaoUid) => {
   const [row] = await conn.query(
-    'SELECT id, kakao_uid, nickname, phone, gender, birthday, is_admin, refresh_token FROM `user` WHERE kakao_uid = (?) and is_deleted = false;',
+    'SELECT id, kakao_uid, nickname, phone, kakao_id, gender, birthday, is_admin FROM `user` WHERE kakao_uid = (?) and is_deleted = false;',
     [kakaoUid],
   );
 
@@ -45,7 +45,7 @@ const saveRefreshToken = async (conn, refreshToken, userId) => {
 
 const getUserById = async (conn, userId) => {
   const [row] = await conn.query(
-    'SELECT id, kakao_uid, nickname, phone, gender, birthday, is_admin FROM `user` WHERE id = (?) and is_deleted = false;',
+    'SELECT id, kakao_uid, nickname, phone, kakao_id, gender, birthday, is_admin FROM `user` WHERE id = (?) and is_deleted = false;',
     [userId],
   );
 
@@ -66,7 +66,7 @@ const deleteUserByUserId = async (conn, userId) => {
 
 const getUserInfoByUserId = async (conn, userId) => {
   const [row] = await conn.query(
-    'SELECT id, nickname, phone, gender, is_admin FROM `user` WHERE id = (?) and is_deleted = false;',
+    'SELECT id, nickname, phone, kakao_id, gender, is_admin FROM `user` WHERE id = (?) and is_deleted = false;',
     [userId],
   );
 
@@ -76,6 +76,37 @@ const getUserInfoByUserId = async (conn, userId) => {
 const signoutUserByUserId = async (conn, userId) => {
   await conn.query('UPDATE `user` SET refresh_token=null WHERE id = (?);', [userId]);
 
+  return true;
+};
+
+const saveUserPrivacy = async (
+  conn,
+  userId,
+  phone,
+  kakaoId,
+  serviceConfirm,
+  privateInfConfirm,
+  ageInfo,
+  marketingConfirm,
+) => {
+  await conn.query('UPDATE `user` SET phone = (?), kakao_id = (?) WHERE id = (?);', [phone, kakaoId, userId]);
+
+  const [row] = await conn.query('SELECT * FROM `user_confirm` WHERE user_id = (?);', [userId]);
+
+  // 약관 동의 정보 없는 경우
+  if (!row[0]) {
+    await conn.query(
+      'INSERT INTO `user_confirm` (user_id, service_confirm, private_inf_confirm, age_inf, marketing_confirm) VALUES (?, ?, ?, ?, ?);',
+      [userId, serviceConfirm, privateInfConfirm, ageInfo, marketingConfirm],
+    );
+  }
+  // 약관 동의 정보 있는 경우
+  else {
+    await conn.query(
+      'UPDATE `user_confirm` SET service_confirm  = (?), private_inf_confirm = (?), age_inf = (?), marketing_confirm = (?) WHERE user_id = (?);',
+      [serviceConfirm, privateInfConfirm, ageInfo, marketingConfirm, userId],
+    );
+  }
   return true;
 };
 
@@ -89,4 +120,5 @@ module.exports = {
   deleteUserByUserId,
   getUserInfoByUserId,
   signoutUserByUserId,
+  saveUserPrivacy,
 };
