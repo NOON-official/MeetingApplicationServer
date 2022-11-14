@@ -1,5 +1,6 @@
 const pool = require('../../repository/db');
 const { teamDB } = require('../../repository');
+const { toString } = require('../../lib/convertArrayToString');
 const util = require('../../lib/util');
 const statusCode = require('../../constants/statusCode');
 const responseMessage = require('../../constants/responseMessage');
@@ -15,14 +16,42 @@ module.exports = async (req, res) => {
   let conn;
   try {
     conn = await pool.getConnection();
+    let currentTeam = await teamDB.getCurrentTeamForReapply(conn, ourteamId);
 
-    const success = await teamDB.updateTeamReapply(conn, ourteamId);
-
-    if (success === false) {
+    if (!currentTeam) {
       return res.status(statusCode.BAD_REQUEST).send(util.success(statusCode.BAD_REQUEST, responseMessage.NO_APPLY));
-    } else if (success === true) {
-      const team = await teamDB.getOurteamByOurteamId(conn, ourteamId);
-      res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.REAPPLY_SUCCESS, team));
+    }
+
+    // 기존팀 가삭제 처리 (state = -1)
+    await teamDB.updateTeamState(conn, ourteamId, -1);
+
+    let params = {
+      userId: currentTeam.ourteam.userId,
+      gender: currentTeam.ourteam.gender,
+      num: currentTeam.ourteam.num,
+      age: currentTeam.ourteam.age,
+      drink: currentTeam.ourteam.drink,
+      intro: currentTeam.ourteam.intro,
+      job: toString(currentTeam.ourteam.job),
+      university: toString(currentTeam.ourteam.university),
+      area: toString(currentTeam.ourteam.area),
+      day: toString(currentTeam.ourteam.day),
+      appearance: toString(currentTeam.ourteam.appearance),
+      mbti: toString(currentTeam.ourteam.mbti),
+      role: toString(currentTeam.ourteam.role),
+      sameUniversity: currentTeam.ourteamPreference.sameUniversity,
+      preferenceJob: toString(currentTeam.ourteamPreference.job),
+      preferenceAge: toString(currentTeam.ourteamPreference.age),
+      vibe: toString(currentTeam.ourteamPreference.vibe),
+    };
+
+    const newOurteamId = await teamDB.saveUserOurteam(conn, params);
+    const ourteam = await teamDB.getOurteamByOurteamId(conn, newOurteamId);
+
+    if (!ourteam) {
+      return res.status(statusCode.BAD_REQUEST).send(util.success(statusCode.BAD_REQUEST, responseMessage.NO_APPLY));
+    } else {
+      return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.REAPPLY_SUCCESS, ourteam));
     }
   } catch (error) {
     return res
