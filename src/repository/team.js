@@ -124,7 +124,11 @@ const getWaitingTeam = async (conn) => {
 };
 
 const getOurteamIdByUserId = async (conn, userId) => {
-  const [row] = await conn.query('SELECT id FROM `user_ourteam` WHERE user_id=(?) and is_deleted=false;', [userId]);
+  // 매칭 그만두기(가삭제) 또는 거절한 경우 제외
+  const [row] = await conn.query(
+    'SELECT id FROM `user_ourteam` WHERE user_id=(?) AND state!=-1 AND is_deleted=false;',
+    [userId],
+  );
 
   // 매칭 진행중인 팀 정보가 없는 경우
   if (!row[0]) {
@@ -163,7 +167,7 @@ const getOurteamByOurteamId = async (conn, ourteamId) => {
 
   // 1. 우리팀 정보
   [row] = await conn.query(
-    'SELECT id AS ourteam_id, gender, num, age, drink, intro FROM `user_ourteam` WHERE id = (?) and is_deleted = false;',
+    'SELECT id AS ourteam_id, gender, num, age, drink, intro FROM `user_ourteam` WHERE id = (?) AND state!=-1 AND is_deleted = false;',
     [ourteamId],
   );
   if (!row[0]) return 0;
@@ -232,9 +236,164 @@ const getOurteamByOurteamId = async (conn, ourteamId) => {
   return convertSnakeToCamel.keysToCamel({ ourteam, ourteamPreference });
 };
 
+// 가삭제(state = -1)인 경우 포함
+const getTeamInfoByTeamId = async (conn, ourteamId) => {
+  let row;
+  let ourteam;
+  let ourteamPreference = {};
+  // 1. 우리팀 정보
+
+  [row] = await conn.query(
+    'SELECT id AS ourteam_id, gender, num, age, drink, intro FROM `user_ourteam` WHERE id = (?) AND is_deleted = false;',
+    [ourteamId],
+  );
+
+  if (!row[0]) return 0;
+  ourteam = row[0];
+  // 우리팀 직업
+
+  [row] = await conn.query('SELECT job  FROM `ourteam_job` WHERE ourteam_id = (?);', [ourteamId]);
+  if (!row[0]['job']) return 0;
+  ourteam.job = toArrayOfNumber(row[0]['job']);
+
+  // 우리팀 대학교
+  [row] = await conn.query('SELECT university  FROM `ourteam_university` WHERE ourteam_id = (?);', [ourteamId]);
+  if (!row[0]['university']) return 0;
+  ourteam.university = toArrayOfNumber(row[0]['university']);
+
+  // 우리팀 지역
+  [row] = await conn.query('SELECT area  FROM `ourteam_area` WHERE ourteam_id = (?);', [ourteamId]);
+  if (!row[0]['area']) return 0;
+  ourteam.area = toArrayOfNumber(row[0]['area']);
+
+  // 우리팀 요일
+  [row] = await conn.query('SELECT day  FROM `ourteam_day` WHERE ourteam_id = (?);', [ourteamId]);
+  if (!row[0]['day']) return 0;
+  ourteam.day = toArrayOfNumber(row[0]['day']);
+
+  // 우리팀 외모
+  [row] = await conn.query('SELECT appearance  FROM `ourteam_appearance` WHERE ourteam_id = (?);', [ourteamId]);
+  if (!row[0]['appearance']) return 0;
+  ourteam.appearance = toArrayOfNumber(row[0]['appearance']);
+
+  // 우리팀 MBTI
+  [row] = await conn.query('SELECT mbti  FROM `ourteam_mbti` WHERE ourteam_id = (?);', [ourteamId]);
+  if (!row[0]['mbti']) return 0;
+  ourteam.mbti = toArrayOfNumber(row[0]['mbti']);
+
+  // 우리팀 구성원
+  [row] = await conn.query('SELECT role  FROM `ourteam_role` WHERE ourteam_id = (?);', [ourteamId]);
+  if (!row[0]['role']) return 0;
+  ourteam.role = toArrayOfNumber(row[0]['role']);
+
+  ourteam = convertSnakeToCamel.keysToCamel(ourteam);
+
+  // 2. 우리팀 선호 정보
+  // 우리팀 선호 직업
+  [row] = await conn.query('SELECT preference_job  FROM `ourteam_preference_job` WHERE ourteam_id = (?);', [ourteamId]);
+  if (!row[0]['preference_job']) return 0;
+  ourteamPreference.job = toArrayOfNumber(row[0]['preference_job']);
+
+  [row] = await conn.query('SELECT age, same_university FROM `ourteam_preference` WHERE ourteam_id = (?);', [
+    ourteamId,
+  ]);
+  if (!row[0]) return 0;
+
+  // 우리팀 선호 나이
+  ourteamPreference.age = toArrayOfString(row[0]['age']);
+
+  // 같은 학교
+  ourteamPreference.sameUniversity = row[0]['same_university'];
+
+  [row] = await conn.query('SELECT preference_vibe  FROM `ourteam_preference_vibe` WHERE ourteam_id = (?);', [
+    ourteamId,
+  ]);
+  if (!row[0]['preference_vibe']) return 0;
+  ourteamPreference.vibe = toArrayOfNumber(row[0]['preference_vibe']);
+
+  return convertSnakeToCamel.keysToCamel({ ourteam, ourteamPreference });
+};
+
+const getCurrentTeamForReapply = async (conn, ourteamId) => {
+  let row;
+  let ourteam;
+  let ourteamPreference = {};
+  // 1. 우리팀 정보
+
+  [row] = await conn.query(
+    'SELECT user_id, gender, num, age, drink, intro FROM `user_ourteam` WHERE id = (?) AND state!=-1 AND is_deleted = false;',
+    [ourteamId],
+  );
+
+  if (!row[0]) return 0;
+  ourteam = row[0];
+  // 우리팀 직업
+
+  [row] = await conn.query('SELECT job  FROM `ourteam_job` WHERE ourteam_id = (?);', [ourteamId]);
+  if (!row[0]['job']) return 0;
+  ourteam.job = toArrayOfNumber(row[0]['job']);
+
+  // 우리팀 대학교
+  [row] = await conn.query('SELECT university  FROM `ourteam_university` WHERE ourteam_id = (?);', [ourteamId]);
+  if (!row[0]['university']) return 0;
+  ourteam.university = toArrayOfNumber(row[0]['university']);
+
+  // 우리팀 지역
+  [row] = await conn.query('SELECT area  FROM `ourteam_area` WHERE ourteam_id = (?);', [ourteamId]);
+  if (!row[0]['area']) return 0;
+  ourteam.area = toArrayOfNumber(row[0]['area']);
+
+  // 우리팀 요일
+  [row] = await conn.query('SELECT day  FROM `ourteam_day` WHERE ourteam_id = (?);', [ourteamId]);
+  if (!row[0]['day']) return 0;
+  ourteam.day = toArrayOfNumber(row[0]['day']);
+
+  // 우리팀 외모
+  [row] = await conn.query('SELECT appearance  FROM `ourteam_appearance` WHERE ourteam_id = (?);', [ourteamId]);
+  if (!row[0]['appearance']) return 0;
+  ourteam.appearance = toArrayOfNumber(row[0]['appearance']);
+
+  // 우리팀 MBTI
+  [row] = await conn.query('SELECT mbti  FROM `ourteam_mbti` WHERE ourteam_id = (?);', [ourteamId]);
+  if (!row[0]['mbti']) return 0;
+  ourteam.mbti = toArrayOfNumber(row[0]['mbti']);
+
+  // 우리팀 구성원
+  [row] = await conn.query('SELECT role  FROM `ourteam_role` WHERE ourteam_id = (?);', [ourteamId]);
+  if (!row[0]['role']) return 0;
+  ourteam.role = toArrayOfNumber(row[0]['role']);
+
+  ourteam = convertSnakeToCamel.keysToCamel(ourteam);
+
+  // 2. 우리팀 선호 정보
+  // 우리팀 선호 직업
+  [row] = await conn.query('SELECT preference_job  FROM `ourteam_preference_job` WHERE ourteam_id = (?);', [ourteamId]);
+  if (!row[0]['preference_job']) return 0;
+  ourteamPreference.job = toArrayOfNumber(row[0]['preference_job']);
+
+  [row] = await conn.query('SELECT age, same_university FROM `ourteam_preference` WHERE ourteam_id = (?);', [
+    ourteamId,
+  ]);
+  if (!row[0]) return 0;
+
+  // 우리팀 선호 나이
+  ourteamPreference.age = toArrayOfString(row[0]['age']);
+
+  // 같은 학교
+  ourteamPreference.sameUniversity = row[0]['same_university'];
+
+  [row] = await conn.query('SELECT preference_vibe  FROM `ourteam_preference_vibe` WHERE ourteam_id = (?);', [
+    ourteamId,
+  ]);
+  if (!row[0]['preference_vibe']) return 0;
+  ourteamPreference.vibe = toArrayOfNumber(row[0]['preference_vibe']);
+
+  return convertSnakeToCamel.keysToCamel({ ourteam, ourteamPreference });
+};
+
 const getPartnerTeamIdByOurteamId = async (conn, ourteamId) => {
   const [row] = await conn.query(
-    'SELECT IF(male_team_id=(?), female_team_id, male_team_id) AS partner_team_id FROM `match_team` WHERE (male_team_id=(?) OR female_team_id=(?))',
+    'SELECT IF(male_team_id=(?), female_team_id, male_team_id) AS partner_team_id FROM `match_team` WHERE (male_team_id=(?) OR female_team_id=(?)) AND is_deleted=false;',
     [ourteamId, ourteamId, ourteamId],
   );
 
@@ -354,18 +513,18 @@ const closeTeam = async (conn, ourteamId) => {
   return true;
 };
 
-const updateTeamReapply = async (conn, ourteamId) => {
-  const [row] = await conn.query('SELECT * FROM `user_ourteam` WHERE id=(?) AND is_deleted=false;', [ourteamId]);
+// const updateTeamReapply = async (conn, ourteamId) => {
+//   const [row] = await conn.query('SELECT * FROM `user_ourteam` WHERE id=(?) AND is_deleted=false;', [ourteamId]);
 
-  // 매칭 정보가 없는 경우
-  if (!row[0]) {
-    return false;
-  }
+//   // 매칭 정보가 없는 경우
+//   if (!row[0]) {
+//     return false;
+//   }
 
-  await conn.query('UPDATE `user_ourteam` SET state=0, page_num=3 WHERE id=(?);', [ourteamId]);
+//   await conn.query('UPDATE `user_ourteam` SET state=0, page_num=3 WHERE id=(?);', [ourteamId]);
 
-  return true;
-};
+//   return true;
+// };
 
 const failTeam = async (conn, ourteamId) => {
   const [row] = await conn.query('SELECT * FROM `user_ourteam` WHERE id=(?) AND state=0 AND is_deleted=false;', [
@@ -431,7 +590,10 @@ const revertFailTeam = async (conn, ourteamId) => {
 };
 
 const getOurteamPageByOurteamId = async (conn, ourteamId) => {
-  const [row] = await conn.query('SELECT page_num FROM `user_ourteam` WHERE id=(?) and is_deleted=false;', [ourteamId]);
+  const [row] = await conn.query(
+    'SELECT page_num FROM `user_ourteam` WHERE id=(?) AND state!=-1 AND is_deleted=false;',
+    [ourteamId],
+  );
 
   // 해당 팀 정보가 없는 경우
   if (!row[0]) {
@@ -441,11 +603,100 @@ const getOurteamPageByOurteamId = async (conn, ourteamId) => {
   return convertSnakeToCamel.keysToCamel(row[0]['page_num']);
 };
 
+const getCurrentMatchingStatus = async (conn, ourteamId, partnerTeamId) => {
+  const [row] = await conn.query('SELECT gender FROM `user_ourteam` WHERE id=(?) and is_deleted=false;', [ourteamId]);
+
+  // 남자팀인 경우
+  if (row[0]['gender'] === 1) {
+    const [row] = await conn.query(
+      'SELECT male_team_is_accepted AS ourteam_is_accepted, female_team_is_accepted AS partner_team_is_accepted FROM `match_team` WHERE male_team_id=(?) AND female_team_id=(?) AND is_deleted=false;',
+      [ourteamId, partnerTeamId],
+    );
+    return convertSnakeToCamel.keysToCamel(row[0]);
+  }
+  // 여자팀인 경우
+  else if (row[0]['gender'] === 2) {
+    const [row] = await conn.query(
+      'SELECT female_team_is_accepted AS ourteam_is_accepted, male_team_is_accepted AS partner_team_is_accepted FROM `match_team` WHERE female_team_id=(?) AND male_team_id=(?) AND is_deleted=false;',
+      [ourteamId, partnerTeamId],
+    );
+    return convertSnakeToCamel.keysToCamel(row[0]);
+  }
+  // 해당 팀 정보가 없는 경우
+  else {
+    return -1;
+  }
+};
+
+const updateMatchingResponseTrue = async (conn, ourteamId, partnerTeamId) => {
+  const [row] = await conn.query('SELECT gender FROM `user_ourteam` WHERE id=(?) and is_deleted=false;', [ourteamId]);
+
+  // 남자팀인 경우
+  if (row[0]['gender'] === 1) {
+    await conn.query(
+      'UPDATE `match_team` SET male_team_is_accepted=true  WHERE male_team_id=(?) AND female_team_id=(?) AND is_deleted=false;',
+      [ourteamId, partnerTeamId],
+    );
+  }
+  // 여자팀인 경우
+  else if (row[0]['gender'] === 2) {
+    await conn.query(
+      'UPDATE `match_team` SET female_team_is_accepted=true  WHERE female_team_id=(?) AND male_team_id=(?) AND is_deleted=false;',
+      [ourteamId, partnerTeamId],
+    );
+  }
+  // 해당 팀 정보가 없는 경우
+  else {
+    return -1;
+  }
+};
+
+const updateMatchingResponseFalse = async (conn, ourteamId, partnerTeamId) => {
+  const [row] = await conn.query('SELECT gender FROM `user_ourteam` WHERE id=(?) and is_deleted=false;', [ourteamId]);
+
+  // 남자팀인 경우
+  if (row[0]['gender'] === 1) {
+    await conn.query(
+      'UPDATE `match_team` SET male_team_is_accepted=false  WHERE male_team_id=(?) AND female_team_id=(?) AND is_deleted=false;',
+      [ourteamId, partnerTeamId],
+    );
+  }
+  // 여자팀인 경우
+  else if (row[0]['gender'] === 2) {
+    await conn.query(
+      'UPDATE `match_team` SET female_team_is_accepted=false  WHERE female_team_id=(?) AND male_team_id=(?) AND is_deleted=false;',
+      [ourteamId, partnerTeamId],
+    );
+  }
+  // 해당 팀 정보가 없는 경우
+  else {
+    return -1;
+  }
+};
+
+const updateTeamPageNum = async (conn, teamId, teamNewPage) => {
+  await conn.query('UPDATE `user_ourteam` SET page_num=(?) WHERE id=(?) AND is_deleted=false;', [teamNewPage, teamId]);
+};
+
+const updateTeamState = async (conn, teamId, teamNewState) => {
+  await conn.query('UPDATE `user_ourteam` SET state=(?) WHERE id=(?) AND is_deleted=false;', [teamNewState, teamId]);
+};
+
+const saveTeamRefuseReason = async (conn, params) => {
+  await conn.query('INSERT INTO `ourteam_refuse_reason` (ourteam_id, reason, other) VALUES (?, ?, ?);', [
+    params.ourteamId,
+    params.id,
+    params.other,
+  ]);
+};
+
 module.exports = {
   saveUserOurteam,
   updateUserOurteam,
   getIsMatchingByUserId,
   getOurteamByOurteamId,
+  getTeamInfoByTeamId,
+  getCurrentTeamForReapply,
   getMaleApplyNum,
   getFemaleApplyNum,
   getWaitingTeam,
@@ -461,9 +712,15 @@ module.exports = {
   matchTeam,
   closeMatching,
   closeTeam,
-  updateTeamReapply,
+  // updateTeamReapply,
   failTeam,
   revertMatchTeam,
   revertFailTeam,
   getOurteamPageByOurteamId,
+  getCurrentMatchingStatus,
+  updateMatchingResponseTrue,
+  updateTeamPageNum,
+  updateTeamState,
+  updateMatchingResponseFalse,
+  saveTeamRefuseReason,
 };

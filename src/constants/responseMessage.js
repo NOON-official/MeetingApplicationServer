@@ -50,6 +50,11 @@ module.exports = {
   NO_RESULT: '해당 팀의 매칭 결과가 없습니다',
   REAPPLY_SUCCESS: '팀 매칭 재신청에 성공하였습니다',
   GET_TEAM_MATCHING_PAGE_SUCCESS: '팀 매칭 상태 페이지 조회에 성공하였습니다',
+  ALREADY_RESPONEDED_TEAM: '이미 수락 또는 거절한 팀입니다',
+  MATCHING_ACCEPT_SUCCESS: '매칭 수락하기에 성공하였습니다',
+  MATCHING_REFUSE_SUCCESS: '매칭 거절하기에 성공하였습니다',
+  QUIT_APPLY_SUCCESS: '매칭 그만두기에 성공하였습니다',
+  SAVE_REFUSE_REASON_SUCCESS: '매칭 거절 이유 보내기에 성공하였습니다',
 
   // Admin
   ADMIN_NO_RESULT: '조회 결과가 없습니다',

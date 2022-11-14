@@ -26,6 +26,18 @@ module.exports = async (req, res) => {
 
     const partnerTeamId = await teamDB.getPartnerTeamIdByOurteamId(conn, ourteamId);
 
+    // 수락-수락 상태가 아닌 경우
+    const currentMatchingStatus = await teamDB.getCurrentMatchingStatus(conn, ourteamId, partnerTeamId);
+
+    if (currentMatchingStatus === -1) {
+      return res.status(statusCode.BAD_REQUEST).send(util.success(statusCode.BAD_REQUEST, responseMessage.NO_APPLY));
+    }
+
+    if (!(currentMatchingStatus.ourteamIsAccepted === 1 && currentMatchingStatus.partnerTeamIsAccepted === 1)) {
+      return res.status(statusCode.BAD_REQUEST).send(util.success(statusCode.BAD_REQUEST, responseMessage.FORBIDDEN));
+    }
+
+    // 매칭 결과
     const matchingResult = await teamDB.getMatchingResultByTeamId(conn, partnerTeamId);
 
     if (!matchingResult) {

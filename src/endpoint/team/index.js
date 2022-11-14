@@ -11,5 +11,9 @@ router.get('/status/:ourteamId', checkUser, require('./teamStatusOurteamIdGET(de
 router.get('/result/:ourteamId', checkUser, require('./teamResultOurteamIdGET'));
 router.put('/reapply', checkUser, require('./teamReapplyPUT'));
 router.get('/page/:ourteamId', checkUser, require('./teamPageOurteamIdGET'));
+router.post('/accept', checkUser, require('./teamAcceptPOST'));
+router.post('/refuse', checkUser, require('./teamRefusePOST'));
+router.put('/quit', checkUser, require('./teamQuitPUT'));
+router.post('/refuse/reason', checkUser, require('./teamRefuseReasonPOST'));
 
 module.exports = router;
