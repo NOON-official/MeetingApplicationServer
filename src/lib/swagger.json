@@ -2390,7 +2390,7 @@
             }
           },
           "400": {
-            "description": "이미 매칭된 유저인 경우",
+            "description": "매칭 신청 정보가 없는 경우",
             "content": {
               "application/json": {
                 "schema": {
@@ -2398,11 +2398,11 @@
                 },
                 "examples": {
                   "1": {
-                    "summary": "ALREADY_MATCHED_USER",
+                    "summary": "NO_APPLY",
                     "value": {
                       "status": 400,
                       "success": false,
-                      "message": "이미 매칭 완료된 유저입니다"
+                      "message": "해당 유저의 매칭 신청 정보가 없습니다"
                     }
                   }
                 }
