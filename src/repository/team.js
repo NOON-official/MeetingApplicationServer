@@ -690,6 +690,21 @@ const saveTeamRefuseReason = async (conn, params) => {
   ]);
 };
 
+const checkTeam = async (conn, teamId) => {
+  const [row] = await conn.query('SELECT * FROM `user_ourteam` WHERE id=(?) AND state=0 AND is_deleted=false;', [
+    teamId,
+  ]);
+
+  // 가신청 정보가 없는 경우
+  if (!row[0]) {
+    return false;
+  }
+
+  await conn.query('UPDATE `user_ourteam` SET state=1 WHERE id=(?);', [teamId]);
+
+  return true;
+};
+
 module.exports = {
   saveUserOurteam,
   updateUserOurteam,
@@ -723,4 +738,5 @@ module.exports = {
   updateTeamState,
   updateMatchingResponseFalse,
   saveTeamRefuseReason,
+  checkTeam,
 };

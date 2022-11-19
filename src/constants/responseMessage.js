@@ -62,6 +62,7 @@ module.exports = {
   GET_MALE_THREE_TEAM_UNCHECKED_APPLY_SUCCESS: '가신청 남자팀 3:3 매칭 신청 정보 전체 조회에 성공하였습니다',
   GET_FEMALE_TWO_TEAM_UNCHECKED_APPLY_SUCCESS: '가신청 여자팀 2:2 매칭 신청 정보 전체 조회에 성공하였습니다',
   GET_FEMALE_THREE_TEAM_UNCHECKED_APPLY_SUCCESS: '가신청 여자팀 3:3 매칭 신청 정보 전체 조회에 성공하였습니다',
+  CHECK_TEAM_SUCCESS: '매칭 신청 승인하기에 성공하였습니다',
   GET_MALE_TWO_TEAM_CHECKED_APPLY_SUCCESS: '승인 완료된 남자팀 2:2 매칭 신청 정보 전체 조회에 성공하였습니다',
   GET_MALE_THREE_TEAM_CHECKED_APPLY_SUCCESS: '승인 완료된 남자팀 3:3 매칭 신청 정보 전체 조회에 성공하였습니다',
   GET_FEMALE_TWO_TEAM_CHECKED_APPLY_SUCCESS: '승인 완료된 여자팀 2:2 매칭 신청 정보 전체 조회에 성공하였습니다',
