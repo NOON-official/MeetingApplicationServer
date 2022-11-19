@@ -2339,6 +2339,79 @@
         }
       }
     },
+    "/admin/team/check": {
+      "post": {
+        "tags": ["Admin"],
+        "summary": "매칭 신청 승인하기",
+        "parameters": [{ "in": "cookie", "name": "access", "schema": { "type": "string" } }],
+        "description": "🌸 매칭 신청을 승인합니다. (state=0 => state=1)",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "teamId": {
+                    "type": "integer",
+                    "example": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "매칭 신청 승인하기 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "매칭 신청 승인하기에 성공하였습니다"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {
+                        "success": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "이미 매칭된 유저인 경우",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "ALREADY_MATCHED_USER",
+                    "value": {
+                      "status": 400,
+                      "success": false,
+                      "message": "이미 매칭 완료된 유저입니다"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/admin/team/male/2/checked": {
       "get": {
         "tags": ["Admin"],
