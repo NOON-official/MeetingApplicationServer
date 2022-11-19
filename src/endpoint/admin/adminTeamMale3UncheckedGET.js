@@ -5,20 +5,20 @@ const { toArrayOfString, toArrayOfNumber } = require('../../lib/convertArrayToSt
 const pool = require('../../repository/db');
 const { teamDB } = require('../../repository');
 
-// 여자팀 3:3 매칭 신청 정보 전체 조회
+// 남자팀 3:3 매칭 신청 정보 전체 조회 (가신청)
 module.exports = async (req, res) => {
   let conn;
 
   try {
     conn = await pool.getConnection();
-    let femaleTeam = await teamDB.getTeamByAdmin(conn, 2, 3); // 3:3, 여자
+    let maleTeam = await teamDB.getTeamByAdmin(conn, 1, 3, 0); // 3:3, 남자, 가신청
 
     // 결과가 없는 경우
-    if (!femaleTeam || femaleTeam.length === 0) {
+    if (!maleTeam || maleTeam.length === 0) {
       return res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.BAD_REQUEST, responseMessage.ADMIN_NO_RESULT));
     }
 
-    femaleTeam = femaleTeam.map((t) => {
+    maleTeam = maleTeam.map((t) => {
       let n = {}; // 반환할 객체를 저장
       const arrayCheckList = [
         'job',
@@ -27,12 +27,11 @@ module.exports = async (req, res) => {
         'day',
         'appearance',
         'mbti',
-        'fashion',
         'role',
         'preferenceJob',
         'preferenceVibe',
       ];
-      const stringCheckList = ['preferenceAge', 'preferenceHeight'];
+      const stringCheckList = ['preferenceAge'];
 
       // 반환할 형태로 변환하기
       for (const [k, v] of Object.entries(t)) {
@@ -51,8 +50,8 @@ module.exports = async (req, res) => {
     });
 
     res.status(statusCode.OK).send(
-      util.success(statusCode.OK, responseMessage.GET_FEMALE_THREE_TEAM_APPLY_SUCCESS, {
-        femaleTeam,
+      util.success(statusCode.OK, responseMessage.GET_MALE_THREE_TEAM_UNCHECKED_APPLY_SUCCESS, {
+        maleTeam,
       }),
     );
   } catch (error) {
