@@ -6,9 +6,9 @@ const responseMessage = require('../../constants/responseMessage');
 
 // 팀 매칭하기
 module.exports = async (req, res) => {
-  const { maleTeamId, femaleTeamId, chatLink } = req.body;
+  const { maleTeamId, femaleTeamId } = req.body;
 
-  if (!maleTeamId || !femaleTeamId || !chatLink) {
+  if (!maleTeamId || !femaleTeamId) {
     return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
   }
 
@@ -16,7 +16,7 @@ module.exports = async (req, res) => {
   try {
     conn = await pool.getConnection();
 
-    const success = await teamDB.matchTeam(conn, maleTeamId, femaleTeamId, chatLink);
+    const success = await teamDB.matchTeam(conn, maleTeamId, femaleTeamId);
 
     if (success === false) {
       return res
