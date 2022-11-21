@@ -3245,9 +3245,9 @@
     "/admin/team/fail": {
       "post": {
         "tags": ["Admin"],
-        "summary": "팀 매칭 실패 처리하기",
+        "summary": "팀 매칭 실패 처리하기 (updated)",
         "parameters": [{ "in": "cookie", "name": "access", "schema": { "type": "string" } }],
-        "description": "해당 팀 매칭 상태를 실패로 처리합니다. (state=2)",
+        "description": "해당 팀 매칭 상태를 실패로 처리합니다. (state=5, page=4)",
         "requestBody": {
           "content": {
             "application/json": {
