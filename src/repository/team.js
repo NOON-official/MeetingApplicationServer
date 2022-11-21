@@ -450,13 +450,13 @@ const getFailTeamByAdmin = async (conn, genderId) => {
   return convertSnakeToCamel.keysToCamel(row);
 };
 
-const matchTeam = async (conn, maleTeamId, femaleTeamId, chatLink) => {
+const matchTeam = async (conn, maleTeamId, femaleTeamId) => {
   const [row1] = await conn.query(
-    'SELECT male_team_id FROM `match_team` WHERE male_team_id=(?) and is_deleted=false;',
+    'SELECT male_team_id FROM `match_team` WHERE male_team_id=(?) AND male_team_is_accepted != false AND is_deleted=false;',
     [maleTeamId],
   );
   const [row2] = await conn.query(
-    'SELECT female_team_id FROM `match_team` WHERE female_team_id=(?) and is_deleted=false;',
+    'SELECT female_team_id FROM `match_team` WHERE female_team_id=(?) AND male_team_is_accepted != false AND is_deleted=false;',
     [femaleTeamId],
   );
 
@@ -465,14 +465,13 @@ const matchTeam = async (conn, maleTeamId, femaleTeamId, chatLink) => {
     return false;
   }
 
-  await conn.query('INSERT INTO `match_team` (male_team_id, female_team_id, chat_link) VALUES (?, ?, ?);', [
+  await conn.query('INSERT INTO `match_team` (male_team_id, female_team_id) VALUES (?, ?);', [
     maleTeamId,
     femaleTeamId,
-    chatLink,
   ]);
 
-  await conn.query('UPDATE `user_ourteam` SET state=1 WHERE id=(?);', [maleTeamId]);
-  await conn.query('UPDATE `user_ourteam` SET state=1 WHERE id=(?);', [femaleTeamId]);
+  await conn.query('UPDATE `user_ourteam` SET state=2, page_num=5 WHERE id=(?);', [maleTeamId]);
+  await conn.query('UPDATE `user_ourteam` SET state=2, page_num=5 WHERE id=(?);', [femaleTeamId]);
 
   return true;
 };

@@ -2010,7 +2010,7 @@
     "/admin/team/male/2/unchecked": {
       "get": {
         "tags": ["Admin"],
-        "summary": "남자팀 2:2 매칭 신청 정보 전체 조회 (가신청)",
+        "summary": "남자팀 2:2 매칭 신청 정보 전체 조회 (가신청) (updated)",
         "description": "🌸 매칭 신청한 2:2 남자팀 정보를 전체 조회합니다. \n\n * 가신청(state=0)인 상태의 팀 정보를 모두 불러옵니다. \n\n * 정렬 순서: 신청일자(오름차순) -> 나이 \n\n* 2022.11.19 height, fashion 삭제",
         "parameters": [{ "in": "cookie", "name": "access", "schema": { "type": "string" } }],
         "responses": {
@@ -2093,7 +2093,7 @@
     "/admin/team/male/3/unchecked": {
       "get": {
         "tags": ["Admin"],
-        "summary": "남자팀 3:3 매칭 신청 정보 전체 조회 (가신청)",
+        "summary": "남자팀 3:3 매칭 신청 정보 전체 조회 (가신청) (updated)",
         "description": "🌸 매칭 신청한 3:3 남자팀 정보를 전체 조회합니다. \n\n * 가신청(state=0)인 상태의 팀 정보를 모두 불러옵니다. \n\n * 정렬 순서: 신청일자(오름차순) -> 나이 \n\n* 2022.11.19 height, fashion 삭제",
         "parameters": [{ "in": "cookie", "name": "access", "schema": { "type": "string" } }],
         "responses": {
@@ -2176,7 +2176,7 @@
     "/admin/team/female/2/unchecked": {
       "get": {
         "tags": ["Admin"],
-        "summary": "여자팀 2:2 매칭 신청 정보 전체 조회 (가신청)",
+        "summary": "여자팀 2:2 매칭 신청 정보 전체 조회 (가신청) (updated)",
         "description": "🌸 매칭 신청한 2:2 여자팀 정보를 전체 조회합니다. \n\n * 가신청(state=0)인 상태의 팀 정보를 모두 불러옵니다. \n\n * 정렬 순서: 신청일자(오름차순) -> 나이 \n\n* 2022.11.19 height, fashion 삭제",
         "parameters": [{ "in": "cookie", "name": "access", "schema": { "type": "string" } }],
         "responses": {
@@ -2259,7 +2259,7 @@
     "/admin/team/female/3/unchecked": {
       "get": {
         "tags": ["Admin"],
-        "summary": "여자팀 3:3 매칭 신청 정보 전체 조회 (가신청)",
+        "summary": "여자팀 3:3 매칭 신청 정보 전체 조회 (가신청) (updated)",
         "description": "🌸 매칭 신청한 3:3 여자팀 정보를 전체 조회합니다. \n\n * 가신청(state=0)인 상태의 팀 정보를 모두 불러옵니다. \n\n * 정렬 순서: 신청일자(오름차순) -> 나이 \n\n* 2022.11.19 height, fashion 삭제",
         "parameters": [{ "in": "cookie", "name": "access", "schema": { "type": "string" } }],
         "responses": {
@@ -2342,7 +2342,7 @@
     "/admin/team/check": {
       "post": {
         "tags": ["Admin"],
-        "summary": "매칭 신청 승인하기",
+        "summary": "매칭 신청 승인하기 (updated)",
         "parameters": [{ "in": "cookie", "name": "access", "schema": { "type": "string" } }],
         "description": "🌸 매칭 신청을 승인합니다. (state=0 => state=1)",
         "requestBody": {
@@ -2415,7 +2415,7 @@
     "/admin/team/male/2/checked": {
       "get": {
         "tags": ["Admin"],
-        "summary": "남자팀 2:2 매칭 신청 정보 전체 조회 (승인 완료)",
+        "summary": "남자팀 2:2 매칭 신청 정보 전체 조회 (승인 완료) (updated)",
         "description": "🌸 매칭 신청한 2:2 남자팀 정보를 전체 조회합니다. \n\n * 승인 완료(state=1)인 상태의 팀 정보를 모두 불러옵니다. \n\n * 정렬 순서: 신청일자(오름차순) -> 나이 \n\n* 2022.11.19 height, fashion 삭제",
         "parameters": [{ "in": "cookie", "name": "access", "schema": { "type": "string" } }],
         "responses": {
@@ -2498,7 +2498,7 @@
     "/admin/team/male/3/checked": {
       "get": {
         "tags": ["Admin"],
-        "summary": "남자팀 3:3 매칭 신청 정보 전체 조회 (승인 완료)",
+        "summary": "남자팀 3:3 매칭 신청 정보 전체 조회 (승인 완료) (updated)",
         "description": "🌸 매칭 신청한 3:3 남자팀 정보를 전체 조회합니다. \n\n * 승인 완료(state=1)인 상태의 팀 정보를 모두 불러옵니다. \n\n * 정렬 순서: 신청일자(오름차순) -> 나이 \n\n* 2022.11.19 height, fashion 삭제",
         "parameters": [{ "in": "cookie", "name": "access", "schema": { "type": "string" } }],
         "responses": {
@@ -2581,7 +2581,7 @@
     "/admin/team/female/2/checked": {
       "get": {
         "tags": ["Admin"],
-        "summary": "여자팀 2:2 매칭 신청 정보 전체 조회 (승인 완료)",
+        "summary": "여자팀 2:2 매칭 신청 정보 전체 조회 (승인 완료) (updated)",
         "description": "🌸 매칭 신청한 2:2 여자팀 정보를 전체 조회합니다. \n\n * 승인 완료(state=1)인 상태의 팀 정보를 모두 불러옵니다. \n\n * 정렬 순서: 신청일자(오름차순) -> 나이 \n\n* 2022.11.19 height, fashion 삭제",
         "parameters": [{ "in": "cookie", "name": "access", "schema": { "type": "string" } }],
         "responses": {
@@ -2664,7 +2664,7 @@
     "/admin/team/female/3/checked": {
       "get": {
         "tags": ["Admin"],
-        "summary": "여자팀 3:3 매칭 신청 정보 전체 조회 (승인 완료)",
+        "summary": "여자팀 3:3 매칭 신청 정보 전체 조회 (승인 완료) (updated)",
         "description": "🌸 매칭 신청한 3:3 여자팀 정보를 전체 조회합니다. \n\n * 승인 완료(state=1)인 상태의 팀 정보를 모두 불러옵니다. \n\n * 정렬 순서: 신청일자(오름차순) -> 나이 \n\n* 2022.11.19 height, fashion 삭제",
         "parameters": [{ "in": "cookie", "name": "access", "schema": { "type": "string" } }],
         "responses": {
@@ -3093,9 +3093,9 @@
     "/admin/team/match": {
       "post": {
         "tags": ["Admin"],
-        "summary": "팀 매칭하기",
+        "summary": "팀 매칭하기 (updated)",
         "parameters": [{ "in": "cookie", "name": "access", "schema": { "type": "string" } }],
-        "description": "팀을 매칭합니다. 해당 팀의 오픈채팅 링크를 함께 입력받습니다.",
+        "description": "팀을 매칭합니다.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -3108,10 +3108,6 @@
                   "femaleTeamId": {
                     "type": "integer",
                     "example": 2
-                  },
-                  "chatLink": {
-                    "type": "integer",
-                    "example": "https://~"
                   }
                 }
               }
