@@ -526,7 +526,7 @@ const closeTeam = async (conn, ourteamId) => {
 // };
 
 const failTeam = async (conn, ourteamId) => {
-  const [row] = await conn.query('SELECT * FROM `user_ourteam` WHERE id=(?) AND state=0 AND is_deleted=false;', [
+  const [row] = await conn.query('SELECT * FROM `user_ourteam` WHERE id=(?) AND state=1 AND is_deleted=false;', [
     ourteamId,
   ]);
 
@@ -535,7 +535,7 @@ const failTeam = async (conn, ourteamId) => {
     return false;
   }
 
-  await conn.query('UPDATE `user_ourteam` SET state=2 WHERE id=(?);', [ourteamId]);
+  await conn.query('UPDATE `user_ourteam` SET state=5, page_num=4 WHERE id=(?);', [ourteamId]);
 
   return true;
 };
