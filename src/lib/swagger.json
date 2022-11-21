@@ -3095,7 +3095,7 @@
         "tags": ["Admin"],
         "summary": "팀 매칭하기 (updated)",
         "parameters": [{ "in": "cookie", "name": "access", "schema": { "type": "string" } }],
-        "description": "팀을 매칭합니다.",
+        "description": "🌸 팀을 매칭합니다.",
         "requestBody": {
           "content": {
             "application/json": {
