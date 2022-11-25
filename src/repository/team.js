@@ -722,6 +722,32 @@ const getPendingFemaleTeamByAdmin = async (conn, genderId) => {
   return convertSnakeToCamel.keysToCamel(row);
 };
 
+const getTeamByStateAndPageNum = async (conn, stateId, pageId) => {
+  const [row] = await conn.query(
+    'SELECT JSON_ARRAYAGG(id) AS team_id FROM `user_ourteam` WHERE state = (?) AND page_num = (?) AND is_deleted = false',
+    [stateId, pageId],
+  );
+
+  return convertSnakeToCamel.keysToCamel(row[0]['team_id']);
+};
+
+const getTeamByState = async (conn, stateId) => {
+  const [row] = await conn.query(
+    'SELECT JSON_ARRAYAGG(id) AS team_id FROM `user_ourteam` WHERE state = (?) AND is_deleted = false',
+    [stateId],
+  );
+
+  return convertSnakeToCamel.keysToCamel(row[0]['team_id']);
+};
+
+const updateTeamStateAndPageNum = async (conn, teamId, stateId, pageId) => {
+  await conn.query('UPDATE `user_ourteam` SET state=(?), page_num=(?) WHERE id=(?);', [stateId, pageId, teamId]);
+};
+
+const deleteTeam = async (conn, ourteamId) => {
+  await conn.query('UPDATE `user_ourteam` SET is_deleted=true WHERE id=(?);', [ourteamId]);
+};
+
 module.exports = {
   saveUserOurteam,
   updateUserOurteam,
@@ -758,4 +784,8 @@ module.exports = {
   checkTeam,
   getPendingMaleTeamByAdmin,
   getPendingFemaleTeamByAdmin,
+  getTeamByStateAndPageNum,
+  getTeamByState,
+  updateTeamStateAndPageNum,
+  deleteTeam,
 };
