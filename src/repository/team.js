@@ -526,7 +526,7 @@ const closeTeam = async (conn, ourteamId) => {
 // };
 
 const failTeam = async (conn, ourteamId) => {
-  const [row] = await conn.query('SELECT * FROM `user_ourteam` WHERE id=(?) AND state=1 AND is_deleted=false;', [
+  const [row] = await conn.query('SELECT * FROM `user_ourteam` WHERE id=(?) AND state=0 AND is_deleted=false;', [
     ourteamId,
   ]);
 
