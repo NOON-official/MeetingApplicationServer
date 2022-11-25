@@ -26,5 +26,6 @@ router.put('/team/fail', checkUser, checkAdmin, require('./adminTeamFailPUT(depr
 router.post('/team/check', checkUser, checkAdmin, require('./adminTeamCheckPOST(deprecated)'));
 router.get('/team/matching/pending/male', checkUser, checkAdmin, require('./adminTeamMatchingPendingMaleGET'));
 router.get('/team/matching/pending/female', checkUser, checkAdmin, require('./adminTeamMatchingPendingFemaleGET'));
+router.post('/update/team/state', checkUser, checkAdmin, require('./adminUpdateTeamStatePOST'));
 
 module.exports = router;

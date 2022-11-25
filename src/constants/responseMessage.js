@@ -81,4 +81,5 @@ module.exports = {
   REVERT_FAIL_TEAM_SUCCESS: '팀 매칭 실패에서 매칭중으로 되돌리기에 성공하였습니다',
   GET_MATCHING_PENDING_MALE_TEAM_SUCCESS: '매칭 수락 대기중인 남자팀 정보 전체 조회에 성공하였습니다',
   GET_MATCHING_PENDING_FEMALE_TEAM_SUCCESS: '매칭 수락 대기중인 여자팀 정보 전체 조회에 성공하였습니다',
+  UPDATE_TEAM_SUCCESS: '수락/거절 적용하기에 성공하였습니다',
 };
