@@ -5,13 +5,13 @@ const { toArrayOfString, toArrayOfNumber } = require('../../lib/convertArrayToSt
 const pool = require('../../repository/db');
 const { teamDB } = require('../../repository');
 
-// 여자팀 3:3 매칭 신청 정보 전체 조회 (승인 완료)
+// 여자팀 2:2 매칭 신청 정보 전체 조회
 module.exports = async (req, res) => {
   let conn;
 
   try {
     conn = await pool.getConnection();
-    let femaleTeam = await teamDB.getTeamByAdmin(conn, 2, 3, 1); // 3:3, 여자, 승인 완료
+    let femaleTeam = await teamDB.getTeamByAdmin(conn, 2, 2, 0); // 여자, 2:2, 매칭중
 
     // 결과가 없는 경우
     if (!femaleTeam || femaleTeam.length === 0) {
@@ -50,7 +50,7 @@ module.exports = async (req, res) => {
     });
 
     res.status(statusCode.OK).send(
-      util.success(statusCode.OK, responseMessage.GET_FEMALE_THREE_TEAM_CHECKED_APPLY_SUCCESS, {
+      util.success(statusCode.OK, responseMessage.GET_FEMALE_TWO_TEAM_APPLY_SUCCESS, {
         femaleTeam,
       }),
     );
