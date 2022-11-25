@@ -2493,7 +2493,7 @@
       "get": {
         "tags": ["Admin"],
         "summary": "매칭 완료된 남자팀 정보 전체 조회 (updated)",
-        "description": "🌸 매칭 완료된 남자팀 정보를 전체 조회합니다. \n\n * 매칭 완료(state=2 & page=5)인 상태의 팀 정보를 모두 불러옵니다. \n\n * 정렬 순서: 매칭 완료순(오름차순) \n\n* 2022.11.19 height, fashion 삭제",
+        "description": "🌸 매칭 완료된 남자팀 정보를 전체 조회합니다. \n\n * 매칭 완료이고 수락/거절 선택X (1. state=2 & page=5, 2. state=4 & page=5)인 상태의 팀 정보를 모두 불러옵니다. \n\n * 정렬 순서: 매칭 완료순(오름차순) \n\n* 2022.11.19 height, fashion 삭제",
         "parameters": [{ "in": "cookie", "name": "access", "schema": { "type": "string" } }],
         "responses": {
           "200": {
@@ -2577,7 +2577,7 @@
       "get": {
         "tags": ["Admin"],
         "summary": "매칭 완료된 여자팀 정보 전체 조회 (updated)",
-        "description": "🌸 매칭 완료된 여자팀 정보를 전체 조회합니다. \n\n * 매칭 완료(state=2 & page=5)인 상태의 팀 정보를 모두 불러옵니다. \n\n * 정렬 순서: 매칭 완료순(오름차순) \n\n* 2022.11.19 height, fashion 삭제",
+        "description": "🌸 매칭 완료된 여자팀 정보를 전체 조회합니다. \n\n * 매칭 완료이고 수락/거절 선택X (1. state=2 & page=5, 2. state=4 & page=5)인 상태의 팀 정보를 모두 불러옵니다. \n\n * 정렬 순서: 매칭 완료순(오름차순) \n\n* 2022.11.19 height, fashion 삭제",
         "parameters": [{ "in": "cookie", "name": "access", "schema": { "type": "string" } }],
         "responses": {
           "200": {
@@ -2661,7 +2661,7 @@
       "get": {
         "tags": ["Admin"],
         "summary": "매칭 수락 대기중인 남자팀 정보 전체 조회 (new)",
-        "description": "🌸 매칭 수락 대기중인 남자팀 정보를 전체 조회합니다. \n\n * 매칭 수락 대기중(1. state=2 & page=6, 2. state=3)인 상태의 팀 정보를 모두 불러옵니다. \n\n * 정렬 순서: 수락 완료순(오름차순) \n\n* 2022.11.19 height, fashion 삭제",
+        "description": "🌸 매칭 수락 대기중인 남자팀 정보를 전체 조회합니다. \n\n * 매칭 수락 대기중(1. state=2 & page=6, 2. state=3 & page=6)인 상태의 팀 정보를 모두 불러옵니다. \n\n * 정렬 순서: 수락 완료순(오름차순) \n\n* 2022.11.19 height, fashion 삭제",
         "parameters": [{ "in": "cookie", "name": "access", "schema": { "type": "string" } }],
         "responses": {
           "200": {
@@ -2745,7 +2745,7 @@
       "get": {
         "tags": ["Admin"],
         "summary": "매칭 수락 대기중인 여자팀 정보 전체 조회 (new)",
-        "description": "🌸 매칭 수락 대기중인 여자팀 정보를 전체 조회합니다. \n\n * 매칭 수락 대기중(1. state=2 & page=6, 2. state=3)인 상태의 팀 정보를 모두 불러옵니다. \n\n * 정렬 순서: 수락 완료순(오름차순) \n\n* 2022.11.19 height, fashion 삭제",
+        "description": "🌸 매칭 수락 대기중인 여자팀 정보를 전체 조회합니다. \n\n * 매칭 수락 대기중(1. state=2 & page=6, 2. state=3 & page=6)인 상태의 팀 정보를 모두 불러옵니다. \n\n * 정렬 순서: 수락 완료순(오름차순) \n\n* 2022.11.19 height, fashion 삭제",
         "parameters": [{ "in": "cookie", "name": "access", "schema": { "type": "string" } }],
         "responses": {
           "200": {
@@ -2830,8 +2830,7 @@
         "tags": ["Admin"],
         "summary": "수락/거절 적용하기 (new)",
         "parameters": [{ "in": "cookie", "name": "access", "schema": { "type": "string" } }],
-        "description": "🌸 수락/거절 상태를 적용합니다. \n\n 1. 둘 다 수락한 경우(state=3 & page=6) => 상대팀 정보 공개(state=3 & page=7) \n\n 1. 상대팀 무응답인 경우(state=3 & page=6) => 둘다 매칭 실패(거절) 처리(state=4 & page=9)",
-
+        "description": "🌸 수락/거절 상태를 적용합니다. \n\n 1. 둘 다 수락한 경우(state=3 & page=6) => 상대팀 정보 공개(state=3 & page=7) \n\n 2. 상대팀 무응답인 경우(state=2 & page=6) => 매칭 실패(거절) 처리(state=4 & page=9) \n\n 3. 본인팀 무응답인 경우(state=2, page=5) => 매칭 실패(거절) 처리(state=4 & page=9) \n\n 4. 가삭제인 경우(state=-1) => 삭제 처리(is_deleted=true)",
         "responses": {
           "200": {
             "description": "수락/거절 적용하기 성공",
@@ -2868,8 +2867,8 @@
     "/admin/team/matching/fail/male": {
       "get": {
         "tags": ["Admin"],
-        "summary": "매칭 실패한 남자팀 정보 전체 조회",
-        "description": "🌸 매칭 실패한 남자팀 정보를 전체 조회합니다. \n\n * 매칭 실패(state=2)한 상태의 팀 정보를 모두 불러옵니다. \n\n * 정렬 순서: 매칭 완료순(오름차순)",
+        "summary": "매칭 실패한 남자팀 정보 전체 조회 (updated)",
+        "description": "🌸 매칭 실패한 남자팀 정보를 전체 조회합니다. \n\n * 매칭 실패(state=5)한 상태의 팀 정보를 모두 불러옵니다. \n\n * 정렬 순서: 매칭 실패순(오름차순) \n\n* 2022.11.25 height, fashion 삭제",
         "parameters": [{ "in": "cookie", "name": "access", "schema": { "type": "string" } }],
         "responses": {
           "200": {
@@ -2902,7 +2901,6 @@
                             "gender": 1,
                             "num": 2,
                             "age": "25",
-                            "height": "170",
                             "drink": "2",
                             "intro": "안녕하세요. 저희는~",
                             "job": [1, 3],
@@ -2911,11 +2909,9 @@
                             "day": [1, 6, 7],
                             "appearance": [1, 2],
                             "mbti": [1, 3, 16],
-                            "fashion": [1, 2, 5],
                             "role": [2, 4],
                             "preferenceJob": [1, 2],
                             "preferenceAge": ["21", "25"],
-                            "preferenceHeight": ["170", "180"],
                             "sameUniversity": 1,
                             "preferenceVibe": [4, 5],
                             "updatedAt": "2022.8.5 21:54"
@@ -2954,8 +2950,8 @@
     "/admin/team/matching/fail/female": {
       "get": {
         "tags": ["Admin"],
-        "summary": "매칭 실패한 여자팀 정보 전체 조회",
-        "description": "🌸 매칭 실패한 여자팀 정보를 전체 조회합니다. \n\n * 매칭 실패(state=2)한 상태의 팀 정보를 모두 불러옵니다. \n\n * 정렬 순서: 매칭 완료순(오름차순)",
+        "summary": "매칭 실패한 여자팀 정보 전체 조회 (updated)",
+        "description": "🌸 매칭 실패한 여자팀 정보를 전체 조회합니다. \n\n * 매칭 실패(state=5)한 상태의 팀 정보를 모두 불러옵니다. \n\n * 정렬 순서: 매칭 실패순(오름차순) \n\n* 2022.11.25 height, fashion 삭제",
         "parameters": [{ "in": "cookie", "name": "access", "schema": { "type": "string" } }],
         "responses": {
           "200": {
@@ -2988,7 +2984,6 @@
                             "gender": 1,
                             "num": 2,
                             "age": "25",
-                            "height": "170",
                             "drink": "2",
                             "intro": "안녕하세요. 저희는~",
                             "job": [1, 3],
@@ -2997,11 +2992,507 @@
                             "day": [1, 6, 7],
                             "appearance": [1, 2],
                             "mbti": [1, 3, 16],
-                            "fashion": [1, 2, 5],
                             "role": [2, 4],
                             "preferenceJob": [1, 2],
                             "preferenceAge": ["21", "25"],
-                            "preferenceHeight": ["170", "180"],
+                            "sameUniversity": 1,
+                            "preferenceVibe": [4, 5],
+                            "updatedAt": "2022.8.5 21:54"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "결과가 없는 경우",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "ADMIN_NO_RESULT",
+                    "value": {
+                      "status": 400,
+                      "success": false,
+                      "message": "조회 결과가 없습니다"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/team/matching/refuse/male": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "매칭 거절한 남자팀 정보 전체 조회 (new)",
+        "description": "🌸 매칭 거절한 남자팀 정보를 전체 조회합니다. \n\n * 매칭 거절(state=4, page=8)한 상태의 팀 정보를 모두 불러옵니다. \n\n * 정렬 순서: 매칭 거절순(오름차순)",
+        "parameters": [{ "in": "cookie", "name": "access", "schema": { "type": "string" } }],
+        "responses": {
+          "200": {
+            "description": "매칭 거절한 남자팀 정보 전체 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "매칭 거절한 남자팀 정보 전체 조회에 성공하였습니다"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {
+                        "maleTeam": [
+                          {
+                            "ourteamId": 2,
+                            "userId": 1,
+                            "nickname": "미팅이",
+                            "phone": "01012345678",
+                            "gender": 1,
+                            "num": 2,
+                            "age": "25",
+                            "drink": "2",
+                            "intro": "안녕하세요. 저희는~",
+                            "job": [1, 3],
+                            "university": [1, 55],
+                            "area": [2, 4, 1],
+                            "day": [1, 6, 7],
+                            "appearance": [1, 2],
+                            "mbti": [1, 3, 16],
+                            "role": [2, 4],
+                            "preferenceJob": [1, 2],
+                            "preferenceAge": ["21", "25"],
+                            "sameUniversity": 1,
+                            "preferenceVibe": [4, 5],
+                            "updatedAt": "2022.8.5 21:54"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "결과가 없는 경우",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "ADMIN_NO_RESULT",
+                    "value": {
+                      "status": 400,
+                      "success": false,
+                      "message": "조회 결과가 없습니다"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/team/matching/refuse/female": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "매칭 거절한 여자팀 정보 전체 조회 (new)",
+        "description": "🌸 매칭 거절한 여자팀 정보를 전체 조회합니다. \n\n * 매칭 거절(state=4, page=8)한 상태의 팀 정보를 모두 불러옵니다. \n\n * 정렬 순서: 매칭 거절순(오름차순)",
+        "parameters": [{ "in": "cookie", "name": "access", "schema": { "type": "string" } }],
+        "responses": {
+          "200": {
+            "description": "매칭 거절한 여자팀 정보 전체 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "매칭 거절한 여자팀 정보 전체 조회에 성공하였습니다"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {
+                        "femaleTeam": [
+                          {
+                            "ourteamId": 2,
+                            "userId": 1,
+                            "nickname": "미팅이",
+                            "phone": "01012345678",
+                            "gender": 1,
+                            "num": 2,
+                            "age": "25",
+                            "drink": "2",
+                            "intro": "안녕하세요. 저희는~",
+                            "job": [1, 3],
+                            "university": [1, 55],
+                            "area": [2, 4, 1],
+                            "day": [1, 6, 7],
+                            "appearance": [1, 2],
+                            "mbti": [1, 3, 16],
+                            "role": [2, 4],
+                            "preferenceJob": [1, 2],
+                            "preferenceAge": ["21", "25"],
+                            "sameUniversity": 1,
+                            "preferenceVibe": [4, 5],
+                            "updatedAt": "2022.8.5 21:54"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "결과가 없는 경우",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "ADMIN_NO_RESULT",
+                    "value": {
+                      "status": 400,
+                      "success": false,
+                      "message": "조회 결과가 없습니다"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/team/matching/refused/male": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "매칭 거절당한 남자팀 정보 전체 조회 (new)",
+        "description": "🌸 매칭 거절당한 남자팀 정보를 전체 조회합니다. \n\n * 매칭 거절당한(state=4, page=9) 상태의 팀 정보를 모두 불러옵니다. \n\n * 정렬 순서: 매칭 거절당한순(오름차순)",
+        "parameters": [{ "in": "cookie", "name": "access", "schema": { "type": "string" } }],
+        "responses": {
+          "200": {
+            "description": "매칭 거절당한 남자팀 정보 전체 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "매칭 거절당한 남자팀 정보 전체 조회에 성공하였습니다"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {
+                        "maleTeam": [
+                          {
+                            "ourteamId": 2,
+                            "userId": 1,
+                            "nickname": "미팅이",
+                            "phone": "01012345678",
+                            "gender": 1,
+                            "num": 2,
+                            "age": "25",
+                            "drink": "2",
+                            "intro": "안녕하세요. 저희는~",
+                            "job": [1, 3],
+                            "university": [1, 55],
+                            "area": [2, 4, 1],
+                            "day": [1, 6, 7],
+                            "appearance": [1, 2],
+                            "mbti": [1, 3, 16],
+                            "role": [2, 4],
+                            "preferenceJob": [1, 2],
+                            "preferenceAge": ["21", "25"],
+                            "sameUniversity": 1,
+                            "preferenceVibe": [4, 5],
+                            "updatedAt": "2022.8.5 21:54"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "결과가 없는 경우",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "ADMIN_NO_RESULT",
+                    "value": {
+                      "status": 400,
+                      "success": false,
+                      "message": "조회 결과가 없습니다"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/team/matching/refused/female": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "매칭 거절당한 여자팀 정보 전체 조회 (new)",
+        "description": "🌸 매칭 거절당한 여자팀 정보를 전체 조회합니다. \n\n * 매칭 거절당한(state=4, page=9) 상태의 팀 정보를 모두 불러옵니다. \n\n * 정렬 순서: 매칭 거절당한순(오름차순)",
+        "parameters": [{ "in": "cookie", "name": "access", "schema": { "type": "string" } }],
+        "responses": {
+          "200": {
+            "description": "매칭 거절당한 여자팀 정보 전체 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "매칭 거절당한 여자팀 정보 전체 조회에 성공하였습니다"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {
+                        "femaleTeam": [
+                          {
+                            "ourteamId": 2,
+                            "userId": 1,
+                            "nickname": "미팅이",
+                            "phone": "01012345678",
+                            "gender": 1,
+                            "num": 2,
+                            "age": "25",
+                            "drink": "2",
+                            "intro": "안녕하세요. 저희는~",
+                            "job": [1, 3],
+                            "university": [1, 55],
+                            "area": [2, 4, 1],
+                            "day": [1, 6, 7],
+                            "appearance": [1, 2],
+                            "mbti": [1, 3, 16],
+                            "role": [2, 4],
+                            "preferenceJob": [1, 2],
+                            "preferenceAge": ["21", "25"],
+                            "sameUniversity": 1,
+                            "preferenceVibe": [4, 5],
+                            "updatedAt": "2022.8.5 21:54"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "결과가 없는 경우",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "ADMIN_NO_RESULT",
+                    "value": {
+                      "status": 400,
+                      "success": false,
+                      "message": "조회 결과가 없습니다"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/team/matching/both-accepted/male": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "매칭 상호 수락한 남자팀 정보 전체 조회 (new)",
+        "description": "🌸 매칭 상호 수락한 남자팀 정보를 전체 조회합니다. \n\n * 매칭 상호 수락한(state=3, page=7) 상태의 팀 정보를 모두 불러옵니다. \n\n * 정렬 순서: 매칭 수락한순(오름차순)",
+        "parameters": [{ "in": "cookie", "name": "access", "schema": { "type": "string" } }],
+        "responses": {
+          "200": {
+            "description": "매칭 상호 수락한 남자팀 정보 전체 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "매칭 상호 수락한 남자팀 정보 전체 조회에 성공하였습니다"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {
+                        "maleTeam": [
+                          {
+                            "ourteamId": 2,
+                            "userId": 1,
+                            "nickname": "미팅이",
+                            "phone": "01012345678",
+                            "gender": 1,
+                            "num": 2,
+                            "age": "25",
+                            "drink": "2",
+                            "intro": "안녕하세요. 저희는~",
+                            "job": [1, 3],
+                            "university": [1, 55],
+                            "area": [2, 4, 1],
+                            "day": [1, 6, 7],
+                            "appearance": [1, 2],
+                            "mbti": [1, 3, 16],
+                            "role": [2, 4],
+                            "preferenceJob": [1, 2],
+                            "preferenceAge": ["21", "25"],
+                            "sameUniversity": 1,
+                            "preferenceVibe": [4, 5],
+                            "updatedAt": "2022.8.5 21:54"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "결과가 없는 경우",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fail"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "ADMIN_NO_RESULT",
+                    "value": {
+                      "status": 400,
+                      "success": false,
+                      "message": "조회 결과가 없습니다"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/team/matching/both-accepted/female": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "매칭 상호 수락한 여자팀 정보 전체 조회 (new)",
+        "description": "🌸 매칭 상호 수락한 여자팀 정보를 전체 조회합니다. \n\n * 매칭 상호 수락한(state=3, page=7) 상태의 팀 정보를 모두 불러옵니다. \n\n * 정렬 순서: 매칭 수락한순(오름차순)",
+        "parameters": [{ "in": "cookie", "name": "access", "schema": { "type": "string" } }],
+        "responses": {
+          "200": {
+            "description": "매칭 상호 수락한 여자팀 정보 전체 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "매칭 상호 수락한 여자팀 정보 전체 조회에 성공하였습니다"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {
+                        "femaleTeam": [
+                          {
+                            "ourteamId": 2,
+                            "userId": 1,
+                            "nickname": "미팅이",
+                            "phone": "01012345678",
+                            "gender": 1,
+                            "num": 2,
+                            "age": "25",
+                            "drink": "2",
+                            "intro": "안녕하세요. 저희는~",
+                            "job": [1, 3],
+                            "university": [1, 55],
+                            "area": [2, 4, 1],
+                            "day": [1, 6, 7],
+                            "appearance": [1, 2],
+                            "mbti": [1, 3, 16],
+                            "role": [2, 4],
+                            "preferenceJob": [1, 2],
+                            "preferenceAge": ["21", "25"],
                             "sameUniversity": 1,
                             "preferenceVibe": [4, 5],
                             "updatedAt": "2022.8.5 21:54"
@@ -3040,8 +3531,8 @@
     "/admin/close/matching": {
       "post": {
         "tags": ["Admin"],
-        "summary": "매칭 성공한 팀 삭제하기",
-        "description": "매칭에 성공한 팀 정보 및 매칭 정보를 삭제합니다. (추후 환불 등 불가!) \n\n 매칭 완료(state=0)과 다르게 삭제(is_deleted=true) 시킵니다!",
+        "summary": "매칭 비활성화 (updated)",
+        "description": "🌸 매칭에 성공한 팀 정보 및 매칭 정보를 삭제합니다. (is_deleted=true)",
         "parameters": [{ "in": "cookie", "name": "access", "schema": { "type": "string" } }],
         "requestBody": {
           "content": {
@@ -3063,7 +3554,7 @@
         },
         "responses": {
           "200": {
-            "description": "매칭 정보 삭제하기 성공",
+            "description": "매칭 비활성화 성공",
             "content": {
               "application/json": {
                 "schema": {
@@ -3078,7 +3569,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "매칭 정보 삭제하기에 성공하였습니다"
+                      "example": "매칭 비활성화에 성공하였습니다"
                     },
                     "data": {
                       "type": "object",
@@ -3117,7 +3608,7 @@
     "/admin/close/team": {
       "post": {
         "tags": ["Admin"],
-        "summary": "매칭 실패한 팀정보 삭제하기",
+        "summary": "매칭 실패한 팀정보 삭제하기 (deprecated)",
         "description": "매칭에 실패한 팀 정보를 삭제합니다. (is_deleted=true) \n\n 수동으로 삭제해줘야 해당 유저가 새롭게 매칭을 신청할 수 있습니다!",
         "parameters": [{ "in": "cookie", "name": "access", "schema": { "type": "string" } }],
         "requestBody": {
@@ -3190,7 +3681,7 @@
     "/admin/apply/status": {
       "get": {
         "tags": ["Admin"],
-        "summary": "서비스 매칭 신청 가능 상태 조회",
+        "summary": "서비스 매칭 신청 가능 상태 조회 (deprecated)",
         "description": "🌸 서비스 매칭 신청 가능 상태를 조회합니다.",
         "parameters": [{ "in": "cookie", "name": "access", "schema": { "type": "string" } }],
         "responses": {
@@ -3232,7 +3723,7 @@
       },
       "put": {
         "tags": ["Admin"],
-        "summary": "서비스 매칭 신청 가능 상태 변경",
+        "summary": "서비스 매칭 신청 가능 상태 변경 (deprecated)",
         "description": "남, 여 매칭 신청 가능 상태 변경",
         "parameters": [{ "in": "cookie", "name": "access", "schema": { "type": "string" } }],
         "requestBody": {
@@ -3290,18 +3781,6 @@
                 }
               }
             }
-          }
-        }
-      }
-    },
-    "/admin/team/{teamId}": {
-      "get": {
-        "tags": ["Admin"],
-        "summary": "팀 신청 정보 개별 조회 (예정)",
-        "description": "",
-        "responses": {
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
           }
         }
       }
