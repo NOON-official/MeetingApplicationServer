@@ -722,7 +722,7 @@ const getPendingFemaleTeamByAdmin = async (conn, genderId) => {
   return convertSnakeToCamel.keysToCamel(row);
 };
 
-const getTeamByStateAndPageNum = async (conn, stateId, pageId) => {
+const getTeamIdByStateAndPageNum = async (conn, stateId, pageId) => {
   const [row] = await conn.query(
     'SELECT JSON_ARRAYAGG(id) AS team_id FROM `user_ourteam` WHERE state = (?) AND page_num = (?) AND is_deleted = false',
     [stateId, pageId],
@@ -731,7 +731,7 @@ const getTeamByStateAndPageNum = async (conn, stateId, pageId) => {
   return convertSnakeToCamel.keysToCamel(row[0]['team_id']);
 };
 
-const getTeamByState = async (conn, stateId) => {
+const getTeamIdByState = async (conn, stateId) => {
   const [row] = await conn.query(
     'SELECT JSON_ARRAYAGG(id) AS team_id FROM `user_ourteam` WHERE state = (?) AND is_deleted = false',
     [stateId],
@@ -784,8 +784,8 @@ module.exports = {
   checkTeam,
   getPendingMaleTeamByAdmin,
   getPendingFemaleTeamByAdmin,
-  getTeamByStateAndPageNum,
-  getTeamByState,
+  getTeamIdByStateAndPageNum,
+  getTeamIdByState,
   updateTeamStateAndPageNum,
   deleteTeam,
 };

@@ -10,10 +10,10 @@ module.exports = async (req, res) => {
   try {
     conn = await pool.getConnection();
 
-    const bothAcceptedTeamId = await teamDB.getTeamByStateAndPageNum(conn, 3, 6); // 둘 다 수락한 경우
-    const partnerTeamNotRespondedTeamId = await teamDB.getTeamByStateAndPageNum(conn, 2, 6); // 상대팀 무응답인 경우
-    const ourteamNotRespondedTeamId = await teamDB.getTeamByStateAndPageNum(conn, 2, 5); // 본인팀 무응답인 경우
-    const tmpDeletedTeamId = await teamDB.getTeamByState(conn, -1); // 가삭제인 경우
+    const bothAcceptedTeamId = await teamDB.getTeamIdByStateAndPageNum(conn, 3, 6); // 둘 다 수락한 경우
+    const partnerTeamNotRespondedTeamId = await teamDB.getTeamIdByStateAndPageNum(conn, 2, 6); // 상대팀 무응답인 경우
+    const ourteamNotRespondedTeamId = await teamDB.getTeamIdByStateAndPageNum(conn, 2, 5); // 본인팀 무응답인 경우
+    const tmpDeletedTeamId = await teamDB.getTeamIdByState(conn, -1); // 가삭제인 경우
 
     bothAcceptedTeamId &&
       bothAcceptedTeamId.forEach(async (i) => {
