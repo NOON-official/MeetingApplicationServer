@@ -4,7 +4,7 @@ const util = require('../../lib/util');
 const statusCode = require('../../constants/statusCode');
 const responseMessage = require('../../constants/responseMessage');
 
-// 매칭 성공한 팀 삭제하기
+// 매칭 비활성화
 module.exports = async (req, res) => {
   const { maleTeamId, femaleTeamId } = req.body;
 
