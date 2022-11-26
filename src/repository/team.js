@@ -722,7 +722,7 @@ const getPendingFemaleTeamByAdmin = async (conn, genderId) => {
   return convertSnakeToCamel.keysToCamel(row);
 };
 
-const getTeamByStateAndPageNum = async (conn, stateId, pageId) => {
+const getTeamIdByStateAndPageNum = async (conn, stateId, pageId) => {
   const [row] = await conn.query(
     'SELECT JSON_ARRAYAGG(id) AS team_id FROM `user_ourteam` WHERE state = (?) AND page_num = (?) AND is_deleted = false',
     [stateId, pageId],
@@ -731,7 +731,7 @@ const getTeamByStateAndPageNum = async (conn, stateId, pageId) => {
   return convertSnakeToCamel.keysToCamel(row[0]['team_id']);
 };
 
-const getTeamByState = async (conn, stateId) => {
+const getTeamIdByState = async (conn, stateId) => {
   const [row] = await conn.query(
     'SELECT JSON_ARRAYAGG(id) AS team_id FROM `user_ourteam` WHERE state = (?) AND is_deleted = false',
     [stateId],
@@ -746,6 +746,24 @@ const updateTeamStateAndPageNum = async (conn, teamId, stateId, pageId) => {
 
 const deleteTeam = async (conn, ourteamId) => {
   await conn.query('UPDATE `user_ourteam` SET is_deleted=true WHERE id=(?);', [ourteamId]);
+};
+
+const getMaleTeamByStateAndPageNum = async (conn, stateId, pageId) => {
+  const [row] = await conn.query(
+    'SELECT uo.id AS ourteam_id, mt.female_team_id AS partner_team_id, u.id AS user_id, u.nickname, u.phone, uo.gender, uo.num, uo.age, uo.drink, uo.intro, oj.job, ou.university, oa.area, od.day, oap.appearance, om.mbti, oro.role, opj.preference_job, op.age AS preference_age, op.same_university, opv.preference_vibe, uo.updated_at FROM `user_ourteam` uo INNER JOIN `user` u ON uo.user_id = u.id INNER JOIN `ourteam_job` oj ON uo.id = oj.ourteam_id INNER JOIN `ourteam_university` ou ON uo.id = ou.ourteam_id INNER JOIN `ourteam_area` oa ON uo.id = oa.ourteam_id INNER JOIN `ourteam_day` od ON uo.id = od.ourteam_id INNER JOIN `ourteam_appearance` oap ON uo.id = oap.ourteam_id INNER JOIN `ourteam_mbti` om ON uo.id = om.ourteam_id INNER JOIN `ourteam_role` oro ON uo.id = oro.ourteam_id INNER JOIN `ourteam_preference` op ON uo.id = op.ourteam_id INNER JOIN `ourteam_preference_job` opj ON uo.id = opj.ourteam_id INNER JOIN `ourteam_preference_vibe` opv ON uo.id = opv.ourteam_id INNER JOIN `match_team` mt ON uo.id = mt.male_team_id WHERE u.is_deleted = false AND mt.is_deleted = false AND uo.gender = 1 AND uo.state = (?) AND uo.page_num = (?) AND uo.is_deleted = false ORDER BY uo.updated_at ASC',
+    [stateId, pageId],
+  );
+
+  return convertSnakeToCamel.keysToCamel(row);
+};
+
+const getFemaleTeamByStateAndPageNum = async (conn, stateId, pageId) => {
+  const [row] = await conn.query(
+    'SELECT uo.id AS ourteam_id, mt.male_team_id AS partner_team_id, u.id AS user_id, u.nickname, u.phone, uo.gender, uo.num, uo.age, uo.drink, uo.intro, oj.job, ou.university, oa.area, od.day, oap.appearance, om.mbti, oro.role, opj.preference_job, op.age AS preference_age, op.same_university, opv.preference_vibe, uo.updated_at FROM `user_ourteam` uo INNER JOIN `user` u ON uo.user_id = u.id INNER JOIN `ourteam_job` oj ON uo.id = oj.ourteam_id INNER JOIN `ourteam_university` ou ON uo.id = ou.ourteam_id INNER JOIN `ourteam_area` oa ON uo.id = oa.ourteam_id INNER JOIN `ourteam_day` od ON uo.id = od.ourteam_id INNER JOIN `ourteam_appearance` oap ON uo.id = oap.ourteam_id INNER JOIN `ourteam_mbti` om ON uo.id = om.ourteam_id INNER JOIN `ourteam_role` oro ON uo.id = oro.ourteam_id INNER JOIN `ourteam_preference` op ON uo.id = op.ourteam_id INNER JOIN `ourteam_preference_job` opj ON uo.id = opj.ourteam_id INNER JOIN `ourteam_preference_vibe` opv ON uo.id = opv.ourteam_id INNER JOIN `match_team` mt ON uo.id = mt.female_team_id WHERE u.is_deleted = false AND mt.is_deleted = false AND uo.gender = 2 AND uo.state = (?) AND uo.page_num = (?) AND uo.is_deleted = false ORDER BY uo.updated_at ASC',
+    [stateId, pageId],
+  );
+
+  return convertSnakeToCamel.keysToCamel(row);
 };
 
 module.exports = {
@@ -784,8 +802,10 @@ module.exports = {
   checkTeam,
   getPendingMaleTeamByAdmin,
   getPendingFemaleTeamByAdmin,
-  getTeamByStateAndPageNum,
-  getTeamByState,
+  getTeamIdByStateAndPageNum,
+  getTeamIdByState,
   updateTeamStateAndPageNum,
   deleteTeam,
+  getMaleTeamByStateAndPageNum,
+  getFemaleTeamByStateAndPageNum,
 };

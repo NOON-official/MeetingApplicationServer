@@ -27,5 +27,21 @@ router.post('/team/check', checkUser, checkAdmin, require('./adminTeamCheckPOST(
 router.get('/team/matching/pending/male', checkUser, checkAdmin, require('./adminTeamMatchingPendingMaleGET'));
 router.get('/team/matching/pending/female', checkUser, checkAdmin, require('./adminTeamMatchingPendingFemaleGET'));
 router.post('/update/team/state', checkUser, checkAdmin, require('./adminUpdateTeamStatePOST'));
+router.get('/team/matching/refuse/male', checkUser, checkAdmin, require('./adminTeamMatchingRefuseMaleGET'));
+router.get('/team/matching/refuse/female', checkUser, checkAdmin, require('./adminTeamMatchingRefuseFemaleGET'));
+router.get('/team/matching/refused/male', checkUser, checkAdmin, require('./adminTeamMatchingRefusedMaleGET'));
+router.get('/team/matching/refused/female', checkUser, checkAdmin, require('./adminTeamMatchingRefusedFemaleGET'));
+router.get(
+  '/team/matching/both-accepted/male',
+  checkUser,
+  checkAdmin,
+  require('./adminTeamMatchingBothAcceptedMaleGET'),
+);
+router.get(
+  '/team/matching/both-accepted/female',
+  checkUser,
+  checkAdmin,
+  require('./adminTeamMatchingBothAcceptedFemaleGET'),
+);
 
 module.exports = router;
