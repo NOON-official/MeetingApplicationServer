@@ -86,4 +86,6 @@ module.exports = {
   GET_MATCHING_REFUSE_FEMALE_TEAM_SUCCESS: '매칭 거절한 여자팀 정보 전체 조회에 성공하였습니다',
   GET_MATCHING_REFUSED_MALE_TEAM_SUCCESS: '매칭 거절당한 남자팀 정보 전체 조회에 성공하였습니다',
   GET_MATCHING_REFUSED_FEMALE_TEAM_SUCCESS: '매칭 거절당한 여자팀 정보 전체 조회에 성공하였습니다',
+  GET_MATCHING_BOTH_ACCEPTED_MALE_TEAM_SUCCESS: '매칭 상호 수락한 남자팀 정보 전체 조회에 성공하였습니다',
+  GET_MATCHING_BOTH_ACCEPTED_FEMALE_TEAM_SUCCESS: '매칭 상호 수락한 여자팀 정보 전체 조회에 성공하였습니다',
 };

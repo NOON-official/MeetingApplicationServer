@@ -31,5 +31,17 @@ router.get('/team/matching/refuse/male', checkUser, checkAdmin, require('./admin
 router.get('/team/matching/refuse/female', checkUser, checkAdmin, require('./adminTeamMatchingRefuseFemaleGET'));
 router.get('/team/matching/refused/male', checkUser, checkAdmin, require('./adminTeamMatchingRefusedMaleGET'));
 router.get('/team/matching/refused/female', checkUser, checkAdmin, require('./adminTeamMatchingRefusedFemaleGET'));
+router.get(
+  '/team/matching/both-accepted/male',
+  checkUser,
+  checkAdmin,
+  require('./adminTeamMatchingBothAcceptedMaleGET'),
+);
+router.get(
+  '/team/matching/both-accepted/female',
+  checkUser,
+  checkAdmin,
+  require('./adminTeamMatchingBothAcceptedFemaleGET'),
+);
 
 module.exports = router;
