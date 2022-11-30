@@ -27,12 +27,11 @@ module.exports = async (req, res) => {
         'day',
         'appearance',
         'mbti',
-        'fashion',
         'role',
         'preferenceJob',
         'preferenceVibe',
       ];
-      const stringCheckList = ['preferenceAge', 'preferenceHeight'];
+      const stringCheckList = ['preferenceAge'];
 
       // 반환할 형태로 변환하기
       for (const [k, v] of Object.entries(t)) {

@@ -4,11 +4,11 @@ const util = require('../../lib/util');
 const statusCode = require('../../constants/statusCode');
 const responseMessage = require('../../constants/responseMessage');
 
-// 팀 매칭하기
+// 매칭 그만두기
 module.exports = async (req, res) => {
-  const { maleTeamId, femaleTeamId } = req.body;
+  const { ourteamId } = req.body;
 
-  if (!maleTeamId || !femaleTeamId) {
+  if (!ourteamId) {
     return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
   }
 
@@ -16,15 +16,17 @@ module.exports = async (req, res) => {
   try {
     conn = await pool.getConnection();
 
-    const success = await teamDB.matchTeam(conn, maleTeamId, femaleTeamId);
-
-    if (success === false) {
-      return res
-        .status(statusCode.BAD_REQUEST)
-        .send(util.success(statusCode.BAD_REQUEST, responseMessage.ALREADY_MATCHED_USER));
-    } else if (success === true) {
-      res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.MATCH_TEAM_SUCCESS, { success }));
+    const team = await teamDB.getOurteamByOurteamId(conn, ourteamId);
+    if (!team) {
+      return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_APPLY));
     }
+
+    // 가삭제 처리 (state = -1)
+    await teamDB.updateTeamState(conn, ourteamId, -1);
+
+    return res
+      .status(statusCode.OK)
+      .send(util.success(statusCode.OK, responseMessage.QUIT_APPLY_SUCCESS, { success: true }));
   } catch (error) {
     return res
       .status(statusCode.INTERNAL_SERVER_ERROR)

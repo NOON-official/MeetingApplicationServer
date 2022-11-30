@@ -29,6 +29,7 @@ module.exports = {
   // User
   SAVE_USER_PHONE_SUCCESS: '유저 핸드폰 번호 저장에 성공하였습니다',
   GET_USER_SUCCESS: '유저 정보 조회에 성공하였습니다',
+  SAVE_USER_PRIVACY_SUCCESS: '유저 개인 정보 저장 및 수정에 성공하였습니다',
 
   // Team
   SAVE_USER_SUCCESS: '유저 정보 저장에 성공하였습니다',
@@ -48,9 +49,20 @@ module.exports = {
   GET_MATCHING_RESULT_SUCCESS: '매칭 결과 조회에 성공하였습니다',
   NO_RESULT: '해당 팀의 매칭 결과가 없습니다',
   REAPPLY_SUCCESS: '팀 매칭 재신청에 성공하였습니다',
+  GET_TEAM_MATCHING_PAGE_SUCCESS: '팀 매칭 상태 페이지 조회에 성공하였습니다',
+  ALREADY_RESPONEDED_TEAM: '이미 수락 또는 거절한 팀입니다',
+  MATCHING_ACCEPT_SUCCESS: '매칭 수락하기에 성공하였습니다',
+  MATCHING_REFUSE_SUCCESS: '매칭 거절하기에 성공하였습니다',
+  QUIT_APPLY_SUCCESS: '매칭 그만두기에 성공하였습니다',
+  SAVE_REFUSE_REASON_SUCCESS: '매칭 거절 이유 보내기에 성공하였습니다',
 
   // Admin
   ADMIN_NO_RESULT: '조회 결과가 없습니다',
+  GET_MALE_TWO_TEAM_UNCHECKED_APPLY_SUCCESS: '가신청 남자팀 2:2 매칭 신청 정보 전체 조회에 성공하였습니다',
+  GET_MALE_THREE_TEAM_UNCHECKED_APPLY_SUCCESS: '가신청 남자팀 3:3 매칭 신청 정보 전체 조회에 성공하였습니다',
+  GET_FEMALE_TWO_TEAM_UNCHECKED_APPLY_SUCCESS: '가신청 여자팀 2:2 매칭 신청 정보 전체 조회에 성공하였습니다',
+  GET_FEMALE_THREE_TEAM_UNCHECKED_APPLY_SUCCESS: '가신청 여자팀 3:3 매칭 신청 정보 전체 조회에 성공하였습니다',
+  CHECK_TEAM_SUCCESS: '매칭 신청 승인하기에 성공하였습니다',
   GET_MALE_TWO_TEAM_APPLY_SUCCESS: '남자팀 2:2 매칭 신청 정보 전체 조회에 성공하였습니다',
   GET_MALE_THREE_TEAM_APPLY_SUCCESS: '남자팀 3:3 매칭 신청 정보 전체 조회에 성공하였습니다',
   GET_FEMALE_TWO_TEAM_APPLY_SUCCESS: '여자팀 2:2 매칭 신청 정보 전체 조회에 성공하였습니다',
@@ -62,9 +74,18 @@ module.exports = {
   MATCH_TEAM_SUCCESS: '팀 매칭하기에 성공하였습니다',
   FAIL_TEAM_SUCCESS: '팀 매칭 실패 처리에 성공하였습니다',
   ALREADY_MATCHED_USER: '이미 매칭 완료된 유저입니다',
-  DELETE_MATCHING_SUCCESS: '매칭 정보 삭제하기에 성공하였습니다',
+  DELETE_MATCHING_SUCCESS: '매칭 비활성화에 성공하였습니다',
   UPDATE_SERVICE_APPLY_STATUS_SUCCESS: '서비스 매칭 신청 가능 상태 변경에 성공하였습니다',
   GET_SERVICE_APPLY_STATUS_SUCCESS: '서비스 매칭 신청 가능 상태 조회에 성공하였습니다',
   REVERT_MATCH_TEAM_SUCCESS: '팀 매칭 완료에서 매칭중으로 되돌리기에 성공하였습니다',
   REVERT_FAIL_TEAM_SUCCESS: '팀 매칭 실패에서 매칭중으로 되돌리기에 성공하였습니다',
+  GET_MATCHING_PENDING_MALE_TEAM_SUCCESS: '매칭 수락 대기중인 남자팀 정보 전체 조회에 성공하였습니다',
+  GET_MATCHING_PENDING_FEMALE_TEAM_SUCCESS: '매칭 수락 대기중인 여자팀 정보 전체 조회에 성공하였습니다',
+  UPDATE_TEAM_SUCCESS: '수락/거절 적용하기에 성공하였습니다',
+  GET_MATCHING_REFUSE_MALE_TEAM_SUCCESS: '매칭 거절한 남자팀 정보 전체 조회에 성공하였습니다',
+  GET_MATCHING_REFUSE_FEMALE_TEAM_SUCCESS: '매칭 거절한 여자팀 정보 전체 조회에 성공하였습니다',
+  GET_MATCHING_REFUSED_MALE_TEAM_SUCCESS: '매칭 거절당한 남자팀 정보 전체 조회에 성공하였습니다',
+  GET_MATCHING_REFUSED_FEMALE_TEAM_SUCCESS: '매칭 거절당한 여자팀 정보 전체 조회에 성공하였습니다',
+  GET_MATCHING_BOTH_ACCEPTED_MALE_TEAM_SUCCESS: '매칭 상호 수락한 남자팀 정보 전체 조회에 성공하였습니다',
+  GET_MATCHING_BOTH_ACCEPTED_FEMALE_TEAM_SUCCESS: '매칭 상호 수락한 여자팀 정보 전체 조회에 성공하였습니다',
 };

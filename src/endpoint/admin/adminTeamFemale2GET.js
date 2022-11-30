@@ -11,7 +11,7 @@ module.exports = async (req, res) => {
 
   try {
     conn = await pool.getConnection();
-    let femaleTeam = await teamDB.getTeamByAdmin(conn, 2, 2); // 여자, 2:2
+    let femaleTeam = await teamDB.getTeamByAdmin(conn, 2, 2, 0); // 여자, 2:2, 매칭중
 
     // 결과가 없는 경우
     if (!femaleTeam || femaleTeam.length === 0) {
@@ -27,12 +27,11 @@ module.exports = async (req, res) => {
         'day',
         'appearance',
         'mbti',
-        'fashion',
         'role',
         'preferenceJob',
         'preferenceVibe',
       ];
-      const stringCheckList = ['preferenceAge', 'preferenceHeight'];
+      const stringCheckList = ['preferenceAge'];
 
       // 반환할 형태로 변환하기
       for (const [k, v] of Object.entries(t)) {

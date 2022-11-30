@@ -8,24 +8,11 @@ const { userDB, teamDB } = require('../../repository');
 // 팀 매칭 신청 정보 저장
 module.exports = async (req, res) => {
   const { userId } = req.body;
-  const { gender, num, age, height, drink, intro } = req.body.ourteam;
-  const { job, university, area, day, appearance, mbti, fashion, role } = req.body.ourteam; // 배열 자료형
+  const { gender, num, age, drink, intro } = req.body.ourteam;
+  const { job, university, area, day, appearance, mbti, role } = req.body.ourteam; // 배열 자료형
   const { sameUniversity } = req.body.ourteamPreference;
-  const { job: preferenceJob, age: preferenceAge, height: preferenceHeight, vibe } = req.body.ourteamPreference; // 배열 자료형
-  const arrays = [
-    job,
-    university,
-    area,
-    day,
-    appearance,
-    mbti,
-    fashion,
-    role,
-    preferenceJob,
-    preferenceAge,
-    preferenceHeight,
-    vibe,
-  ];
+  const { job: preferenceJob, age: preferenceAge, vibe } = req.body.ourteamPreference; // 배열 자료형
+  const arrays = [job, university, area, day, appearance, mbti, role, preferenceJob, preferenceAge, vibe];
 
   // 잘못된 유저 id인 경우
   if (userId != req.user.id) {
@@ -37,13 +24,12 @@ module.exports = async (req, res) => {
     !gender ||
     !num ||
     !age ||
-    !height ||
     !drink ||
     !intro ||
     !sameUniversity ||
     !arrayChecker(arrays) ||
     !(preferenceAge.length == 2) ||
-    !(preferenceHeight.length == 2)
+    !(day.length >= 2)
   )
     return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
 
@@ -52,7 +38,6 @@ module.exports = async (req, res) => {
     gender,
     num,
     age,
-    height,
     drink,
     intro,
     job: toString(job),
@@ -61,12 +46,10 @@ module.exports = async (req, res) => {
     day: toString(day),
     appearance: toString(appearance),
     mbti: toString(mbti),
-    fashion: toString(fashion),
     role: toString(role),
     sameUniversity,
     preferenceJob: toString(preferenceJob),
     preferenceAge: toString(preferenceAge),
-    preferenceHeight: toString(preferenceHeight),
     vibe: toString(vibe),
   };
 

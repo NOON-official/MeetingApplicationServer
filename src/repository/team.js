@@ -3,10 +3,14 @@ const { toArrayOfString, toArrayOfNumber } = require('../lib/convertArrayToStrin
 
 const saveUserOurteam = async (conn, params) => {
   // 1. 우리팀 정보 저장
-  await conn.query(
-    'INSERT INTO `user_ourteam` (user_id, gender, num, age, height, drink, intro) VALUES (?, ?, ?, ?, ?, ?, ?);',
-    [params.userId, params.gender, params.num, params.age, params.height, params.drink, params.intro],
-  );
+  await conn.query('INSERT INTO `user_ourteam` (user_id, gender, num, age, drink, intro) VALUES (?, ?, ?, ?, ?, ?);', [
+    params.userId,
+    params.gender,
+    params.num,
+    params.age,
+    params.drink,
+    params.intro,
+  ]);
 
   [newOurteamId] = await conn.query('SELECT LAST_INSERT_ID();');
   newOurteamId = newOurteamId[0]['LAST_INSERT_ID()'];
@@ -24,17 +28,12 @@ const saveUserOurteam = async (conn, params) => {
     params.appearance,
   ]);
   await conn.query('INSERT INTO `ourteam_mbti` (ourteam_id, mbti) VALUES (?, ?);', [newOurteamId, params.mbti]);
-  await conn.query('INSERT INTO `ourteam_fashion` (ourteam_id, fashion) VALUES (?, ?);', [
-    newOurteamId,
-    params.fashion,
-  ]);
   await conn.query('INSERT INTO `ourteam_role` (ourteam_id, role) VALUES (?, ?);', [newOurteamId, params.role]);
 
   // 2. 우리팀 선호 정보 저장
-  await conn.query('INSERT INTO `ourteam_preference` (ourteam_id, age, height, same_university) VALUES (?, ?, ?, ?);', [
+  await conn.query('INSERT INTO `ourteam_preference` (ourteam_id, age, same_university) VALUES (?, ?, ?);', [
     newOurteamId,
     params.preferenceAge,
-    params.preferenceHeight,
     params.sameUniversity,
   ]);
 
@@ -54,8 +53,8 @@ const saveUserOurteam = async (conn, params) => {
 const updateUserOurteam = async (conn, params) => {
   // 1. 우리팀 정보 업데이트
   await conn.query(
-    'UPDATE `user_ourteam` SET gender=(?), num=(?), age=(?), height=(?), drink=(?), intro=(?) WHERE id=(?);',
-    [params.gender, params.num, params.age, params.height, params.drink, params.intro, params.ourteamId],
+    'UPDATE `user_ourteam` SET gender=(?), num=(?), age=(?), drink=(?), intro=(?), state=0, page_num=3 WHERE id=(?);',
+    [params.gender, params.num, params.age, params.drink, params.intro, params.ourteamId],
   );
 
   // 배열 타입 데이터 업데이트
@@ -71,16 +70,11 @@ const updateUserOurteam = async (conn, params) => {
     params.ourteamId,
   ]);
   await conn.query('UPDATE `ourteam_mbti` SET mbti=(?) WHERE ourteam_id=(?);', [params.mbti, params.ourteamId]);
-  await conn.query('UPDATE `ourteam_fashion` SET fashion=(?) WHERE ourteam_id=(?);', [
-    params.fashion,
-    params.ourteamId,
-  ]);
   await conn.query('UPDATE `ourteam_role` SET role=(?) WHERE ourteam_id=(?);', [params.role, params.ourteamId]);
 
   // 2. 우리팀 선호 정보 업데이트
-  await conn.query('UPDATE `ourteam_preference` SET age=(?), height=(?), same_university=(?) WHERE ourteam_id=(?);', [
+  await conn.query('UPDATE `ourteam_preference` SET age=(?), same_university=(?) WHERE ourteam_id=(?);', [
     params.preferenceAge,
-    params.preferenceHeight,
     params.sameUniversity,
     params.ourteamId,
   ]);
@@ -130,7 +124,11 @@ const getWaitingTeam = async (conn) => {
 };
 
 const getOurteamIdByUserId = async (conn, userId) => {
-  const [row] = await conn.query('SELECT id FROM `user_ourteam` WHERE user_id=(?) and is_deleted=false;', [userId]);
+  // 매칭 그만두기(가삭제) 또는 거절한 경우 제외
+  const [row] = await conn.query(
+    'SELECT id FROM `user_ourteam` WHERE user_id=(?) AND state!=-1 AND is_deleted=false;',
+    [userId],
+  );
 
   // 매칭 진행중인 팀 정보가 없는 경우
   if (!row[0]) {
@@ -169,7 +167,7 @@ const getOurteamByOurteamId = async (conn, ourteamId) => {
 
   // 1. 우리팀 정보
   [row] = await conn.query(
-    'SELECT id AS ourteam_id, gender, num, age, height, drink, intro FROM `user_ourteam` WHERE id = (?) and is_deleted = false;',
+    'SELECT id AS ourteam_id, gender, num, age, drink, intro FROM `user_ourteam` WHERE id = (?) AND state!=-1 AND is_deleted = false;',
     [ourteamId],
   );
   if (!row[0]) return 0;
@@ -205,10 +203,83 @@ const getOurteamByOurteamId = async (conn, ourteamId) => {
   if (!row[0]['mbti']) return 0;
   ourteam.mbti = toArrayOfNumber(row[0]['mbti']);
 
-  // 우리팀 패션
-  [row] = await conn.query('SELECT fashion  FROM `ourteam_fashion` WHERE ourteam_id = (?);', [ourteamId]);
-  if (!row[0]['fashion']) return 0;
-  ourteam.fashion = toArrayOfNumber(row[0]['fashion']);
+  // 우리팀 구성원
+  [row] = await conn.query('SELECT role  FROM `ourteam_role` WHERE ourteam_id = (?);', [ourteamId]);
+  if (!row[0]['role']) return 0;
+  ourteam.role = toArrayOfNumber(row[0]['role']);
+
+  ourteam = convertSnakeToCamel.keysToCamel(ourteam);
+
+  // 2. 우리팀 선호 정보
+  // 우리팀 선호 직업
+  [row] = await conn.query('SELECT preference_job  FROM `ourteam_preference_job` WHERE ourteam_id = (?);', [ourteamId]);
+  if (!row[0]['preference_job']) return 0;
+  ourteamPreference.job = toArrayOfNumber(row[0]['preference_job']);
+
+  [row] = await conn.query('SELECT age, same_university FROM `ourteam_preference` WHERE ourteam_id = (?);', [
+    ourteamId,
+  ]);
+  if (!row[0]) return 0;
+
+  // 우리팀 선호 나이
+  ourteamPreference.age = toArrayOfString(row[0]['age']);
+
+  // 같은 학교
+  ourteamPreference.sameUniversity = row[0]['same_university'];
+
+  [row] = await conn.query('SELECT preference_vibe  FROM `ourteam_preference_vibe` WHERE ourteam_id = (?);', [
+    ourteamId,
+  ]);
+  if (!row[0]['preference_vibe']) return 0;
+  ourteamPreference.vibe = toArrayOfNumber(row[0]['preference_vibe']);
+
+  return convertSnakeToCamel.keysToCamel({ ourteam, ourteamPreference });
+};
+
+// 가삭제(state = -1)인 경우 포함
+const getTeamInfoByTeamId = async (conn, ourteamId) => {
+  let row;
+  let ourteam;
+  let ourteamPreference = {};
+  // 1. 우리팀 정보
+
+  [row] = await conn.query(
+    'SELECT id AS ourteam_id, gender, num, age, drink, intro FROM `user_ourteam` WHERE id = (?) AND is_deleted = false;',
+    [ourteamId],
+  );
+
+  if (!row[0]) return 0;
+  ourteam = row[0];
+  // 우리팀 직업
+
+  [row] = await conn.query('SELECT job  FROM `ourteam_job` WHERE ourteam_id = (?);', [ourteamId]);
+  if (!row[0]['job']) return 0;
+  ourteam.job = toArrayOfNumber(row[0]['job']);
+
+  // 우리팀 대학교
+  [row] = await conn.query('SELECT university  FROM `ourteam_university` WHERE ourteam_id = (?);', [ourteamId]);
+  if (!row[0]['university']) return 0;
+  ourteam.university = toArrayOfNumber(row[0]['university']);
+
+  // 우리팀 지역
+  [row] = await conn.query('SELECT area  FROM `ourteam_area` WHERE ourteam_id = (?);', [ourteamId]);
+  if (!row[0]['area']) return 0;
+  ourteam.area = toArrayOfNumber(row[0]['area']);
+
+  // 우리팀 요일
+  [row] = await conn.query('SELECT day  FROM `ourteam_day` WHERE ourteam_id = (?);', [ourteamId]);
+  if (!row[0]['day']) return 0;
+  ourteam.day = toArrayOfNumber(row[0]['day']);
+
+  // 우리팀 외모
+  [row] = await conn.query('SELECT appearance  FROM `ourteam_appearance` WHERE ourteam_id = (?);', [ourteamId]);
+  if (!row[0]['appearance']) return 0;
+  ourteam.appearance = toArrayOfNumber(row[0]['appearance']);
+
+  // 우리팀 MBTI
+  [row] = await conn.query('SELECT mbti  FROM `ourteam_mbti` WHERE ourteam_id = (?);', [ourteamId]);
+  if (!row[0]['mbti']) return 0;
+  ourteam.mbti = toArrayOfNumber(row[0]['mbti']);
 
   // 우리팀 구성원
   [row] = await conn.query('SELECT role  FROM `ourteam_role` WHERE ourteam_id = (?);', [ourteamId]);
@@ -223,7 +294,7 @@ const getOurteamByOurteamId = async (conn, ourteamId) => {
   if (!row[0]['preference_job']) return 0;
   ourteamPreference.job = toArrayOfNumber(row[0]['preference_job']);
 
-  [row] = await conn.query('SELECT age, height, same_university FROM `ourteam_preference` WHERE ourteam_id = (?);', [
+  [row] = await conn.query('SELECT age, same_university FROM `ourteam_preference` WHERE ourteam_id = (?);', [
     ourteamId,
   ]);
   if (!row[0]) return 0;
@@ -231,8 +302,82 @@ const getOurteamByOurteamId = async (conn, ourteamId) => {
   // 우리팀 선호 나이
   ourteamPreference.age = toArrayOfString(row[0]['age']);
 
-  // 우리팀 선호 키
-  ourteamPreference.height = toArrayOfString(row[0]['height']);
+  // 같은 학교
+  ourteamPreference.sameUniversity = row[0]['same_university'];
+
+  [row] = await conn.query('SELECT preference_vibe  FROM `ourteam_preference_vibe` WHERE ourteam_id = (?);', [
+    ourteamId,
+  ]);
+  if (!row[0]['preference_vibe']) return 0;
+  ourteamPreference.vibe = toArrayOfNumber(row[0]['preference_vibe']);
+
+  return convertSnakeToCamel.keysToCamel({ ourteam, ourteamPreference });
+};
+
+const getCurrentTeamForReapply = async (conn, ourteamId) => {
+  let row;
+  let ourteam;
+  let ourteamPreference = {};
+  // 1. 우리팀 정보
+
+  [row] = await conn.query(
+    'SELECT user_id, gender, num, age, drink, intro FROM `user_ourteam` WHERE id = (?) AND state!=-1 AND is_deleted = false;',
+    [ourteamId],
+  );
+
+  if (!row[0]) return 0;
+  ourteam = row[0];
+  // 우리팀 직업
+
+  [row] = await conn.query('SELECT job  FROM `ourteam_job` WHERE ourteam_id = (?);', [ourteamId]);
+  if (!row[0]['job']) return 0;
+  ourteam.job = toArrayOfNumber(row[0]['job']);
+
+  // 우리팀 대학교
+  [row] = await conn.query('SELECT university  FROM `ourteam_university` WHERE ourteam_id = (?);', [ourteamId]);
+  if (!row[0]['university']) return 0;
+  ourteam.university = toArrayOfNumber(row[0]['university']);
+
+  // 우리팀 지역
+  [row] = await conn.query('SELECT area  FROM `ourteam_area` WHERE ourteam_id = (?);', [ourteamId]);
+  if (!row[0]['area']) return 0;
+  ourteam.area = toArrayOfNumber(row[0]['area']);
+
+  // 우리팀 요일
+  [row] = await conn.query('SELECT day  FROM `ourteam_day` WHERE ourteam_id = (?);', [ourteamId]);
+  if (!row[0]['day']) return 0;
+  ourteam.day = toArrayOfNumber(row[0]['day']);
+
+  // 우리팀 외모
+  [row] = await conn.query('SELECT appearance  FROM `ourteam_appearance` WHERE ourteam_id = (?);', [ourteamId]);
+  if (!row[0]['appearance']) return 0;
+  ourteam.appearance = toArrayOfNumber(row[0]['appearance']);
+
+  // 우리팀 MBTI
+  [row] = await conn.query('SELECT mbti  FROM `ourteam_mbti` WHERE ourteam_id = (?);', [ourteamId]);
+  if (!row[0]['mbti']) return 0;
+  ourteam.mbti = toArrayOfNumber(row[0]['mbti']);
+
+  // 우리팀 구성원
+  [row] = await conn.query('SELECT role  FROM `ourteam_role` WHERE ourteam_id = (?);', [ourteamId]);
+  if (!row[0]['role']) return 0;
+  ourteam.role = toArrayOfNumber(row[0]['role']);
+
+  ourteam = convertSnakeToCamel.keysToCamel(ourteam);
+
+  // 2. 우리팀 선호 정보
+  // 우리팀 선호 직업
+  [row] = await conn.query('SELECT preference_job  FROM `ourteam_preference_job` WHERE ourteam_id = (?);', [ourteamId]);
+  if (!row[0]['preference_job']) return 0;
+  ourteamPreference.job = toArrayOfNumber(row[0]['preference_job']);
+
+  [row] = await conn.query('SELECT age, same_university FROM `ourteam_preference` WHERE ourteam_id = (?);', [
+    ourteamId,
+  ]);
+  if (!row[0]) return 0;
+
+  // 우리팀 선호 나이
+  ourteamPreference.age = toArrayOfString(row[0]['age']);
 
   // 같은 학교
   ourteamPreference.sameUniversity = row[0]['same_university'];
@@ -248,7 +393,7 @@ const getOurteamByOurteamId = async (conn, ourteamId) => {
 
 const getPartnerTeamIdByOurteamId = async (conn, ourteamId) => {
   const [row] = await conn.query(
-    'SELECT IF(male_team_id=(?), female_team_id, male_team_id) AS partner_team_id FROM `match_team` WHERE (male_team_id=(?) OR female_team_id=(?))',
+    'SELECT IF(male_team_id=(?), female_team_id, male_team_id) AS partner_team_id FROM `match_team` WHERE (male_team_id=(?) OR female_team_id=(?)) AND is_deleted=false;',
     [ourteamId, ourteamId, ourteamId],
   );
 
@@ -257,11 +402,11 @@ const getPartnerTeamIdByOurteamId = async (conn, ourteamId) => {
   return row[0]['partner_team_id'];
 };
 
-const getMatchingResultByOurteamId = async (conn, ourteamId) => {
-  const [row] = await conn.query('SELECT chat_link FROM `match_team` WHERE (male_team_id=(?) OR female_team_id=(?));', [
-    ourteamId,
-    ourteamId,
-  ]);
+const getMatchingResultByTeamId = async (conn, teamId) => {
+  const [row] = await conn.query(
+    'SELECT kakao_id FROM `user` u INNER JOIN `user_ourteam` uo ON u.id = uo.user_id WHERE uo.id = (?);',
+    [teamId],
+  );
 
   if (!row[0]) return 0;
 
@@ -269,10 +414,10 @@ const getMatchingResultByOurteamId = async (conn, ourteamId) => {
 };
 
 // 성별, 인원수 조건에 맞는 매칭 전인 팀 리스트 조회
-const getTeamByAdmin = async (conn, genderId, numId) => {
+const getTeamByAdmin = async (conn, genderId, numId, stateId) => {
   const [row] = await conn.query(
-    'SELECT uo.id AS ourteam_id, u.id AS user_id, u.nickname, u.phone, uo.gender, uo.num, uo.age, uo.height, uo.drink, uo.intro, oj.job, ou.university, oa.area, od.day, oap.appearance, om.mbti, ofa.fashion, oro.role, opj.preference_job, op.age AS preference_age, op.height AS preference_height, op.same_university, opv.preference_vibe, uo.updated_at FROM `user_ourteam` uo INNER JOIN `user` u ON uo.user_id = u.id INNER JOIN `ourteam_job` oj ON uo.id = oj.ourteam_id INNER JOIN `ourteam_university` ou ON uo.id = ou.ourteam_id INNER JOIN `ourteam_area` oa ON uo.id = oa.ourteam_id INNER JOIN `ourteam_day` od ON uo.id = od.ourteam_id INNER JOIN `ourteam_appearance` oap ON uo.id = oap.ourteam_id INNER JOIN `ourteam_mbti` om ON uo.id = om.ourteam_id INNER JOIN `ourteam_fashion` ofa ON uo.id = ofa.ourteam_id INNER JOIN `ourteam_role` oro ON uo.id = oro.ourteam_id INNER JOIN `ourteam_preference` op ON uo.id = op.ourteam_id INNER JOIN `ourteam_preference_job` opj ON uo.id = opj.ourteam_id INNER JOIN `ourteam_preference_vibe` opv ON uo.id = opv.ourteam_id WHERE u.is_deleted = false AND uo.gender = (?) AND uo.num = (?) AND uo.state = 0 AND uo.is_deleted = false ORDER BY uo.updated_at ASC, uo.age ASC;',
-    [genderId, numId],
+    'SELECT uo.id AS ourteam_id, u.id AS user_id, u.nickname, u.phone, uo.gender, uo.num, uo.age, uo.drink, uo.intro, oj.job, ou.university, oa.area, od.day, oap.appearance, om.mbti, oro.role, opj.preference_job, op.age AS preference_age, op.same_university, opv.preference_vibe, uo.updated_at FROM `user_ourteam` uo INNER JOIN `user` u ON uo.user_id = u.id INNER JOIN `ourteam_job` oj ON uo.id = oj.ourteam_id INNER JOIN `ourteam_university` ou ON uo.id = ou.ourteam_id INNER JOIN `ourteam_area` oa ON uo.id = oa.ourteam_id INNER JOIN `ourteam_day` od ON uo.id = od.ourteam_id INNER JOIN `ourteam_appearance` oap ON uo.id = oap.ourteam_id INNER JOIN `ourteam_mbti` om ON uo.id = om.ourteam_id INNER JOIN `ourteam_role` oro ON uo.id = oro.ourteam_id INNER JOIN `ourteam_preference` op ON uo.id = op.ourteam_id INNER JOIN `ourteam_preference_job` opj ON uo.id = opj.ourteam_id INNER JOIN `ourteam_preference_vibe` opv ON uo.id = opv.ourteam_id WHERE u.is_deleted = false AND uo.gender = (?) AND uo.num = (?) AND uo.state = (?) AND uo.is_deleted = false ORDER BY uo.updated_at ASC, uo.age ASC;',
+    [genderId, numId, stateId],
   );
 
   return convertSnakeToCamel.keysToCamel(row);
@@ -280,7 +425,7 @@ const getTeamByAdmin = async (conn, genderId, numId) => {
 
 const getSuccessMaleTeamByAdmin = async (conn, genderId) => {
   const [row] = await conn.query(
-    'SELECT uo.id AS ourteam_id, mt.female_team_id AS partner_team_id, u.id AS user_id, u.nickname, u.phone, uo.gender, uo.num, uo.age, uo.height, uo.drink, uo.intro, oj.job, ou.university, oa.area, od.day, oap.appearance, om.mbti, ofa.fashion, oro.role, opj.preference_job, op.age AS preference_age, op.height AS preference_height, op.same_university, opv.preference_vibe, uo.updated_at FROM `user_ourteam` uo INNER JOIN `user` u ON uo.user_id = u.id INNER JOIN `ourteam_job` oj ON uo.id = oj.ourteam_id INNER JOIN `ourteam_university` ou ON uo.id = ou.ourteam_id INNER JOIN `ourteam_area` oa ON uo.id = oa.ourteam_id INNER JOIN `ourteam_day` od ON uo.id = od.ourteam_id INNER JOIN `ourteam_appearance` oap ON uo.id = oap.ourteam_id INNER JOIN `ourteam_mbti` om ON uo.id = om.ourteam_id INNER JOIN `ourteam_fashion` ofa ON uo.id = ofa.ourteam_id INNER JOIN `ourteam_role` oro ON uo.id = oro.ourteam_id INNER JOIN `ourteam_preference` op ON uo.id = op.ourteam_id INNER JOIN `ourteam_preference_job` opj ON uo.id = opj.ourteam_id INNER JOIN `ourteam_preference_vibe` opv ON uo.id = opv.ourteam_id INNER JOIN `match_team` mt ON uo.id = mt.male_team_id WHERE u.is_deleted = false AND mt.is_deleted = false AND uo.gender = (?) AND uo.state = 1 AND uo.is_deleted = false ORDER BY uo.updated_at ASC',
+    'SELECT uo.id AS ourteam_id, mt.female_team_id AS partner_team_id, u.id AS user_id, u.nickname, u.phone, uo.gender, uo.num, uo.age, uo.drink, uo.intro, oj.job, ou.university, oa.area, od.day, oap.appearance, om.mbti, oro.role, opj.preference_job, op.age AS preference_age, op.same_university, opv.preference_vibe, uo.updated_at FROM `user_ourteam` uo INNER JOIN `user` u ON uo.user_id = u.id INNER JOIN `ourteam_job` oj ON uo.id = oj.ourteam_id INNER JOIN `ourteam_university` ou ON uo.id = ou.ourteam_id INNER JOIN `ourteam_area` oa ON uo.id = oa.ourteam_id INNER JOIN `ourteam_day` od ON uo.id = od.ourteam_id INNER JOIN `ourteam_appearance` oap ON uo.id = oap.ourteam_id INNER JOIN `ourteam_mbti` om ON uo.id = om.ourteam_id INNER JOIN `ourteam_role` oro ON uo.id = oro.ourteam_id INNER JOIN `ourteam_preference` op ON uo.id = op.ourteam_id INNER JOIN `ourteam_preference_job` opj ON uo.id = opj.ourteam_id INNER JOIN `ourteam_preference_vibe` opv ON uo.id = opv.ourteam_id INNER JOIN `match_team` mt ON uo.id = mt.male_team_id WHERE u.is_deleted = false AND mt.is_deleted = false AND uo.gender = (?) AND (uo.state = 2 OR uo.state = 4) AND uo.page_num = 5 AND uo.is_deleted = false ORDER BY uo.updated_at ASC',
     [genderId],
   );
 
@@ -289,7 +434,7 @@ const getSuccessMaleTeamByAdmin = async (conn, genderId) => {
 
 const getSuccessFemaleTeamByAdmin = async (conn, genderId) => {
   const [row] = await conn.query(
-    'SELECT uo.id AS ourteam_id, mt.male_team_id AS partner_team_id, u.id AS user_id, u.nickname, u.phone, uo.gender, uo.num, uo.age, uo.height, uo.drink, uo.intro, oj.job, ou.university, oa.area, od.day, oap.appearance, om.mbti, ofa.fashion, oro.role, opj.preference_job, op.age AS preference_age, op.height AS preference_height, op.same_university, opv.preference_vibe, uo.updated_at FROM `user_ourteam` uo INNER JOIN `user` u ON uo.user_id = u.id INNER JOIN `ourteam_job` oj ON uo.id = oj.ourteam_id INNER JOIN `ourteam_university` ou ON uo.id = ou.ourteam_id INNER JOIN `ourteam_area` oa ON uo.id = oa.ourteam_id INNER JOIN `ourteam_day` od ON uo.id = od.ourteam_id INNER JOIN `ourteam_appearance` oap ON uo.id = oap.ourteam_id INNER JOIN `ourteam_mbti` om ON uo.id = om.ourteam_id INNER JOIN `ourteam_fashion` ofa ON uo.id = ofa.ourteam_id INNER JOIN `ourteam_role` oro ON uo.id = oro.ourteam_id INNER JOIN `ourteam_preference` op ON uo.id = op.ourteam_id INNER JOIN `ourteam_preference_job` opj ON uo.id = opj.ourteam_id INNER JOIN `ourteam_preference_vibe` opv ON uo.id = opv.ourteam_id INNER JOIN `match_team` mt ON uo.id = mt.female_team_id WHERE u.is_deleted = false AND mt.is_deleted = false AND uo.gender = (?) AND uo.state = 1 AND uo.is_deleted = false ORDER BY uo.updated_at ASC',
+    'SELECT uo.id AS ourteam_id, mt.male_team_id AS partner_team_id, u.id AS user_id, u.nickname, u.phone, uo.gender, uo.num, uo.age, uo.drink, uo.intro, oj.job, ou.university, oa.area, od.day, oap.appearance, om.mbti, oro.role, opj.preference_job, op.age AS preference_age, op.same_university, opv.preference_vibe, uo.updated_at FROM `user_ourteam` uo INNER JOIN `user` u ON uo.user_id = u.id INNER JOIN `ourteam_job` oj ON uo.id = oj.ourteam_id INNER JOIN `ourteam_university` ou ON uo.id = ou.ourteam_id INNER JOIN `ourteam_area` oa ON uo.id = oa.ourteam_id INNER JOIN `ourteam_day` od ON uo.id = od.ourteam_id INNER JOIN `ourteam_appearance` oap ON uo.id = oap.ourteam_id INNER JOIN `ourteam_mbti` om ON uo.id = om.ourteam_id INNER JOIN `ourteam_role` oro ON uo.id = oro.ourteam_id INNER JOIN `ourteam_preference` op ON uo.id = op.ourteam_id INNER JOIN `ourteam_preference_job` opj ON uo.id = opj.ourteam_id INNER JOIN `ourteam_preference_vibe` opv ON uo.id = opv.ourteam_id INNER JOIN `match_team` mt ON uo.id = mt.female_team_id WHERE u.is_deleted = false AND mt.is_deleted = false AND uo.gender = (?) AND (uo.state = 2 OR uo.state = 4) AND uo.page_num = 5 AND uo.is_deleted = false ORDER BY uo.updated_at ASC',
     [genderId],
   );
 
@@ -298,20 +443,20 @@ const getSuccessFemaleTeamByAdmin = async (conn, genderId) => {
 
 const getFailTeamByAdmin = async (conn, genderId) => {
   const [row] = await conn.query(
-    'SELECT uo.id AS ourteam_id, u.id AS user_id, u.nickname, u.phone, uo.gender, uo.num, uo.age, uo.height, uo.drink, uo.intro, oj.job, ou.university, oa.area, od.day, oap.appearance, om.mbti, ofa.fashion, oro.role, opj.preference_job, op.age AS preference_age, op.height AS preference_height, op.same_university, opv.preference_vibe, uo.updated_at FROM `user_ourteam` uo INNER JOIN `user` u ON uo.user_id = u.id INNER JOIN `ourteam_job` oj ON uo.id = oj.ourteam_id INNER JOIN `ourteam_university` ou ON uo.id = ou.ourteam_id INNER JOIN `ourteam_area` oa ON uo.id = oa.ourteam_id INNER JOIN `ourteam_day` od ON uo.id = od.ourteam_id INNER JOIN `ourteam_appearance` oap ON uo.id = oap.ourteam_id INNER JOIN `ourteam_mbti` om ON uo.id = om.ourteam_id INNER JOIN `ourteam_fashion` ofa ON uo.id = ofa.ourteam_id INNER JOIN `ourteam_role` oro ON uo.id = oro.ourteam_id INNER JOIN `ourteam_preference` op ON uo.id = op.ourteam_id INNER JOIN `ourteam_preference_job` opj ON uo.id = opj.ourteam_id INNER JOIN `ourteam_preference_vibe` opv ON uo.id = opv.ourteam_id WHERE u.is_deleted = false AND uo.gender = (?) AND uo.state = 2 AND uo.is_deleted = false ORDER BY uo.updated_at ASC;',
+    'SELECT uo.id AS ourteam_id, u.id AS user_id, u.nickname, u.phone, uo.gender, uo.num, uo.age, uo.drink, uo.intro, oj.job, ou.university, oa.area, od.day, oap.appearance, om.mbti, oro.role, opj.preference_job, op.age AS preference_age, op.same_university, opv.preference_vibe, uo.updated_at FROM `user_ourteam` uo INNER JOIN `user` u ON uo.user_id = u.id INNER JOIN `ourteam_job` oj ON uo.id = oj.ourteam_id INNER JOIN `ourteam_university` ou ON uo.id = ou.ourteam_id INNER JOIN `ourteam_area` oa ON uo.id = oa.ourteam_id INNER JOIN `ourteam_day` od ON uo.id = od.ourteam_id INNER JOIN `ourteam_appearance` oap ON uo.id = oap.ourteam_id INNER JOIN `ourteam_mbti` om ON uo.id = om.ourteam_id INNER JOIN `ourteam_role` oro ON uo.id = oro.ourteam_id INNER JOIN `ourteam_preference` op ON uo.id = op.ourteam_id INNER JOIN `ourteam_preference_job` opj ON uo.id = opj.ourteam_id INNER JOIN `ourteam_preference_vibe` opv ON uo.id = opv.ourteam_id WHERE u.is_deleted = false AND uo.gender = (?) AND uo.state = 5 AND uo.is_deleted = false ORDER BY uo.updated_at ASC;',
     [genderId],
   );
 
   return convertSnakeToCamel.keysToCamel(row);
 };
 
-const matchTeam = async (conn, maleTeamId, femaleTeamId, chatLink) => {
+const matchTeam = async (conn, maleTeamId, femaleTeamId) => {
   const [row1] = await conn.query(
-    'SELECT male_team_id FROM `match_team` WHERE male_team_id=(?) and is_deleted=false;',
+    'SELECT male_team_id FROM `match_team` WHERE male_team_id=(?) AND male_team_is_accepted != false AND is_deleted=false;',
     [maleTeamId],
   );
   const [row2] = await conn.query(
-    'SELECT female_team_id FROM `match_team` WHERE female_team_id=(?) and is_deleted=false;',
+    'SELECT female_team_id FROM `match_team` WHERE female_team_id=(?) AND male_team_is_accepted != false AND is_deleted=false;',
     [femaleTeamId],
   );
 
@@ -320,14 +465,13 @@ const matchTeam = async (conn, maleTeamId, femaleTeamId, chatLink) => {
     return false;
   }
 
-  await conn.query('INSERT INTO `match_team` (male_team_id, female_team_id, chat_link) VALUES (?, ?, ?);', [
+  await conn.query('INSERT INTO `match_team` (male_team_id, female_team_id) VALUES (?, ?);', [
     maleTeamId,
     femaleTeamId,
-    chatLink,
   ]);
 
-  await conn.query('UPDATE `user_ourteam` SET state=1 WHERE id=(?);', [maleTeamId]);
-  await conn.query('UPDATE `user_ourteam` SET state=1 WHERE id=(?);', [femaleTeamId]);
+  await conn.query('UPDATE `user_ourteam` SET state=2, page_num=5 WHERE id=(?);', [maleTeamId]);
+  await conn.query('UPDATE `user_ourteam` SET state=2, page_num=5 WHERE id=(?);', [femaleTeamId]);
 
   return true;
 };
@@ -368,20 +512,18 @@ const closeTeam = async (conn, ourteamId) => {
   return true;
 };
 
-const updateTeamReapply = async (conn, ourteamId) => {
-  const [row] = await conn.query('SELECT * FROM `user_ourteam` WHERE id=(?) AND state=2 AND is_deleted=false;', [
-    ourteamId,
-  ]);
+// const updateTeamReapply = async (conn, ourteamId) => {
+//   const [row] = await conn.query('SELECT * FROM `user_ourteam` WHERE id=(?) AND is_deleted=false;', [ourteamId]);
 
-  // 매칭 실패 정보가 없는 경우
-  if (!row[0]) {
-    return false;
-  }
+//   // 매칭 정보가 없는 경우
+//   if (!row[0]) {
+//     return false;
+//   }
 
-  await conn.query('UPDATE `user_ourteam` SET state=0 WHERE id=(?);', [ourteamId]);
+//   await conn.query('UPDATE `user_ourteam` SET state=0, page_num=3 WHERE id=(?);', [ourteamId]);
 
-  return true;
-};
+//   return true;
+// };
 
 const failTeam = async (conn, ourteamId) => {
   const [row] = await conn.query('SELECT * FROM `user_ourteam` WHERE id=(?) AND state=0 AND is_deleted=false;', [
@@ -393,7 +535,7 @@ const failTeam = async (conn, ourteamId) => {
     return false;
   }
 
-  await conn.query('UPDATE `user_ourteam` SET state=2 WHERE id=(?);', [ourteamId]);
+  await conn.query('UPDATE `user_ourteam` SET state=5, page_num=4 WHERE id=(?);', [ourteamId]);
 
   return true;
 };
@@ -446,11 +588,191 @@ const revertFailTeam = async (conn, ourteamId) => {
   return true;
 };
 
+const getOurteamPageByOurteamId = async (conn, ourteamId) => {
+  const [row] = await conn.query(
+    'SELECT page_num FROM `user_ourteam` WHERE id=(?) AND state!=-1 AND is_deleted=false;',
+    [ourteamId],
+  );
+
+  // 해당 팀 정보가 없는 경우
+  if (!row[0]) {
+    return -1;
+  }
+
+  return convertSnakeToCamel.keysToCamel(row[0]['page_num']);
+};
+
+const getCurrentMatchingStatus = async (conn, ourteamId, partnerTeamId) => {
+  const [row] = await conn.query('SELECT gender FROM `user_ourteam` WHERE id=(?) and is_deleted=false;', [ourteamId]);
+
+  // 남자팀인 경우
+  if (row[0]['gender'] === 1) {
+    const [row] = await conn.query(
+      'SELECT male_team_is_accepted AS ourteam_is_accepted, female_team_is_accepted AS partner_team_is_accepted FROM `match_team` WHERE male_team_id=(?) AND female_team_id=(?) AND is_deleted=false;',
+      [ourteamId, partnerTeamId],
+    );
+    return convertSnakeToCamel.keysToCamel(row[0]);
+  }
+  // 여자팀인 경우
+  else if (row[0]['gender'] === 2) {
+    const [row] = await conn.query(
+      'SELECT female_team_is_accepted AS ourteam_is_accepted, male_team_is_accepted AS partner_team_is_accepted FROM `match_team` WHERE female_team_id=(?) AND male_team_id=(?) AND is_deleted=false;',
+      [ourteamId, partnerTeamId],
+    );
+    return convertSnakeToCamel.keysToCamel(row[0]);
+  }
+  // 해당 팀 정보가 없는 경우
+  else {
+    return -1;
+  }
+};
+
+const updateMatchingResponseTrue = async (conn, ourteamId, partnerTeamId) => {
+  const [row] = await conn.query('SELECT gender FROM `user_ourteam` WHERE id=(?) and is_deleted=false;', [ourteamId]);
+
+  // 남자팀인 경우
+  if (row[0]['gender'] === 1) {
+    await conn.query(
+      'UPDATE `match_team` SET male_team_is_accepted=true  WHERE male_team_id=(?) AND female_team_id=(?) AND is_deleted=false;',
+      [ourteamId, partnerTeamId],
+    );
+  }
+  // 여자팀인 경우
+  else if (row[0]['gender'] === 2) {
+    await conn.query(
+      'UPDATE `match_team` SET female_team_is_accepted=true  WHERE female_team_id=(?) AND male_team_id=(?) AND is_deleted=false;',
+      [ourteamId, partnerTeamId],
+    );
+  }
+  // 해당 팀 정보가 없는 경우
+  else {
+    return -1;
+  }
+};
+
+const updateMatchingResponseFalse = async (conn, ourteamId, partnerTeamId) => {
+  const [row] = await conn.query('SELECT gender FROM `user_ourteam` WHERE id=(?) and is_deleted=false;', [ourteamId]);
+
+  // 남자팀인 경우
+  if (row[0]['gender'] === 1) {
+    await conn.query(
+      'UPDATE `match_team` SET male_team_is_accepted=false  WHERE male_team_id=(?) AND female_team_id=(?) AND is_deleted=false;',
+      [ourteamId, partnerTeamId],
+    );
+  }
+  // 여자팀인 경우
+  else if (row[0]['gender'] === 2) {
+    await conn.query(
+      'UPDATE `match_team` SET female_team_is_accepted=false  WHERE female_team_id=(?) AND male_team_id=(?) AND is_deleted=false;',
+      [ourteamId, partnerTeamId],
+    );
+  }
+  // 해당 팀 정보가 없는 경우
+  else {
+    return -1;
+  }
+};
+
+const updateTeamPageNum = async (conn, teamId, teamNewPage) => {
+  await conn.query('UPDATE `user_ourteam` SET page_num=(?) WHERE id=(?) AND is_deleted=false;', [teamNewPage, teamId]);
+};
+
+const updateTeamState = async (conn, teamId, teamNewState) => {
+  await conn.query('UPDATE `user_ourteam` SET state=(?) WHERE id=(?) AND is_deleted=false;', [teamNewState, teamId]);
+};
+
+const saveTeamRefuseReason = async (conn, params) => {
+  await conn.query('INSERT INTO `ourteam_refuse_reason` (ourteam_id, reason, other) VALUES (?, ?, ?);', [
+    params.ourteamId,
+    params.id,
+    params.other,
+  ]);
+};
+
+const checkTeam = async (conn, teamId) => {
+  const [row] = await conn.query('SELECT * FROM `user_ourteam` WHERE id=(?) AND state=0 AND is_deleted=false;', [
+    teamId,
+  ]);
+
+  // 가신청 정보가 없는 경우
+  if (!row[0]) {
+    return false;
+  }
+
+  await conn.query('UPDATE `user_ourteam` SET state=1 WHERE id=(?);', [teamId]);
+
+  return true;
+};
+
+const getPendingMaleTeamByAdmin = async (conn, genderId) => {
+  const [row] = await conn.query(
+    'SELECT uo.id AS ourteam_id, mt.female_team_id AS partner_team_id, u.id AS user_id, u.nickname, u.phone, uo.gender, uo.num, uo.age, uo.drink, uo.intro, oj.job, ou.university, oa.area, od.day, oap.appearance, om.mbti, oro.role, opj.preference_job, op.age AS preference_age, op.same_university, opv.preference_vibe, uo.updated_at FROM `user_ourteam` uo INNER JOIN `user` u ON uo.user_id = u.id INNER JOIN `ourteam_job` oj ON uo.id = oj.ourteam_id INNER JOIN `ourteam_university` ou ON uo.id = ou.ourteam_id INNER JOIN `ourteam_area` oa ON uo.id = oa.ourteam_id INNER JOIN `ourteam_day` od ON uo.id = od.ourteam_id INNER JOIN `ourteam_appearance` oap ON uo.id = oap.ourteam_id INNER JOIN `ourteam_mbti` om ON uo.id = om.ourteam_id INNER JOIN `ourteam_role` oro ON uo.id = oro.ourteam_id INNER JOIN `ourteam_preference` op ON uo.id = op.ourteam_id INNER JOIN `ourteam_preference_job` opj ON uo.id = opj.ourteam_id INNER JOIN `ourteam_preference_vibe` opv ON uo.id = opv.ourteam_id INNER JOIN `match_team` mt ON uo.id = mt.male_team_id WHERE u.is_deleted = false AND mt.is_deleted = false AND uo.gender = (?) AND (uo.state = 2 OR uo.state = 3) AND uo.page_num = 6 AND uo.is_deleted = false ORDER BY uo.updated_at ASC',
+    [genderId],
+  );
+
+  return convertSnakeToCamel.keysToCamel(row);
+};
+
+const getPendingFemaleTeamByAdmin = async (conn, genderId) => {
+  const [row] = await conn.query(
+    'SELECT uo.id AS ourteam_id, mt.male_team_id AS partner_team_id, u.id AS user_id, u.nickname, u.phone, uo.gender, uo.num, uo.age, uo.drink, uo.intro, oj.job, ou.university, oa.area, od.day, oap.appearance, om.mbti, oro.role, opj.preference_job, op.age AS preference_age, op.same_university, opv.preference_vibe, uo.updated_at FROM `user_ourteam` uo INNER JOIN `user` u ON uo.user_id = u.id INNER JOIN `ourteam_job` oj ON uo.id = oj.ourteam_id INNER JOIN `ourteam_university` ou ON uo.id = ou.ourteam_id INNER JOIN `ourteam_area` oa ON uo.id = oa.ourteam_id INNER JOIN `ourteam_day` od ON uo.id = od.ourteam_id INNER JOIN `ourteam_appearance` oap ON uo.id = oap.ourteam_id INNER JOIN `ourteam_mbti` om ON uo.id = om.ourteam_id INNER JOIN `ourteam_role` oro ON uo.id = oro.ourteam_id INNER JOIN `ourteam_preference` op ON uo.id = op.ourteam_id INNER JOIN `ourteam_preference_job` opj ON uo.id = opj.ourteam_id INNER JOIN `ourteam_preference_vibe` opv ON uo.id = opv.ourteam_id INNER JOIN `match_team` mt ON uo.id = mt.female_team_id WHERE u.is_deleted = false AND mt.is_deleted = false AND uo.gender = (?) AND (uo.state = 2 OR uo.state = 3) AND uo.page_num = 6 AND uo.is_deleted = false ORDER BY uo.updated_at ASC',
+    [genderId],
+  );
+
+  return convertSnakeToCamel.keysToCamel(row);
+};
+
+const getTeamIdByStateAndPageNum = async (conn, stateId, pageId) => {
+  const [row] = await conn.query(
+    'SELECT JSON_ARRAYAGG(id) AS team_id FROM `user_ourteam` WHERE state = (?) AND page_num = (?) AND is_deleted = false',
+    [stateId, pageId],
+  );
+
+  return convertSnakeToCamel.keysToCamel(row[0]['team_id']);
+};
+
+const getTeamIdByState = async (conn, stateId) => {
+  const [row] = await conn.query(
+    'SELECT JSON_ARRAYAGG(id) AS team_id FROM `user_ourteam` WHERE state = (?) AND is_deleted = false',
+    [stateId],
+  );
+
+  return convertSnakeToCamel.keysToCamel(row[0]['team_id']);
+};
+
+const updateTeamStateAndPageNum = async (conn, teamId, stateId, pageId) => {
+  await conn.query('UPDATE `user_ourteam` SET state=(?), page_num=(?) WHERE id=(?);', [stateId, pageId, teamId]);
+};
+
+const deleteTeam = async (conn, ourteamId) => {
+  await conn.query('UPDATE `user_ourteam` SET is_deleted=true WHERE id=(?);', [ourteamId]);
+};
+
+const getMaleTeamByStateAndPageNum = async (conn, stateId, pageId) => {
+  const [row] = await conn.query(
+    'SELECT uo.id AS ourteam_id, mt.female_team_id AS partner_team_id, u.id AS user_id, u.nickname, u.phone, uo.gender, uo.num, uo.age, uo.drink, uo.intro, oj.job, ou.university, oa.area, od.day, oap.appearance, om.mbti, oro.role, opj.preference_job, op.age AS preference_age, op.same_university, opv.preference_vibe, uo.updated_at FROM `user_ourteam` uo INNER JOIN `user` u ON uo.user_id = u.id INNER JOIN `ourteam_job` oj ON uo.id = oj.ourteam_id INNER JOIN `ourteam_university` ou ON uo.id = ou.ourteam_id INNER JOIN `ourteam_area` oa ON uo.id = oa.ourteam_id INNER JOIN `ourteam_day` od ON uo.id = od.ourteam_id INNER JOIN `ourteam_appearance` oap ON uo.id = oap.ourteam_id INNER JOIN `ourteam_mbti` om ON uo.id = om.ourteam_id INNER JOIN `ourteam_role` oro ON uo.id = oro.ourteam_id INNER JOIN `ourteam_preference` op ON uo.id = op.ourteam_id INNER JOIN `ourteam_preference_job` opj ON uo.id = opj.ourteam_id INNER JOIN `ourteam_preference_vibe` opv ON uo.id = opv.ourteam_id INNER JOIN `match_team` mt ON uo.id = mt.male_team_id WHERE u.is_deleted = false AND mt.is_deleted = false AND uo.gender = 1 AND uo.state = (?) AND uo.page_num = (?) AND uo.is_deleted = false ORDER BY uo.updated_at ASC',
+    [stateId, pageId],
+  );
+
+  return convertSnakeToCamel.keysToCamel(row);
+};
+
+const getFemaleTeamByStateAndPageNum = async (conn, stateId, pageId) => {
+  const [row] = await conn.query(
+    'SELECT uo.id AS ourteam_id, mt.male_team_id AS partner_team_id, u.id AS user_id, u.nickname, u.phone, uo.gender, uo.num, uo.age, uo.drink, uo.intro, oj.job, ou.university, oa.area, od.day, oap.appearance, om.mbti, oro.role, opj.preference_job, op.age AS preference_age, op.same_university, opv.preference_vibe, uo.updated_at FROM `user_ourteam` uo INNER JOIN `user` u ON uo.user_id = u.id INNER JOIN `ourteam_job` oj ON uo.id = oj.ourteam_id INNER JOIN `ourteam_university` ou ON uo.id = ou.ourteam_id INNER JOIN `ourteam_area` oa ON uo.id = oa.ourteam_id INNER JOIN `ourteam_day` od ON uo.id = od.ourteam_id INNER JOIN `ourteam_appearance` oap ON uo.id = oap.ourteam_id INNER JOIN `ourteam_mbti` om ON uo.id = om.ourteam_id INNER JOIN `ourteam_role` oro ON uo.id = oro.ourteam_id INNER JOIN `ourteam_preference` op ON uo.id = op.ourteam_id INNER JOIN `ourteam_preference_job` opj ON uo.id = opj.ourteam_id INNER JOIN `ourteam_preference_vibe` opv ON uo.id = opv.ourteam_id INNER JOIN `match_team` mt ON uo.id = mt.female_team_id WHERE u.is_deleted = false AND mt.is_deleted = false AND uo.gender = 2 AND uo.state = (?) AND uo.page_num = (?) AND uo.is_deleted = false ORDER BY uo.updated_at ASC',
+    [stateId, pageId],
+  );
+
+  return convertSnakeToCamel.keysToCamel(row);
+};
+
 module.exports = {
   saveUserOurteam,
   updateUserOurteam,
   getIsMatchingByUserId,
   getOurteamByOurteamId,
+  getTeamInfoByTeamId,
+  getCurrentTeamForReapply,
   getMaleApplyNum,
   getFemaleApplyNum,
   getWaitingTeam,
@@ -458,7 +780,7 @@ module.exports = {
   getUserIdByOurteamId,
   getOurteamStatusByOurteamId,
   getPartnerTeamIdByOurteamId,
-  getMatchingResultByOurteamId,
+  getMatchingResultByTeamId,
   getTeamByAdmin,
   getSuccessMaleTeamByAdmin,
   getSuccessFemaleTeamByAdmin,
@@ -466,8 +788,24 @@ module.exports = {
   matchTeam,
   closeMatching,
   closeTeam,
-  updateTeamReapply,
+  // updateTeamReapply,
   failTeam,
   revertMatchTeam,
   revertFailTeam,
+  getOurteamPageByOurteamId,
+  getCurrentMatchingStatus,
+  updateMatchingResponseTrue,
+  updateTeamPageNum,
+  updateTeamState,
+  updateMatchingResponseFalse,
+  saveTeamRefuseReason,
+  checkTeam,
+  getPendingMaleTeamByAdmin,
+  getPendingFemaleTeamByAdmin,
+  getTeamIdByStateAndPageNum,
+  getTeamIdByState,
+  updateTeamStateAndPageNum,
+  deleteTeam,
+  getMaleTeamByStateAndPageNum,
+  getFemaleTeamByStateAndPageNum,
 };

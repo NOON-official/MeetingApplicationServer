@@ -4,11 +4,11 @@ const util = require('../../lib/util');
 const statusCode = require('../../constants/statusCode');
 const responseMessage = require('../../constants/responseMessage');
 
-// 팀 매칭하기
+// 매칭 신청 승인하기
 module.exports = async (req, res) => {
-  const { maleTeamId, femaleTeamId } = req.body;
+  const { teamId } = req.body;
 
-  if (!maleTeamId || !femaleTeamId) {
+  if (!teamId) {
     return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
   }
 
@@ -16,14 +16,12 @@ module.exports = async (req, res) => {
   try {
     conn = await pool.getConnection();
 
-    const success = await teamDB.matchTeam(conn, maleTeamId, femaleTeamId);
+    const success = await teamDB.checkTeam(conn, teamId);
 
-    if (success === false) {
-      return res
-        .status(statusCode.BAD_REQUEST)
-        .send(util.success(statusCode.BAD_REQUEST, responseMessage.ALREADY_MATCHED_USER));
+    if (!success) {
+      return res.status(statusCode.BAD_REQUEST).send(util.success(statusCode.BAD_REQUEST, responseMessage.NO_APPLY));
     } else if (success === true) {
-      res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.MATCH_TEAM_SUCCESS, { success }));
+      res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.CHECK_TEAM_SUCCESS, { success }));
     }
   } catch (error) {
     return res
