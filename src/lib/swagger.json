@@ -3061,6 +3061,7 @@
                         "maleTeam": [
                           {
                             "ourteamId": 2,
+                            "partnerTeamId": 1,
                             "userId": 1,
                             "nickname": "미팅이",
                             "phone": "01012345678",
@@ -3144,6 +3145,7 @@
                         "femaleTeam": [
                           {
                             "ourteamId": 2,
+                            "partnerTeamId": 1,
                             "userId": 1,
                             "nickname": "미팅이",
                             "phone": "01012345678",
@@ -3227,6 +3229,7 @@
                         "maleTeam": [
                           {
                             "ourteamId": 2,
+                            "partnerTeamId": 1,
                             "userId": 1,
                             "nickname": "미팅이",
                             "phone": "01012345678",
@@ -3310,6 +3313,7 @@
                         "femaleTeam": [
                           {
                             "ourteamId": 2,
+                            "partnerTeamId": 1,
                             "userId": 1,
                             "nickname": "미팅이",
                             "phone": "01012345678",
@@ -3393,6 +3397,7 @@
                         "maleTeam": [
                           {
                             "ourteamId": 2,
+                            "partnerTeamId": 1,
                             "userId": 1,
                             "nickname": "미팅이",
                             "phone": "01012345678",
@@ -3476,6 +3481,7 @@
                         "femaleTeam": [
                           {
                             "ourteamId": 2,
+                            "partnerTeamId": 1,
                             "userId": 1,
                             "nickname": "미팅이",
                             "phone": "01012345678",
