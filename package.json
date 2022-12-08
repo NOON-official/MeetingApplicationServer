@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "cross-env NODE_ENV=development pm2 start src/index.js --watch",
     "start": "cross-env NODE_ENV=development nodemon src/index.js",
     "prod": "cross-env NODE_ENV=production pm2 start src/index.js --watch"
   },
