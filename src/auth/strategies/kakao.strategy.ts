@@ -1,8 +1,8 @@
+import { KakaoProfileDto } from '../dto/kakao-profile.dto';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, Profile } from 'passport-kakao';
-import { ExtractJwt, Strategy as PassportJwtStrategy } from 'passport-jwt';
 
 @Injectable()
 export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
@@ -10,17 +10,13 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
     super({
       clientID: configService.get<string>('KAKAO_REST_API_KEY'),
       callbackURL: configService.get<string>('KAKAO_CALLBACK_URI'),
-      proxy: true,
     });
   }
 
-  async validate(accessToken, refreshToken, profile: Profile, done: any) {
-    console.log('heyy');
-    console.log(profile);
+  async validate(accessToken: string, refreshToken: string, profile: Profile, done: any) {
     const kakaoUser = profile._json;
 
-    //존재하는 유저인지 DB에서 확인 가능
-    const payload = {
+    const payload: KakaoProfileDto = {
       kakaoUid: kakaoUser.id,
       nickname: kakaoUser.properties.nickname,
       ageRange:
@@ -34,20 +30,5 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
     };
 
     done(null, payload);
-  }
-}
-
-@Injectable()
-export class JwtStrategy extends PassportStrategy(PassportJwtStrategy) {
-  constructor(configService: ConfigService) {
-    super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      ignoreExpiration: false,
-      secretOrKey: configService.get<string>('JWT_SECRET'),
-    });
-  }
-
-  async validate(payload: any) {
-    return { id: payload.sub, username: payload.username };
   }
 }
