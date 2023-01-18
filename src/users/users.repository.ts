@@ -29,4 +29,13 @@ export class UsersRepository extends Repository<User> {
   async updateUserRefreshToken(userId: number, refreshToken: string) {
     await this.update({ id: userId }, { refreshToken });
   }
+
+  async deleteUserRefreshToken(userId: number) {
+    await this.update({ id: userId }, { refreshToken: null });
+  }
+
+  async getUserById(userId: number): Promise<User> {
+    const user = await this.findOneBy({ id: userId });
+    return user;
+  }
 }
