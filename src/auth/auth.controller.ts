@@ -2,14 +2,13 @@ import { AccessTokenGuard } from './guards/access-token.guard';
 import { RefreshTokenGuard } from './guards/refresh-token.guard';
 import { AuthService } from './auth.service';
 import { KakaoProfileDto } from './dto/kakao-profile.dto';
-import { ConfigService } from '@nestjs/config';
 import { Controller, Get, HttpStatus, UseGuards, Req, Res, Redirect } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private configService: ConfigService, private authService: AuthService) {}
+  constructor(private authService: AuthService) {}
 
   @Get('signin/kakao')
   @UseGuards(AuthGuard('kakao'))
