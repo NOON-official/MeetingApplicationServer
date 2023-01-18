@@ -90,8 +90,7 @@ export class AuthService {
   }
 
   async signOut(userId: number, res: Response): Promise<void> {
-    await this.userService.deleteUserRefreshToken(userId);
-
     res.clearCookie('refresh');
+    return await this.userService.deleteUserRefreshToken(userId);
   }
 }
