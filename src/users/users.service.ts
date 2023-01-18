@@ -30,4 +30,12 @@ export class UsersService {
   async updateUserRefreshToken(userId: number, refreshToken: string) {
     return this.userRepository.updateUserRefreshToken(userId, refreshToken);
   }
+
+  async deleteUserRefreshToken(userId: number) {
+    return this.userRepository.deleteUserRefreshToken(userId);
+  }
+
+  async getUserById(userId: number): Promise<User> {
+    return this.userRepository.getUserById(userId);
+  }
 }
