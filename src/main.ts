@@ -17,6 +17,13 @@ async function bootstrap() {
     .setTitle('미팅학개론')
     .setDescription('미팅학개론 ver.2 API 명세서')
     .setVersion('2.0')
+    .addTag('AUTH')
+    .addTag('USER')
+    .addTag('TEAM')
+    .addTag('ORDER')
+    .addTag('COUPON')
+    .addTag('INVITATION')
+    .addTag('MATCHING')
     .addBearerAuth()
     .addCookieAuth('refresh')
     .build();

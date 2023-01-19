@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 import { AccessTokenGuard } from './guards/access-token.guard';
 import { RefreshTokenGuard } from './guards/refresh-token.guard';
 import { AuthService } from './auth.service';
 import { KakaoProfileDto } from './dto/kakao-profile.dto';
-import { Controller, Get, HttpStatus, UseGuards, Req, Res, Redirect } from '@nestjs/common';
+import { Controller, Get, HttpStatus, UseGuards, Req, Res, Redirect, Delete } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger/dist';
@@ -32,7 +33,7 @@ export class AuthController {
   })
   @Get('signin/kakao')
   @UseGuards(AuthGuard('kakao'))
-  signinKakao() {
+  getAuthSigninKakao() {
     return HttpStatus.OK;
   }
 
@@ -40,7 +41,7 @@ export class AuthController {
   @Get('kakao/callback')
   @UseGuards(AuthGuard('kakao'))
   @Redirect()
-  async kakaoCallback(@Req() req, @Res() res: Response): Promise<{ url: string }> {
+  async getAuthKakaoCallback(@Req() req, @Res() res: Response): Promise<{ url: string }> {
     const kakaoUser: KakaoProfileDto = req.user;
 
     const clientRedirectUrl = await this.authService.signInWithKakao(kakaoUser, res);
@@ -66,7 +67,7 @@ export class AuthController {
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @Get('refresh')
   @UseGuards(RefreshTokenGuard)
-  refresh(@Req() req: Request): Promise<{ accessToken: string }> {
+  getAuthRefresh(@Req() req: Request): Promise<{ accessToken: string }> {
     return this.authService.refreshToken(req.user['sub'], req.user['refreshToken']);
   }
 
@@ -78,7 +79,14 @@ export class AuthController {
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @Get('signout')
   @UseGuards(AccessTokenGuard)
-  signout(@Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<void> {
+  getAuthSignout(@Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<void> {
     return this.authService.signOut(req.user['sub'], res);
   }
+
+  @ApiOperation({
+    summary: '회원 탈퇴',
+    description: 'DB 유저 정보 삭제',
+  })
+  @Delete('account')
+  deleteAuthAccount() {}
 }
