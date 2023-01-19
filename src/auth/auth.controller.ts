@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 import { AccessTokenGuard } from './guards/access-token.guard';
 import { RefreshTokenGuard } from './guards/refresh-token.guard';
 import { AuthService } from './auth.service';
 import { KakaoProfileDto } from './dto/kakao-profile.dto';
-import { Controller, Get, HttpStatus, UseGuards, Req, Res, Redirect } from '@nestjs/common';
+import { Controller, Get, HttpStatus, UseGuards, Req, Res, Redirect, Delete } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger/dist';
@@ -81,4 +82,11 @@ export class AuthController {
   getAuthSignout(@Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<void> {
     return this.authService.signOut(req.user['sub'], res);
   }
+
+  @ApiOperation({
+    summary: '회원 탈퇴',
+    description: 'DB 유저 정보 삭제',
+  })
+  @Delete('account')
+  deleteAuthAccount() {}
 }
