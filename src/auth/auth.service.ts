@@ -1,7 +1,7 @@
-import { JwtPayload } from './dto/jwt-payload.dto';
+import { JwtPayload } from './dtos/jwt-payload.dto';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt/dist';
-import { KakaoProfileDto } from './dto/kakao-profile.dto';
+import { KakaoProfileDto } from './dtos/kakao-profile.dto';
 import { UsersService } from './../users/users.service';
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { Response } from 'express';

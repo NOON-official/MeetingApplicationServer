@@ -1,6 +1,6 @@
-import { KakaoProfileDto } from './../auth/dto/kakao-profile.dto';
-import { User } from './user.entity';
-import { UsersRepository } from './users.repository';
+import { KakaoProfileDto } from '../auth/dtos/kakao-profile.dto';
+import { User } from './entities/user.entity';
+import { UsersRepository } from './repositories/users.repository';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()

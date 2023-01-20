@@ -13,7 +13,7 @@ import {
 @Entity()
 @Unique(['id', 'kakaoUid', 'referralId', 'refreshToken'])
 export class User extends BaseEntity {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
 
   @Column({ type: 'bigint' })

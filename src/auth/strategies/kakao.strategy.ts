@@ -1,4 +1,4 @@
-import { KakaoProfileDto } from '../dto/kakao-profile.dto';
+import { KakaoProfileDto } from '../dtos/kakao-profile.dto';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';

@@ -2,7 +2,7 @@
 import { AccessTokenGuard } from './guards/access-token.guard';
 import { RefreshTokenGuard } from './guards/refresh-token.guard';
 import { AuthService } from './auth.service';
-import { KakaoProfileDto } from './dto/kakao-profile.dto';
+import { KakaoProfileDto } from './dtos/kakao-profile.dto';
 import { Controller, Get, HttpStatus, UseGuards, Req, Res, Redirect, Delete } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
@@ -52,7 +52,7 @@ export class AuthController {
   @ApiOperation({
     summary: 'Access Token 재발급',
     description:
-      'Refresh Token이 만료되지 않은 경우 Access Token을 재발급합니다. Refresh Token도 만료된 경우 재로그인 해야합니다.',
+      'Refresh Token이 만료되지 않은 경우 Access Token을 재발급합니다. \n\n Refresh Token도 만료된 경우(401 Unauthorized) 재로그인 해야합니다.',
   })
   @ApiCookieAuth()
   @ApiOkResponse({
@@ -85,8 +85,11 @@ export class AuthController {
 
   @ApiOperation({
     summary: '회원 탈퇴',
-    description: 'DB 유저 정보 삭제',
+    description: 'DB에 있는 유저 정보 삭제',
   })
+  @ApiBearerAuth()
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @Delete('account')
+  @UseGuards(AccessTokenGuard)
   deleteAuthAccount() {}
 }
