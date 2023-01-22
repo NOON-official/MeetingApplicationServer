@@ -22,7 +22,7 @@ export class Order extends BaseEntity {
   paymentId: string;
 
   @Column({ type: 'int' })
-  ticketCount: number;
+  type: number;
 
   @Column({ type: 'int' })
   amount: number;
