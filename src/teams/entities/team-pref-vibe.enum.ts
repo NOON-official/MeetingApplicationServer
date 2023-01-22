@@ -1,7 +1,7 @@
 export enum TeamPrefVibe {
-  LOVE = 'love',
-  FRIEND = 'friend',
-  NOISY = 'noisy',
-  DRINK = 'drink',
-  KIND = 'kind',
+  love = 'love',
+  friend = 'friend',
+  noisy = 'noisy',
+  drink = 'drink',
+  kind = 'kind',
 }
