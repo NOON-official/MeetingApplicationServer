@@ -55,7 +55,7 @@ export class GetTeamDto {
     description: '대학교',
     example: [1, 42, 345],
   })
-  university: number[];
+  university?: number[];
 
   @ApiProperty({
     description: '미팅 선호 날짜',
@@ -139,5 +139,5 @@ export class GetTeamDto {
     description: '삭제일시',
     example: '2023-01-20T21:37:26.886Z',
   })
-  deletedAt: Date;
+  deletedAt?: Date;
 }
