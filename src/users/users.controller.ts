@@ -1,15 +1,25 @@
+import { CreateAgreementDto } from './dtos/create-agreement.dto';
+import { UpdatePhoneDto } from './dtos/update-phone.dto';
 import { AccessTokenGuard } from './../auth/guards/access-token.guard';
 import { UseGuards } from '@nestjs/common';
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { ApiBearerAuth, ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger/dist';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger/dist';
 import { UsersService } from './users.service';
 import { Controller, Get } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
-import { Param, Post, Put } from '@nestjs/common/decorators';
+import { Body, Param, Post, Put } from '@nestjs/common/decorators';
 
 @ApiTags('USER')
 @ApiBearerAuth()
 @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+@ApiNotFoundResponse({ description: 'Not Found' })
 @Controller('users')
 export class UsersController {
   constructor(private userService: UsersService) {}
@@ -32,6 +42,13 @@ export class UsersController {
   @ApiOperation({
     summary: '추천 코드 조회',
   })
+  @ApiOkResponse({
+    schema: {
+      example: {
+        referralId: 'LD4GSTO3',
+      },
+    },
+  })
   @Get(':userId/referral-id')
   @UseGuards(AccessTokenGuard)
   getUsersUserIdReferralId(@Param('userId') userId: number) {}
@@ -40,12 +57,31 @@ export class UsersController {
     summary: '내 정보 조회',
     description: '이름, 전화번호 반환',
   })
+  @ApiOkResponse({
+    schema: {
+      example: {
+        nickname: '미팅이',
+        phone: '01012345678',
+      },
+    },
+  })
   @Get(':userId/my-info')
   @UseGuards(AccessTokenGuard)
   getUsersUserIdMyInfo(@Param('userId') userId: number) {}
 
   @ApiOperation({
     summary: '신청 내역 조회',
+    description: '인원수, 신청날짜 반환',
+  })
+  @ApiOkResponse({
+    schema: {
+      example: {
+        teams: [
+          { id: 1, memberCount: 2, createdAt: '2023-01-20T21:37:26.886Z' },
+          { id: 4, memberCount: 3, createdAt: '2023-01-20T21:37:26.886Z' },
+        ],
+      },
+    },
   })
   @Get(':userId/teams')
   @UseGuards(AccessTokenGuard)
@@ -54,12 +90,26 @@ export class UsersController {
   @ApiOperation({
     summary: '전화번호 변경',
   })
+  @ApiOkResponse({
+    schema: {
+      example: {
+        phone: '01012345678',
+      },
+    },
+  })
   @Put(':userId/phone')
   @UseGuards(AccessTokenGuard)
-  putUsersUserIdPhone(@Param('userId') userId: number) {}
+  putUsersUserIdPhone(@Param('userId') userId: number, @Body() updatePhoneDto: UpdatePhoneDto) {}
 
   @ApiOperation({
     summary: '미사용 이용권 개수 조회',
+  })
+  @ApiOkResponse({
+    schema: {
+      example: {
+        ticketCount: 5,
+      },
+    },
   })
   @Get(':userId/tickets/count')
   @UseGuards(AccessTokenGuard)
@@ -68,12 +118,29 @@ export class UsersController {
   @ApiOperation({
     summary: '할인 쿠폰 개수 조회',
   })
+  @ApiOkResponse({
+    schema: {
+      example: {
+        couponCount: 5,
+      },
+    },
+  })
   @Get(':userId/coupons/count')
   @UseGuards(AccessTokenGuard)
   getUsersUserIdCouponsCount(@Param('userId') userId: number) {}
 
   @ApiOperation({
     summary: '보유 쿠폰 조회',
+  })
+  @ApiOkResponse({
+    schema: {
+      example: {
+        coupons: [
+          { id: 1, type: 1, expiresAt: '2023-01-22' },
+          { id: 2, type: 2, expiresAt: '2023-01-22' },
+        ],
+      },
+    },
   })
   @Get(':userId/coupons')
   @UseGuards(AccessTokenGuard)
@@ -82,12 +149,27 @@ export class UsersController {
   @ApiOperation({
     summary: '이용 약관 동의',
   })
+  @ApiCreatedResponse({ description: 'Created' })
   @Post(':userId/agreements')
   @UseGuards(AccessTokenGuard)
-  postUsersUserIdAgreements(@Param('userId') userId: number) {}
+  postUsersUserIdAgreements(@Param('userId') userId: number, @Body() createAgreementDto: CreateAgreementDto) {}
 
   @ApiOperation({
     summary: '이용 약관 동의 목록 조회',
+  })
+  @ApiOkResponse({
+    schema: {
+      example: {
+        agreements: {
+          service: true,
+          privacy: false,
+          age: false,
+          marketing: true,
+          createdAt: '2023-01-20T21:37:26.886Z',
+          updatedAt: '2023-01-20T21:37:26.886Z',
+        },
+      },
+    },
   })
   @Get(':userId/agreements')
   @UseGuards(AccessTokenGuard)
@@ -95,6 +177,16 @@ export class UsersController {
 
   @ApiOperation({
     summary: '결제 내역 조회',
+  })
+  @ApiOkResponse({
+    schema: {
+      example: {
+        orders: [
+          { id: 1, type: 1, amount: 5000, couponId: null, createdAt: '2023-01-2023-01-20T21:37:26.886Z' },
+          { id: 2, type: 1, amount: 0, couponId: 1, createdAt: '2023-01-2023-01-20T21:37:26.886Z' },
+        ],
+      },
+    },
   })
   @Get(':userId/orders')
   @UseGuards(AccessTokenGuard)
@@ -104,6 +196,13 @@ export class UsersController {
     summary: '유저의 팀ID 조회',
     description: '팀(매칭 신청 정보)이 없는 경우 null 반환',
   })
+  @ApiOkResponse({
+    schema: {
+      example: {
+        teamId: 1,
+      },
+    },
+  })
   @Get(':userId/team-id')
   @UseGuards(AccessTokenGuard)
   getUsersUserIdTeamId(@Param('userId') userId: number) {}
@@ -111,6 +210,36 @@ export class UsersController {
   @ApiOperation({
     summary: '유저 전체 조회',
     description: '관리자 페이지 내 사용',
+  })
+  @ApiOkResponse({
+    schema: {
+      example: {
+        users: [
+          {
+            id: 1,
+            nickname: '미팅이1',
+            status: '신청대기',
+            phone: '01012345678',
+            createdAt: '2023-01-2023-01-20T21:37:26.886Z',
+            referralId: 'LD4GSTO3',
+            ticketCount: 5,
+            discount50CouponCount: 1,
+            freeCouponCount: 0,
+          },
+          {
+            id: 1,
+            nickname: '미팅이2',
+            status: '진행중',
+            phone: '01012345678',
+            createdAt: '2023-01-2023-01-20T21:37:26.886Z',
+            referralId: 'LD4GSTO3',
+            ticketCount: 5,
+            discount50CouponCount: 1,
+            freeCouponCount: 0,
+          },
+        ],
+      },
+    },
   })
   @Get()
   @UseGuards(AccessTokenGuard)
