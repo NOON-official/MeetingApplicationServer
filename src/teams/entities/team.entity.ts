@@ -1,4 +1,4 @@
-import { TeamPrefVibe } from './team.pref-vibe.enum';
+import { TeamPrefVibe } from './team-pref-vibe.enum';
 import {
   BaseEntity,
   Column,
