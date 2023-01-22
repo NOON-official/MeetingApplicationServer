@@ -10,8 +10,8 @@ export class UsersRepository extends Repository<User> {
     return user;
   }
 
-  async createUser(userData: CreateUserDto): Promise<User> {
-    const user = this.create(userData);
+  async createUser(createUserDto: CreateUserDto): Promise<User> {
+    const user = this.create(createUserDto);
 
     await this.save(user);
 
