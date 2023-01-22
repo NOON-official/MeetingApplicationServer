@@ -1,14 +1,27 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { ApiOperation } from '@nestjs/swagger';
-import { ApiTags } from '@nestjs/swagger/dist';
-import { Controller, Post } from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiNotFoundResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger/dist';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
+import { CreateInvitationDto } from './dtos/create-invitation.dto';
 
 @ApiTags('INVITATION')
+@ApiBearerAuth()
+@ApiUnauthorizedResponse({ description: 'Unauthorized' })
+@ApiNotFoundResponse({ description: 'Not Found' })
 @Controller('invitations')
 export class InvitationsController {
   @ApiOperation({
     summary: '회원 초대 코드 입력',
   })
+  @ApiCreatedResponse({ description: 'Created' })
   @Post()
-  postInvitations() {}
+  @UseGuards(AccessTokenGuard)
+  postInvitations(@Body() createInvitationDto: CreateInvitationDto) {}
 }
