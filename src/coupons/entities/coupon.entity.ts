@@ -24,6 +24,9 @@ export class Coupon extends BaseEntity {
   @Column({ type: 'int' })
   type: number;
 
+  @Column({ type: 'date' })
+  expiresAt: Date;
+
   @Column({ type: 'timestamp' })
   usedAt: Date;
 
