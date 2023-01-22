@@ -76,7 +76,7 @@ export class AuthController {
     description: '쿠키에 있는 refresh token을 삭제합니다. access token은 프론트엔드에서 삭제 처리 해주시면 됩니다.',
   })
   @ApiBearerAuth()
-  @ApiOkResponse()
+  @ApiOkResponse({ description: 'OK' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @Get('signout')
   @UseGuards(AccessTokenGuard)
@@ -89,7 +89,7 @@ export class AuthController {
     description: 'DB에 있는 유저 정보 삭제',
   })
   @ApiBearerAuth()
-  @ApiOkResponse()
+  @ApiOkResponse({ description: 'OK' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @Delete('account')
   @UseGuards(AccessTokenGuard)
