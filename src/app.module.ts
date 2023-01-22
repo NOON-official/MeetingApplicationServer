@@ -25,6 +25,7 @@ import { TicketsModule } from './tickets/tickets.module';
       database: process.env.DB_DATABASE,
       entities: [__dirname + '/**/*.entity.{js,ts}'],
       synchronize: Boolean(process.env.DB_SYNCHRONIZE),
+      timezone: 'Z',
     }),
     AuthModule,
     UsersModule,
