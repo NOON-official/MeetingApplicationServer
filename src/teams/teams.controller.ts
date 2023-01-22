@@ -25,7 +25,6 @@ import { ApiOperation } from '@nestjs/swagger';
 import { ApiTags } from '@nestjs/swagger/dist';
 import { Controller, Get, Post, Patch, Delete, Put, UseGuards } from '@nestjs/common';
 import { UpdateTeamDto } from './dtos/update-team.dto';
-import { Team } from './entities/team.entity';
 
 @ApiTags('TEAM')
 @ApiUnauthorizedResponse({ description: 'Unauthorized' })
