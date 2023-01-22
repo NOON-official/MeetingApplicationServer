@@ -52,7 +52,7 @@ export class Team extends BaseEntity {
   @Column({ type: 'int' })
   startRound: number;
 
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'int' })
   currentRound: number;
 
   @CreateDateColumn({ type: 'timestamp' })
