@@ -1,0 +1,18 @@
+export const Mbties = [
+  { mbti: 'ENFJ', key: 1 },
+  { mbti: 'ENTJ', key: 2 },
+  { mbti: 'ENFP', key: 3 },
+  { mbti: 'ENTP', key: 4 },
+  { mbti: 'ESFP', key: 5 },
+  { mbti: 'ESFJ', key: 6 },
+  { mbti: 'ESTP', key: 7 },
+  { mbti: 'ESTJ', key: 8 },
+  { mbti: 'INFP', key: 9 },
+  { mbti: 'INFJ', key: 10 },
+  { mbti: 'INTP', key: 11 },
+  { mbti: 'ISTP', key: 12 },
+  { mbti: 'ISFP', key: 13 },
+  { mbti: 'ISFJ', key: 14 },
+  { mbti: 'ISTJ', key: 15 },
+  { mbti: 'INTJ', key: 16 },
+];

@@ -13,7 +13,7 @@ import {
 @Entity()
 @Unique(['id', 'kakaoUid', 'referralId', 'refreshToken'])
 export class User extends BaseEntity {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
 
   @Column({ type: 'bigint' })
@@ -31,7 +31,7 @@ export class User extends BaseEntity {
   @Column({ type: 'varchar', length: 10, nullable: true })
   ageRange: string;
 
-  @Column({ type: 'varchar', length: 20, nullable: true })
+  @Column({ type: 'varchar', length: 20 })
   referralId: string;
 
   @Column({ nullable: true })
@@ -46,6 +46,6 @@ export class User extends BaseEntity {
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
 
-  @DeleteDateColumn({ type: 'timestamp' })
+  @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt: Date;
 }

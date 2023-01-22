@@ -8,6 +8,7 @@ import { OrdersModule } from './orders/orders.module';
 import { MatchingsModule } from './matchings/matchings.module';
 import { InvitationsModule } from './invitations/invitations.module';
 import { CouponsModule } from './coupons/coupons.module';
+import { TicketsModule } from './tickets/tickets.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { CouponsModule } from './coupons/coupons.module';
       database: process.env.DB_DATABASE,
       entities: [__dirname + '/**/*.entity.{js,ts}'],
       synchronize: Boolean(process.env.DB_SYNCHRONIZE),
+      timezone: 'Z',
     }),
     AuthModule,
     UsersModule,
@@ -32,6 +34,7 @@ import { CouponsModule } from './coupons/coupons.module';
     MatchingsModule,
     InvitationsModule,
     CouponsModule,
+    TicketsModule,
   ],
 })
 export class AppModule {}
