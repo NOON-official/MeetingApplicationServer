@@ -20,7 +20,6 @@ async function bootstrap() {
     .addTag('AUTH')
     .addTag('USER')
     .addTag('TEAM')
-    .addTag('TICKET')
     .addTag('ORDER')
     .addTag('COUPON')
     .addTag('INVITATION')
