@@ -14,7 +14,7 @@ import {
   Max,
 } from 'class-validator';
 
-export class createMemberDto {
+export class CreateMemberDto {
   @ApiProperty({
     description: '포지션',
     example: 1,
@@ -125,16 +125,16 @@ export class CreateTeamDto {
   readonly area: number[];
 
   @ApiProperty({
-    type: [createMemberDto],
+    type: [CreateMemberDto],
     description: '멤버',
     required: true,
   })
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => createMemberDto)
+  @Type(() => CreateMemberDto)
   @ArrayMinSize(2)
   @ArrayMaxSize(3)
-  readonly members: createMemberDto[];
+  readonly members: CreateMemberDto[];
 
   @ApiProperty({
     description: '한 줄 소개',
