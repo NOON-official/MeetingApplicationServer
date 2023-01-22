@@ -18,16 +18,16 @@ export class Coupon extends BaseEntity {
   @Column({ type: 'int', nullable: true })
   userId: number;
 
-  @Column({ type: 'varchar', length: 30 })
+  @Column({ type: 'varchar', length: 30, nullable: true })
   code: string;
 
   @Column({ type: 'int' })
   type: number;
 
-  @Column({ type: 'date' })
+  @Column({ type: 'date', nullable: true })
   expiresAt: Date;
 
-  @Column({ type: 'timestamp' })
+  @Column({ type: 'timestamp', nullable: true })
   usedAt: Date;
 
   @CreateDateColumn({ type: 'timestamp' })
@@ -36,6 +36,6 @@ export class Coupon extends BaseEntity {
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
 
-  @DeleteDateColumn({ type: 'timestamp' })
+  @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt: Date;
 }

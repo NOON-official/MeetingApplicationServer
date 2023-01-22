@@ -18,7 +18,7 @@ export class Order extends BaseEntity {
   @Column({ type: 'int' })
   userId: number;
 
-  @Column({ type: 'varchar', length: 30 })
+  @Column({ type: 'varchar', length: 30, nullable: true })
   paymentId: string;
 
   @Column({ type: 'int' })
@@ -27,10 +27,10 @@ export class Order extends BaseEntity {
   @Column({ type: 'int' })
   amount: number;
 
-  @Column({ type: 'int' })
+  @Column({ type: 'int', nullable: true })
   couponId: number;
 
-  @Column({ type: 'timestamp' })
+  @Column({ type: 'timestamp', nullable: true })
   refundedAt: Date;
 
   @CreateDateColumn({ type: 'timestamp' })
@@ -39,6 +39,6 @@ export class Order extends BaseEntity {
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
 
-  @DeleteDateColumn({ type: 'timestamp' })
+  @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt: Date;
 }

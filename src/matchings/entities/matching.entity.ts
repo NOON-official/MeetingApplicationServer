@@ -27,7 +27,7 @@ export class Matching extends BaseEntity {
   @Column({ type: 'tinyint', nullable: true })
   femaleTeamIsAccepted: number;
 
-  @Column({ type: 'timestamp' })
+  @Column({ type: 'timestamp', nullable: true })
   chatCreatedAt: Date;
 
   @CreateDateColumn({ type: 'timestamp' })
@@ -36,6 +36,6 @@ export class Matching extends BaseEntity {
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
 
-  @DeleteDateColumn({ type: 'timestamp' })
+  @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt: Date;
 }

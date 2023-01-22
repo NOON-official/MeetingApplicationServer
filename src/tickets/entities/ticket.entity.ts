@@ -18,10 +18,10 @@ export class Ticket extends BaseEntity {
   @Column({ type: 'int' })
   userId: number;
 
-  @Column({ type: 'int' })
+  @Column({ type: 'int', nullable: true })
   orderId: number;
 
-  @Column({ type: 'timestamp' })
+  @Column({ type: 'timestamp', nullable: true })
   usedAt: Date;
 
   @CreateDateColumn({ type: 'timestamp' })
@@ -30,6 +30,6 @@ export class Ticket extends BaseEntity {
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
 
-  @DeleteDateColumn({ type: 'timestamp' })
+  @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt: Date;
 }

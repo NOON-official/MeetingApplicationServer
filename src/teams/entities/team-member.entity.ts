@@ -15,7 +15,7 @@ export class TeamMember extends BaseEntity {
   @Column({ type: 'int' })
   mbti: number;
 
-  @Column({ type: 'varchar', length: 50 })
+  @Column({ type: 'varchar', length: 50, nullable: true })
   appearance: string;
 
   @Column({ type: 'int' })
