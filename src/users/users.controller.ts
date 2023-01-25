@@ -71,14 +71,14 @@ export class UsersController {
 
   @ApiOperation({
     summary: '신청 내역 조회',
-    description: '인원수, 신청날짜 반환',
+    description: '인원수, 신청날짜 반환 \n\n chatCreatedAt이 null이 아닌 경우 "매칭 완료"로 표시해주세요.',
   })
   @ApiOkResponse({
     schema: {
       example: {
         teams: [
-          { id: 1, memberCount: 2, createdAt: '2023-01-20T21:37:26.886Z' },
-          { id: 4, memberCount: 3, createdAt: '2023-01-20T21:37:26.886Z' },
+          { id: 1, memberCount: 2, createdAt: '2023-01-20T21:37:26.886Z', chatCreatedAt: '2023-01-20T21:37:26.886Z' },
+          { id: 4, memberCount: 3, createdAt: '2023-01-20T21:37:26.886Z', chatCreatedAt: null },
         ],
       },
     },
