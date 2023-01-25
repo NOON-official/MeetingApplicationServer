@@ -37,7 +37,9 @@ export class UsersController {
   })
   @Get(':userId/invitations/count')
   @UseGuards(AccessTokenGuard)
-  getUsersUserIdInvitationsCount(@Param('userId') userId: number) {}
+  getUsersUserIdInvitationsCount(@Param('userId') userId: number) {
+    return this.usersService.getInvitationCountByUserId(userId);
+  }
 
   @ApiOperation({
     summary: '추천 코드 조회',

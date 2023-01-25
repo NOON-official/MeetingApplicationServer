@@ -10,4 +10,12 @@ export class InvitationsRepository extends Repository<Invitation> {
 
     await this.save(invitation);
   }
+
+  async getInvitationCountByUserId(userId: number): Promise<{ invitationCount: number }> {
+    const invitationCount = await this.createQueryBuilder('invitation')
+      .where('invitation.inviterId = :userId', { userId })
+      .getCount();
+
+    return { invitationCount };
+  }
 }

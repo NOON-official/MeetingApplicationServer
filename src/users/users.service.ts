@@ -1,11 +1,16 @@
+import { InvitationsService } from './../invitations/invitations.service';
 import { KakaoUser } from './../auth/interfaces/kakao-user.interface';
 import { User } from './entities/user.entity';
 import { UsersRepository } from './repositories/users.repository';
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class UsersService {
-  constructor(private usersRepository: UsersRepository) {}
+  constructor(
+    @Inject(forwardRef(() => InvitationsService))
+    private invitationsService: InvitationsService,
+    private usersRepository: UsersRepository,
+  ) {}
 
   async getUserByKakaoUid(kakaoUid: number): Promise<User> {
     return this.usersRepository.getUserByKakaoUid(kakaoUid);
@@ -45,5 +50,16 @@ export class UsersService {
 
   async getUserByReferralId(referralId: string): Promise<User> {
     return this.usersRepository.getUserByReferralId(referralId);
+  }
+
+  async getInvitationCountByUserId(userId: number): Promise<{ invitationCount: number }> {
+    let { invitationCount } = await this.invitationsService.getInvitationCountByUserId(userId);
+
+    // 초대횟수가 4회 이상인 경우 4 반환
+    if (invitationCount > 4) {
+      invitationCount = 4;
+    }
+
+    return { invitationCount };
   }
 }

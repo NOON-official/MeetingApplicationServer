@@ -1,11 +1,15 @@
 import { CreateInvitationDto } from './dtos/create-invitation.dto';
 import { InvitationsRepository } from './repositories/invitations.repository';
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class InvitationsService {
-  constructor(private invitationsRepository: InvitationsRepository, private usersService: UsersService) {}
+  constructor(
+    @Inject(forwardRef(() => UsersService))
+    private usersService: UsersService,
+    private invitationsRepository: InvitationsRepository,
+  ) {}
 
   async createInvitation(createInvitationDto: CreateInvitationDto): Promise<void> {
     // 추천인코드 확인
@@ -19,5 +23,11 @@ export class InvitationsService {
     }
 
     return this.invitationsRepository.createInvitation(inviter, invitee);
+  }
+
+  async getInvitationCountByUserId(userId: number): Promise<{ invitationCount: number }> {
+    await this.usersService.getUserById(userId);
+
+    return await this.invitationsRepository.getInvitationCountByUserId(userId);
   }
 }
