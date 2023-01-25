@@ -39,7 +39,7 @@ export class UsersRepository extends Repository<User> {
     const user = await this.findOneBy({ id: userId });
 
     if (!user) {
-      throw new NotFoundException(`Can't find Board with id ${userId}`);
+      throw new NotFoundException(`Can't find user with id ${userId}`);
     }
 
     return user;
@@ -52,5 +52,15 @@ export class UsersRepository extends Repository<User> {
     if (result.affected === 0) {
       throw new NotFoundException(`Can't find user with id ${userId}`);
     }
+  }
+
+  async getUserByReferralId(referralId: string): Promise<User> {
+    const user = await this.findOneBy({ referralId: referralId });
+
+    if (!user) {
+      throw new NotFoundException(`Can't find user with referralId ${referralId}`);
+    }
+
+    return user;
   }
 }
