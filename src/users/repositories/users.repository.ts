@@ -19,19 +19,19 @@ export class UsersRepository extends Repository<User> {
     return user;
   }
 
-  async updateUserAgeRange(userId: number, ageRange: string) {
+  async updateAgeRange(userId: number, ageRange: string) {
     await this.update({ id: userId }, { ageRange });
   }
 
-  async updateUserGender(userId: number, gender: string) {
+  async updateGender(userId: number, gender: string) {
     await this.update({ id: userId }, { gender });
   }
 
-  async updateUserRefreshToken(userId: number, refreshToken: string) {
+  async updateRefreshToken(userId: number, refreshToken: string) {
     await this.update({ id: userId }, { refreshToken });
   }
 
-  async deleteUserRefreshToken(userId: number) {
+  async deleteRefreshToken(userId: number) {
     await this.update({ id: userId }, { refreshToken: null });
   }
 

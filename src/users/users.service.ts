@@ -20,19 +20,19 @@ export class UsersService {
   }
 
   async updateUserAgeRange(userId: number, ageRange: string) {
-    return this.userRepository.updateUserAgeRange(userId, ageRange);
+    return this.userRepository.updateAgeRange(userId, ageRange);
   }
 
   async updateUserGender(userId: number, gender: string) {
-    return this.userRepository.updateUserGender(userId, gender);
+    return this.userRepository.updateGender(userId, gender);
   }
 
   async updateUserRefreshToken(userId: number, refreshToken: string) {
-    return this.userRepository.updateUserRefreshToken(userId, refreshToken);
+    return this.userRepository.updateRefreshToken(userId, refreshToken);
   }
 
   async deleteUserRefreshToken(userId: number) {
-    return this.userRepository.deleteUserRefreshToken(userId);
+    return this.userRepository.deleteRefreshToken(userId);
   }
 
   async getUserById(userId: number): Promise<User> {
