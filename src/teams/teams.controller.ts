@@ -23,7 +23,7 @@ import {
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { ApiOperation } from '@nestjs/swagger';
 import { ApiTags } from '@nestjs/swagger/dist';
-import { Controller, Get, Post, Patch, Delete, Put, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, UseGuards } from '@nestjs/common';
 import { UpdateTeamDto } from './dtos/update-team.dto';
 
 @ApiTags('TEAM')
@@ -104,7 +104,7 @@ export class TeamsController {
     description: 'request body에 수정이 필요한 프로퍼티만 보내주시면 됩니다',
   })
   @ApiOkResponse({ description: 'OK' })
-  @Patch('/:teamId')
+  @Patch(':teamId')
   @UseGuards(AccessTokenGuard)
   patchTeamsTeamId(@Param('teamId') teamId: number, @Body() updateTeamDto: UpdateTeamDto) {}
 
@@ -113,7 +113,7 @@ export class TeamsController {
     summary: '매칭 중단하기',
   })
   @ApiOkResponse({ description: 'OK' })
-  @Delete('/:teamId')
+  @Delete(':teamId')
   @UseGuards(AccessTokenGuard)
   deleteTeamsTeamId(@Param('teamId') teamId: number) {}
 
@@ -126,7 +126,7 @@ export class TeamsController {
     type: GetTeamDto,
   })
   @ApiForbiddenResponse({ description: 'Forbidden' })
-  @Get('/:teamId')
+  @Get(':teamId')
   @UseGuards(AccessTokenGuard)
   getTeamsTeamId(@Param('teamId') teamId: number) {}
 
@@ -152,65 +152,7 @@ export class TeamsController {
       },
     },
   })
-  @Get('/:teamId/matching-id')
+  @Get(':teamId/matching-id')
   @UseGuards(AccessTokenGuard)
   getTeamsTeamIdMatchingId(@Param('teamId') teamId: number) {}
-
-  @ApiBearerAuth()
-  @ApiOperation({
-    summary: '신청자 조회',
-    description:
-      '관리자페이지 내 사용 \n\n 아직 매칭되지 않은 경우 partnerTeamId와 matchedAt은 null 반환 \n\n 거절당하지 않은 경우 refusedAt은 null 반환',
-  })
-  @ApiQuery({ name: 'status', enum: TeamStatus })
-  @ApiQuery({ name: 'membercount', enum: ['2', '3'] })
-  @ApiQuery({ name: 'gender', enum: TeamGender })
-  @ApiOkResponse({
-    schema: {
-      example: {
-        teams: [
-          {
-            id: 1,
-            ownerId: 1,
-            intro: '안녕하세요',
-            currentRound: 1,
-            createdAt: '2023-01-20T21:37:26.886Z',
-            nickname: '미팅이1',
-            phone: '01012345678',
-            partnerTeamId: 1,
-            matchedAt: '2023-01-20T21:37:26.886Z',
-            refusedAt: '2023-01-20T21:37:26.886Z',
-          },
-          {
-            id: 2,
-            ownerId: 3,
-            intro: '안녕하세요',
-            currentRound: 1,
-            createdAt: '2023-01-20T21:37:26.886Z',
-            nickname: '미팅이2',
-            phone: '01012345678',
-            partnerTeamId: null,
-            matchedAt: null,
-            refusedAt: null,
-          },
-        ],
-      },
-    },
-  })
-  @Get()
-  @UseGuards(AccessTokenGuard)
-  getTeams(
-    @Query('status') status: TeamStatus,
-    @Query('membercount') membercount: '2' | '3',
-    @Query('gender') gender: TeamGender,
-  ) {}
-
-  @ApiBearerAuth()
-  @ApiOperation({
-    summary: '삭제 적용(매칭 실패 처리) -- 보류',
-    description: '관리자페이지 내 사용 \n\n currentRount = startRound + 3',
-  })
-  @Put(':teamId/fail')
-  @UseGuards(AccessTokenGuard)
-  putTeamsTeamIdFail() {}
 }

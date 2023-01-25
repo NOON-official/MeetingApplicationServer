@@ -206,42 +206,4 @@ export class UsersController {
   @Get(':userId/team-id')
   @UseGuards(AccessTokenGuard)
   getUsersUserIdTeamId(@Param('userId') userId: number) {}
-
-  @ApiOperation({
-    summary: '유저 전체 조회',
-    description: '관리자 페이지 내 사용',
-  })
-  @ApiOkResponse({
-    schema: {
-      example: {
-        users: [
-          {
-            id: 1,
-            nickname: '미팅이1',
-            status: '신청대기',
-            phone: '01012345678',
-            createdAt: '2023-01-2023-01-20T21:37:26.886Z',
-            referralId: 'LD4GSTO3',
-            ticketCount: 5,
-            discount50CouponCount: 1,
-            freeCouponCount: 0,
-          },
-          {
-            id: 1,
-            nickname: '미팅이2',
-            status: '진행중',
-            phone: '01012345678',
-            createdAt: '2023-01-2023-01-20T21:37:26.886Z',
-            referralId: 'LD4GSTO3',
-            ticketCount: 5,
-            discount50CouponCount: 1,
-            freeCouponCount: 0,
-          },
-        ],
-      },
-    },
-  })
-  @Get()
-  @UseGuards(AccessTokenGuard)
-  getUsers() {}
 }

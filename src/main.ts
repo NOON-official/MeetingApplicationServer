@@ -24,6 +24,7 @@ async function bootstrap() {
     .addTag('COUPON')
     .addTag('INVITATION')
     .addTag('MATCHING')
+    .addTag('ADMIN')
     .addBearerAuth()
     .addCookieAuth('refresh')
     .build();
