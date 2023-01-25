@@ -94,4 +94,8 @@ export class AuthService {
 
     res.clearCookie('refresh').status(200).send('OK');
   }
+
+  async deleteAccount(userId: number): Promise<void> {
+    return await this.userService.deleteAccount(userId);
+  }
 }

@@ -93,5 +93,7 @@ export class AuthController {
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @Delete('account')
   @UseGuards(AccessTokenGuard)
-  deleteAuthAccount() {}
+  deleteAuthAccount(@GetUser() user: PassportUser) {
+    return this.authService.deleteAccount(user.sub);
+  }
 }

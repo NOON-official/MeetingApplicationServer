@@ -38,4 +38,8 @@ export class UsersService {
   async getUserById(userId: number): Promise<User> {
     return this.userRepository.getUserById(userId);
   }
+
+  async deleteAccount(userId: number): Promise<void> {
+    return this.userRepository.deleteAccountByUserId(userId);
+  }
 }

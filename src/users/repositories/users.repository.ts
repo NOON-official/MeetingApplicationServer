@@ -2,6 +2,7 @@ import { User } from './../entities/user.entity';
 import { CreateUserDto } from './../dtos/create-user.dto';
 import { CustomRepository } from 'src/database/typeorm-ex.decorator';
 import { Repository } from 'typeorm';
+import { NotFoundException } from '@nestjs/common';
 
 @CustomRepository(User)
 export class UsersRepository extends Repository<User> {
@@ -36,6 +37,20 @@ export class UsersRepository extends Repository<User> {
 
   async getUserById(userId: number): Promise<User> {
     const user = await this.findOneBy({ id: userId });
+
+    if (!user) {
+      throw new NotFoundException(`Can't find Board with id ${userId}`);
+    }
+
     return user;
+  }
+
+  async deleteAccountByUserId(userId: number): Promise<void> {
+    await this.getUserById(userId); // 유저 존재 확인
+
+    const result = await this.softDelete({ id: userId });
+    if (result.affected === 0) {
+      throw new NotFoundException(`Can't find user with id ${userId}`);
+    }
   }
 }
