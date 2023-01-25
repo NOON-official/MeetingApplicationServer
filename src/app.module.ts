@@ -9,6 +9,7 @@ import { MatchingsModule } from './matchings/matchings.module';
 import { InvitationsModule } from './invitations/invitations.module';
 import { CouponsModule } from './coupons/coupons.module';
 import { TicketsModule } from './tickets/tickets.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { TicketsModule } from './tickets/tickets.module';
     InvitationsModule,
     CouponsModule,
     TicketsModule,
+    AdminModule,
   ],
 })
 export class AppModule {}

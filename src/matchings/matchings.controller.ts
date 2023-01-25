@@ -8,12 +8,10 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger/dist';
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 import { GetMatchingDto } from './dtos/get-matching.dto';
 import { CreateMatchingRefuseReasonDto } from './dtos/create-matching-refuse-reason.dto';
-import { GetMatchingsDto } from './dtos/get-matchings.dto';
-
 @ApiTags('MATCHING')
 @ApiBearerAuth()
 @ApiUnauthorizedResponse({ description: 'Unauthorized' })
@@ -61,42 +59,4 @@ export class MatchingsController {
     @Param('teamId') teamId: number,
     @Body() createMatchingRefuseReasonDto: CreateMatchingRefuseReasonDto,
   ) {}
-
-  @ApiOperation({
-    summary: '매칭 적용(매칭 알고리즘)',
-    description: '관리자페이지 내 사용',
-  })
-  @ApiOkResponse({ description: 'OK' })
-  @Post()
-  @UseGuards(AccessTokenGuard)
-  postMatchings() {}
-
-  @ApiOperation({
-    summary: '매칭완료자 조회',
-    description: '관리자페이지 내 사용',
-  })
-  @ApiOkResponse({
-    type: [GetMatchingsDto],
-  })
-  @Get()
-  @UseGuards(AccessTokenGuard)
-  getMatchings() {}
-
-  @ApiOperation({
-    summary: '채팅방 생성 완료 일시 저장',
-    description: '관리자페이지 내 사용',
-  })
-  @ApiOkResponse({ description: 'OK' })
-  @Put(':matchingId/chat')
-  @UseGuards(AccessTokenGuard)
-  putMatchingsMatchingIdChat(@Param('matchingId') matchingId: number) {}
-
-  @ApiOperation({
-    summary: '매칭 삭제하기',
-    description: '관리자페이지-매칭완료자에서 사용 \n\n',
-  })
-  @ApiOkResponse({ description: 'OK' })
-  @Delete(':matchingId')
-  @UseGuards(AccessTokenGuard)
-  deleteMatchingMatchingId(@Param('matchingId') matchingId: number) {}
 }
