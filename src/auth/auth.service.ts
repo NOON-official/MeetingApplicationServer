@@ -1,7 +1,7 @@
-import { JwtPayload } from './dtos/jwt-payload.dto';
+import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt/dist';
-import { KakaoProfileDto } from './dtos/kakao-profile.dto';
+import { KakaoUser } from './interfaces/kakao-user.interface';
 import { UsersService } from './../users/users.service';
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { Response } from 'express';
@@ -32,7 +32,7 @@ export class AuthService {
     return refreshToken;
   }
 
-  async signInWithKakao(kakaoUser: KakaoProfileDto, res: Response): Promise<string> {
+  async signInWithKakao(kakaoUser: KakaoUser, res: Response): Promise<string> {
     let user = await this.userService.getUserByKakaoUid(kakaoUser.kakaoUid);
 
     // 회원가입X
@@ -90,7 +90,12 @@ export class AuthService {
   }
 
   async signOut(userId: number, res: Response): Promise<void> {
-    res.clearCookie('refresh');
-    return await this.userService.deleteUserRefreshToken(userId);
+    await this.userService.deleteUserRefreshToken(userId);
+
+    res.clearCookie('refresh').status(200).send('OK');
+  }
+
+  async deleteAccount(userId: number): Promise<void> {
+    return await this.userService.deleteAccount(userId);
   }
 }

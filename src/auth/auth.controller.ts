@@ -1,11 +1,12 @@
+import { PassportUser } from './interfaces/passport-user.interface';
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { AccessTokenGuard } from './guards/access-token.guard';
 import { RefreshTokenGuard } from './guards/refresh-token.guard';
 import { AuthService } from './auth.service';
-import { KakaoProfileDto } from './dtos/kakao-profile.dto';
-import { Controller, Get, HttpStatus, UseGuards, Req, Res, Redirect, Delete } from '@nestjs/common';
+import { KakaoUser } from './interfaces/kakao-user.interface';
+import { Controller, Get, HttpStatus, UseGuards, Res, Redirect, Delete } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger/dist';
 import {
   ApiCookieAuth,
@@ -16,6 +17,7 @@ import {
   ApiResponse,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger/dist/decorators';
+import { GetUser } from 'src/common/get-user.decorator';
 
 @ApiTags('AUTH')
 @Controller('auth')
@@ -41,10 +43,8 @@ export class AuthController {
   @Get('kakao/callback')
   @UseGuards(AuthGuard('kakao'))
   @Redirect()
-  async getAuthKakaoCallback(@Req() req, @Res() res: Response): Promise<{ url: string }> {
-    const kakaoUser: KakaoProfileDto = req.user;
-
-    const clientRedirectUrl = await this.authService.signInWithKakao(kakaoUser, res);
+  async getAuthKakaoCallback(@GetUser() user: KakaoUser, @Res() res: Response): Promise<{ url: string }> {
+    const clientRedirectUrl = await this.authService.signInWithKakao(user, res);
 
     return { url: clientRedirectUrl };
   }
@@ -67,8 +67,8 @@ export class AuthController {
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @Get('refresh')
   @UseGuards(RefreshTokenGuard)
-  getAuthRefresh(@Req() req: Request): Promise<{ accessToken: string }> {
-    return this.authService.refreshToken(req.user['sub'], req.user['refreshToken']);
+  getAuthRefresh(@GetUser() user: PassportUser): Promise<{ accessToken: string }> {
+    return this.authService.refreshToken(user['sub'], user['refreshToken']);
   }
 
   @ApiOperation({
@@ -80,8 +80,8 @@ export class AuthController {
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @Get('signout')
   @UseGuards(AccessTokenGuard)
-  getAuthSignout(@Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<void> {
-    return this.authService.signOut(req.user['sub'], res);
+  getAuthSignout(@GetUser() user: PassportUser, @Res({ passthrough: true }) res: Response): Promise<void> {
+    return this.authService.signOut(user['sub'], res);
   }
 
   @ApiOperation({
@@ -93,5 +93,7 @@ export class AuthController {
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @Delete('account')
   @UseGuards(AccessTokenGuard)
-  deleteAuthAccount() {}
+  deleteAuthAccount(@GetUser() user: PassportUser) {
+    return this.authService.deleteAccount(user.sub);
+  }
 }

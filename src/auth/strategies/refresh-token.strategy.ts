@@ -1,4 +1,4 @@
-import { JwtPayload } from '../dtos/jwt-payload.dto';
+import { JwtPayload } from '../interfaces/jwt-payload.interface';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
