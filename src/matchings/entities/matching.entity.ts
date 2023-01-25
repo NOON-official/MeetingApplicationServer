@@ -1,25 +1,23 @@
+import { Team } from './../../teams/entities/team.entity';
 import {
   BaseEntity,
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
+  OneToOne,
   PrimaryGeneratedColumn,
   Unique,
   UpdateDateColumn,
 } from 'typeorm';
+import { MatchingRefuseReason } from './matching-refuse-reason.entity';
 
 @Entity()
 @Unique(['id'])
 export class Matching extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
-
-  @Column({ type: 'int' })
-  maleTeamId: number;
-
-  @Column({ type: 'int' })
-  femaleTeamId: number;
 
   @Column({ type: 'tinyint', nullable: true })
   maleTeamIsAccepted: number;
@@ -38,4 +36,15 @@ export class Matching extends BaseEntity {
 
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt: Date;
+
+  @OneToOne(() => Team, { cascade: true })
+  @JoinColumn()
+  maleTeam: Team;
+
+  @OneToOne(() => Team, { cascade: true })
+  @JoinColumn()
+  femaleTeam: Team;
+
+  @OneToOne(() => MatchingRefuseReason, { cascade: true })
+  matchingRefuseReason: MatchingRefuseReason;
 }

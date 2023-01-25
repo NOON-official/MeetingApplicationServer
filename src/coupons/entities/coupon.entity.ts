@@ -1,9 +1,11 @@
+import { User } from 'src/users/entities/user.entity';
 import {
   BaseEntity,
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
   Unique,
   UpdateDateColumn,
@@ -14,9 +16,6 @@ import {
 export class Coupon extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
-
-  @Column({ type: 'int', nullable: true })
-  userId: number;
 
   @Column({ type: 'varchar', length: 30, nullable: true })
   code: string;
@@ -38,4 +37,7 @@ export class Coupon extends BaseEntity {
 
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt: Date;
+
+  @ManyToOne(() => User, (user) => user.coupons, { cascade: true })
+  user: User;
 }

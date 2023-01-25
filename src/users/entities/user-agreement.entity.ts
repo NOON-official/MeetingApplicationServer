@@ -1,21 +1,21 @@
+import { User } from 'src/users/entities/user.entity';
 import {
   BaseEntity,
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  OneToOne,
   PrimaryGeneratedColumn,
   Unique,
   UpdateDateColumn,
 } from 'typeorm';
 
 @Entity()
-@Unique(['id', 'userId'])
+@Unique(['id'])
 export class UserAgreement extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
-
-  @Column({ type: 'int' })
-  userId: number;
 
   @Column({ type: 'tinyint' })
   service: number;
@@ -34,4 +34,8 @@ export class UserAgreement extends BaseEntity {
 
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
+
+  @OneToOne(() => User, { cascade: true })
+  @JoinColumn()
+  user: User;
 }
