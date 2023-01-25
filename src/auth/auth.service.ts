@@ -9,7 +9,7 @@ import { Response } from 'express';
 @Injectable()
 export class AuthService {
   constructor(
-    private userService: UsersService,
+    private usersService: UsersService,
     private jwtService: JwtService,
     private configService: ConfigService,
   ) {}
@@ -33,21 +33,21 @@ export class AuthService {
   }
 
   async signInWithKakao(kakaoUser: KakaoUser, res: Response): Promise<string> {
-    let user = await this.userService.getUserByKakaoUid(kakaoUser.kakaoUid);
+    let user = await this.usersService.getUserByKakaoUid(kakaoUser.kakaoUid);
 
     // 회원가입X
     if (!user) {
       // DB에 유저 생성
-      user = await this.userService.createUser(kakaoUser);
+      user = await this.usersService.createUser(kakaoUser);
     }
     // 회원가입O
     else {
       // 유저 정보 업데이트
       if (!user.ageRange && kakaoUser.ageRange) {
-        await this.userService.updateUserAgeRange(user.id, kakaoUser.ageRange);
+        await this.usersService.updateUserAgeRange(user.id, kakaoUser.ageRange);
       }
       if (!user.gender && kakaoUser.gender) {
-        await this.userService.updateUserGender(user.id, kakaoUser.gender);
+        await this.usersService.updateUserGender(user.id, kakaoUser.gender);
       }
     }
 
@@ -58,7 +58,7 @@ export class AuthService {
     const refreshToken = await this.IssueRefreshToken(payload);
 
     // refresh token을 DB와 쿠키에저장
-    await this.userService.updateUserRefreshToken(user.id, refreshToken);
+    await this.usersService.updateUserRefreshToken(user.id, refreshToken);
 
     res.cookie('refresh', refreshToken, {
       signed: true, // 암호화
@@ -75,7 +75,7 @@ export class AuthService {
   }
 
   async refreshToken(userId: number, refreshToken: string): Promise<{ accessToken: string }> {
-    const user = await this.userService.getUserById(userId);
+    const user = await this.usersService.getUserById(userId);
 
     // refresh token 검증
     if (!user || !user.refreshToken || user.refreshToken !== refreshToken) {
@@ -90,12 +90,12 @@ export class AuthService {
   }
 
   async signOut(userId: number, res: Response): Promise<void> {
-    await this.userService.deleteUserRefreshToken(userId);
+    await this.usersService.deleteUserRefreshToken(userId);
 
     res.clearCookie('refresh').status(200).send('OK');
   }
 
   async deleteAccount(userId: number): Promise<void> {
-    return await this.userService.deleteAccount(userId);
+    return await this.usersService.deleteAccount(userId);
   }
 }

@@ -22,7 +22,7 @@ import { Body, Param, Post, Put } from '@nestjs/common/decorators';
 @ApiNotFoundResponse({ description: 'Not Found' })
 @Controller('users')
 export class UsersController {
-  constructor(private userService: UsersService) {}
+  constructor(private usersService: UsersService) {}
 
   @ApiOperation({
     summary: '친구 초대 횟수 조회',
