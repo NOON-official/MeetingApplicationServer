@@ -1,9 +1,16 @@
+import { Ticket } from './../../tickets/entities/ticket.entity';
+import { User } from 'src/users/entities/user.entity';
+import { Coupon } from 'src/coupons/entities/coupon.entity';
 import {
   BaseEntity,
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   Unique,
   UpdateDateColumn,
@@ -15,9 +22,6 @@ export class Order extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
 
-  @Column({ type: 'int' })
-  userId: number;
-
   @Column({ type: 'varchar', length: 30, nullable: true })
   paymentId: string;
 
@@ -26,9 +30,6 @@ export class Order extends BaseEntity {
 
   @Column({ type: 'int' })
   amount: number;
-
-  @Column({ type: 'int', nullable: true })
-  couponId: number;
 
   @Column({ type: 'timestamp', nullable: true })
   refundedAt: Date;
@@ -41,4 +42,14 @@ export class Order extends BaseEntity {
 
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt: Date;
+
+  @ManyToOne(() => User, (user) => user.orders, { cascade: true })
+  user: User;
+
+  @OneToOne(() => Coupon, { cascade: true })
+  @JoinColumn()
+  coupon: Coupon;
+
+  @OneToMany(() => Ticket, (ticket) => ticket.order)
+  tickets: Ticket[];
 }

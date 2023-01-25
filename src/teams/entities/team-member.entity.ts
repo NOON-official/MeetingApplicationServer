@@ -1,13 +1,11 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { Team } from './team.entity';
 
 @Entity()
 @Unique(['id'])
 export class TeamMember extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
-
-  @Column({ type: 'int' })
-  teamId: number;
 
   @Column({ type: 'int' })
   role: number;
@@ -20,4 +18,7 @@ export class TeamMember extends BaseEntity {
 
   @Column({ type: 'int' })
   age: number;
+
+  @ManyToOne(() => Team, (team) => team.teamMembers, { cascade: true })
+  team: Team;
 }

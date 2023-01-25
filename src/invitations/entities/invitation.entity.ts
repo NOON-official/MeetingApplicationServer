@@ -1,9 +1,10 @@
+import { User } from 'src/users/entities/user.entity';
 import {
   BaseEntity,
-  Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
@@ -14,15 +15,15 @@ export class Invitation extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
 
-  @Column({ type: 'int' })
-  inviterId: number;
-
-  @Column({ type: 'int' })
-  inviteeId: number;
-
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt: Date;
+
+  @ManyToOne(() => User, (user) => user.inviter, { cascade: true })
+  inviter: User;
+
+  @ManyToOne(() => User, (user) => user.invitee, { cascade: true })
+  invitee: User;
 }

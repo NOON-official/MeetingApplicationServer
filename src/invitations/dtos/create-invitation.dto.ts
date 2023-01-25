@@ -1,22 +1,22 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsInt } from 'class-validator';
+import { IsNotEmpty, IsInt, IsString } from 'class-validator';
 
 export class CreateInvitationDto {
   @ApiProperty({
-    description: '초대한 유저 ID',
+    description: '초대받은(로그인 한) 유저 ID',
     example: 1,
     required: true,
   })
   @IsNotEmpty()
   @IsInt()
-  readonly inviterId: number;
+  readonly userId: number;
 
   @ApiProperty({
-    description: '초대받은 유저 ID',
-    example: 2,
+    description: '추천인 코드',
+    example: 'LD4GSTO3',
     required: true,
   })
   @IsNotEmpty()
-  @IsInt()
-  readonly inviteeId: number;
+  @IsString()
+  readonly referralId: string;
 }

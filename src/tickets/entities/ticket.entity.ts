@@ -1,9 +1,12 @@
+import { User } from 'src/users/entities/user.entity';
+import { Order } from './../../orders/entities/order.entity';
 import {
   BaseEntity,
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
   Unique,
   UpdateDateColumn,
@@ -14,12 +17,6 @@ import {
 export class Ticket extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
-
-  @Column({ type: 'int' })
-  userId: number;
-
-  @Column({ type: 'int', nullable: true })
-  orderId: number;
 
   @Column({ type: 'timestamp', nullable: true })
   usedAt: Date;
@@ -32,4 +29,10 @@ export class Ticket extends BaseEntity {
 
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt: Date;
+
+  @ManyToOne(() => User, (user) => user.tickets, { cascade: true })
+  user: User;
+
+  @ManyToOne(() => Order, (order) => order.tickets, { cascade: true })
+  order: Order;
 }

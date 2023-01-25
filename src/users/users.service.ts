@@ -5,10 +5,10 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class UsersService {
-  constructor(private userRepository: UsersRepository) {}
+  constructor(private usersRepository: UsersRepository) {}
 
   async getUserByKakaoUid(kakaoUid: number): Promise<User> {
-    return this.userRepository.getUserByKakaoUid(kakaoUid);
+    return this.usersRepository.getUserByKakaoUid(kakaoUid);
   }
 
   async createUser(kakaoUser: KakaoUser): Promise<User> {
@@ -16,30 +16,34 @@ export class UsersService {
 
     const userData = { ...kakaoUser, referralId };
 
-    return this.userRepository.createUser(userData);
+    return this.usersRepository.createUser(userData);
   }
 
   async updateUserAgeRange(userId: number, ageRange: string) {
-    return this.userRepository.updateAgeRange(userId, ageRange);
+    return this.usersRepository.updateAgeRange(userId, ageRange);
   }
 
   async updateUserGender(userId: number, gender: string) {
-    return this.userRepository.updateGender(userId, gender);
+    return this.usersRepository.updateGender(userId, gender);
   }
 
   async updateUserRefreshToken(userId: number, refreshToken: string) {
-    return this.userRepository.updateRefreshToken(userId, refreshToken);
+    return this.usersRepository.updateRefreshToken(userId, refreshToken);
   }
 
   async deleteUserRefreshToken(userId: number) {
-    return this.userRepository.deleteRefreshToken(userId);
+    return this.usersRepository.deleteRefreshToken(userId);
   }
 
   async getUserById(userId: number): Promise<User> {
-    return this.userRepository.getUserById(userId);
+    return this.usersRepository.getUserById(userId);
   }
 
   async deleteAccount(userId: number): Promise<void> {
-    return this.userRepository.deleteAccountByUserId(userId);
+    return this.usersRepository.deleteAccountByUserId(userId);
+  }
+
+  async getUserByReferralId(referralId: string): Promise<User> {
+    return this.usersRepository.getUserByReferralId(referralId);
   }
 }
