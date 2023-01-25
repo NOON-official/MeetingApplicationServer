@@ -1,4 +1,4 @@
-import { KakaoProfileDto } from '../auth/dtos/kakao-profile.dto';
+import { KakaoUser } from './../auth/interfaces/kakao-user.interface';
 import { User } from './entities/user.entity';
 import { UsersRepository } from './repositories/users.repository';
 import { Injectable } from '@nestjs/common';
@@ -11,7 +11,7 @@ export class UsersService {
     return this.userRepository.getUserByKakaoUid(kakaoUid);
   }
 
-  async createUser(kakaoUser: KakaoProfileDto): Promise<User> {
+  async createUser(kakaoUser: KakaoUser): Promise<User> {
     const referralId = new Date().getTime().toString(36).toUpperCase(); // 추천인 코드 생성
 
     const userData = { ...kakaoUser, referralId };

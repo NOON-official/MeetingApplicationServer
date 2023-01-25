@@ -1,4 +1,4 @@
-import { KakaoProfileDto } from '../dtos/kakao-profile.dto';
+import { KakaoUser } from './../interfaces/kakao-user.interface';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
@@ -16,7 +16,7 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
   async validate(accessToken: string, refreshToken: string, profile: Profile, done: any) {
     const kakaoUser = profile._json;
 
-    const payload: KakaoProfileDto = {
+    const payload: KakaoUser = {
       kakaoUid: kakaoUser.id,
       nickname: kakaoUser.properties.nickname,
       ageRange:
