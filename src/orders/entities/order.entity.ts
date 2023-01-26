@@ -43,13 +43,13 @@ export class Order extends BaseEntity {
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt: Date;
 
-  @ManyToOne(() => User, (user) => user.orders, { cascade: true })
+  @ManyToOne(() => User, (user) => user.orders, { onDelete: 'CASCADE' })
   user: User;
 
   @OneToOne(() => Coupon, { cascade: true })
   @JoinColumn()
   coupon: Coupon;
 
-  @OneToMany(() => Ticket, (ticket) => ticket.order)
+  @OneToMany(() => Ticket, (ticket) => ticket.order, { cascade: true })
   tickets: Ticket[];
 }

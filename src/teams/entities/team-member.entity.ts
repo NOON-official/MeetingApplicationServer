@@ -19,6 +19,6 @@ export class TeamMember extends BaseEntity {
   @Column({ type: 'int' })
   age: number;
 
-  @ManyToOne(() => Team, (team) => team.teamMembers, { cascade: true })
+  @ManyToOne(() => Team, (team) => team.teamMembers, { onDelete: 'CASCADE' })
   team: Team;
 }

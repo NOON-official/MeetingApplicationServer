@@ -10,6 +10,6 @@ export class TeamAvailableDate extends BaseEntity {
   @Column({ type: 'date' })
   teamAvailableDate: Date;
 
-  @ManyToOne(() => Team, (team) => team.teamAvailableDates, { cascade: true })
+  @ManyToOne(() => Team, (team) => team.teamAvailableDates, { onDelete: 'CASCADE' })
   team: Team;
 }

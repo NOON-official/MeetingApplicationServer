@@ -56,22 +56,22 @@ export class User extends BaseEntity {
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt: Date;
 
-  @OneToMany(() => Coupon, (coupon) => coupon.user)
+  @OneToMany(() => Coupon, (coupon) => coupon.user, { cascade: true })
   coupons: Coupon[];
 
-  @OneToMany(() => Order, (order) => order.user)
+  @OneToMany(() => Order, (order) => order.user, { cascade: true })
   orders: Order[];
 
-  @OneToMany(() => Ticket, (ticket) => ticket.user)
+  @OneToMany(() => Ticket, (ticket) => ticket.user, { cascade: true })
   tickets: Ticket[];
 
-  @OneToMany(() => Invitation, (invitation) => invitation.inviter)
+  @OneToMany(() => Invitation, (invitation) => invitation.inviter, { cascade: true })
   inviter: Invitation[];
 
-  @OneToMany(() => Invitation, (invitation) => invitation.invitee)
+  @OneToMany(() => Invitation, (invitation) => invitation.invitee, { cascade: true })
   invitee: Invitation[];
 
-  @OneToMany(() => Team, (team) => team.user)
+  @OneToMany(() => Team, (team) => team.user, { cascade: true })
   teams: Team[];
 
   @OneToOne(() => UserAgreement, { cascade: true })
