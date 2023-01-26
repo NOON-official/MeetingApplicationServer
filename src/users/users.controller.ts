@@ -14,7 +14,9 @@ import {
 import { UsersService } from './users.service';
 import { Controller, Get } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
-import { Body, Param, Post, Put } from '@nestjs/common/decorators';
+import { Body, Post, Put } from '@nestjs/common/decorators';
+import { GetUser } from 'src/common/get-user.decorator';
+import { PassportUser } from 'src/auth/interfaces/passport-user.interface';
 
 @ApiTags('USER')
 @ApiBearerAuth()
@@ -35,10 +37,10 @@ export class UsersController {
       },
     },
   })
-  @Get(':userId/invitations/count')
+  @Get('invitations/count')
   @UseGuards(AccessTokenGuard)
-  getUsersUserIdInvitationsCount(@Param('userId') userId: number) {
-    return this.usersService.getInvitationCountByUserId(userId);
+  getUsersInvitationsCount(@GetUser() user: PassportUser) {
+    return this.usersService.getInvitationCountByUserId(user.sub);
   }
 
   @ApiOperation({
@@ -51,10 +53,10 @@ export class UsersController {
       },
     },
   })
-  @Get(':userId/referral-id')
+  @Get('referral-id')
   @UseGuards(AccessTokenGuard)
-  getUsersUserIdReferralId(@Param('userId') userId: number) {
-    return this.usersService.getReferralIdByUserId(userId);
+  getUsersReferralId(@GetUser() user: PassportUser) {
+    return this.usersService.getReferralIdByUserId(user.sub);
   }
 
   @ApiOperation({
@@ -69,10 +71,10 @@ export class UsersController {
       },
     },
   })
-  @Get(':userId/my-info')
+  @Get('my-info')
   @UseGuards(AccessTokenGuard)
-  getUsersUserIdMyInfo(@Param('userId') userId: number) {
-    return this.usersService.getMyInfoByUserId(userId);
+  getUsersMyInfo(@GetUser() user: PassportUser) {
+    return this.usersService.getMyInfoByUserId(user.sub);
   }
 
   @ApiOperation({
@@ -89,9 +91,9 @@ export class UsersController {
       },
     },
   })
-  @Get(':userId/teams')
+  @Get('teams')
   @UseGuards(AccessTokenGuard)
-  getUsersUserIdTeams(@Param('userId') userId: number) {}
+  getUsersTeams(@GetUser() user: PassportUser) {}
 
   @ApiOperation({
     summary: '전화번호 변경',
@@ -103,9 +105,9 @@ export class UsersController {
       },
     },
   })
-  @Put(':userId/phone')
+  @Put('phone')
   @UseGuards(AccessTokenGuard)
-  putUsersUserIdPhone(@Param('userId') userId: number, @Body() updatePhoneDto: UpdatePhoneDto) {}
+  putUsersPhone(@GetUser() user: PassportUser, @Body() updatePhoneDto: UpdatePhoneDto) {}
 
   @ApiOperation({
     summary: '미사용 이용권 개수 조회',
@@ -117,9 +119,9 @@ export class UsersController {
       },
     },
   })
-  @Get(':userId/tickets/count')
+  @Get('tickets/count')
   @UseGuards(AccessTokenGuard)
-  getUsersUserIdTicketsCount(@Param('userId') userId: number) {}
+  getUsersTicketsCount(@GetUser() user: PassportUser) {}
 
   @ApiOperation({
     summary: '할인 쿠폰 개수 조회',
@@ -131,9 +133,9 @@ export class UsersController {
       },
     },
   })
-  @Get(':userId/coupons/count')
+  @Get('coupons/count')
   @UseGuards(AccessTokenGuard)
-  getUsersUserIdCouponsCount(@Param('userId') userId: number) {}
+  getUsersCouponsCount(@GetUser() user: PassportUser) {}
 
   @ApiOperation({
     summary: '보유 쿠폰 조회',
@@ -148,17 +150,17 @@ export class UsersController {
       },
     },
   })
-  @Get(':userId/coupons')
+  @Get('coupons')
   @UseGuards(AccessTokenGuard)
-  getUsersUserIdCoupons(@Param('userId') userId: number) {}
+  getUsersCoupons(@GetUser() user: PassportUser) {}
 
   @ApiOperation({
     summary: '이용 약관 동의',
   })
   @ApiCreatedResponse({ description: 'Created' })
-  @Post(':userId/agreements')
+  @Post('agreements')
   @UseGuards(AccessTokenGuard)
-  postUsersUserIdAgreements(@Param('userId') userId: number, @Body() createAgreementDto: CreateAgreementDto) {}
+  postUsersAgreements(@GetUser() user: PassportUser, @Body() createAgreementDto: CreateAgreementDto) {}
 
   @ApiOperation({
     summary: '이용 약관 동의 목록 조회',
@@ -177,9 +179,9 @@ export class UsersController {
       },
     },
   })
-  @Get(':userId/agreements')
+  @Get('agreements')
   @UseGuards(AccessTokenGuard)
-  getUsersUserIdAgreements(@Param('userId') userId: number) {}
+  getUsersAgreements(@GetUser() user: PassportUser) {}
 
   @ApiOperation({
     summary: '결제 내역 조회',
@@ -194,9 +196,9 @@ export class UsersController {
       },
     },
   })
-  @Get(':userId/orders')
+  @Get('orders')
   @UseGuards(AccessTokenGuard)
-  getUsersUserIdOrders(@Param('userId') userId: number) {}
+  getUsersOrders(@GetUser() user: PassportUser) {}
 
   @ApiOperation({
     summary: '유저의 팀ID 조회',
@@ -209,7 +211,7 @@ export class UsersController {
       },
     },
   })
-  @Get(':userId/team-id')
+  @Get('team-id')
   @UseGuards(AccessTokenGuard)
-  getUsersUserIdTeamId(@Param('userId') userId: number) {}
+  getUsersTeamId(@GetUser() user: PassportUser) {}
 }
