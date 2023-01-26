@@ -71,4 +71,16 @@ export class UsersRepository extends Repository<User> {
 
     return { referralId };
   }
+
+  async getMyInfoByUserId(userId: number): Promise<{ nickname: string; phone: string }> {
+    await this.getUserById(userId);
+
+    const { nickname, phone } = await this.createQueryBuilder('user')
+      .select('user.nickname')
+      .addSelect('user.phone')
+      .where('user.id = :userId', { userId })
+      .getOne();
+
+    return { nickname, phone };
+  }
 }

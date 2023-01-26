@@ -71,7 +71,9 @@ export class UsersController {
   })
   @Get(':userId/my-info')
   @UseGuards(AccessTokenGuard)
-  getUsersUserIdMyInfo(@Param('userId') userId: number) {}
+  getUsersUserIdMyInfo(@Param('userId') userId: number) {
+    return this.usersService.getMyInfoByUserId(userId);
+  }
 
   @ApiOperation({
     summary: '신청 내역 조회',
