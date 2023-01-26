@@ -53,7 +53,9 @@ export class UsersController {
   })
   @Get(':userId/referral-id')
   @UseGuards(AccessTokenGuard)
-  getUsersUserIdReferralId(@Param('userId') userId: number) {}
+  getUsersUserIdReferralId(@Param('userId') userId: number) {
+    return this.usersService.getReferralIdByUserId(userId);
+  }
 
   @ApiOperation({
     summary: '내 정보 조회',
@@ -69,7 +71,9 @@ export class UsersController {
   })
   @Get(':userId/my-info')
   @UseGuards(AccessTokenGuard)
-  getUsersUserIdMyInfo(@Param('userId') userId: number) {}
+  getUsersUserIdMyInfo(@Param('userId') userId: number) {
+    return this.usersService.getMyInfoByUserId(userId);
+  }
 
   @ApiOperation({
     summary: '신청 내역 조회',
