@@ -63,4 +63,12 @@ export class UsersRepository extends Repository<User> {
 
     return user;
   }
+
+  async getReferralIdByUserId(userId: number): Promise<{ referralId: string }> {
+    await this.getUserById(userId);
+
+    const referralId = (await this.findOneBy({ id: userId })).referralId;
+
+    return { referralId };
+  }
 }

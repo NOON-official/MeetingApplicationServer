@@ -62,4 +62,8 @@ export class UsersService {
 
     return { invitationCount };
   }
+
+  async getReferralIdByUserId(userId: number): Promise<{ referralId: string }> {
+    return this.usersRepository.getReferralIdByUserId(userId);
+  }
 }
