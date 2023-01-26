@@ -1,3 +1,6 @@
+import { PassportUser } from './../auth/interfaces/passport-user.interface';
+import { GetUser } from './../common/get-user.decorator';
+import { TeamsService } from './teams.service';
 import { GetTeamDto } from './dtos/get-team.dto';
 import { CreateTeamDto } from './dtos/create-team.dto';
 import { Vibes } from './constants/Vibes';
@@ -31,6 +34,8 @@ import { UpdateTeamDto } from './dtos/update-team.dto';
 @ApiNotFoundResponse({ description: 'Not Found' })
 @Controller('teams')
 export class TeamsController {
+  constructor(private teamsService: TeamsService) {}
+
   @ApiOperation({
     summary: '주간 사용자 수 조회',
     description: '팀 수 * 멤버 수',
@@ -96,7 +101,9 @@ export class TeamsController {
   @ApiCreatedResponse({ description: 'Created' })
   @Post()
   @UseGuards(AccessTokenGuard)
-  postTeams(@Body() createTeamDto: CreateTeamDto) {}
+  postTeams(@Body() createTeamDto: CreateTeamDto, @GetUser() user: PassportUser): Promise<void> {
+    return this.teamsService.createTeam(createTeamDto, user.sub);
+  }
 
   @ApiBearerAuth()
   @ApiOperation({

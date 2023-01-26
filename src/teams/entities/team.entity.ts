@@ -2,7 +2,6 @@ import { TeamMember } from './team-member.entity';
 import { TeamAvailableDate } from './team-available-date.entity';
 import { MatchingRefuseReason } from './../../matchings/entities/matching-refuse-reason.entity';
 import { Matching } from './../../matchings/entities/matching.entity';
-import { TeamPrefVibe } from './team-pref-vibe.enum';
 import {
   BaseEntity,
   Column,
@@ -31,11 +30,11 @@ export class Team extends BaseEntity {
   @Column({ type: 'int' })
   memberCount: number;
 
-  @Column({ type: 'varchar', length: 255 })
-  university: string;
+  @Column({ type: 'json' })
+  university: number[];
 
-  @Column({ type: 'varchar', length: 255 })
-  area: string;
+  @Column({ type: 'json' })
+  area: number[];
 
   @Column({ type: 'text' })
   intro: string;
@@ -52,8 +51,8 @@ export class Team extends BaseEntity {
   @Column({ type: 'int' })
   prefMaxAge: number;
 
-  @Column({ type: 'enum', enum: TeamPrefVibe })
-  prefVibe: string;
+  @Column({ type: 'json' })
+  prefVibe: number[];
 
   @Column({ type: 'int' })
   startRound: number;
