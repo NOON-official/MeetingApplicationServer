@@ -53,20 +53,11 @@ export class CreateMemberDto {
   @IsNotEmpty()
   @IsInt()
   @Min(19)
-  @Max(20)
+  @Max(29)
   readonly age: number;
 }
 
 export class CreateTeamDto {
-  @ApiProperty({
-    description: '팀 생성하는 유저아이디',
-    example: 1,
-    required: true,
-  })
-  @IsNotEmpty()
-  @IsInt()
-  readonly ownerId: number;
-
   @ApiProperty({
     description: '성별',
     example: 1,
@@ -96,18 +87,19 @@ export class CreateTeamDto {
   })
   @IsInt({ each: true })
   @Min(1, { each: true })
-  @Max(4, { each: true })
+  @Max(450, { each: true })
   @ArrayMinSize(0)
   @ArrayMaxSize(3)
   readonly university?: number[];
 
   @ApiProperty({
     description: '미팅 선호 날짜',
-    example: ['2023-01-22', '2023-01-23', '2023-01-24'],
+    example: ['2023-01-23', '2023-01-24', '2023-01-25', '2023-01-26'],
     required: true,
   })
   @IsNotEmpty()
   @IsDate({ each: true })
+  @Type(() => Date)
   @ArrayMinSize(4)
   readonly availableDate: Date[];
 
