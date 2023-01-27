@@ -17,19 +17,31 @@ import {
 } from 'typeorm';
 
 @Entity()
-@Unique(['id', 'paymentId'])
+@Unique(['id', 'tossPaymentKey', 'tossOrderId'])
 export class Order extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
-
-  @Column({ type: 'varchar', length: 30, nullable: true })
-  paymentId: string;
 
   @Column({ type: 'int' })
   type: number;
 
   @Column({ type: 'int' })
-  amount: number;
+  price: number;
+
+  @Column({ type: 'int' })
+  discountAmount: number;
+
+  @Column({ type: 'int' })
+  totalAmount: number;
+
+  @Column({ type: 'varchar', length: 30, nullable: true })
+  tossPaymentKey: string;
+
+  @Column({ type: 'varchar', length: 30, nullable: true })
+  tossOrderId: string;
+
+  @Column({ type: 'int', nullable: true })
+  tossAmount: string;
 
   @Column({ type: 'timestamp', nullable: true })
   refundedAt: Date;
