@@ -69,19 +69,22 @@ export class Team extends BaseEntity {
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt: Date;
 
-  @OneToOne(() => Matching, { cascade: true })
-  matching: Matching;
+  @OneToOne(() => Matching, (matching) => matching.maleTeam, { cascade: true, eager: true })
+  maleTeamMatching: Matching;
+
+  @OneToOne(() => Matching, (matching) => matching.femaleTeam, { cascade: true, eager: true })
+  femaleTeamMatching: Matching;
 
   @OneToOne(() => MatchingRefuseReason, { cascade: true })
   matchingRefuseReason: MatchingRefuseReason;
 
-  @OneToMany(() => TeamAvailableDate, (teamAvailableDate) => teamAvailableDate.team)
+  @OneToMany(() => TeamAvailableDate, (teamAvailableDate) => teamAvailableDate.team, { cascade: true })
   teamAvailableDates: TeamAvailableDate[];
 
-  @OneToMany(() => TeamMember, (teamMember) => teamMember.team)
+  @OneToMany(() => TeamMember, (teamMember) => teamMember.team, { cascade: true })
   teamMembers: TeamMember[];
 
-  @ManyToOne(() => User, (user) => user.teams, { cascade: true })
+  @ManyToOne(() => User, (user) => user.teams, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'ownerId' })
   user: User;
 }

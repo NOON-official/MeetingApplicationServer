@@ -38,6 +38,6 @@ export class Coupon extends BaseEntity {
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt: Date;
 
-  @ManyToOne(() => User, (user) => user.coupons, { cascade: true })
+  @ManyToOne(() => User, (user) => user.coupons, { onDelete: 'CASCADE' })
   user: User;
 }

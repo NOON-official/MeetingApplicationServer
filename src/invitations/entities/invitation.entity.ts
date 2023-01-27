@@ -21,9 +21,9 @@ export class Invitation extends BaseEntity {
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt: Date;
 
-  @ManyToOne(() => User, (user) => user.inviter, { cascade: true })
+  @ManyToOne(() => User, (user) => user.inviter, { onDelete: 'CASCADE' })
   inviter: User;
 
-  @ManyToOne(() => User, (user) => user.invitee, { cascade: true })
+  @ManyToOne(() => User, (user) => user.invitee, { onDelete: 'CASCADE' })
   invitee: User;
 }
