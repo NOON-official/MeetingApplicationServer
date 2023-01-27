@@ -1,3 +1,4 @@
+import { PassportUser } from './../auth/interfaces/passport-user.interface';
 import { InvitationsService } from './invitations.service';
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { ApiOperation } from '@nestjs/swagger';
@@ -11,6 +12,7 @@ import {
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 import { CreateInvitationDto } from './dtos/create-invitation.dto';
+import { GetUser } from 'src/common/get-user.decorator';
 
 @ApiTags('INVITATION')
 @ApiBearerAuth()
@@ -26,7 +28,7 @@ export class InvitationsController {
   @ApiCreatedResponse({ description: 'Created' })
   @Post()
   @UseGuards(AccessTokenGuard)
-  postInvitations(@Body() createInvitationDto: CreateInvitationDto) {
-    return this.invitationsService.createInvitation(createInvitationDto);
+  postInvitations(@GetUser() user: PassportUser, @Body() createInvitationDto: CreateInvitationDto) {
+    return this.invitationsService.createInvitation(user.sub, createInvitationDto);
   }
 }
