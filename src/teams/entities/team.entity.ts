@@ -69,8 +69,11 @@ export class Team extends BaseEntity {
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt: Date;
 
-  @OneToOne(() => Matching, { cascade: true })
-  matching: Matching;
+  @OneToOne(() => Matching, (matching) => matching.maleTeam, { cascade: true, eager: true })
+  maleTeamMatching: Matching;
+
+  @OneToOne(() => Matching, (matching) => matching.femaleTeam, { cascade: true, eager: true })
+  femaleTeamMatching: Matching;
 
   @OneToOne(() => MatchingRefuseReason, { cascade: true })
   matchingRefuseReason: MatchingRefuseReason;

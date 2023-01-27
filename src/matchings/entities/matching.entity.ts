@@ -37,11 +37,11 @@ export class Matching extends BaseEntity {
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt: Date;
 
-  @OneToOne(() => Team, { cascade: true })
+  @OneToOne(() => Team, (team) => team.maleTeamMatching, { onDelete: 'CASCADE' })
   @JoinColumn()
   maleTeam: Team;
 
-  @OneToOne(() => Team, { cascade: true })
+  @OneToOne(() => Team, (team) => team.femaleTeamMatching, { onDelete: 'CASCADE' })
   @JoinColumn()
   femaleTeam: Team;
 

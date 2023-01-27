@@ -1,3 +1,4 @@
+import { UserTeam } from './interfaces/user-team.interface';
 import { CreateAgreementDto } from './dtos/create-agreement.dto';
 import { UpdatePhoneDto } from './dtos/update-phone.dto';
 import { AccessTokenGuard } from './../auth/guards/access-token.guard';
@@ -93,7 +94,9 @@ export class UsersController {
   })
   @Get('teams')
   @UseGuards(AccessTokenGuard)
-  getUsersTeams(@GetUser() user: PassportUser) {}
+  getUsersTeams(@GetUser() user: PassportUser): Promise<{ teams: Array<UserTeam> }> {
+    return this.usersService.getTeamsByUserId(user.sub);
+  }
 
   @ApiOperation({
     summary: '전화번호 변경',

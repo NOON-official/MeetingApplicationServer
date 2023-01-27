@@ -4,15 +4,16 @@ import { TeamMembersRepository } from './repositories/team-members.repository';
 import { TeamAvailableDatesRepository } from './repositories/team-available-dates.repository';
 import { TypeOrmExModule } from './../database/typeorm-ex.module';
 import { TeamsController } from './teams.controller';
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TeamsService } from './teams.service';
 
 @Module({
   imports: [
     TypeOrmExModule.forCustomRepository([TeamsRepository, TeamMembersRepository, TeamAvailableDatesRepository]),
-    UsersModule,
+    forwardRef(() => UsersModule),
   ],
   providers: [TeamsService],
   controllers: [TeamsController],
+  exports: [TeamsService],
 })
 export class TeamsModule {}

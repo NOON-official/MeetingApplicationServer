@@ -4,8 +4,9 @@ import { TeamMember } from './../entities/team-member.entity';
 import { TeamAvailableDate } from './../entities/team-available-date.entity';
 import { Team } from './../entities/team.entity';
 import { CustomRepository } from 'src/database/typeorm-ex.decorator';
-import { Repository } from 'typeorm';
+import { FindOptionsUtils, Repository } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
+import { UserTeam } from 'src/users/interfaces/user-team.interface';
 
 @CustomRepository(Team)
 export class TeamsRepository extends Repository<Team> {
@@ -38,7 +39,7 @@ export class TeamsRepository extends Repository<Team> {
   }
 
   // 팀 정보 조회
-  async getTeamByTeamId(teamId: number): Promise<Team> {
+  async getTeamById(teamId: number): Promise<Team> {
     const team = this.findOneBy({ id: teamId });
     return team;
   }
@@ -67,5 +68,24 @@ export class TeamsRepository extends Repository<Team> {
         }),
       )
       .execute();
+  }
+
+  // 유저 신청 내역 조회
+  async getTeamsByUserId(userId: number): Promise<{ teamsWithMatching: Team[] }> {
+    // 팀 성별 가져오기
+    const { gender: teamGender } = await this.createQueryBuilder('team')
+      .select('team.gender')
+      .where('team.ownerId = :userId', { userId })
+      .withDeleted()
+      .getOne();
+
+    // 팀 + 매칭 기록 조회
+    const teamsWithMatching = await this.createQueryBuilder('team')
+      .leftJoinAndSelect(teamGender === 1 ? 'team.maleTeamMatching' : 'team.femaleTeamMatching', 'matching')
+      .where('team.ownerId = :userId', { userId })
+      .withDeleted()
+      .getMany();
+
+    return { teamsWithMatching };
   }
 }
