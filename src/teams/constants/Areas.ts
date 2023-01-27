@@ -1,7 +1,7 @@
 export const Areas = [
-  { area: '강남', key: 1 },
-  { area: '건대', key: 2 },
-  { area: '신촌', key: 3 },
-  { area: '홍대', key: 4 },
-  { area: '상관없음', key: 5 },
+  { name: '강남', id: 1 },
+  { name: '건대', id: 2 },
+  { name: '신촌', id: 3 },
+  { name: '홍대', id: 4 },
+  { name: '상관없음', id: 5 },
 ];

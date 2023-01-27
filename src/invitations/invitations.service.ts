@@ -11,12 +11,12 @@ export class InvitationsService {
     private invitationsRepository: InvitationsRepository,
   ) {}
 
-  async createInvitation(createInvitationDto: CreateInvitationDto): Promise<void> {
+  async createInvitation(userId: number, createInvitationDto: CreateInvitationDto): Promise<void> {
     // 추천인코드 확인
     const inviter = await this.usersService.getUserByReferralId(createInvitationDto.referralId);
 
     // 유저 확인
-    const invitee = await this.usersService.getUserById(createInvitationDto.userId);
+    const invitee = await this.usersService.getUserById(userId);
 
     if (inviter.id === invitee.id) {
       throw new ForbiddenException();

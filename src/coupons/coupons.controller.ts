@@ -19,7 +19,7 @@ import { RegisterCouponDto } from './dtos/register-coupon.dto';
 @Controller('coupons')
 export class CouponsController {
   @ApiOperation({
-    summary: '쿠폰 메타데이터 가져오기',
+    summary: '쿠폰 페이지데이터 가져오기',
   })
   @ApiBearerAuth()
   @ApiOkResponse({
@@ -29,9 +29,9 @@ export class CouponsController {
       },
     },
   })
-  @Get('metadata')
+  @Get('pagedata')
   @UseGuards(AccessTokenGuard)
-  getCouponsMetadata() {}
+  getCouponsPagedata() {}
 
   @ApiOperation({
     summary: '쿠폰 등록',

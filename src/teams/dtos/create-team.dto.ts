@@ -90,7 +90,7 @@ export class CreateTeamDto {
   @Max(450, { each: true })
   @ArrayMinSize(0)
   @ArrayMaxSize(3)
-  readonly university?: number[];
+  readonly universities?: number[];
 
   @ApiProperty({
     description: '미팅 선호 날짜',
@@ -101,7 +101,7 @@ export class CreateTeamDto {
   @IsDate({ each: true })
   @Type(() => Date)
   @ArrayMinSize(4)
-  readonly availableDate: Date[];
+  readonly availableDates: Date[];
 
   @ApiProperty({
     description: '지역',
@@ -114,7 +114,7 @@ export class CreateTeamDto {
   @Max(5, { each: true })
   @ArrayMinSize(1)
   @ArrayMaxSize(5)
-  readonly area: number[];
+  readonly areas: number[];
 
   @ApiProperty({
     type: [CreateMemberDto],
@@ -192,5 +192,5 @@ export class CreateTeamDto {
   @Max(5, { each: true })
   @ArrayMinSize(1)
   @ArrayMaxSize(5)
-  readonly prefVibe: number[];
+  readonly prefVibes: number[];
 }

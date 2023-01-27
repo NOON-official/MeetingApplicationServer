@@ -31,10 +31,10 @@ export class Team extends BaseEntity {
   memberCount: number;
 
   @Column({ type: 'json' })
-  university: number[];
+  universities: number[];
 
   @Column({ type: 'json' })
-  area: number[];
+  areas: number[];
 
   @Column({ type: 'text' })
   intro: string;
@@ -52,7 +52,7 @@ export class Team extends BaseEntity {
   prefMaxAge: number;
 
   @Column({ type: 'json' })
-  prefVibe: number[];
+  prefVibes: number[];
 
   @Column({ type: 'int' })
   startRound: number;

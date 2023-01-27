@@ -1,4 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import { TicketsRepository } from './repositories/tickets.repository';
 
 @Injectable()
-export class TicketsService {}
+export class TicketsService {
+  constructor(private ticketsRepository: TicketsRepository) {}
+
+  async getTicketCountByUserId(userId: number): Promise<{ ticketCount: number }> {
+    return this.ticketsRepository.getTicketCountByUserId(userId);
+  }
+}

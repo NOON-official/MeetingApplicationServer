@@ -20,7 +20,7 @@ import { CreateOrderDto } from './dtos/create-order.dto';
 @Controller('orders')
 export class OrdersController {
   @ApiOperation({
-    summary: '이용권 구매 메타데이터 가져오기',
+    summary: '이용권 구매 페이지데이터 가져오기',
   })
   @ApiBearerAuth()
   @ApiOkResponse({
@@ -30,9 +30,9 @@ export class OrdersController {
       },
     },
   })
-  @Get('metadata')
+  @Get('pagedata')
   @UseGuards(AccessTokenGuard)
-  getTicketsMetadata() {}
+  getTicketsPagedata() {}
 
   @ApiOperation({
     summary: '이용권 구매',

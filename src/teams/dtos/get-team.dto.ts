@@ -55,19 +55,19 @@ export class GetTeamDto {
     description: '대학교',
     example: [1, 42, 345],
   })
-  university?: number[];
+  universities?: number[];
 
   @ApiProperty({
     description: '미팅 선호 날짜',
     example: ['2023-01-22', '2023-01-23', '2023-01-24'],
   })
-  availableDate: Date[];
+  availableDates: Date[];
 
   @ApiProperty({
     description: '지역',
     example: [1, 3],
   })
-  area: number[];
+  areas: number[];
 
   @ApiProperty({
     type: [getMemberDto],
@@ -109,7 +109,7 @@ export class GetTeamDto {
     description: '분위기',
     example: [1, 2, 5],
   })
-  prefVibe: number[];
+  prefVibes: number[];
 
   @ApiProperty({
     description: '시작 라운드',

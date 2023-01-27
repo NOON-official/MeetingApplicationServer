@@ -1,4 +1,4 @@
 export const Genders = [
-  { gender: '남자', key: 1 },
-  { gender: '여자', key: 2 },
+  { name: '남자', id: 1 },
+  { name: '여자', id: 2 },
 ];
