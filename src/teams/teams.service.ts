@@ -16,15 +16,15 @@ export class TeamsService {
     const {
       gender,
       memberCount,
-      university,
-      area,
+      universities,
+      areas,
       intro,
       drink,
       prefSameUniversity,
       prefMinAge,
       prefMaxAge,
-      prefVibe,
-      availableDate,
+      prefVibes,
+      availableDates,
       members,
     } = createTeamDto;
 
@@ -32,14 +32,14 @@ export class TeamsService {
 
     // 팀 정보 저장
     const { teamId } = await this.teamsRepository.createTeam(
-      { gender, memberCount, university, area, intro, drink, prefSameUniversity, prefMinAge, prefMaxAge, prefVibe },
+      { gender, memberCount, universities, areas, intro, drink, prefSameUniversity, prefMinAge, prefMaxAge, prefVibes },
       user,
     );
 
     const team = await this.teamsRepository.getTeamById(teamId);
 
     // 팀 가능 날짜 저장
-    await this.teamsRepository.createTeamAvailableDate(availableDate, team);
+    await this.teamsRepository.createTeamAvailableDate(availableDates, team);
 
     // 팀 멤버 저장
     await this.teamsRepository.createTeamMember(members, team);
