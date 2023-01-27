@@ -110,7 +110,9 @@ export class UsersController {
   })
   @Put('phone')
   @UseGuards(AccessTokenGuard)
-  putUsersPhone(@GetUser() user: PassportUser, @Body() updatePhoneDto: UpdatePhoneDto) {}
+  putUsersPhone(@GetUser() user: PassportUser, @Body() updatePhoneDto: UpdatePhoneDto): Promise<void> {
+    return this.usersService.updateUserPhone(user.sub, updatePhoneDto);
+  }
 
   @ApiOperation({
     summary: '미사용 이용권 개수 조회',

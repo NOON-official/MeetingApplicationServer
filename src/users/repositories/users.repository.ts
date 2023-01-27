@@ -1,3 +1,4 @@
+import { UpdatePhoneDto } from './../dtos/update-phone.dto';
 import { User } from './../entities/user.entity';
 import { CreateUserDto } from './../dtos/create-user.dto';
 import { CustomRepository } from 'src/database/typeorm-ex.decorator';
@@ -82,5 +83,13 @@ export class UsersRepository extends Repository<User> {
       .getOne();
 
     return { nickname, phone };
+  }
+
+  async updateUserPhone(userId: number, phone: UpdatePhoneDto): Promise<void> {
+    const result = await this.update({ id: userId }, phone);
+
+    if (result.affected === 0) {
+      throw new NotFoundException(`Can't find user with id ${userId}`);
+    }
   }
 }

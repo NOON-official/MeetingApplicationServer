@@ -1,3 +1,4 @@
+import { UpdatePhoneDto } from './dtos/update-phone.dto';
 import { TeamsService } from './../teams/teams.service';
 import { InvitationsService } from './../invitations/invitations.service';
 import { User } from './entities/user.entity';
@@ -77,5 +78,9 @@ export class UsersService {
 
   async getTeamsByUserId(userId: number): Promise<{ teams: Array<UserTeam> }> {
     return this.teamsService.getTeamsByUserId(userId);
+  }
+
+  async updateUserPhone(userId: number, phone: UpdatePhoneDto): Promise<void> {
+    return this.usersRepository.updateUserPhone(userId, phone);
   }
 }
