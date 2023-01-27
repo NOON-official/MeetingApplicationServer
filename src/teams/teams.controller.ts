@@ -73,7 +73,7 @@ export class TeamsController {
 
   @ApiBearerAuth()
   @ApiOperation({
-    summary: '팀 메타데이터 가져오기',
+    summary: '팀 페이지데이터 가져오기',
     description:
       '성별, 학교, 지역, MBTI, 포지션, 상대팀 학교, 분위기 반환 \n\n 반환 프로퍼티 이름: Genders, Universities, Areas, Mbties, Roles, SameUniversities, Vibes',
   })
@@ -90,9 +90,9 @@ export class TeamsController {
       },
     },
   })
-  @Get('metadata')
+  @Get('pagedata')
   @UseGuards(AccessTokenGuard)
-  getTeamsMetadata() {}
+  getTeamsPagedata() {}
 
   @ApiBearerAuth()
   @ApiOperation({

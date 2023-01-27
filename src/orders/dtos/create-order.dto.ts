@@ -34,7 +34,7 @@ export class CreateOrderDto {
   readonly userId: number;
 
   @ApiProperty({
-    description: '구매 타입(이용권 구매 메타데이터 key값)',
+    description: '구매 타입(이용권 구매 페이지데이터 id값)',
     example: 1,
     required: true,
   })
