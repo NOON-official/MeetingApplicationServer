@@ -6,12 +6,14 @@ import { forwardRef, Module } from '@nestjs/common';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { TeamsModule } from 'src/teams/teams.module';
+import { TicketsModule } from 'src/tickets/tickets.module';
 
 @Module({
   imports: [
     TypeOrmExModule.forCustomRepository([UsersRepository, UserAgreementsRepository]),
     forwardRef(() => InvitationsModule),
     forwardRef(() => TeamsModule),
+    forwardRef(() => TicketsModule),
   ],
   controllers: [UsersController],
   providers: [UsersService],

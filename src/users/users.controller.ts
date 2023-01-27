@@ -126,7 +126,9 @@ export class UsersController {
   })
   @Get('tickets/count')
   @UseGuards(AccessTokenGuard)
-  getUsersTicketsCount(@GetUser() user: PassportUser) {}
+  getUsersTicketsCount(@GetUser() user: PassportUser): Promise<{ ticketCount: number }> {
+    return this.usersService.getTicketCountByUserId(user.sub);
+  }
 
   @ApiOperation({
     summary: '할인 쿠폰 개수 조회',

@@ -6,6 +6,7 @@ import { UsersRepository } from './repositories/users.repository';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { UserTeam } from './interfaces/user-team.interface';
 import { KakaoUser } from 'src/auth/interfaces/kakao-user.interface';
+import { TicketsService } from 'src/tickets/tickets.service';
 
 @Injectable()
 export class UsersService {
@@ -15,6 +16,8 @@ export class UsersService {
     private usersRepository: UsersRepository,
     @Inject(forwardRef(() => TeamsService))
     private teamsService: TeamsService,
+    @Inject(forwardRef(() => TicketsService))
+    private ticketsService: TicketsService,
   ) {}
 
   async getUserByKakaoUid(kakaoUid: number): Promise<User> {
@@ -82,5 +85,9 @@ export class UsersService {
 
   async updateUserPhone(userId: number, phone: UpdatePhoneDto): Promise<void> {
     return this.usersRepository.updateUserPhone(userId, phone);
+  }
+
+  async getTicketCountByUserId(userId: number): Promise<{ ticketCount: number }> {
+    return this.ticketsService.getTicketCountByUserId(userId);
   }
 }

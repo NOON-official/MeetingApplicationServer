@@ -8,5 +8,6 @@ import { TicketsController } from './tickets.controller';
   imports: [TypeOrmExModule.forCustomRepository([TicketsRepository])],
   providers: [TicketsService],
   controllers: [TicketsController],
+  exports: [TicketsService],
 })
 export class TicketsModule {}
