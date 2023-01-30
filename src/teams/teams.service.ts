@@ -21,8 +21,7 @@ export class TeamsService {
       intro,
       drink,
       prefSameUniversity,
-      prefMinAge,
-      prefMaxAge,
+      prefAge,
       prefVibes,
       availableDates,
       members,
@@ -32,7 +31,7 @@ export class TeamsService {
 
     // 팀 정보 저장
     const { teamId } = await this.teamsRepository.createTeam(
-      { gender, memberCount, universities, areas, intro, drink, prefSameUniversity, prefMinAge, prefMaxAge, prefVibes },
+      { gender, memberCount, universities, areas, intro, drink, prefSameUniversity, prefAge, prefVibes },
       user,
     );
 

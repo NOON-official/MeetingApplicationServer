@@ -160,26 +160,17 @@ export class CreateTeamDto {
   readonly prefSameUniversity: 1 | 2;
 
   @ApiProperty({
-    description: '상대방 선호 나이 최솟값',
-    example: 23,
+    description: '상대방 선호 나이',
+    example: [23, 27],
     required: true,
   })
   @IsNotEmpty()
-  @IsInt()
-  @Min(19)
-  @Max(29)
-  readonly prefMinAge: number;
-
-  @ApiProperty({
-    description: '상대방 선호 나이 최댓값',
-    example: 27,
-    required: true,
-  })
-  @IsNotEmpty()
-  @IsInt()
-  @Min(19)
-  @Max(29)
-  readonly prefMaxAge: number;
+  @IsInt({ each: true })
+  @Min(20, { each: true })
+  @Max(29, { each: true })
+  @ArrayMinSize(2)
+  @ArrayMaxSize(2)
+  readonly prefAge: number[];
 
   @ApiProperty({
     description: '분위기',

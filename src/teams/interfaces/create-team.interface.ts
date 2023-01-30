@@ -6,7 +6,6 @@ export interface CreateTeam {
   intro: string;
   drink: number;
   prefSameUniversity: number;
-  prefMinAge: number;
-  prefMaxAge: number;
+  prefAge: number[];
   prefVibes: number[];
 }
