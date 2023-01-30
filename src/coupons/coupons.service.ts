@@ -13,4 +13,8 @@ export class CouponsService {
   async updateUsedAt(couponId: number): Promise<void> {
     return this.couponsRepository.updateUsedAt(couponId);
   }
+
+  async getCouponCountByUserId(userId: number): Promise<{ couponCount: number }> {
+    return this.couponsRepository.getCouponCountByUserId(userId);
+  }
 }

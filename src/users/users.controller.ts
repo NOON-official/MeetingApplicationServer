@@ -142,7 +142,9 @@ export class UsersController {
   })
   @Get('coupons/count')
   @UseGuards(AccessTokenGuard)
-  getUsersCouponsCount(@GetUser() user: PassportUser) {}
+  getUsersCouponsCount(@GetUser() user: PassportUser) {
+    return this.usersService.getCouponCountByUserId(user.sub);
+  }
 
   @ApiOperation({
     summary: '보유 쿠폰 조회',
