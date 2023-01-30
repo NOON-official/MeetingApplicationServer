@@ -26,7 +26,7 @@ import { AdminModule } from './admin/admin.module';
       database: process.env.DB_DATABASE,
       entities: [__dirname + '/**/*.entity.{js,ts}'],
       synchronize: Boolean(process.env.DB_SYNCHRONIZE),
-      timezone: 'Z',
+      timezone: '+09:00',
     }),
     AuthModule,
     UsersModule,

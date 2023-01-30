@@ -23,7 +23,7 @@ export class Order extends BaseEntity {
   id: number;
 
   @Column({ type: 'int' })
-  type: number;
+  productType: number;
 
   @Column({ type: 'int' })
   price: number;
@@ -40,8 +40,14 @@ export class Order extends BaseEntity {
   @Column({ type: 'varchar', length: 30, nullable: true })
   tossOrderId: string;
 
+  @Column({ type: 'varchar', length: 30, nullable: true })
+  tossOrderName: string;
+
+  @Column({ type: 'varchar', length: 30, nullable: true })
+  tossMethod: string;
+
   @Column({ type: 'int', nullable: true })
-  tossAmount: string;
+  tossAmount: number;
 
   @Column({ type: 'timestamp', nullable: true })
   refundedAt: Date;

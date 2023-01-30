@@ -45,11 +45,8 @@ export class Team extends BaseEntity {
   @Column({ type: 'tinyint' })
   prefSameUniversity: number;
 
-  @Column({ type: 'int' })
-  prefMinAge: number;
-
-  @Column({ type: 'int' })
-  prefMaxAge: number;
+  @Column({ type: 'json' })
+  prefAge: number[];
 
   @Column({ type: 'json' })
   prefVibes: number[];
