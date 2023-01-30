@@ -25,16 +25,7 @@ export class TossPaymentsDto {
 }
 export class CreateOrderDto {
   @ApiProperty({
-    description: '유저ID',
-    example: 1,
-    required: true,
-  })
-  @IsNotEmpty()
-  @IsInt()
-  readonly userId: number;
-
-  @ApiProperty({
-    description: '구매 타입(이용권 구매 페이지데이터 id값)',
+    description: '상품 타입(이용권 구매 페이지데이터 id값)',
     example: 1,
     required: true,
   })
@@ -42,7 +33,7 @@ export class CreateOrderDto {
   @IsInt()
   @Min(1)
   @Max(4)
-  readonly type: number;
+  readonly productType: number;
 
   @ApiProperty({
     description: '상품 가격',

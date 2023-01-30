@@ -8,5 +8,6 @@ import { CouponsRepository } from './repositories/coupons.repository';
   imports: [TypeOrmExModule.forCustomRepository([CouponsRepository])],
   providers: [CouponsService],
   controllers: [CouponsController],
+  exports: [CouponsService],
 })
 export class CouponsModule {}
