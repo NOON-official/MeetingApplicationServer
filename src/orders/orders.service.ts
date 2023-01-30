@@ -5,7 +5,7 @@ import { Products } from './constants/Products';
 import { CouponsService } from './../coupons/coupons.service';
 import { CreateOrder } from './interfaces/create-order.interface';
 import { CreateOrderDto } from './dtos/create-order.dto';
-import { forwardRef, HttpException, Inject, Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { forwardRef, HttpException, Inject, Injectable, ForbiddenException } from '@nestjs/common';
 import { OrdersRepository } from './repositories/orders.repository';
 import { HttpService } from '@nestjs/axios';
 import { catchError, firstValueFrom } from 'rxjs';
