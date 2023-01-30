@@ -1,3 +1,4 @@
+import { CouponsService } from './../coupons/coupons.service';
 import { UpdatePhoneDto } from './dtos/update-phone.dto';
 import { TeamsService } from './../teams/teams.service';
 import { InvitationsService } from './../invitations/invitations.service';
@@ -18,6 +19,8 @@ export class UsersService {
     private teamsService: TeamsService,
     @Inject(forwardRef(() => TicketsService))
     private ticketsService: TicketsService,
+    @Inject(forwardRef(() => CouponsService))
+    private couponsService: CouponsService,
   ) {}
 
   async getUserByKakaoUid(kakaoUid: number): Promise<User> {
@@ -89,5 +92,9 @@ export class UsersService {
 
   async getTicketCountByUserId(userId: number): Promise<{ ticketCount: number }> {
     return this.ticketsService.getTicketCountByUserId(userId);
+  }
+
+  async getCouponCountByUserId(userId: number): Promise<{ couponCount: number }> {
+    return this.couponsService.getCouponCountByUserId(userId);
   }
 }

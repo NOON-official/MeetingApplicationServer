@@ -19,4 +19,16 @@ export class CouponsRepository extends Repository<Coupon> {
   async updateUsedAt(couponId: number): Promise<void> {
     await this.update({ id: couponId }, { usedAt: moment().tz('Asia/Seoul').format() });
   }
+
+  async getCouponCountByUserId(userId: number): Promise<{ couponCount: number }> {
+    const today = new Date(moment().tz('Asia/Seoul').format('YYYY-MM-DD'));
+
+    const couponCount = await this.createQueryBuilder('coupon')
+      .where('coupon.userId = :userId', { userId })
+      .andWhere('coupon.usedAt IS NULL')
+      .andWhere('coupon.expiresAt IS null OR coupon.expiresAt > :today', { today })
+      .getCount();
+
+    return { couponCount };
+  }
 }
