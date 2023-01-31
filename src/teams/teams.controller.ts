@@ -48,7 +48,9 @@ export class TeamsController {
     },
   })
   @Get('members/count/oneWeek')
-  getTeamsMembersCountOneWeek() {}
+  getTeamsMembersCountOneWeek(): Promise<{ memberCount: number }> {
+    return this.teamsService.getMembersCountOneWeek();
+  }
 
   @ApiOperation({
     summary: '현재 신청팀 수 조회',

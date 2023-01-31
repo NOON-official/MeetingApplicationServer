@@ -60,4 +60,8 @@ export class TeamsService {
   async getTeamIdByUserId(userId: number): Promise<{ teamId: number }> {
     return this.teamsRepository.getTeamIdByUserId(userId);
   }
+
+  async getMembersCountOneWeek(): Promise<{ memberCount: number }> {
+    return this.teamsRepository.getMembersCountOneWeek();
+  }
 }
