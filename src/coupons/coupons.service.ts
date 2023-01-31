@@ -1,3 +1,4 @@
+import { UserCoupon } from './../users/interfaces/user-coupon.interface';
 import { CouponsRepository } from './repositories/coupons.repository';
 import { Injectable } from '@nestjs/common';
 import { Coupon } from './entities/coupon.entity';
@@ -16,5 +17,9 @@ export class CouponsService {
 
   async getCouponCountByUserId(userId: number): Promise<{ couponCount: number }> {
     return this.couponsRepository.getCouponCountByUserId(userId);
+  }
+
+  async getCouponsByUserId(userId: number): Promise<{ coupons: UserCoupon[] }> {
+    return this.couponsRepository.getCouponsByUserId(userId);
   }
 }

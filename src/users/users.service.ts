@@ -1,3 +1,4 @@
+import { UserCoupon } from './interfaces/user-coupon.interface';
 import { CouponsService } from './../coupons/coupons.service';
 import { UpdatePhoneDto } from './dtos/update-phone.dto';
 import { TeamsService } from './../teams/teams.service';
@@ -82,7 +83,7 @@ export class UsersService {
     return this.usersRepository.getMyInfoByUserId(userId);
   }
 
-  async getTeamsByUserId(userId: number): Promise<{ teams: Array<UserTeam> }> {
+  async getTeamsByUserId(userId: number): Promise<{ teams: UserTeam[] }> {
     return this.teamsService.getTeamsByUserId(userId);
   }
 
@@ -96,5 +97,9 @@ export class UsersService {
 
   async getCouponCountByUserId(userId: number): Promise<{ couponCount: number }> {
     return this.couponsService.getCouponCountByUserId(userId);
+  }
+
+  async getCouponsByUserId(userId: number): Promise<{ coupons: UserCoupon[] }> {
+    return this.couponsService.getCouponsByUserId(userId);
   }
 }

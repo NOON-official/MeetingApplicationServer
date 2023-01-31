@@ -4,9 +4,8 @@ import { TeamMember } from './../entities/team-member.entity';
 import { TeamAvailableDate } from './../entities/team-available-date.entity';
 import { Team } from './../entities/team.entity';
 import { CustomRepository } from 'src/database/typeorm-ex.decorator';
-import { FindOptionsUtils, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
-import { UserTeam } from 'src/users/interfaces/user-team.interface';
 
 @CustomRepository(Team)
 export class TeamsRepository extends Repository<Team> {
