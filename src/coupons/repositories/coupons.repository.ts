@@ -1,3 +1,4 @@
+import { UserCoupon } from './../../users/interfaces/user-coupon.interface';
 import { CustomRepository } from 'src/database/typeorm-ex.decorator';
 import { Coupon } from '../entities/coupon.entity';
 import { Repository } from 'typeorm';
@@ -21,14 +22,29 @@ export class CouponsRepository extends Repository<Coupon> {
   }
 
   async getCouponCountByUserId(userId: number): Promise<{ couponCount: number }> {
-    const today = new Date(moment().tz('Asia/Seoul').format('YYYY-MM-DD'));
+    const today = moment().tz('Asia/Seoul').format('YYYY-MM-DD');
 
     const couponCount = await this.createQueryBuilder('coupon')
       .where('coupon.userId = :userId', { userId })
       .andWhere('coupon.usedAt IS NULL')
-      .andWhere('coupon.expiresAt IS null OR coupon.expiresAt > :today', { today })
+      .andWhere('coupon.expiresAt IS null OR coupon.expiresAt >= :today', { today })
       .getCount();
 
     return { couponCount };
+  }
+
+  async getCouponsByUserId(userId: number): Promise<{ coupons: UserCoupon[] }> {
+    const today = moment().tz('Asia/Seoul').format('YYYY-MM-DD');
+
+    const coupons = await this.createQueryBuilder('coupon')
+      .select('coupon.id')
+      .addSelect('coupon.type')
+      .addSelect('coupon.expiresAt')
+      .where('coupon.userId = :userId', { userId })
+      .andWhere('coupon.usedAt IS NULL')
+      .andWhere('coupon.expiresAt IS null OR coupon.expiresAt >= :today', { today })
+      .getMany();
+
+    return { coupons };
   }
 }

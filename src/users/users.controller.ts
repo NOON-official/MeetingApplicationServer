@@ -1,3 +1,4 @@
+import { UserCoupon } from './interfaces/user-coupon.interface';
 import { UserTeam } from './interfaces/user-team.interface';
 import { CreateAgreementDto } from './dtos/create-agreement.dto';
 import { UpdatePhoneDto } from './dtos/update-phone.dto';
@@ -94,7 +95,7 @@ export class UsersController {
   })
   @Get('teams')
   @UseGuards(AccessTokenGuard)
-  getUsersTeams(@GetUser() user: PassportUser): Promise<{ teams: Array<UserTeam> }> {
+  getUsersTeams(@GetUser() user: PassportUser): Promise<{ teams: UserTeam[] }> {
     return this.usersService.getTeamsByUserId(user.sub);
   }
 
@@ -161,7 +162,9 @@ export class UsersController {
   })
   @Get('coupons')
   @UseGuards(AccessTokenGuard)
-  getUsersCoupons(@GetUser() user: PassportUser) {}
+  getUsersCoupons(@GetUser() user: PassportUser): Promise<{ coupons: UserCoupon[] }> {
+    return this.usersService.getCouponsByUserId(user.sub);
+  }
 
   @ApiOperation({
     summary: '이용 약관 동의',
