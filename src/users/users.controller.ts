@@ -41,7 +41,7 @@ export class UsersController {
   })
   @Get('invitations/count')
   @UseGuards(AccessTokenGuard)
-  getUsersInvitationsCount(@GetUser() user: PassportUser) {
+  getUsersInvitationsCount(@GetUser() user: PassportUser): Promise<{ invitationCount: number }> {
     return this.usersService.getInvitationCountByUserId(user.sub);
   }
 
@@ -57,7 +57,7 @@ export class UsersController {
   })
   @Get('referral-id')
   @UseGuards(AccessTokenGuard)
-  getUsersReferralId(@GetUser() user: PassportUser) {
+  getUsersReferralId(@GetUser() user: PassportUser): Promise<{ referralId: string }> {
     return this.usersService.getReferralIdByUserId(user.sub);
   }
 
@@ -75,7 +75,7 @@ export class UsersController {
   })
   @Get('my-info')
   @UseGuards(AccessTokenGuard)
-  getUsersMyInfo(@GetUser() user: PassportUser) {
+  getUsersMyInfo(@GetUser() user: PassportUser): Promise<{ nickname: string; phone: string }> {
     return this.usersService.getMyInfoByUserId(user.sub);
   }
 
@@ -143,7 +143,7 @@ export class UsersController {
   })
   @Get('coupons/count')
   @UseGuards(AccessTokenGuard)
-  getUsersCouponsCount(@GetUser() user: PassportUser) {
+  getUsersCouponsCount(@GetUser() user: PassportUser): Promise<{ couponCount: number }> {
     return this.usersService.getCouponCountByUserId(user.sub);
   }
 

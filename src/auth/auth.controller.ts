@@ -93,7 +93,7 @@ export class AuthController {
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @Delete('account')
   @UseGuards(AccessTokenGuard)
-  deleteAuthAccount(@GetUser() user: PassportUser) {
+  deleteAuthAccount(@GetUser() user: PassportUser): Promise<void> {
     return this.authService.deleteAccount(user.sub);
   }
 }
