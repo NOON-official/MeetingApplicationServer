@@ -87,4 +87,15 @@ export class TeamsRepository extends Repository<Team> {
 
     return { teamsWithMatching };
   }
+
+  async getTeamIdByUserId(userId: number): Promise<{ teamId: number }> {
+    const result = await this.createQueryBuilder('team')
+      .select('team.id')
+      .where('team.ownerId = :userId', { userId })
+      .getOne();
+
+    const teamId = result?.id || null;
+
+    return { teamId };
+  }
 }

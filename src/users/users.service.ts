@@ -136,4 +136,8 @@ export class UsersService {
   async getOrdersByUserId(userId: number): Promise<{ orders: UserOrder[] }> {
     return this.ordersService.getOrdersByUserId(userId);
   }
+
+  async getTeamIdByUserId(userId: number): Promise<{ teamId: number }> {
+    return this.teamsService.getTeamIdByUserId(userId);
+  }
 }
