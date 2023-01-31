@@ -56,4 +56,8 @@ export class TeamsService {
 
     return { teams };
   }
+
+  async getTeamIdByUserId(userId: number): Promise<{ teamId: number }> {
+    return this.teamsRepository.getTeamIdByUserId(userId);
+  }
 }

@@ -232,5 +232,7 @@ export class UsersController {
   })
   @Get('team-id')
   @UseGuards(AccessTokenGuard)
-  getUsersTeamId(@GetUser() user: PassportUser) {}
+  getUsersTeamId(@GetUser() user: PassportUser): Promise<{ teamId: number }> {
+    return this.usersService.getTeamIdByUserId(user.sub);
+  }
 }
