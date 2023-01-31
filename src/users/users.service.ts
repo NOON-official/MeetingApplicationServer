@@ -1,3 +1,4 @@
+import { UserAgreement } from './entities/user-agreement.entity';
 import { UserAgreementsRepository } from './repositories/user-agreements.repository';
 import { CreateAgreementDto } from './dtos/create-agreement.dto';
 import { UserCoupon } from './interfaces/user-coupon.interface';
@@ -7,7 +8,7 @@ import { TeamsService } from './../teams/teams.service';
 import { InvitationsService } from './../invitations/invitations.service';
 import { User } from './entities/user.entity';
 import { UsersRepository } from './repositories/users.repository';
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { UserTeam } from './interfaces/user-team.interface';
 import { KakaoUser } from 'src/auth/interfaces/kakao-user.interface';
 import { TicketsService } from 'src/tickets/tickets.service';
@@ -116,5 +117,15 @@ export class UsersService {
     }
 
     return this.userAgreementsRepository.createAgreement(user, createAgreementDto);
+  }
+
+  async getAgreementByUserId(userId: number): Promise<UserAgreement> {
+    const userAgreement = await this.userAgreementsRepository.getAgreementByUserId(userId);
+
+    if (!userAgreement) {
+      throw new NotFoundException(`Can't find user agreement with user id ${userId}`);
+    }
+
+    return userAgreement;
   }
 }
