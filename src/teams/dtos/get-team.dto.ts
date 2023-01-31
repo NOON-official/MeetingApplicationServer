@@ -89,9 +89,9 @@ export class GetTeamDto {
 
   @ApiProperty({
     description: '상대방 학교',
-    example: 1,
+    example: true,
   })
-  prefSameUniversity: number;
+  prefSameUniversity: boolean;
 
   @ApiProperty({
     description: '상대방 선호 나이 최솟값',

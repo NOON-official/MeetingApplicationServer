@@ -12,6 +12,7 @@ import {
   ArrayMaxSize,
   Min,
   Max,
+  IsBoolean,
 } from 'class-validator';
 
 export class CreateMemberDto {
@@ -150,14 +151,12 @@ export class CreateTeamDto {
 
   @ApiProperty({
     description: '상대방 학교',
-    example: 1,
+    example: true,
     required: true,
   })
   @IsNotEmpty()
-  @IsInt()
-  @Min(1)
-  @Max(2)
-  readonly prefSameUniversity: 1 | 2;
+  @IsBoolean()
+  readonly prefSameUniversity: boolean;
 
   @ApiProperty({
     description: '상대방 선호 나이',

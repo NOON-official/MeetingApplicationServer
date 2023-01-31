@@ -5,7 +5,7 @@ export interface CreateTeam {
   areas: number[];
   intro: string;
   drink: number;
-  prefSameUniversity: number;
+  prefSameUniversity: boolean;
   prefAge: number[];
   prefVibes: number[];
 }
