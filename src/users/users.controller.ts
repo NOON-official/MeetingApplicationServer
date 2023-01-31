@@ -20,6 +20,7 @@ import { ApiOperation } from '@nestjs/swagger';
 import { Body, Post, Put } from '@nestjs/common/decorators';
 import { GetUser } from 'src/common/get-user.decorator';
 import { PassportUser } from 'src/auth/interfaces/passport-user.interface';
+import { UserOrder } from './interfaces/user-order.interface';
 
 @ApiTags('USER')
 @ApiBearerAuth()
@@ -206,15 +207,17 @@ export class UsersController {
     schema: {
       example: {
         orders: [
-          { id: 1, type: 1, amount: 5000, couponId: null, createdAt: '2023-01-2023-01-20T21:37:26.886Z' },
-          { id: 2, type: 1, amount: 0, couponId: 1, createdAt: '2023-01-2023-01-20T21:37:26.886Z' },
+          { id: 1, productType: 1, totalAmount: 5000, couponType: null, createdAt: '2023-01-20T21:37:26.886Z' },
+          { id: 1, productType: 1, totalAmount: 0, couponType: 2, createdAt: '2023-01-20T21:37:26.886Z' },
         ],
       },
     },
   })
   @Get('orders')
   @UseGuards(AccessTokenGuard)
-  getUsersOrders(@GetUser() user: PassportUser) {}
+  getUsersOrders(@GetUser() user: PassportUser): Promise<{ orders: UserOrder[] }> {
+    return this.usersService.getOrdersByUserId(user.sub);
+  }
 
   @ApiOperation({
     summary: '유저의 팀ID 조회',

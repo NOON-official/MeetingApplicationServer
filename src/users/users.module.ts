@@ -1,3 +1,4 @@
+import { OrdersModule } from './../orders/orders.module';
 import { CouponsModule } from './../coupons/coupons.module';
 import { InvitationsModule } from './../invitations/invitations.module';
 import { UsersRepository } from './repositories/users.repository';
@@ -16,6 +17,7 @@ import { TicketsModule } from 'src/tickets/tickets.module';
     forwardRef(() => TeamsModule),
     forwardRef(() => TicketsModule),
     forwardRef(() => CouponsModule),
+    forwardRef(() => OrdersModule),
   ],
   controllers: [UsersController],
   providers: [UsersService],
