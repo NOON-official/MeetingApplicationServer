@@ -28,7 +28,7 @@ export class InvitationsController {
   @ApiCreatedResponse({ description: 'Created' })
   @Post()
   @UseGuards(AccessTokenGuard)
-  postInvitations(@GetUser() user: PassportUser, @Body() createInvitationDto: CreateInvitationDto) {
+  postInvitations(@GetUser() user: PassportUser, @Body() createInvitationDto: CreateInvitationDto): Promise<void> {
     return this.invitationsService.createInvitation(user.sub, createInvitationDto);
   }
 }

@@ -1,3 +1,5 @@
+import { UserAgreementsRepository } from './repositories/user-agreements.repository';
+import { CreateAgreementDto } from './dtos/create-agreement.dto';
 import { UserCoupon } from './interfaces/user-coupon.interface';
 import { CouponsService } from './../coupons/coupons.service';
 import { UpdatePhoneDto } from './dtos/update-phone.dto';
@@ -9,13 +11,15 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { UserTeam } from './interfaces/user-team.interface';
 import { KakaoUser } from 'src/auth/interfaces/kakao-user.interface';
 import { TicketsService } from 'src/tickets/tickets.service';
+import { BadRequestException } from '@nestjs/common/exceptions';
 
 @Injectable()
 export class UsersService {
   constructor(
+    private usersRepository: UsersRepository,
+    private userAgreementsRepository: UserAgreementsRepository,
     @Inject(forwardRef(() => InvitationsService))
     private invitationsService: InvitationsService,
-    private usersRepository: UsersRepository,
     @Inject(forwardRef(() => TeamsService))
     private teamsService: TeamsService,
     @Inject(forwardRef(() => TicketsService))
@@ -101,5 +105,16 @@ export class UsersService {
 
   async getCouponsByUserId(userId: number): Promise<{ coupons: UserCoupon[] }> {
     return this.couponsService.getCouponsByUserId(userId);
+  }
+
+  async createAgreement(userId: number, createAgreementDto: CreateAgreementDto): Promise<void> {
+    const user = await this.usersRepository.getUserById(userId);
+    const userAgreement = await this.userAgreementsRepository.getAgreementByUserId(userId);
+
+    if (!!userAgreement) {
+      throw new BadRequestException(`user agreement with user id ${userId} is already exists`);
+    }
+
+    return this.userAgreementsRepository.createAgreement(user, createAgreementDto);
   }
 }
