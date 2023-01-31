@@ -167,7 +167,7 @@ export class OrdersService {
     // 구매 정보 저장
     const { orderId } = await this.ordersRepository.createOrder(createOrderData, user, coupon);
 
-    // 쿠폰 구매 처리
+    // 쿠폰 사용 처리
     if (!!coupon) await this.couponsService.updateUsedAt(createOrderDto.couponId);
 
     // 이용권 생성 및 저장
