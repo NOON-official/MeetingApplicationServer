@@ -12,6 +12,7 @@ import { catchError, firstValueFrom } from 'rxjs';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from 'src/users/users.service';
 import * as moment from 'moment-timezone';
+import { UserOrder } from 'src/users/interfaces/user-order.interface';
 
 @Injectable()
 export class OrdersService {
@@ -174,5 +175,9 @@ export class OrdersService {
     const order = await this.ordersRepository.getOrderById(orderId);
     const ticketCount = Products.find((p) => p.id === createOrderDto.productType).ticketCount;
     await this.ticketsService.createTickets(ticketCount, user, order);
+  }
+
+  async getOrdersByUserId(userId: number): Promise<{ orders: UserOrder[] }> {
+    return this.ordersRepository.getOrdersByUserId(userId);
   }
 }

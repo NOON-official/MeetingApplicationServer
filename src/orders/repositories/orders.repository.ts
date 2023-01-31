@@ -1,3 +1,4 @@
+import { UserOrder } from './../../users/interfaces/user-order.interface';
 import { Order } from '../entities/order.entity';
 import { CustomRepository } from 'src/database/typeorm-ex.decorator';
 import { Repository } from 'typeorm';
@@ -32,5 +33,21 @@ export class OrdersRepository extends Repository<Order> {
     }
 
     return order;
+  }
+
+  async getOrdersByUserId(userId: number): Promise<{ orders: UserOrder[] }> {
+    const orders = await this.createQueryBuilder('order')
+      .leftJoinAndSelect('order.coupon', 'coupon')
+      .select([
+        'order.id AS id',
+        'order.productType AS productType',
+        'order.totalAmount AS totalAmount',
+        'coupon.type AS couponType',
+        'order.createdAt AS createdAt',
+      ])
+      .where('order.userId = :userId', { userId })
+      .getRawMany();
+
+    return { orders };
   }
 }

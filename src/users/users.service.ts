@@ -1,3 +1,4 @@
+import { OrdersService } from './../orders/orders.service';
 import { UserAgreement } from './entities/user-agreement.entity';
 import { UserAgreementsRepository } from './repositories/user-agreements.repository';
 import { CreateAgreementDto } from './dtos/create-agreement.dto';
@@ -13,6 +14,7 @@ import { UserTeam } from './interfaces/user-team.interface';
 import { KakaoUser } from 'src/auth/interfaces/kakao-user.interface';
 import { TicketsService } from 'src/tickets/tickets.service';
 import { BadRequestException } from '@nestjs/common/exceptions';
+import { UserOrder } from './interfaces/user-order.interface';
 
 @Injectable()
 export class UsersService {
@@ -27,6 +29,8 @@ export class UsersService {
     private ticketsService: TicketsService,
     @Inject(forwardRef(() => CouponsService))
     private couponsService: CouponsService,
+    @Inject(forwardRef(() => OrdersService))
+    private ordersService: OrdersService,
   ) {}
 
   async getUserByKakaoUid(kakaoUid: number): Promise<User> {
@@ -127,5 +131,9 @@ export class UsersService {
     }
 
     return userAgreement;
+  }
+
+  async getOrdersByUserId(userId: number): Promise<{ orders: UserOrder[] }> {
+    return this.ordersService.getOrdersByUserId(userId);
   }
 }
