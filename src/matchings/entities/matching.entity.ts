@@ -19,11 +19,11 @@ export class Matching extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
 
-  @Column({ type: 'tinyint', nullable: true })
-  maleTeamIsAccepted: number;
+  @Column({ type: 'boolean', nullable: true })
+  maleTeamIsAccepted: boolean;
 
-  @Column({ type: 'tinyint', nullable: true })
-  femaleTeamIsAccepted: number;
+  @Column({ type: 'boolean', nullable: true })
+  femaleTeamIsAccepted: boolean;
 
   @Column({ type: 'timestamp', nullable: true })
   chatCreatedAt: Date;

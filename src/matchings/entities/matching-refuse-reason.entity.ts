@@ -17,14 +17,14 @@ export class MatchingRefuseReason extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
 
-  @Column({ type: 'tinyint', default: 0 })
-  reason1: number;
+  @Column({ type: 'boolean', default: false })
+  reason1: boolean;
 
-  @Column({ type: 'tinyint', default: 0 })
-  reason2: number;
+  @Column({ type: 'boolean', default: false })
+  reason2: boolean;
 
-  @Column({ type: 'tinyint', default: 0 })
-  reason3: number;
+  @Column({ type: 'boolean', default: false })
+  reason3: boolean;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   other: string;

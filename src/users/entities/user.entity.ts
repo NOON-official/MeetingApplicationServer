@@ -44,8 +44,8 @@ export class User extends BaseEntity {
   @Column({ nullable: true })
   refreshToken: string;
 
-  @Column({ type: 'tinyint', default: 0 })
-  isAdmin: number;
+  @Column({ type: 'boolean', default: false })
+  isAdmin: boolean;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

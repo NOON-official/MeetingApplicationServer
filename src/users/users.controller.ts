@@ -1,3 +1,4 @@
+import { UserAgreement } from './entities/user-agreement.entity';
 import { UserCoupon } from './interfaces/user-coupon.interface';
 import { UserTeam } from './interfaces/user-team.interface';
 import { CreateAgreementDto } from './dtos/create-agreement.dto';
@@ -182,20 +183,21 @@ export class UsersController {
   @ApiOkResponse({
     schema: {
       example: {
-        agreements: {
-          service: true,
-          privacy: false,
-          age: false,
-          marketing: true,
-          createdAt: '2023-01-20T21:37:26.886Z',
-          updatedAt: '2023-01-20T21:37:26.886Z',
-        },
+        id: 1,
+        service: true,
+        privacy: false,
+        age: false,
+        marketing: true,
+        createdAt: '2023-01-20T21:37:26.886Z',
+        updatedAt: '2023-01-20T21:37:26.886Z',
       },
     },
   })
   @Get('agreements')
   @UseGuards(AccessTokenGuard)
-  getUsersAgreements(@GetUser() user: PassportUser) {}
+  getUsersAgreements(@GetUser() user: PassportUser): Promise<UserAgreement> {
+    return this.usersService.getAgreementByUserId(user.sub);
+  }
 
   @ApiOperation({
     summary: '결제 내역 조회',

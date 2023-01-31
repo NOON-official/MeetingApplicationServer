@@ -42,8 +42,8 @@ export class Team extends BaseEntity {
   @Column({ type: 'int' })
   drink: number;
 
-  @Column({ type: 'tinyint' })
-  prefSameUniversity: number;
+  @Column({ type: 'boolean' })
+  prefSameUniversity: boolean;
 
   @Column({ type: 'json' })
   prefAge: number[];
