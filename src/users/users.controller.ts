@@ -172,7 +172,9 @@ export class UsersController {
   @ApiCreatedResponse({ description: 'Created' })
   @Post('agreements')
   @UseGuards(AccessTokenGuard)
-  postUsersAgreements(@GetUser() user: PassportUser, @Body() createAgreementDto: CreateAgreementDto) {}
+  postUsersAgreements(@GetUser() user: PassportUser, @Body() createAgreementDto: CreateAgreementDto): Promise<void> {
+    return this.usersService.createAgreement(user.sub, createAgreementDto);
+  }
 
   @ApiOperation({
     summary: '이용 약관 동의 목록 조회',

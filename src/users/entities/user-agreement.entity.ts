@@ -17,17 +17,17 @@ export class UserAgreement extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
 
-  @Column({ type: 'tinyint' })
-  service: number;
+  @Column({ type: 'boolean' })
+  service: boolean;
 
-  @Column({ type: 'tinyint' })
-  privacy: number;
+  @Column({ type: 'boolean' })
+  privacy: boolean;
 
-  @Column({ type: 'tinyint' })
-  age: number;
+  @Column({ type: 'boolean' })
+  age: boolean;
 
-  @Column({ type: 'tinyint' })
-  marketing: number;
+  @Column({ type: 'boolean' })
+  marketing: boolean;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
