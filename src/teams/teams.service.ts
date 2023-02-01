@@ -40,6 +40,12 @@ export class TeamsService {
       members,
     } = createTeamDto;
 
+    // 이미 매칭중인 팀이 있는 경우
+    const existingTeam = await this.teamsRepository.getTeamIdByUserId(userId);
+    if (!!existingTeam) {
+      throw new BadRequestException('team is already exists');
+    }
+
     const user = await this.usersService.getUserById(userId);
 
     // 팀 정보 저장
@@ -112,7 +118,7 @@ export class TeamsService {
     const team = await this.teamsRepository.getTeamById(teamId);
 
     // 해당 팀 정보가 없는 경우
-    if (!team) {
+    if (!team || !!team.deletedAt) {
       throw new NotFoundException(`Can't find team with id ${teamId}`);
     }
 
