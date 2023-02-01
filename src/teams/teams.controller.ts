@@ -123,12 +123,15 @@ export class TeamsController {
   @ApiBearerAuth()
   @ApiOperation({
     summary: '매칭 신청 정보 수정',
-    description: 'request body에 수정이 필요한 프로퍼티만 보내주시면 됩니다',
+    description:
+      'request body에 수정이 필요한 프로퍼티만 보내주시면 됩니다 \n\n * ex) members 프로퍼티가 수정된 경우 members 프로퍼티 전체 정보가 필요함 \n\n 이미 매칭 완료된 팀인 경우 OR 매칭 실패한 팀인 경우 수정 불가',
   })
   @ApiOkResponse({ description: 'OK' })
   @Patch(':teamId')
   @UseGuards(AccessTokenGuard)
-  patchTeamsTeamId(@Param('teamId') teamId: number, @Body() updateTeamDto: UpdateTeamDto) {}
+  patchTeamsTeamId(@Param('teamId') teamId: number, @Body() updateTeamDto: UpdateTeamDto): Promise<void> {
+    return this.teamsService.updateTeam(teamId, updateTeamDto);
+  }
 
   @ApiBearerAuth()
   @ApiOperation({

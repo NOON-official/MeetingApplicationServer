@@ -9,6 +9,7 @@ import { User } from 'src/users/entities/user.entity';
 import { TeamStatus } from '../entities/team-status.enum';
 import { TeamGender } from '../entities/team-gender.enum';
 import { MatchingRound } from 'src/matchings/constants/matching-round';
+import { UpdateTeam } from '../interfaces/update-team.interface';
 
 @CustomRepository(Team)
 export class TeamsRepository extends Repository<Team> {
@@ -42,7 +43,12 @@ export class TeamsRepository extends Repository<Team> {
 
   // 팀 정보 조회
   async getTeamById(teamId: number): Promise<Team> {
-    const team = this.findOneBy({ id: teamId });
+    const team = this.findOne({
+      where: {
+        id: teamId,
+      },
+      withDeleted: true,
+    });
     return team;
   }
 
@@ -137,5 +143,25 @@ export class TeamsRepository extends Repository<Team> {
     const teamCount = await qb.getCount();
 
     return { teamCount };
+  }
+
+  async updateTeam(teamId: number, teamData: UpdateTeam): Promise<void> {
+    await this.createQueryBuilder().update(Team).set(teamData).where('id = :teamId', { teamId }).execute();
+  }
+
+  async deleteTeamAvailableDateByTeamId(teamId: number): Promise<void> {
+    await this.createQueryBuilder('team-available-date')
+      .delete()
+      .from(TeamAvailableDate)
+      .where('teamId = :teamId', { teamId })
+      .execute();
+  }
+
+  async deleteTeamMemberByTeamId(teamId: number): Promise<void> {
+    await this.createQueryBuilder('team-available-date')
+      .delete()
+      .from(TeamMember)
+      .where('teamId = :teamId', { teamId })
+      .execute();
   }
 }

@@ -1,6 +1,7 @@
+import { BadRequestException } from '@nestjs/common/exceptions';
 import { MatchingRound } from './../matchings/constants/matching-round';
 import { CreateTeamDto } from './dtos/create-team.dto';
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { TeamsRepository } from './repositories/teams.repository';
 import { UsersService } from 'src/users/users.service';
 import { UserTeam } from 'src/users/interfaces/user-team.interface';
@@ -14,6 +15,7 @@ import { Mbties } from './constants/mbties';
 import { Roles } from './constants/roles';
 import { SameUniversities } from './constants/same-universities';
 import { Vibes } from './constants/vibes';
+import { UpdateTeamDto } from './dtos/update-team.dto';
 
 @Injectable()
 export class TeamsService {
@@ -37,6 +39,12 @@ export class TeamsService {
       availableDates,
       members,
     } = createTeamDto;
+
+    // 이미 매칭중인 팀이 있는 경우
+    const existingTeam = await this.teamsRepository.getTeamIdByUserId(userId);
+    if (!!existingTeam) {
+      throw new BadRequestException('team is already exists');
+    }
 
     const user = await this.usersService.getUserById(userId);
 
@@ -104,5 +112,63 @@ export class TeamsService {
     Vibes: teamPagedata[];
   }> {
     return { Genders, Universities, Areas, Mbties, Roles, SameUniversities, Vibes };
+  }
+
+  async updateTeam(teamId: number, updateTeamDto: UpdateTeamDto): Promise<void> {
+    const team = await this.teamsRepository.getTeamById(teamId);
+
+    // 해당 팀 정보가 없는 경우
+    if (!team || !!team.deletedAt) {
+      throw new NotFoundException(`Can't find team with id ${teamId}`);
+    }
+
+    // 이미 매칭 완료된 팀인 경우
+    if (!!team.maleTeamMatching || !!team.femaleTeamMatching) {
+      throw new BadRequestException(`already matched team`);
+    }
+
+    // 이미 매칭 실패한 팀인 경우
+    if (team.currentRound - team.startRound >= MatchingRound.MAX_TRIAL) {
+      throw new BadRequestException(`matching already failed team`);
+    }
+
+    const {
+      gender,
+      memberCount,
+      universities,
+      areas,
+      intro,
+      drink,
+      prefSameUniversity,
+      prefAge,
+      prefVibes,
+      availableDates,
+      members,
+    } = updateTeamDto;
+
+    // Team 테이블 정보 업데이트
+    await this.teamsRepository.updateTeam(teamId, {
+      gender,
+      memberCount,
+      universities,
+      areas,
+      intro,
+      drink,
+      prefSameUniversity,
+      prefAge,
+      prefVibes,
+    });
+
+    // 팀 가능 날짜 정보 있는 경우 row 삭제 후 다시 생성
+    if (!!availableDates) {
+      await this.teamsRepository.deleteTeamAvailableDateByTeamId(teamId);
+      await this.teamsRepository.createTeamAvailableDate(availableDates, team);
+    }
+
+    // 팀 멤버 정보 있는 경우 row 삭제 후 다시 생성
+    if (!!members) {
+      await this.teamsRepository.deleteTeamMemberByTeamId(teamId);
+      await this.teamsRepository.createTeamMember(members, team);
+    }
   }
 }
