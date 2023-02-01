@@ -6,6 +6,9 @@ import { Team } from './../entities/team.entity';
 import { CustomRepository } from 'src/database/typeorm-ex.decorator';
 import { Repository } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
+import { TeamStatus } from '../entities/team-status.enum';
+import { TeamGender } from '../entities/team-gender.enum';
+import { MatchingRound } from 'src/matchings/constants/matching-round';
 
 @CustomRepository(Team)
 export class TeamsRepository extends Repository<Team> {
@@ -109,5 +112,30 @@ export class TeamsRepository extends Repository<Team> {
     memberCount ? (memberCount = Number(memberCount)) : (memberCount = 0);
 
     return { memberCount };
+  }
+
+  async getTeamsCountByStatusAndMembercountAndGender(
+    status: TeamStatus.applied,
+    membercount: '2' | '3',
+    gender: TeamGender,
+  ): Promise<{ teamCount: number }> {
+    const qb = this.createQueryBuilder('team');
+
+    // 인원수 & 성별 필터링
+    qb.leftJoinAndSelect(`team.${gender}TeamMatching`, 'matching')
+      .where('memberCount = :membercount', { membercount })
+      .andWhere('team.gender = :genderNum', { genderNum: gender === TeamGender.male ? 1 : 2 });
+
+    // 매칭 신청자인 경우
+    if (status === TeamStatus.applied) {
+      // 매칭 정보 X
+      qb.andWhere('matching.id IS NULL');
+      // 매칭 실패 횟수 3회 미만
+      qb.andWhere('team.currentRound - team.startRound < :maxTrial', { maxTrial: MatchingRound.MAX_TRIAL });
+    }
+
+    const teamCount = await qb.getCount();
+
+    return { teamCount };
   }
 }

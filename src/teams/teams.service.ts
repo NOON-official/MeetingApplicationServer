@@ -1,8 +1,11 @@
+import { MatchingRound } from './../matchings/constants/matching-round';
 import { CreateTeamDto } from './dtos/create-team.dto';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { TeamsRepository } from './repositories/teams.repository';
 import { UsersService } from 'src/users/users.service';
 import { UserTeam } from 'src/users/interfaces/user-team.interface';
+import { TeamStatus } from './entities/team-status.enum';
+import { TeamGender } from './entities/team-gender.enum';
 
 @Injectable()
 export class TeamsService {
@@ -63,5 +66,23 @@ export class TeamsService {
 
   async getMembersCountOneWeek(): Promise<{ memberCount: number }> {
     return this.teamsRepository.getMembersCountOneWeek();
+  }
+
+  async getTeamsCountByStatusAndMembercountAndGender(
+    status: TeamStatus.applied,
+    membercount: '2' | '3',
+    gender: TeamGender,
+  ): Promise<{ teamCount: number }> {
+    let { teamCount } = await this.teamsRepository.getTeamsCountByStatusAndMembercountAndGender(
+      status,
+      membercount,
+      gender,
+    );
+
+    // 최소 팀 수 미만인 경우 OR 최대 팀 수 이상인 경우 값 조정
+    if (teamCount < MatchingRound.MIN_TEAM) teamCount = MatchingRound.MIN_TEAM;
+    if (teamCount > MatchingRound.MAX_TEAM) teamCount = MatchingRound.MAX_TEAM;
+
+    return { teamCount };
   }
 }

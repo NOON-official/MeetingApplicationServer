@@ -3,13 +3,13 @@ import { GetUser } from './../common/get-user.decorator';
 import { TeamsService } from './teams.service';
 import { GetTeamDto } from './dtos/get-team.dto';
 import { CreateTeamDto } from './dtos/create-team.dto';
-import { Vibes } from './constants/Vibes';
-import { SameUniversities } from './constants/SameUniversities';
-import { Roles } from './constants/Roles';
-import { Mbties } from './constants/Mbties';
-import { Areas } from './constants/Areas';
-import { Genders } from './constants/Genders';
-import { Universities } from './constants/Universities';
+import { Vibes } from './constants/vibes';
+import { SameUniversities } from './constants/same-universities';
+import { Roles } from './constants/roles';
+import { Mbties } from './constants/mbties';
+import { Areas } from './constants/areas';
+import { Genders } from './constants/genders';
+import { Universities } from './constants/universities';
 import { TeamGender } from './entities/team-gender.enum';
 import { TeamStatus } from './entities/team-status.enum';
 import { AccessTokenGuard } from './../auth/guards/access-token.guard';
@@ -54,7 +54,7 @@ export class TeamsController {
 
   @ApiOperation({
     summary: '현재 신청팀 수 조회',
-    description: '매칭 실패 횟수 3회 미만인 팀 포함',
+    description: '매칭 실패 횟수 3회 미만인 팀 포함 \n\n 최소 팀 수: 3, 최대 팀 수: 10',
   })
   @ApiQuery({ name: 'status', enum: [TeamStatus.applied] })
   @ApiQuery({ name: 'membercount', enum: ['2', '3'] })
@@ -71,7 +71,9 @@ export class TeamsController {
     @Query('status') status: TeamStatus.applied,
     @Query('membercount') membercount: '2' | '3',
     @Query('gender') gender: TeamGender,
-  ) {}
+  ): Promise<{ teamCount: number }> {
+    return this.teamsService.getTeamsCountByStatusAndMembercountAndGender(status, membercount, gender);
+  }
 
   @ApiBearerAuth()
   @ApiOperation({
