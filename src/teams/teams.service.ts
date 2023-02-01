@@ -6,6 +6,14 @@ import { UsersService } from 'src/users/users.service';
 import { UserTeam } from 'src/users/interfaces/user-team.interface';
 import { TeamStatus } from './entities/team-status.enum';
 import { TeamGender } from './entities/team-gender.enum';
+import { teamPagedata } from './interfaces/team-pagedata.interface';
+import { Genders } from './constants/genders';
+import { Universities } from './constants/universities';
+import { Areas } from './constants/areas';
+import { Mbties } from './constants/mbties';
+import { Roles } from './constants/roles';
+import { SameUniversities } from './constants/same-universities';
+import { Vibes } from './constants/vibes';
 
 @Injectable()
 export class TeamsService {
@@ -84,5 +92,17 @@ export class TeamsService {
     if (teamCount > MatchingRound.MAX_TEAM) teamCount = MatchingRound.MAX_TEAM;
 
     return { teamCount };
+  }
+
+  async getTeamPagedata(): Promise<{
+    Genders: teamPagedata[];
+    Universities: teamPagedata[];
+    Areas: teamPagedata[];
+    Mbties: teamPagedata[];
+    Roles: teamPagedata[];
+    SameUniversities: teamPagedata[];
+    Vibes: teamPagedata[];
+  }> {
+    return { Genders, Universities, Areas, Mbties, Roles, SameUniversities, Vibes };
   }
 }

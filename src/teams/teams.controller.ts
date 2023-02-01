@@ -28,6 +28,7 @@ import { ApiOperation } from '@nestjs/swagger';
 import { ApiTags } from '@nestjs/swagger/dist';
 import { Controller, Get, Post, Patch, Delete, UseGuards } from '@nestjs/common';
 import { UpdateTeamDto } from './dtos/update-team.dto';
+import { teamPagedata } from './interfaces/team-pagedata.interface';
 
 @ApiTags('TEAM')
 @ApiUnauthorizedResponse({ description: 'Unauthorized' })
@@ -96,7 +97,17 @@ export class TeamsController {
   })
   @Get('pagedata')
   @UseGuards(AccessTokenGuard)
-  getTeamsPagedata() {}
+  getTeamsPagedata(): Promise<{
+    Genders: teamPagedata[];
+    Universities: teamPagedata[];
+    Areas: teamPagedata[];
+    Mbties: teamPagedata[];
+    Roles: teamPagedata[];
+    SameUniversities: teamPagedata[];
+    Vibes: teamPagedata[];
+  }> {
+    return this.teamsService.getTeamPagedata();
+  }
 
   @ApiBearerAuth()
   @ApiOperation({
