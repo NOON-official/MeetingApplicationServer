@@ -54,7 +54,7 @@ export class TeamsController {
 
   @ApiOperation({
     summary: '현재 신청팀 수 조회',
-    description: '매칭 실패 횟수 3회 미만인 팀 포함',
+    description: '매칭 실패 횟수 3회 미만인 팀 포함 \n\n 최소 팀 수: 3, 최대 팀 수: 10',
   })
   @ApiQuery({ name: 'status', enum: [TeamStatus.applied] })
   @ApiQuery({ name: 'membercount', enum: ['2', '3'] })
@@ -71,7 +71,9 @@ export class TeamsController {
     @Query('status') status: TeamStatus.applied,
     @Query('membercount') membercount: '2' | '3',
     @Query('gender') gender: TeamGender,
-  ) {}
+  ): Promise<{ teamCount: number }> {
+    return this.teamsService.getTeamsCountByStatusAndMembercountAndGender(status, membercount, gender);
+  }
 
   @ApiBearerAuth()
   @ApiOperation({
