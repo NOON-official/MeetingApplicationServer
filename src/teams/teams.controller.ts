@@ -140,7 +140,9 @@ export class TeamsController {
   @ApiOkResponse({ description: 'OK' })
   @Delete(':teamId')
   @UseGuards(AccessTokenGuard)
-  deleteTeamsTeamId(@Param('teamId') teamId: number) {}
+  deleteTeamsTeamId(@Param('teamId') teamId: number): Promise<void> {
+    return this.teamsService.deleteTeamByTeamId(teamId);
+  }
 
   @ApiBearerAuth()
   @ApiOperation({

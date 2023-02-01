@@ -171,4 +171,15 @@ export class TeamsService {
       await this.teamsRepository.createTeamMember(members, team);
     }
   }
+
+  async deleteTeamByTeamId(teamId: number): Promise<void> {
+    const team = await this.teamsRepository.getTeamById(teamId);
+
+    // 해당 팀 정보가 없는 경우
+    if (!team || !!team.deletedAt) {
+      throw new NotFoundException(`Can't find team with id ${teamId}`);
+    }
+
+    await this.teamsRepository.deleteTeamByTeamId(teamId);
+  }
 }
