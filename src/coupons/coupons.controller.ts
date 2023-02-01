@@ -10,7 +10,7 @@ import {
 } from '@nestjs/swagger/dist';
 import { Controller, Put } from '@nestjs/common';
 import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
-import { Coupons } from './constants/Coupons';
+import { Coupons } from './constants/coupons';
 import { RegisterCouponDto } from './dtos/register-coupon.dto';
 
 @ApiTags('COUPON')
