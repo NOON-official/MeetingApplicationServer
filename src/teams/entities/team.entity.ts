@@ -75,10 +75,10 @@ export class Team extends BaseEntity {
   @OneToOne(() => MatchingRefuseReason, { cascade: true })
   matchingRefuseReason: MatchingRefuseReason;
 
-  @OneToMany(() => TeamAvailableDate, (teamAvailableDate) => teamAvailableDate.team, { cascade: true })
+  @OneToMany(() => TeamAvailableDate, (teamAvailableDate) => teamAvailableDate.team, { cascade: true, eager: true })
   teamAvailableDates: TeamAvailableDate[];
 
-  @OneToMany(() => TeamMember, (teamMember) => teamMember.team, { cascade: true })
+  @OneToMany(() => TeamMember, (teamMember) => teamMember.team, { cascade: true, eager: true })
   teamMembers: TeamMember[];
 
   @ManyToOne(() => User, (user) => user.teams, { onDelete: 'CASCADE' })
