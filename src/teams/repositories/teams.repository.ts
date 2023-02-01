@@ -43,7 +43,12 @@ export class TeamsRepository extends Repository<Team> {
 
   // 팀 정보 조회
   async getTeamById(teamId: number): Promise<Team> {
-    const team = this.findOneBy({ id: teamId });
+    const team = this.findOne({
+      where: {
+        id: teamId,
+      },
+      withDeleted: true,
+    });
     return team;
   }
 
