@@ -1,3 +1,4 @@
+import { GetTeamDto } from './dtos/get-team.dto';
 import { BadRequestException } from '@nestjs/common/exceptions';
 import { MatchingRound } from './../matchings/constants/matching-round';
 import { CreateTeamDto } from './dtos/create-team.dto';
@@ -186,5 +187,22 @@ export class TeamsService {
 
   async getTeamById(teamId: number): Promise<Team> {
     return this.teamsRepository.getTeamById(teamId);
+  }
+
+  async getApplicationTeamById(teamId: number): Promise<GetTeamDto> {
+    const team = await this.teamsRepository.getTeamById(teamId);
+
+    team['ownerId'] = team.user.id;
+    team['availableDates'] = team.teamAvailableDates.map((d) => d.teamAvailableDate);
+
+    delete Object.assign(team, { ['members']: team['teamMembers'] })['teamMembers']; // 프로퍼티 이름 변경
+    delete team.user;
+    delete team.teamAvailableDates;
+    delete team.maleTeamMatching;
+    delete team.femaleTeamMatching;
+
+    const result = Object.assign(team);
+
+    return result;
   }
 }

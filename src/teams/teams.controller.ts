@@ -160,7 +160,9 @@ export class TeamsController {
   @ApiForbiddenResponse({ description: 'Forbidden' })
   @Get(':teamId')
   @UseGuards(AccessTokenGuard, OwnerGuard)
-  getTeamsTeamId(@GetUser() _user: PassportUser, @Param('teamId') teamId: number) {}
+  getTeamsTeamId(@GetUser() _user: PassportUser, @Param('teamId') teamId: number): Promise<GetTeamDto> {
+    return this.teamsService.getApplicationTeamById(teamId);
+  }
 
   @ApiBearerAuth()
   @ApiOperation({
