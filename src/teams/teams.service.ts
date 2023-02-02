@@ -173,7 +173,7 @@ export class TeamsService {
     }
   }
 
-  async deleteTeamByTeamId(userId: number, teamId: number): Promise<void> {
+  async deleteTeamByTeamId(teamId: number): Promise<void> {
     const team = await this.teamsRepository.getTeamById(teamId);
 
     // 해당 팀 정보가 없는 경우
