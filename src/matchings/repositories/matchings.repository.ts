@@ -16,4 +16,16 @@ export class MatchingsRepository extends Repository<Matching> {
 
     return matching;
   }
+
+  async getMatchingIdByTeamId(teamId: number): Promise<{ matchingId: number }> {
+    const result = await this.createQueryBuilder('matching')
+      .select('matching.id')
+      .where('matching.maleTeamId = :teamId', { teamId })
+      .orWhere('matching.femaleTeamId = :teamId', { teamId })
+      .getOne();
+
+    const matchingId = result?.id || null;
+
+    return { matchingId };
+  }
 }
