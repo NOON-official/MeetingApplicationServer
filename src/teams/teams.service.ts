@@ -56,7 +56,7 @@ export class TeamsService {
       user,
     );
 
-    const team = await this.teamsRepository.getTeamById(teamId);
+    const team = await this.getTeamById(teamId);
 
     // 팀 가능 날짜 저장
     await this.teamsRepository.createTeamAvailableDate(availableDates, team);
@@ -117,7 +117,7 @@ export class TeamsService {
   }
 
   async updateTeam(teamId: number, updateTeamDto: UpdateTeamDto): Promise<void> {
-    const team = await this.teamsRepository.getTeamById(teamId);
+    const team = await this.getTeamById(teamId);
 
     // 해당 팀 정보가 없는 경우
     if (!team || !!team.deletedAt) {
@@ -175,7 +175,7 @@ export class TeamsService {
   }
 
   async deleteTeamByTeamId(teamId: number): Promise<void> {
-    const team = await this.teamsRepository.getTeamById(teamId);
+    const team = await this.getTeamById(teamId);
 
     // 해당 팀 정보가 없는 경우
     if (!team || !!team.deletedAt) {
@@ -190,7 +190,7 @@ export class TeamsService {
   }
 
   async getApplicationTeamById(teamId: number): Promise<GetTeamDto> {
-    const team = await this.teamsRepository.getTeamById(teamId);
+    const team = await this.getTeamById(teamId);
 
     team['ownerId'] = team.user.id;
     team['availableDates'] = team.teamAvailableDates.map((d) => d.teamAvailableDate);
@@ -204,5 +204,43 @@ export class TeamsService {
     const result = Object.assign(team);
 
     return result;
+  }
+
+  async reapplyTeam(teamId: number): Promise<void> {
+    // 1. 기존 팀 정보 가져오기
+    const existingTeam = await this.getApplicationTeamById(teamId);
+    if (!!existingTeam.deletedAt) {
+      throw new NotFoundException(`Can't find team with id ${teamId}`);
+    }
+
+    const user = await this.usersService.getUserById(existingTeam.ownerId);
+
+    const newTeamData = {
+      gender: existingTeam.gender,
+      memberCount: existingTeam.memberCount,
+      universities: existingTeam.universities,
+      areas: existingTeam.areas,
+      intro: existingTeam.intro,
+      drink: existingTeam.drink,
+      prefSameUniversity: existingTeam.prefSameUniversity,
+      prefAge: existingTeam.prefAge,
+      prefVibes: existingTeam.prefVibes,
+    };
+
+    // 2. 새로운 팀 생성하기
+    const { teamId: newTeamId } = await this.teamsRepository.createTeam(newTeamData, user);
+    const newTeam = await this.getTeamById(newTeamId);
+
+    // 팀 가능 날짜 저장
+    await this.teamsRepository.createTeamAvailableDate(existingTeam.availableDates, newTeam);
+
+    // 팀 멤버 저장
+    const newMembers = existingTeam.members.map((m) => {
+      return { role: m.role, mbti: m.mbti, appearance: m.appearance, age: m.age };
+    });
+    await this.teamsRepository.createTeamMember(newMembers, newTeam);
+
+    // 3. 기존 팀 삭제하기(soft delete)
+    await this.deleteTeamByTeamId(teamId);
   }
 }

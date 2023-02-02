@@ -172,7 +172,9 @@ export class TeamsController {
   @ApiCreatedResponse({ description: 'Created' })
   @Post(':teamId/reapply')
   @UseGuards(AccessTokenGuard, OwnerGuard)
-  postTeamsTeamIdReapply(@GetUser() _user: PassportUser, @Param('teamId') teamId: number) {}
+  postTeamsTeamIdReapply(@GetUser() _user: PassportUser, @Param('teamId') teamId: number): Promise<void> {
+    return this.teamsService.reapplyTeam(teamId);
+  }
 
   @ApiBearerAuth()
   @ApiOperation({
