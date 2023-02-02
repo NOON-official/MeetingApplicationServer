@@ -81,7 +81,7 @@ export class Team extends BaseEntity {
   @OneToMany(() => TeamMember, (teamMember) => teamMember.team, { cascade: true, eager: true })
   teamMembers: TeamMember[];
 
-  @ManyToOne(() => User, (user) => user.teams, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, (user) => user.teams, { onDelete: 'CASCADE', eager: true })
   @JoinColumn({ name: 'ownerId' })
   user: User;
 }
