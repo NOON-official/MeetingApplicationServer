@@ -1,3 +1,4 @@
+import { MatchingsModule } from './../matchings/matchings.module';
 import { UsersModule } from './../users/users.module';
 import { TeamsRepository } from './repositories/teams.repository';
 import { TeamMembersRepository } from './repositories/team-members.repository';
@@ -11,6 +12,7 @@ import { TeamsService } from './teams.service';
   imports: [
     TypeOrmExModule.forCustomRepository([TeamsRepository, TeamMembersRepository, TeamAvailableDatesRepository]),
     forwardRef(() => UsersModule),
+    forwardRef(() => MatchingsModule),
   ],
   providers: [TeamsService],
   controllers: [TeamsController],
