@@ -16,6 +16,7 @@ import { Roles } from './constants/roles';
 import { SameUniversities } from './constants/same-universities';
 import { Vibes } from './constants/vibes';
 import { UpdateTeamDto } from './dtos/update-team.dto';
+import { Team } from './entities/team.entity';
 
 @Injectable()
 export class TeamsService {
@@ -172,7 +173,7 @@ export class TeamsService {
     }
   }
 
-  async deleteTeamByTeamId(teamId: number): Promise<void> {
+  async deleteTeamByTeamId(userId: number, teamId: number): Promise<void> {
     const team = await this.teamsRepository.getTeamById(teamId);
 
     // 해당 팀 정보가 없는 경우
@@ -181,5 +182,9 @@ export class TeamsService {
     }
 
     await this.teamsRepository.deleteTeamByTeamId(teamId);
+  }
+
+  async getTeamById(teamId: number): Promise<Team> {
+    return this.teamsRepository.getTeamById(teamId);
   }
 }
