@@ -2,6 +2,12 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class getMemberDto {
   @ApiProperty({
+    description: '멤버 ID',
+    example: 1,
+  })
+  id: number;
+
+  @ApiProperty({
     description: '포지션',
     example: 1,
   })
@@ -94,16 +100,10 @@ export class GetTeamDto {
   prefSameUniversity: boolean;
 
   @ApiProperty({
-    description: '상대방 선호 나이 최솟값',
-    example: 23,
+    description: '상대방 선호 나이',
+    example: [23, 27],
   })
-  prefMinAge: number;
-
-  @ApiProperty({
-    description: '상대방 선호 나이 최댓값',
-    example: 27,
-  })
-  prefMaxAge: number;
+  prefAge: number[];
 
   @ApiProperty({
     description: '분위기',
