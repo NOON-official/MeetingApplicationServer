@@ -1,7 +1,7 @@
 import { TicketsService } from './../tickets/tickets.service';
 import { Coupon } from 'src/coupons/entities/coupon.entity';
 import { Coupons } from '../coupons/constants/coupons';
-import { Products } from './constants/products';
+import { Products, ProductType } from './constants/products';
 import { CouponsService } from './../coupons/coupons.service';
 import { CreateOrder } from './interfaces/create-order.interface';
 import { CreateOrderDto } from './dtos/create-order.dto';
@@ -179,5 +179,9 @@ export class OrdersService {
 
   async getOrdersByUserId(userId: number): Promise<{ orders: UserOrder[] }> {
     return this.ordersRepository.getOrdersByUserId(userId);
+  }
+
+  async getProductsPagedata(): Promise<{ Products: ProductType[] }> {
+    return { Products };
   }
 }

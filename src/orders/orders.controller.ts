@@ -12,7 +12,7 @@ import {
 } from '@nestjs/swagger/dist';
 import { Controller, Post, UseGuards } from '@nestjs/common';
 import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
-import { Products } from './constants/products';
+import { Products, ProductType } from './constants/products';
 import { CreateOrderDto } from './dtos/create-order.dto';
 import { GetUser } from 'src/common/get-user.decorator';
 import { OrdersService } from './orders.service';
@@ -37,7 +37,9 @@ export class OrdersController {
   })
   @Get('pagedata')
   @UseGuards(AccessTokenGuard)
-  getTicketsPagedata() {}
+  getTicketsPagedata(): Promise<{ Products: ProductType[] }> {
+    return this.ordersService.getProductsPagedata();
+  }
 
   @ApiOperation({
     summary: '이용권 구매',
