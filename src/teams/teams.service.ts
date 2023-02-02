@@ -1,3 +1,4 @@
+import { MatchingsService } from './../matchings/matchings.service';
 import { GetTeamDto } from './dtos/get-team.dto';
 import { BadRequestException } from '@nestjs/common/exceptions';
 import { MatchingRound } from './../matchings/constants/matching-round';
@@ -25,6 +26,8 @@ export class TeamsService {
     private teamsRepository: TeamsRepository,
     @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
+    @Inject(forwardRef(() => MatchingsService))
+    private matchingsService: MatchingsService,
   ) {}
 
   async createTeam(createTeamDto: CreateTeamDto, userId: number): Promise<void> {
@@ -242,5 +245,9 @@ export class TeamsService {
 
     // 3. 기존 팀 삭제하기(soft delete)
     await this.deleteTeamByTeamId(teamId);
+  }
+
+  async getMatchingIdByTeamId(teamId: number): Promise<{ matchingId: number }> {
+    return this.matchingsService.getMatchingIdByTeamId(teamId);
   }
 }

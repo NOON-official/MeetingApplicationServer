@@ -9,4 +9,8 @@ export class MatchingsService {
   async getMatchingByTeamId(teamId: number): Promise<Matching> {
     return this.matchingsRepository.getMatchingByTeamId(teamId);
   }
+
+  async getMatchingIdByTeamId(teamId: number): Promise<{ matchingId: number }> {
+    return this.matchingsRepository.getMatchingIdByTeamId(teamId);
+  }
 }

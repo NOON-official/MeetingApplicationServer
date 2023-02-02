@@ -190,5 +190,10 @@ export class TeamsController {
   })
   @Get(':teamId/matching-id')
   @UseGuards(AccessTokenGuard, OwnerGuard)
-  getTeamsTeamIdMatchingId(@GetUser() _user: PassportUser, @Param('teamId') teamId: number) {}
+  getTeamsTeamIdMatchingId(
+    @GetUser() _user: PassportUser,
+    @Param('teamId') teamId: number,
+  ): Promise<{ matchingId: number }> {
+    return this.teamsService.getMatchingIdByTeamId(teamId);
+  }
 }
