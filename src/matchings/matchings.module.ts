@@ -9,5 +9,6 @@ import { MatchingsService } from './matchings.service';
   imports: [TypeOrmExModule.forCustomRepository([MatchingsRepository, MatchingRefuseReasonsRepository])],
   providers: [MatchingsService],
   controllers: [MatchingsController],
+  exports: [MatchingsService],
 })
 export class MatchingsModule {}
