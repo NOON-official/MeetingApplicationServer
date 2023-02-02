@@ -2,6 +2,7 @@ import { UserCoupon } from './../users/interfaces/user-coupon.interface';
 import { CouponsRepository } from './repositories/coupons.repository';
 import { Injectable } from '@nestjs/common';
 import { Coupon } from './entities/coupon.entity';
+import { Coupons, CouponType } from './constants/coupons';
 
 @Injectable()
 export class CouponsService {
@@ -21,5 +22,9 @@ export class CouponsService {
 
   async getCouponsByUserId(userId: number): Promise<{ coupons: UserCoupon[] }> {
     return this.couponsRepository.getCouponsByUserId(userId);
+  }
+
+  async getCouponsPagedata(): Promise<{ Coupons: CouponType[] }> {
+    return { Coupons };
   }
 }

@@ -1,3 +1,4 @@
+import { CouponsService } from './coupons.service';
 import { Body, Get, UseGuards } from '@nestjs/common';
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { ApiOperation } from '@nestjs/swagger';
@@ -10,7 +11,7 @@ import {
 } from '@nestjs/swagger/dist';
 import { Controller, Put } from '@nestjs/common';
 import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
-import { Coupons } from './constants/coupons';
+import { Coupons, CouponType } from './constants/coupons';
 import { RegisterCouponDto } from './dtos/register-coupon.dto';
 
 @ApiTags('COUPON')
@@ -18,6 +19,8 @@ import { RegisterCouponDto } from './dtos/register-coupon.dto';
 @ApiNotFoundResponse({ description: 'Not Found' })
 @Controller('coupons')
 export class CouponsController {
+  constructor(private couponsService: CouponsService) {}
+
   @ApiOperation({
     summary: '쿠폰 페이지데이터 가져오기',
   })
@@ -31,7 +34,9 @@ export class CouponsController {
   })
   @Get('pagedata')
   @UseGuards(AccessTokenGuard)
-  getCouponsPagedata() {}
+  getCouponsPagedata(): Promise<{ Coupons: CouponType[] }> {
+    return this.couponsService.getCouponsPagedata();
+  }
 
   @ApiOperation({
     summary: '쿠폰 등록',
