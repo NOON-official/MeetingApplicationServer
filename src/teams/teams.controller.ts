@@ -29,6 +29,7 @@ import { ApiTags } from '@nestjs/swagger/dist';
 import { Controller, Get, Post, Patch, Delete, UseGuards } from '@nestjs/common';
 import { UpdateTeamDto } from './dtos/update-team.dto';
 import { teamPagedata } from './interfaces/team-pagedata.interface';
+import { OwnerGuard } from 'src/common/owner.guard';
 
 @ApiTags('TEAM')
 @ApiUnauthorizedResponse({ description: 'Unauthorized' })
@@ -128,8 +129,12 @@ export class TeamsController {
   })
   @ApiOkResponse({ description: 'OK' })
   @Patch(':teamId')
-  @UseGuards(AccessTokenGuard)
-  patchTeamsTeamId(@Param('teamId') teamId: number, @Body() updateTeamDto: UpdateTeamDto): Promise<void> {
+  @UseGuards(AccessTokenGuard, OwnerGuard)
+  patchTeamsTeamId(
+    @GetUser() _user: PassportUser,
+    @Param('teamId') teamId: number,
+    @Body() updateTeamDto: UpdateTeamDto,
+  ): Promise<void> {
     return this.teamsService.updateTeam(teamId, updateTeamDto);
   }
 
@@ -139,8 +144,8 @@ export class TeamsController {
   })
   @ApiOkResponse({ description: 'OK' })
   @Delete(':teamId')
-  @UseGuards(AccessTokenGuard)
-  deleteTeamsTeamId(@Param('teamId') teamId: number): Promise<void> {
+  @UseGuards(AccessTokenGuard, OwnerGuard)
+  deleteTeamsTeamId(@GetUser() _user: PassportUser, @Param('teamId') teamId: number): Promise<void> {
     return this.teamsService.deleteTeamByTeamId(teamId);
   }
 
@@ -154,8 +159,8 @@ export class TeamsController {
   })
   @ApiForbiddenResponse({ description: 'Forbidden' })
   @Get(':teamId')
-  @UseGuards(AccessTokenGuard)
-  getTeamsTeamId(@Param('teamId') teamId: number) {}
+  @UseGuards(AccessTokenGuard, OwnerGuard)
+  getTeamsTeamId(@GetUser() _user: PassportUser, @Param('teamId') teamId: number) {}
 
   @ApiBearerAuth()
   @ApiOperation({
@@ -164,8 +169,8 @@ export class TeamsController {
   })
   @ApiCreatedResponse({ description: 'Created' })
   @Post(':teamId/reapply')
-  @UseGuards(AccessTokenGuard)
-  postTeamsTeamIdReapply(@Param('teamId') teamId: number) {}
+  @UseGuards(AccessTokenGuard, OwnerGuard)
+  postTeamsTeamIdReapply(@GetUser() _user: PassportUser, @Param('teamId') teamId: number) {}
 
   @ApiBearerAuth()
   @ApiOperation({
@@ -180,6 +185,6 @@ export class TeamsController {
     },
   })
   @Get(':teamId/matching-id')
-  @UseGuards(AccessTokenGuard)
-  getTeamsTeamIdMatchingId(@Param('teamId') teamId: number) {}
+  @UseGuards(AccessTokenGuard, OwnerGuard)
+  getTeamsTeamIdMatchingId(@GetUser() _user: PassportUser, @Param('teamId') teamId: number) {}
 }
