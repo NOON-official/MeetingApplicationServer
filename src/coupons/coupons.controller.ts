@@ -1,3 +1,4 @@
+import { PassportUser } from './../auth/interfaces/passport-user.interface';
 import { CouponsService } from './coupons.service';
 import { Body, Get, UseGuards } from '@nestjs/common';
 /* eslint-disable @typescript-eslint/no-empty-function */
@@ -13,6 +14,7 @@ import { Controller, Put } from '@nestjs/common';
 import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 import { Coupons, CouponType } from './constants/coupons';
 import { RegisterCouponDto } from './dtos/register-coupon.dto';
+import { GetUser } from 'src/common/get-user.decorator';
 
 @ApiTags('COUPON')
 @ApiUnauthorizedResponse({ description: 'Unauthorized' })
@@ -45,5 +47,7 @@ export class CouponsController {
   @ApiOkResponse({ description: 'OK' })
   @Put('register')
   @UseGuards(AccessTokenGuard)
-  putCouponsRegister(@Body() registerCouponDto: RegisterCouponDto) {}
+  putCouponsRegister(@GetUser() user: PassportUser, @Body() registerCouponDto: RegisterCouponDto): Promise<void> {
+    return this.couponsService.registerCoupon(user.sub, registerCouponDto);
+  }
 }

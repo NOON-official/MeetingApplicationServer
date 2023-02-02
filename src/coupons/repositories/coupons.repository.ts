@@ -47,4 +47,18 @@ export class CouponsRepository extends Repository<Coupon> {
 
     return { coupons };
   }
+
+  async getCouponByCode(couponCode: string): Promise<Coupon> {
+    const coupon = await this.findOneBy({ code: couponCode });
+
+    if (!coupon) {
+      throw new NotFoundException(`Can't find coupon with code ${couponCode}`);
+    }
+
+    return coupon;
+  }
+
+  async registerCoupon(couponId: number, userId: number): Promise<void> {
+    await this.createQueryBuilder().relation(Coupon, 'user').of(couponId).set(userId);
+  }
 }
