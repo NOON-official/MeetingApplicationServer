@@ -29,7 +29,7 @@ import { ApiTags } from '@nestjs/swagger/dist';
 import { Controller, Get, Post, Patch, Delete, UseGuards } from '@nestjs/common';
 import { UpdateTeamDto } from './dtos/update-team.dto';
 import { teamPagedata } from './interfaces/team-pagedata.interface';
-import { OwnerGuard } from 'src/common/owner.guard';
+import { OwnerGuard } from 'src/auth/guards/owner.guard';
 
 @ApiTags('TEAM')
 @ApiUnauthorizedResponse({ description: 'Unauthorized' })

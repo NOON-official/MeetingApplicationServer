@@ -1,5 +1,5 @@
-import { MatchingsService } from './../matchings/matchings.service';
-import { TeamsService } from './../teams/teams.service';
+import { MatchingsService } from '../../matchings/matchings.service';
+import { TeamsService } from '../../teams/teams.service';
 import { Injectable, CanActivate, ExecutionContext, Inject, forwardRef } from '@nestjs/common';
 
 @Injectable()
