@@ -1,15 +1,18 @@
+import { VerifyPhoneCodeDto } from './dtos/verify-phone-code.dto';
+import { SavePhoneDto } from './dtos/save-phone.dto';
 import { PassportUser } from './interfaces/passport-user.interface';
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { AccessTokenGuard } from './guards/access-token.guard';
 import { RefreshTokenGuard } from './guards/refresh-token.guard';
 import { AuthService } from './auth.service';
 import { KakaoUser } from './interfaces/kakao-user.interface';
-import { Controller, Get, HttpStatus, UseGuards, Res, Redirect, Delete } from '@nestjs/common';
+import { Controller, Get, HttpStatus, UseGuards, Res, Redirect, Delete, Post, Body } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger/dist';
 import {
   ApiCookieAuth,
+  ApiCreatedResponse,
   ApiExcludeEndpoint,
   ApiForbiddenResponse,
   ApiOkResponse,
@@ -69,6 +72,44 @@ export class AuthController {
   @UseGuards(RefreshTokenGuard)
   getAuthRefresh(@GetUser() user: PassportUser): Promise<{ accessToken: string }> {
     return this.authService.refreshToken(user['sub'], user['refreshToken']);
+  }
+
+  @ApiOperation({
+    summary: '전화번호 저장',
+    description: '해당 유저 전화번호로 서버에서 인증 코드가 담긴 문자 발송 (제한 시간: 3분)',
+  })
+  @ApiBearerAuth()
+  @ApiOkResponse({
+    schema: {
+      example: {
+        phone: '01012345678',
+      },
+    },
+  })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @Post('phone')
+  @UseGuards(AccessTokenGuard)
+  postAuthPhone(@Body() savePhoneDto: SavePhoneDto): Promise<void> {
+    return this.authService.postVerificationCode(savePhoneDto);
+  }
+
+  @ApiOperation({
+    summary: '전화번호 인증 코드 확인',
+    description: '인증 코드(6자리)를 서버에서 검증한 후 성공/실패에 따라 응답을 반환 및 전화번호 저장',
+  })
+  @ApiBearerAuth()
+  @ApiCreatedResponse({
+    schema: {
+      example: {
+        code: '123456',
+      },
+    },
+  })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @Post('phone/code')
+  @UseGuards(AccessTokenGuard)
+  postAuthPhoneCode(@GetUser() user: PassportUser, @Body() verifyPhoneCodeDto: VerifyPhoneCodeDto) {
+    return this.authService.verifyCodeAndSavePhone(user.sub, verifyPhoneCodeDto);
   }
 
   @ApiOperation({

@@ -8,9 +8,16 @@ import { forwardRef, Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
-  imports: [JwtModule.register({}), UsersModule, forwardRef(() => TeamsModule), forwardRef(() => MatchingsModule)],
+  imports: [
+    JwtModule.register({}),
+    HttpModule,
+    UsersModule,
+    forwardRef(() => TeamsModule),
+    forwardRef(() => MatchingsModule),
+  ],
   providers: [AuthService, KakaoStrategy, AccessTokenStrategy, RefreshTokenStrategy],
   controllers: [AuthController],
 })

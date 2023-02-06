@@ -1,17 +1,26 @@
+import { BadRequestException, HttpException } from '@nestjs/common/exceptions';
+import { VerifyPhoneCodeDto } from './dtos/verify-phone-code.dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt/dist';
 import { KakaoUser } from './interfaces/kakao-user.interface';
 import { UsersService } from './../users/users.service';
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { CACHE_MANAGER, ForbiddenException, Inject, NotFoundException } from '@nestjs/common';
 import { Response } from 'express';
+import { SavePhoneDto } from './dtos/save-phone.dto';
+import { Cache } from 'cache-manager';
+import { catchError, firstValueFrom } from 'rxjs';
+import { HttpService } from '@nestjs/axios';
+import { Method } from 'axios';
+import * as crypto from 'crypto';
 
-@Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private readonly httpService: HttpService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   async IssueAccessToken(payload: JwtPayload): Promise<string> {
@@ -97,5 +106,111 @@ export class AuthService {
 
   async deleteAccount(userId: number): Promise<void> {
     return await this.usersService.deleteAccount(userId);
+  }
+
+  async getNaverCloudSignature(method: Method, url: string, timestamp: string, accessKey: string, secretKey: string) {
+    const message = [];
+    const space = ' '; // one space
+    const newLine = '\n'; // new line
+
+    const hmac = crypto.createHmac('sha256', secretKey);
+
+    message.push(method);
+    message.push(space);
+    message.push(url);
+    message.push(newLine);
+    message.push(timestamp);
+    message.push(newLine);
+    message.push(accessKey);
+
+    const signature = hmac.update(message.join('')).digest('base64').toString();
+
+    return signature;
+  }
+
+  async postNaverCloudSMS(sendPhoneNumber: string, receivePhoneNumber: string, content: string) {
+    const accessKey = this.configService.get<string>('NAVERCLOUD_ACCESS_KEY');
+    const secretKey = this.configService.get<string>('NAVERCLOUD_SECRET_KEY');
+    const serviceId = this.configService.get<string>('NAVERCLOUD_SENS_SERVICE_ID');
+
+    const url = `https://sens.apigw.ntruss.com/sms/v2/services/${serviceId}/messages`;
+    const timestamp = Date.now().toString();
+
+    const requestConfig = {
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+        'x-ncp-iam-access-key': accessKey,
+        'x-ncp-apigw-timestamp': timestamp,
+        'x-ncp-apigw-signature-v2': await this.getNaverCloudSignature('POST', url, timestamp, accessKey, secretKey),
+      },
+    };
+
+    const requestData = {
+      type: 'SMS',
+      contentType: 'COMM', // 일반 메시지
+      countryCode: '82', // 국가 번호
+      from: sendPhoneNumber, // 발신 번호
+      content,
+      messages: [
+        {
+          to: receivePhoneNumber, // 수신 번호
+        },
+      ],
+    };
+
+    const data = await firstValueFrom(
+      this.httpService.post(url, requestData, requestConfig).pipe(
+        catchError((error) => {
+          throw new HttpException(error.response.data.error, error.response.status);
+        }),
+      ),
+    );
+
+    // console.log(data)
+    // 응답 Body
+    //   {
+    //     "requestId":"string",
+    //     "requestTime":"string",
+    //     "statusCode":"string",
+    //     "statusName":"string"
+    //   }
+  }
+
+  async postVerificationCode(savePhoneDto: SavePhoneDto): Promise<void> {
+    // 1. 인증 코드 생성
+    const phone = savePhoneDto.phone;
+    const code = String(Math.floor(Math.random() * 1000000)).padStart(6, '0');
+    console.log(code);
+    // 2. 해당 전화번호와 1:1 저장
+    await this.cacheManager.set(phone, code); // 제한시간 3분
+
+    // 3. 문자로 인증 코드 발송
+    const sendPhoneNumber = this.configService.get<string>('SEND_MESSAGE_PHONE_NUMBER');
+    const receivePhoneNumber = `${phone.substring(0, 3)}-${phone.substring(3, 7)}-${phone.substring(7, 11)}`;
+    const content = `인증 코드: ${code}`; // 문자 내용
+
+    await this.postNaverCloudSMS(sendPhoneNumber, receivePhoneNumber, content);
+  }
+
+  async verifyCodeAndSavePhone(userId: number, verifyPhoneCodeDto: VerifyPhoneCodeDto): Promise<void> {
+    const phone = verifyPhoneCodeDto.phone;
+    const receivedCode = verifyPhoneCodeDto.code;
+
+    const savedCode = await this.cacheManager.get(phone);
+
+    // 저장된 인증 코드가 없는 경우(인증 시간이 만료된 경우)
+    if (!savedCode) {
+      throw new NotFoundException('verification timeout');
+    }
+
+    // 입력받은 인증 코드와 저장된 인증 코드 비교
+    if (receivedCode !== savedCode) {
+      throw new BadRequestException('invalid verification code');
+    }
+
+    // 저장된 인증 코드 삭제 및 DB에 핸드폰번호 저장
+    await this.cacheManager.del(phone);
+
+    return await this.usersService.updateUserPhone(userId, { phone });
   }
 }

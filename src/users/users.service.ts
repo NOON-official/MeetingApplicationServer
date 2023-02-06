@@ -1,10 +1,10 @@
+import { SavePhoneDto } from './../auth/dtos/save-phone.dto';
 import { OrdersService } from './../orders/orders.service';
 import { UserAgreement } from './entities/user-agreement.entity';
 import { UserAgreementsRepository } from './repositories/user-agreements.repository';
 import { CreateAgreementDto } from './dtos/create-agreement.dto';
 import { UserCoupon } from './interfaces/user-coupon.interface';
 import { CouponsService } from './../coupons/coupons.service';
-import { UpdatePhoneDto } from './dtos/update-phone.dto';
 import { TeamsService } from './../teams/teams.service';
 import { InvitationsService } from './../invitations/invitations.service';
 import { User } from './entities/user.entity';
@@ -96,7 +96,7 @@ export class UsersService {
     return this.teamsService.getTeamsByUserId(userId);
   }
 
-  async updateUserPhone(userId: number, phone: UpdatePhoneDto): Promise<void> {
+  async updateUserPhone(userId: number, phone: SavePhoneDto): Promise<void> {
     return this.usersRepository.updateUserPhone(userId, phone);
   }
 

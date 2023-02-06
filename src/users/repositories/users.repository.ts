@@ -1,4 +1,4 @@
-import { UpdatePhoneDto } from './../dtos/update-phone.dto';
+import { SavePhoneDto } from './../../auth/dtos/save-phone.dto';
 import { User } from './../entities/user.entity';
 import { CreateUserDto } from './../dtos/create-user.dto';
 import { CustomRepository } from 'src/database/typeorm-ex.decorator';
@@ -85,7 +85,7 @@ export class UsersRepository extends Repository<User> {
     return { nickname, phone };
   }
 
-  async updateUserPhone(userId: number, phone: UpdatePhoneDto): Promise<void> {
+  async updateUserPhone(userId: number, phone: SavePhoneDto): Promise<void> {
     const result = await this.update({ id: userId }, phone);
 
     if (result.affected === 0) {
