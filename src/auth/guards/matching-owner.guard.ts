@@ -37,7 +37,7 @@ export class MatchingOwnerGuard implements CanActivate {
       const team = await this.teamsService.getTeamById(teamId);
 
       // 본인팀이고, 매칭 내 teamId와 일치하는 경우 접근 허용
-      if (team.user.id === userId && (matching.maleTeam.id === teamId || matching.femaleTeam.id === teamId)) {
+      if (team?.user.id === userId && (matching.maleTeam.id === teamId || matching.femaleTeam.id === teamId)) {
         return true;
       }
     }
