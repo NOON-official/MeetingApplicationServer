@@ -4,7 +4,7 @@ import { Injectable, CanActivate, ExecutionContext, Inject, forwardRef } from '@
 
 @Injectable()
 // 팀 소유자에 따라 접근 허용
-export class OwnerGuard implements CanActivate {
+export class TeamOwnerGuard implements CanActivate {
   constructor(
     @Inject(forwardRef(() => TeamsService))
     private teamsService: TeamsService,
