@@ -180,7 +180,7 @@ export class AuthService {
     // 1. 인증 코드 생성
     const phone = savePhoneDto.phone;
     const code = String(Math.floor(Math.random() * 1000000)).padStart(6, '0');
-    console.log(code);
+
     // 2. 해당 전화번호와 1:1 저장
     await this.cacheManager.set(phone, code); // 제한시간 3분
 
