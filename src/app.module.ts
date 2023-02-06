@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { CacheModule, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
@@ -10,6 +10,8 @@ import { InvitationsModule } from './invitations/invitations.module';
 import { CouponsModule } from './coupons/coupons.module';
 import { TicketsModule } from './tickets/tickets.module';
 import { AdminModule } from './admin/admin.module';
+import * as redisStore from 'cache-manager-redis-store';
+import type { ClientOpts } from 'redis';
 
 @Module({
   imports: [
@@ -27,6 +29,13 @@ import { AdminModule } from './admin/admin.module';
       entities: [__dirname + '/**/*.entity.{js,ts}'],
       synchronize: Boolean(process.env.DB_SYNCHRONIZE),
       timezone: '+09:00',
+    }),
+    CacheModule.register<ClientOpts>({
+      store: redisStore,
+      host: process.env.REDIS_HOST,
+      port: +process.env.REDIS_PORT,
+      isGlobal: true,
+      ttl: 3 * 60, // 제한시간 3분
     }),
     AuthModule,
     UsersModule,
