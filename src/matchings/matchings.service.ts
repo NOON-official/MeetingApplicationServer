@@ -1,3 +1,6 @@
+import { TeamsService } from './../teams/teams.service';
+import { MatchingRefuseReasonsRepository } from './repositories/matching-refuse-reasons.repository';
+import { CreateMatchingRefuseReasonDto } from './dtos/create-matching-refuse-reason.dto';
 import { TicketsService } from 'src/tickets/tickets.service';
 import { BadRequestException } from '@nestjs/common/exceptions';
 import { MatchingsRepository } from './repositories/matchings.repository';
@@ -10,10 +13,13 @@ import { UsersService } from 'src/users/users.service';
 export class MatchingsService {
   constructor(
     private matchingsRepository: MatchingsRepository,
+    private matchingRefuseReasonsRepository: MatchingRefuseReasonsRepository,
     @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
     @Inject(forwardRef(() => TicketsService))
     private ticketsService: TicketsService,
+    @Inject(forwardRef(() => TeamsService))
+    private teamsService: TeamsService,
   ) {}
 
   async getMatchingByTeamId(teamId: number): Promise<Matching> {
@@ -138,5 +144,29 @@ export class MatchingsService {
     }
 
     return await this.matchingsRepository.refuseMatchingByGender(matchingId, gender);
+  }
+
+  async createMatchingRefuseReason(
+    matchingId: number,
+    teamId: number,
+    createMatchingRefuseReasonDto: CreateMatchingRefuseReasonDto,
+  ): Promise<void> {
+    const matching = await this.getMatchingById(matchingId);
+
+    if (!matching || !!matching.deletedAt) {
+      throw new NotFoundException(`Can't find matching with id ${matchingId}`);
+    }
+
+    const team = await this.teamsService.getTeamById(teamId);
+
+    if (!team || !!team.deletedAt) {
+      throw new NotFoundException(`Can't find team with id ${teamId}`);
+    }
+
+    return this.matchingRefuseReasonsRepository.createMatchingRefuseReason(
+      matching,
+      team,
+      createMatchingRefuseReasonDto,
+    );
   }
 }
