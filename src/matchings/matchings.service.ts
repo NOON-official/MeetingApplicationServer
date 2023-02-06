@@ -53,4 +53,16 @@ export class MatchingsService {
 
     return result;
   }
+
+  async acceptMatchingByTeamId(matchingId: number, teamId: number): Promise<void> {
+    const matching = await this.getMatchingById(matchingId);
+
+    if (!matching || !!matching.deletedAt) {
+      throw new NotFoundException(`Can't find matching with id ${matchingId}`);
+    }
+
+    const gender = matching.maleTeam.id === teamId ? 'male' : 'female';
+
+    return await this.matchingsRepository.acceptMatchingByTeamId(matchingId, gender);
+  }
 }

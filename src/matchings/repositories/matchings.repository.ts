@@ -39,4 +39,20 @@ export class MatchingsRepository extends Repository<Matching> {
 
     return matching;
   }
+
+  async acceptMatchingByTeamId(matchingId: number, gender: 'male' | 'female'): Promise<void> {
+    if (gender === 'male') {
+      await this.createQueryBuilder()
+        .update(Matching)
+        .set({ maleTeamIsAccepted: true })
+        .where('id = :matchingId', { matchingId })
+        .execute();
+    } else if (gender === 'female') {
+      await this.createQueryBuilder()
+        .update(Matching)
+        .set({ femaleTeamIsAccepted: true })
+        .where('id = :matchingId', { matchingId })
+        .execute();
+    }
+  }
 }
