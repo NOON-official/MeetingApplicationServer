@@ -2,28 +2,28 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class GetMatchingDto {
   @ApiProperty({
-    description: '남자팀 ID',
+    description: '우리팀 ID',
     example: 1,
   })
-  maleTeamId: number;
+  ourteamId: number;
 
   @ApiProperty({
-    description: '여자팀 ID',
+    description: '상대팀 ID',
     example: 2,
   })
-  femaleTeamId: number;
+  partnerTeamId: number;
 
   @ApiProperty({
-    description: '남자팀 수락여부',
+    description: '우리팀 수락여부',
     example: null,
   })
-  maleTeamIsAccepted?: boolean;
+  ourteamIsAccepted?: boolean;
 
   @ApiProperty({
-    description: '여자팀 수락여부',
+    description: '상대팀 수락여부',
     example: true,
   })
-  femaleTeamIsAccepted?: boolean;
+  partnerTeamIsAccepted?: boolean;
 
   @ApiProperty({
     description: '카톡방 생성일시',

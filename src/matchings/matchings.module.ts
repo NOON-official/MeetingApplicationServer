@@ -1,12 +1,18 @@
+import { UsersModule } from './../users/users.module';
+import { TeamsModule } from './../teams/teams.module';
 import { MatchingsRepository } from './repositories/matchings.repository';
 import { MatchingRefuseReasonsRepository } from './repositories/matching-refuse-reasons.repository';
 import { TypeOrmExModule } from './../database/typeorm-ex.module';
 import { MatchingsController } from './matchings.controller';
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { MatchingsService } from './matchings.service';
 
 @Module({
-  imports: [TypeOrmExModule.forCustomRepository([MatchingsRepository, MatchingRefuseReasonsRepository])],
+  imports: [
+    TypeOrmExModule.forCustomRepository([MatchingsRepository, MatchingRefuseReasonsRepository]),
+    forwardRef(() => TeamsModule),
+    forwardRef(() => UsersModule),
+  ],
   providers: [MatchingsService],
   controllers: [MatchingsController],
   exports: [MatchingsService],
