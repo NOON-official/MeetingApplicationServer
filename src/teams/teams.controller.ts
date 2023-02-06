@@ -29,7 +29,7 @@ import { ApiTags } from '@nestjs/swagger/dist';
 import { Controller, Get, Post, Patch, Delete, UseGuards } from '@nestjs/common';
 import { UpdateTeamDto } from './dtos/update-team.dto';
 import { teamPagedata } from './interfaces/team-pagedata.interface';
-import { OwnerGuard } from 'src/common/owner.guard';
+import { TeamOwnerGuard } from 'src/auth/guards/team-owner.guard';
 
 @ApiTags('TEAM')
 @ApiUnauthorizedResponse({ description: 'Unauthorized' })
@@ -129,7 +129,7 @@ export class TeamsController {
   })
   @ApiOkResponse({ description: 'OK' })
   @Patch(':teamId')
-  @UseGuards(AccessTokenGuard, OwnerGuard)
+  @UseGuards(AccessTokenGuard, TeamOwnerGuard)
   patchTeamsTeamId(
     @GetUser() _user: PassportUser,
     @Param('teamId') teamId: number,
@@ -144,7 +144,7 @@ export class TeamsController {
   })
   @ApiOkResponse({ description: 'OK' })
   @Delete(':teamId')
-  @UseGuards(AccessTokenGuard, OwnerGuard)
+  @UseGuards(AccessTokenGuard, TeamOwnerGuard)
   deleteTeamsTeamId(@GetUser() _user: PassportUser, @Param('teamId') teamId: number): Promise<void> {
     return this.teamsService.deleteTeamByTeamId(teamId);
   }
@@ -159,7 +159,7 @@ export class TeamsController {
   })
   @ApiForbiddenResponse({ description: 'Forbidden' })
   @Get(':teamId')
-  @UseGuards(AccessTokenGuard, OwnerGuard)
+  @UseGuards(AccessTokenGuard, TeamOwnerGuard)
   getTeamsTeamId(@GetUser() _user: PassportUser, @Param('teamId') teamId: number): Promise<GetTeamDto> {
     return this.teamsService.getApplicationTeamById(teamId);
   }
@@ -171,7 +171,7 @@ export class TeamsController {
   })
   @ApiCreatedResponse({ description: 'Created' })
   @Post(':teamId/reapply')
-  @UseGuards(AccessTokenGuard, OwnerGuard)
+  @UseGuards(AccessTokenGuard, TeamOwnerGuard)
   postTeamsTeamIdReapply(@GetUser() _user: PassportUser, @Param('teamId') teamId: number): Promise<void> {
     return this.teamsService.reapplyTeam(teamId);
   }
@@ -189,7 +189,7 @@ export class TeamsController {
     },
   })
   @Get(':teamId/matching-id')
-  @UseGuards(AccessTokenGuard, OwnerGuard)
+  @UseGuards(AccessTokenGuard, TeamOwnerGuard)
   getTeamsTeamIdMatchingId(
     @GetUser() _user: PassportUser,
     @Param('teamId') teamId: number,

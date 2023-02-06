@@ -1,10 +1,10 @@
-import { MatchingsService } from './../matchings/matchings.service';
-import { TeamsService } from './../teams/teams.service';
+import { MatchingsService } from '../../matchings/matchings.service';
+import { TeamsService } from '../../teams/teams.service';
 import { Injectable, CanActivate, ExecutionContext, Inject, forwardRef } from '@nestjs/common';
 
 @Injectable()
 // 팀 소유자에 따라 접근 허용
-export class OwnerGuard implements CanActivate {
+export class TeamOwnerGuard implements CanActivate {
   constructor(
     @Inject(forwardRef(() => TeamsService))
     private teamsService: TeamsService,

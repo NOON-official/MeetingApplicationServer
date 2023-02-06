@@ -1,3 +1,4 @@
+import { MatchingsService } from './matchings.service';
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { ApiOperation } from '@nestjs/swagger';
 import {
@@ -12,12 +13,17 @@ import { Body, Controller, Get, Param, Post, Put, UseGuards } from '@nestjs/comm
 import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 import { GetMatchingDto } from './dtos/get-matching.dto';
 import { CreateMatchingRefuseReasonDto } from './dtos/create-matching-refuse-reason.dto';
+import { MatchingOwnerGuard } from 'src/auth/guards/matching-owner.guard';
+import { GetUser } from 'src/common/get-user.decorator';
+import { PassportUser } from 'src/auth/interfaces/passport-user.interface';
 @ApiTags('MATCHING')
 @ApiBearerAuth()
 @ApiUnauthorizedResponse({ description: 'Unauthorized' })
 @ApiNotFoundResponse({ description: 'Not Found' })
 @Controller('matchings')
 export class MatchingsController {
+  constructor(private matchingsService: MatchingsService) {}
+
   @ApiOperation({
     summary: '매칭 정보 조회',
     description:
@@ -27,8 +33,13 @@ export class MatchingsController {
     type: GetMatchingDto,
   })
   @Get(':matchingId')
-  @UseGuards(AccessTokenGuard)
-  getMatchingsMatchingId(@Param('matchingId') matchingId: number) {}
+  @UseGuards(AccessTokenGuard, MatchingOwnerGuard)
+  getMatchingsMatchingId(
+    @GetUser() user: PassportUser,
+    @Param('matchingId') matchingId: number,
+  ): Promise<GetMatchingDto> {
+    return this.matchingsService.getMatchingInfoById(user.sub, matchingId);
+  }
 
   @ApiOperation({
     summary: '매칭 수락하기',

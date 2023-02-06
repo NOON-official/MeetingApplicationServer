@@ -2,7 +2,6 @@ import { UserAgreement } from './entities/user-agreement.entity';
 import { UserCoupon } from './interfaces/user-coupon.interface';
 import { UserTeam } from './interfaces/user-team.interface';
 import { CreateAgreementDto } from './dtos/create-agreement.dto';
-import { UpdatePhoneDto } from './dtos/update-phone.dto';
 import { AccessTokenGuard } from './../auth/guards/access-token.guard';
 import { UseGuards } from '@nestjs/common';
 /* eslint-disable @typescript-eslint/no-empty-function */
@@ -99,22 +98,6 @@ export class UsersController {
   @UseGuards(AccessTokenGuard)
   getUsersTeams(@GetUser() user: PassportUser): Promise<{ teams: UserTeam[] }> {
     return this.usersService.getTeamsByUserId(user.sub);
-  }
-
-  @ApiOperation({
-    summary: '전화번호 변경',
-  })
-  @ApiOkResponse({
-    schema: {
-      example: {
-        phone: '01012345678',
-      },
-    },
-  })
-  @Put('phone')
-  @UseGuards(AccessTokenGuard)
-  putUsersPhone(@GetUser() user: PassportUser, @Body() updatePhoneDto: UpdatePhoneDto): Promise<void> {
-    return this.usersService.updateUserPhone(user.sub, updatePhoneDto);
   }
 
   @ApiOperation({

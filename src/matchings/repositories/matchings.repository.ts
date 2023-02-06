@@ -28,4 +28,15 @@ export class MatchingsRepository extends Repository<Matching> {
 
     return { matchingId };
   }
+
+  async getMatchingById(matchingId: number): Promise<Matching> {
+    const matching = await this.createQueryBuilder('matching')
+      .withDeleted()
+      .leftJoinAndSelect('matching.maleTeam', 'maleTeam')
+      .leftJoinAndSelect('matching.femaleTeam', 'femaleTeam')
+      .where('matching.id = :matchingId', { matchingId })
+      .getOne();
+
+    return matching;
+  }
 }

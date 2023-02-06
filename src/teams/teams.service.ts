@@ -47,7 +47,7 @@ export class TeamsService {
 
     // 이미 매칭중인 팀이 있는 경우
     const existingTeam = await this.teamsRepository.getTeamIdByUserId(userId);
-    if (!!existingTeam) {
+    if (!!existingTeam.teamId) {
       throw new BadRequestException('team is already exists');
     }
 
