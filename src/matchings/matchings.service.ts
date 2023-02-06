@@ -31,7 +31,7 @@ export class MatchingsService {
   }
 
   async getMatchingById(matchingId: number): Promise<Matching> {
-    return await this.matchingsRepository.getMatchingById(matchingId);
+    return this.matchingsRepository.getMatchingById(matchingId);
   }
 
   async getMatchingInfoById(userId: number, matchingId: number): Promise<GetMatchingDto> {
@@ -106,7 +106,7 @@ export class MatchingsService {
     // 이용권 사용 처리
     await this.ticketsService.useTicketById(ticket.id);
 
-    return await this.matchingsRepository.acceptMatchingByGender(matchingId, gender, ticket);
+    return this.matchingsRepository.acceptMatchingByGender(matchingId, gender, ticket);
   }
 
   async refuseMatchingByTeamId(matchingId: number, teamId: number): Promise<void> {
@@ -143,7 +143,7 @@ export class MatchingsService {
       }
     }
 
-    return await this.matchingsRepository.refuseMatchingByGender(matchingId, gender);
+    return this.matchingsRepository.refuseMatchingByGender(matchingId, gender);
   }
 
   async createMatchingRefuseReason(
