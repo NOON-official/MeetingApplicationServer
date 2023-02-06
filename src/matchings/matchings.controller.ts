@@ -76,10 +76,12 @@ export class MatchingsController {
   })
   @ApiCreatedResponse({ description: 'Created' })
   @Post(':matchingId/teams/:teamId/refuse-reason')
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard, MatchingOwnerGuard)
   postMatchingsMatchingIdTeamsTeamIdRefuseReason(
     @Param('matchingId') matchingId: number,
     @Param('teamId') teamId: number,
     @Body() createMatchingRefuseReasonDto: CreateMatchingRefuseReasonDto,
-  ) {}
+  ): Promise<void> {
+    return this.matchingsService.createMatchingRefuseReason(matchingId, teamId, createMatchingRefuseReasonDto);
+  }
 }
