@@ -12,6 +12,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { MatchingRefuseReason } from './matching-refuse-reason.entity';
+import { Ticket } from 'src/tickets/entities/ticket.entity';
 
 @Entity()
 @Unique(['id'])
@@ -44,6 +45,14 @@ export class Matching extends BaseEntity {
   @OneToOne(() => Team, (team) => team.femaleTeamMatching, { onDelete: 'CASCADE' })
   @JoinColumn()
   femaleTeam: Team;
+
+  @OneToOne(() => Ticket, (ticket) => ticket.maleTeamMatching, { onDelete: 'CASCADE' })
+  @JoinColumn()
+  maleTeamTicket: Ticket;
+
+  @OneToOne(() => Ticket, (ticket) => ticket.femaleTeamMatching, { onDelete: 'CASCADE' })
+  @JoinColumn()
+  femaleTeamTicket: Ticket;
 
   @OneToOne(() => MatchingRefuseReason, { cascade: true })
   matchingRefuseReason: MatchingRefuseReason;

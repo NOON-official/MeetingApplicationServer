@@ -43,12 +43,19 @@ export class MatchingsController {
 
   @ApiOperation({
     summary: '매칭 수락하기',
-    description: '이용권 차감됨 \n\n 거절당한 경우 이용권 환불 필요',
+    description:
+      '이용권 1개 차감 \n\n 추후 상대팀이 거절한 경우 이용권 환불됨 \n\n 상대팀이 이미 거절한 경우/이용권이 없는 경우 400에러 발생',
   })
   @ApiOkResponse({ description: 'OK' })
   @Put(':matchingId/teams/:teamId/accept')
-  @UseGuards(AccessTokenGuard)
-  putMatchingsMatchingIdTeamsTeamIdAccept(@Param('matchingId') matchingId: number, @Param('teamId') teamId: number) {}
+  @UseGuards(AccessTokenGuard, MatchingOwnerGuard)
+  putMatchingsMatchingIdTeamsTeamIdAccept(
+    @GetUser() user: PassportUser,
+    @Param('matchingId') matchingId: number,
+    @Param('teamId') teamId: number,
+  ): Promise<void> {
+    return this.matchingsService.acceptMatchingByTeamId(user.sub, matchingId, teamId);
+  }
 
   @ApiOperation({
     summary: '매칭 거절하기',
@@ -56,8 +63,13 @@ export class MatchingsController {
   })
   @ApiOkResponse({ description: 'OK' })
   @Put(':matchingId/teams/:teamId/refuse')
-  @UseGuards(AccessTokenGuard)
-  putMatchingsMatchingIdTeamsTeamIdRefuse(@Param('matchingId') matchingId: number, @Param('teamId') teamId: number) {}
+  @UseGuards(AccessTokenGuard, MatchingOwnerGuard)
+  putMatchingsMatchingIdTeamsTeamIdRefuse(
+    @Param('matchingId') matchingId: number,
+    @Param('teamId') teamId: number,
+  ): Promise<void> {
+    return this.matchingsService.refuseMatchingByTeamId(matchingId, teamId);
+  }
 
   @ApiOperation({
     summary: '매칭 거절 이유 보내기',

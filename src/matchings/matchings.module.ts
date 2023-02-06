@@ -1,3 +1,4 @@
+import { TicketsModule } from 'src/tickets/tickets.module';
 import { UsersModule } from './../users/users.module';
 import { TeamsModule } from './../teams/teams.module';
 import { MatchingsRepository } from './repositories/matchings.repository';
@@ -12,6 +13,7 @@ import { MatchingsService } from './matchings.service';
     TypeOrmExModule.forCustomRepository([MatchingsRepository, MatchingRefuseReasonsRepository]),
     forwardRef(() => TeamsModule),
     forwardRef(() => UsersModule),
+    forwardRef(() => TicketsModule),
   ],
   providers: [MatchingsService],
   controllers: [MatchingsController],
