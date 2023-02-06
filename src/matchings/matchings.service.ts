@@ -1,3 +1,4 @@
+import { BadRequestException } from '@nestjs/common/exceptions';
 import { MatchingsRepository } from './repositories/matchings.repository';
 import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Matching } from './entities/matching.entity';
@@ -57,12 +58,42 @@ export class MatchingsService {
   async acceptMatchingByTeamId(matchingId: number, teamId: number): Promise<void> {
     const matching = await this.getMatchingById(matchingId);
 
+    // 해당 매칭 정보가 없는 경우
     if (!matching || !!matching.deletedAt) {
       throw new NotFoundException(`Can't find matching with id ${matchingId}`);
     }
 
     const gender = matching.maleTeam.id === teamId ? 'male' : 'female';
 
+    // 이미 수락 또는 거절한 경우
+    if (gender === 'male' && (matching.maleTeamIsAccepted === true || matching.maleTeamIsAccepted === false)) {
+      throw new BadRequestException(`already responded team`);
+    }
+    if (gender === 'female' && (matching.femaleTeamIsAccepted === true || matching.femaleTeamIsAccepted === false)) {
+      throw new BadRequestException(`already responded team`);
+    }
+
     return await this.matchingsRepository.acceptMatchingByTeamId(matchingId, gender);
+  }
+
+  async refuseMatchingByTeamId(matchingId: number, teamId: number): Promise<void> {
+    const matching = await this.getMatchingById(matchingId);
+
+    // 해당 매칭 정보가 없는 경우
+    if (!matching || !!matching.deletedAt) {
+      throw new NotFoundException(`Can't find matching with id ${matchingId}`);
+    }
+
+    const gender = matching.maleTeam.id === teamId ? 'male' : 'female';
+
+    // 이미 수락 또는 거절한 경우
+    if (gender === 'male' && (matching.maleTeamIsAccepted === true || matching.maleTeamIsAccepted === false)) {
+      throw new BadRequestException(`already responded team`);
+    }
+    if (gender === 'female' && (matching.femaleTeamIsAccepted === true || matching.femaleTeamIsAccepted === false)) {
+      throw new BadRequestException(`already responded team`);
+    }
+
+    return await this.matchingsRepository.refuseMatchingByTeamId(matchingId, gender);
   }
 }

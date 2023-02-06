@@ -61,8 +61,13 @@ export class MatchingsController {
   })
   @ApiOkResponse({ description: 'OK' })
   @Put(':matchingId/teams/:teamId/refuse')
-  @UseGuards(AccessTokenGuard)
-  putMatchingsMatchingIdTeamsTeamIdRefuse(@Param('matchingId') matchingId: number, @Param('teamId') teamId: number) {}
+  @UseGuards(AccessTokenGuard, MatchingOwnerGuard)
+  putMatchingsMatchingIdTeamsTeamIdRefuse(
+    @Param('matchingId') matchingId: number,
+    @Param('teamId') teamId: number,
+  ): Promise<void> {
+    return this.matchingsService.refuseMatchingByTeamId(matchingId, teamId);
+  }
 
   @ApiOperation({
     summary: '매칭 거절 이유 보내기',
