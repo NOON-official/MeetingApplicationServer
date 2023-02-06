@@ -1,3 +1,4 @@
+import { TicketsService } from 'src/tickets/tickets.service';
 import { BadRequestException } from '@nestjs/common/exceptions';
 import { MatchingsRepository } from './repositories/matchings.repository';
 import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
@@ -11,6 +12,8 @@ export class MatchingsService {
     private matchingsRepository: MatchingsRepository,
     @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
+    @Inject(forwardRef(() => TicketsService))
+    private ticketsService: TicketsService,
   ) {}
 
   async getMatchingByTeamId(teamId: number): Promise<Matching> {
@@ -55,7 +58,7 @@ export class MatchingsService {
     return result;
   }
 
-  async acceptMatchingByTeamId(matchingId: number, teamId: number): Promise<void> {
+  async acceptMatchingByTeamId(userId: number, matchingId: number, teamId: number): Promise<void> {
     const matching = await this.getMatchingById(matchingId);
 
     // 해당 매칭 정보가 없는 경우
@@ -65,15 +68,39 @@ export class MatchingsService {
 
     const gender = matching.maleTeam.id === teamId ? 'male' : 'female';
 
-    // 이미 수락 또는 거절한 경우
-    if (gender === 'male' && (matching.maleTeamIsAccepted === true || matching.maleTeamIsAccepted === false)) {
-      throw new BadRequestException(`already responded team`);
-    }
-    if (gender === 'female' && (matching.femaleTeamIsAccepted === true || matching.femaleTeamIsAccepted === false)) {
-      throw new BadRequestException(`already responded team`);
+    if (gender === 'male') {
+      // 이미 수락 또는 거절한 경우
+      if (matching.maleTeamIsAccepted === true || matching.maleTeamIsAccepted === false) {
+        throw new BadRequestException(`already responded team`);
+      }
+      // 상대팀이 이미 거절한 경우
+      if (matching.femaleTeamIsAccepted === false) {
+        throw new BadRequestException(`partner team already refused`);
+      }
     }
 
-    return await this.matchingsRepository.acceptMatchingByTeamId(matchingId, gender);
+    if (gender === 'female') {
+      // 이미 수락 또는 거절한 경우
+      if (matching.femaleTeamIsAccepted === true || matching.femaleTeamIsAccepted === false) {
+        throw new BadRequestException(`already responded team`);
+      }
+      // 상대팀이 이미 거절한 경우
+      if (matching.maleTeamIsAccepted === false) {
+        throw new BadRequestException(`partner team already refused`);
+      }
+    }
+
+    const ticket = await this.ticketsService.getTicketByUserId(userId);
+
+    // 이용권이 없는 경우
+    if (!ticket) {
+      throw new BadRequestException(`user doesn't have a ticket`);
+    }
+
+    // 이용권 사용 처리
+    await this.ticketsService.useTicketById(ticket.id);
+
+    return await this.matchingsRepository.acceptMatchingByGender(matchingId, gender, ticket);
   }
 
   async refuseMatchingByTeamId(matchingId: number, teamId: number): Promise<void> {
@@ -94,6 +121,22 @@ export class MatchingsService {
       throw new BadRequestException(`already responded team`);
     }
 
-    return await this.matchingsRepository.refuseMatchingByTeamId(matchingId, gender);
+    if (gender === 'male') {
+      // 상대팀이 이미 수락한 경우, 상대팀 이용권 환불
+      if (matching.femaleTeamIsAccepted === true) {
+        await this.ticketsService.refundTicketById(matching.femaleTeamTicket.id);
+        await this.matchingsRepository.deleteTicketInfoByGender(matchingId, 'female');
+      }
+    }
+
+    if (gender === 'female') {
+      // 상대팀이 이미 수락한 경우, 상대팀 이용권 환불
+      if (matching.maleTeamIsAccepted === true) {
+        await this.ticketsService.refundTicketById(matching.maleTeamTicket.id);
+        await this.matchingsRepository.deleteTicketInfoByGender(matchingId, 'male');
+      }
+    }
+
+    return await this.matchingsRepository.refuseMatchingByGender(matchingId, gender);
   }
 }

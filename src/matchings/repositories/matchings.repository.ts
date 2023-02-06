@@ -1,6 +1,7 @@
 import { Matching } from './../entities/matching.entity';
 import { CustomRepository } from 'src/database/typeorm-ex.decorator';
 import { Repository } from 'typeorm';
+import { Ticket } from 'src/tickets/entities/ticket.entity';
 
 @CustomRepository(Matching)
 export class MatchingsRepository extends Repository<Matching> {
@@ -34,29 +35,31 @@ export class MatchingsRepository extends Repository<Matching> {
       .withDeleted()
       .leftJoinAndSelect('matching.maleTeam', 'maleTeam')
       .leftJoinAndSelect('matching.femaleTeam', 'femaleTeam')
+      .leftJoinAndSelect('matching.maleTeamTicket', 'maleTeamTicket')
+      .leftJoinAndSelect('matching.femaleTeamTicket', 'femaleTeamTicket')
       .where('matching.id = :matchingId', { matchingId })
       .getOne();
 
     return matching;
   }
 
-  async acceptMatchingByTeamId(matchingId: number, gender: 'male' | 'female'): Promise<void> {
+  async acceptMatchingByGender(matchingId: number, gender: 'male' | 'female', ticket: Ticket): Promise<void> {
     if (gender === 'male') {
       await this.createQueryBuilder()
         .update(Matching)
-        .set({ maleTeamIsAccepted: true })
+        .set({ maleTeamIsAccepted: true, maleTeamTicket: ticket })
         .where('id = :matchingId', { matchingId })
         .execute();
     } else if (gender === 'female') {
       await this.createQueryBuilder()
         .update(Matching)
-        .set({ femaleTeamIsAccepted: true })
+        .set({ femaleTeamIsAccepted: true, femaleTeamTicket: ticket })
         .where('id = :matchingId', { matchingId })
         .execute();
     }
   }
 
-  async refuseMatchingByTeamId(matchingId: number, gender: 'male' | 'female'): Promise<void> {
+  async refuseMatchingByGender(matchingId: number, gender: 'male' | 'female'): Promise<void> {
     if (gender === 'male') {
       await this.createQueryBuilder()
         .update(Matching)
@@ -67,6 +70,22 @@ export class MatchingsRepository extends Repository<Matching> {
       await this.createQueryBuilder()
         .update(Matching)
         .set({ femaleTeamIsAccepted: false })
+        .where('id = :matchingId', { matchingId })
+        .execute();
+    }
+  }
+
+  async deleteTicketInfoByGender(matchingId: number, gender: 'male' | 'female'): Promise<void> {
+    if (gender === 'male') {
+      await this.createQueryBuilder()
+        .update(Matching)
+        .set({ maleTeamTicket: null })
+        .where('id = :matchingId', { matchingId })
+        .execute();
+    } else if (gender === 'female') {
+      await this.createQueryBuilder()
+        .update(Matching)
+        .set({ femaleTeamTicket: null })
         .where('id = :matchingId', { matchingId })
         .execute();
     }

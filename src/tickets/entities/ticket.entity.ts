@@ -7,10 +7,12 @@ import {
   DeleteDateColumn,
   Entity,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
   Unique,
   UpdateDateColumn,
 } from 'typeorm';
+import { Matching } from 'src/matchings/entities/matching.entity';
 
 @Entity()
 @Unique(['id'])
@@ -35,4 +37,10 @@ export class Ticket extends BaseEntity {
 
   @ManyToOne(() => Order, (order) => order.tickets, { onDelete: 'CASCADE' })
   order: Order;
+
+  @OneToOne(() => Matching, (matching) => matching.maleTeamTicket, { cascade: true })
+  maleTeamMatching: Matching;
+
+  @OneToOne(() => Matching, (matching) => matching.femaleTeamTicket, { cascade: true })
+  femaleTeamMatching: Matching;
 }
