@@ -1,3 +1,4 @@
+import { CreateCouponDto } from './dtos/create-coupon.dto';
 import { BadRequestException } from '@nestjs/common/exceptions';
 import { UserCoupon } from './../users/interfaces/user-coupon.interface';
 import { CouponsRepository } from './repositories/coupons.repository';
@@ -60,5 +61,18 @@ export class CouponsService {
     }
 
     return this.couponsRepository.registerCoupon(coupon.id, userId);
+  }
+
+  async createCouponWithUserId(userId: number, createCouponDto: CreateCouponDto): Promise<void> {
+    const couponType = createCouponDto.type;
+    const isExistingType = Coupons.find((c) => c.id === couponType);
+
+    // 해당 쿠폰 타입이 존재하지 않는 경우
+    if (!isExistingType) {
+      throw new BadRequestException('invalid coupon type');
+    }
+
+    const user = await this.usersService.getUserById(userId);
+    return this.couponsRepository.createCouponWithUser(user, createCouponDto.type, createCouponDto.expiresAt);
   }
 }

@@ -1,3 +1,4 @@
+import { User } from './../../users/entities/user.entity';
 import { UserCoupon } from './../../users/interfaces/user-coupon.interface';
 import { CustomRepository } from 'src/database/typeorm-ex.decorator';
 import { Coupon } from '../entities/coupon.entity';
@@ -60,5 +61,17 @@ export class CouponsRepository extends Repository<Coupon> {
 
   async registerCoupon(couponId: number, userId: number): Promise<void> {
     await this.createQueryBuilder().relation(Coupon, 'user').of(couponId).set(userId);
+  }
+
+  async createCouponWithUser(user: User, couponType: number, expiresAt?: Date): Promise<void> {
+    await this.createQueryBuilder()
+      .insert()
+      .into(Coupon)
+      .values({
+        type: couponType,
+        expiresAt,
+        user,
+      })
+      .execute();
   }
 }
