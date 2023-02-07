@@ -79,13 +79,7 @@ export class AuthController {
     description: '해당 유저 전화번호로 서버에서 인증 코드가 담긴 문자 발송 (제한 시간: 3분)',
   })
   @ApiBearerAuth()
-  @ApiOkResponse({
-    schema: {
-      example: {
-        phone: '01012345678',
-      },
-    },
-  })
+  @ApiCreatedResponse({ description: 'Created' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @Post('phone')
   @UseGuards(AccessTokenGuard)
@@ -95,16 +89,10 @@ export class AuthController {
 
   @ApiOperation({
     summary: '전화번호 인증 코드 확인',
-    description: '인증 코드(6자리)를 서버에서 검증한 후 성공/실패에 따라 응답을 반환 및 전화번호 저장',
+    description: '인증 코드(6자리)를 서버에서 검증한 후 성공/실패에 따라 응답 반환 및 전화번호 저장',
   })
   @ApiBearerAuth()
-  @ApiCreatedResponse({
-    schema: {
-      example: {
-        code: '123456',
-      },
-    },
-  })
+  @ApiCreatedResponse({ description: 'Created' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @Post('phone/code')
   @UseGuards(AccessTokenGuard)

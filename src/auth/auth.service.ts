@@ -114,10 +114,11 @@ export class AuthService {
     const newLine = '\n'; // new line
 
     const hmac = crypto.createHmac('sha256', secretKey);
+    const verificationUrl = url.split('https://sens.apigw.ntruss.com')[1];
 
     message.push(method);
     message.push(space);
-    message.push(url);
+    message.push(verificationUrl);
     message.push(newLine);
     message.push(timestamp);
     message.push(newLine);
@@ -150,7 +151,7 @@ export class AuthService {
       contentType: 'COMM', // 일반 메시지
       countryCode: '82', // 국가 번호
       from: sendPhoneNumber, // 발신 번호
-      content,
+      content, // 문자 내용
       messages: [
         {
           to: receivePhoneNumber, // 수신 번호
@@ -158,36 +159,26 @@ export class AuthService {
       ],
     };
 
-    const data = await firstValueFrom(
+    await firstValueFrom(
       this.httpService.post(url, requestData, requestConfig).pipe(
         catchError((error) => {
-          throw new HttpException(error.response.data.error, error.response.status);
+          throw new HttpException(error.response.data, error.response.status);
         }),
       ),
     );
-
-    // console.log(data)
-    // 응답 Body
-    //   {
-    //     "requestId":"string",
-    //     "requestTime":"string",
-    //     "statusCode":"string",
-    //     "statusName":"string"
-    //   }
   }
 
   async postVerificationCode(savePhoneDto: SavePhoneDto): Promise<void> {
     // 1. 인증 코드 생성
-    const phone = savePhoneDto.phone;
+    const receivePhoneNumber = savePhoneDto.phone;
     const code = String(Math.floor(Math.random() * 1000000)).padStart(6, '0');
 
     // 2. 해당 전화번호와 1:1 저장
-    await this.cacheManager.set(phone, code); // 제한시간 3분
+    await this.cacheManager.set(receivePhoneNumber, code); // 제한시간 3분
 
     // 3. 문자로 인증 코드 발송
     const sendPhoneNumber = this.configService.get<string>('SEND_MESSAGE_PHONE_NUMBER');
-    const receivePhoneNumber = `${phone.substring(0, 3)}-${phone.substring(3, 7)}-${phone.substring(7, 11)}`;
-    const content = `인증 코드: ${code}`; // 문자 내용
+    const content = `[미팅학개론] 인증번호 [${code}]를 입력해주세요.`;
 
     await this.postNaverCloudSMS(sendPhoneNumber, receivePhoneNumber, content);
   }
