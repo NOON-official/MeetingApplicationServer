@@ -1,6 +1,6 @@
 import { TicketsService } from './../tickets/tickets.service';
 import { Coupon } from 'src/coupons/entities/coupon.entity';
-import { Coupons } from '../coupons/constants/coupons';
+import { CouponTypes } from '../coupons/constants/coupons';
 import { Products, ProductType } from './constants/products';
 import { CouponsService } from './../coupons/coupons.service';
 import { CreateOrder } from './interfaces/create-order.interface';
@@ -54,7 +54,7 @@ export class OrdersService {
   }
 
   // 쿠폰 유효성 검증
-  async verifyCoupon(coupon: Coupon, userId: number, productType: number): Promise<void> {
+  async verifyCoupon(coupon: Coupon, userId: number, productId: number): Promise<void> {
     // 유저ID 확인
     if (coupon.user.id !== userId) {
       throw new ForbiddenException('invalid coupon');
@@ -76,8 +76,8 @@ export class OrdersService {
     }
 
     // 쿠폰을 적용할 수 없는 상품인 경우
-    if (coupon.type === 1 || coupon.type === 2) {
-      if (productType !== 1) {
+    if (coupon.typeId === 1 || coupon.typeId === 2) {
+      if (productId !== 1) {
         throw new ForbiddenException('invalid coupon type');
       }
     }
@@ -85,7 +85,7 @@ export class OrdersService {
 
   // 결제 금액 검증
   async verifyOrderAmount(
-    productType: number,
+    productId: number,
     price: number,
     discountAmount: number,
     totalAmount: number,
@@ -93,14 +93,14 @@ export class OrdersService {
     coupon?: Coupon,
   ): Promise<void> {
     // 1. 상품 가격 확인
-    const finalPrice = Products.find((p) => p.id === productType).price;
+    const finalPrice = Products.find((p) => p.id === productId).price;
     if (price !== finalPrice) {
       throw new ForbiddenException('invalid price');
     }
 
     // 2. 쿠폰 있는 경우
     if (coupon) {
-      const discountRate = Coupons.find((c) => c.id === coupon.type).discountRate;
+      const discountRate = CouponTypes.find((c) => c.id === coupon.typeId).discountRate;
       const finalDiscountAmount = finalPrice - finalPrice * ((100 - discountRate) / 100);
       const finalTotalAmount = finalPrice - finalDiscountAmount;
 
@@ -130,12 +130,12 @@ export class OrdersService {
     if (!!createOrderDto.couponId) {
       coupon = await this.couponsService.getCouponById(createOrderDto.couponId);
       // 쿠폰 유효성 검증
-      await this.verifyCoupon(coupon, userId, createOrderDto.productType);
+      await this.verifyCoupon(coupon, userId, createOrderDto.productId);
     }
 
     // 결제 금액 검증
     await this.verifyOrderAmount(
-      createOrderDto.productType,
+      createOrderDto.productId,
       createOrderDto.price,
       createOrderDto.discountAmount,
       createOrderDto.totalAmount,
@@ -152,7 +152,7 @@ export class OrdersService {
     }
 
     const createOrderData: CreateOrder = {
-      productType: createOrderDto.productType,
+      productId: createOrderDto.productId,
       price: createOrderDto.price,
       discountAmount: createOrderDto.discountAmount,
       totalAmount: createOrderDto.totalAmount,
@@ -173,7 +173,7 @@ export class OrdersService {
 
     // 이용권 생성 및 저장
     const order = await this.ordersRepository.getOrderById(orderId);
-    const ticketCount = Products.find((p) => p.id === createOrderDto.productType).ticketCount;
+    const ticketCount = Products.find((p) => p.id === createOrderDto.productId).ticketCount;
     await this.ticketsService.createTickets(ticketCount, user, order);
   }
 

@@ -39,7 +39,7 @@ export class CouponsRepository extends Repository<Coupon> {
 
     const coupons = await this.createQueryBuilder('coupon')
       .select('coupon.id')
-      .addSelect('coupon.type')
+      .addSelect('coupon.typeId')
       .addSelect('coupon.expiresAt')
       .where('coupon.userId = :userId', { userId })
       .andWhere('coupon.usedAt IS NULL')
@@ -63,12 +63,12 @@ export class CouponsRepository extends Repository<Coupon> {
     await this.createQueryBuilder().relation(Coupon, 'user').of(couponId).set(userId);
   }
 
-  async createCouponWithUser(user: User, couponType: number, expiresAt?: Date): Promise<void> {
+  async createCouponWithUser(user: User, couponTypeId: number, expiresAt?: Date): Promise<void> {
     await this.createQueryBuilder()
       .insert()
       .into(Coupon)
       .values({
-        type: couponType,
+        typeId: couponTypeId,
         expiresAt,
         user,
       })

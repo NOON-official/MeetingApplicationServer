@@ -1,5 +1,5 @@
 export interface CreateOrder {
-  productType: number;
+  productId: number;
   price: number;
   discountAmount: number;
   totalAmount: number;

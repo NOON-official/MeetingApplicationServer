@@ -1,5 +1,5 @@
 export interface UserCoupon {
   id: number;
-  type: number;
+  typeId: number;
   expiresAt: Date;
 }

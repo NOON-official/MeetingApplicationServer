@@ -16,6 +16,6 @@ export class InvitationCreatedListener {
   handleInvitationCreatedEvent(event: InvitationCreatedEvent) {
     const expiresAt = new Date(moment().tz('Asia/Seoul').add(2, 'M').format('YYYY-MM-DD')); // 만료 기한: 두 달
 
-    this.couponsService.createCouponWithUserId(event.inviteeId, { type: 1, expiresAt });
+    this.couponsService.createCouponWithUserId(event.inviteeId, { couponTypeId: 1, expiresAt });
   }
 }

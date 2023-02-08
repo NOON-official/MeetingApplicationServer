@@ -23,7 +23,7 @@ export class Order extends BaseEntity {
   id: number;
 
   @Column({ type: 'int' })
-  productType: number;
+  productId: number;
 
   @Column({ type: 'int' })
   price: number;

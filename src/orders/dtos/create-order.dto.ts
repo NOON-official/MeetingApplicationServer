@@ -33,7 +33,7 @@ export class CreateOrderDto {
   @IsInt()
   @Min(1)
   @Max(4)
-  readonly productType: number;
+  readonly productId: number;
 
   @ApiProperty({
     description: '상품 가격',
