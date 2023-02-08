@@ -18,4 +18,14 @@ export class InvitationsRepository extends Repository<Invitation> {
 
     return { invitationCount };
   }
+
+  async getInvitationByInviteeId(inviteeId: number): Promise<Invitation> {
+    const invitation = await this.createQueryBuilder('invitation')
+      .select()
+      .where('invitation.inviteeId = :inviteeId', { inviteeId })
+      .withDeleted()
+      .getOne();
+
+    return invitation;
+  }
 }

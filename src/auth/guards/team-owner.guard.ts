@@ -25,7 +25,7 @@ export class TeamOwnerGuard implements CanActivate {
     const team = await this.teamsService.getTeamById(teamId);
 
     // 1. 해당 팀 소유자인 경우 접근 가능
-    if (team.user.id === userId) {
+    if (team?.user.id === userId) {
       return true;
     }
     // 2. GET request이고, 매칭 상대팀인 경우 접근 가능

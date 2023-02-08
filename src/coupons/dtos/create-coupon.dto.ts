@@ -19,5 +19,5 @@ export class CreateCouponDto {
   @IsOptional()
   @IsDate()
   @Type(() => Date)
-  readonly expiresAt: Date;
+  readonly expiresAt?: Date;
 }
