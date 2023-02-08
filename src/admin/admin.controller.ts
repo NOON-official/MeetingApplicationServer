@@ -1,3 +1,4 @@
+import { AdminService } from './admin.service';
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import {
@@ -13,13 +14,19 @@ import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 import { GetMatchingsDto } from 'src/matchings/dtos/get-matchings.dto';
 import { TeamGender } from 'src/teams/entities/team-gender.enum';
 import { TeamStatus } from 'src/teams/entities/team-status.enum';
+import { Roles } from 'src/common/roles.decorator';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 
 @ApiTags('ADMIN')
 @ApiBearerAuth()
 @ApiUnauthorizedResponse({ description: 'Unauthorized' })
 @ApiNotFoundResponse({ description: 'Not Found' })
+@Roles('admin')
+@UseGuards(AccessTokenGuard, RolesGuard)
 @Controller('admin')
 export class AdminController {
+  constructor(private adminService: AdminService) {}
+
   @ApiOperation({
     summary: '유저 전체 조회',
     description: '관리자 페이지 내 사용',
@@ -55,14 +62,13 @@ export class AdminController {
     },
   })
   @Get('users')
-  @UseGuards(AccessTokenGuard)
   getAdminUsers() {}
 
   @ApiBearerAuth()
   @ApiOperation({
     summary: '신청자 조회',
     description:
-      '관리자페이지 내 사용 \n\n 아직 매칭되지 않은 경우 partnerTeamId와 matchedAt은 null 반환 \n\n 거절당하지 않은 경우 refusedAt은 null 반환',
+      '관리자페이지 내 사용 \n\n * applied = 신청자 \n\n * waiting = 수락/거절 대기자 \n\n * failed = 매칭 실패 회원 \n\n * refused = 거절 당한 회원 \n\n 아직 매칭되지 않은 경우: partnerTeamId=null, matchedAt=null \n\n 매칭실패하지 않은 경우: failedAt=null \n\n 거절당하지 않은 경우: refusedAt=null',
   })
   @ApiQuery({ name: 'status', enum: TeamStatus })
   @ApiQuery({ name: 'membercount', enum: ['2', '3'] })
@@ -81,6 +87,7 @@ export class AdminController {
             phone: '01012345678',
             partnerTeamId: 1,
             matchedAt: '2023-01-20T21:37:26.886Z',
+            failedAt: '2023-01-20T21:37:26.886Z',
             refusedAt: '2023-01-20T21:37:26.886Z',
           },
           {
@@ -93,6 +100,7 @@ export class AdminController {
             phone: '01012345678',
             partnerTeamId: null,
             matchedAt: null,
+            failedAt: null,
             refusedAt: null,
           },
         ],
@@ -100,7 +108,6 @@ export class AdminController {
     },
   })
   @Get('teams')
-  @UseGuards(AccessTokenGuard)
   getAdminTeams(
     @Query('status') status: TeamStatus,
     @Query('membercount') membercount: '2' | '3',
@@ -109,12 +116,13 @@ export class AdminController {
 
   @ApiBearerAuth()
   @ApiOperation({
-    summary: '삭제 적용(매칭 실패 처리) -- 보류',
-    description: '관리자페이지 내 사용 \n\n currentRount = startRound + 3',
+    summary: '삭제 적용',
+    description: '관리자페이지 내 사용 \n\n 해당 팀 soft delete 처리',
   })
-  @Put('teams/:teamId/fail')
-  @UseGuards(AccessTokenGuard)
-  putAdminTeamsTeamIdFail() {}
+  @Delete('teams/:teamId')
+  deleteAdminTeamsTeamId(@Param('teamId') teamId: number): Promise<void> {
+    return this.adminService.deleteTeamByTeamId(teamId);
+  }
 
   @ApiOperation({
     summary: '친구초대 4명 달성 유저 조회 --- 보류',
@@ -128,7 +136,6 @@ export class AdminController {
     },
   })
   @Get('invitations/users/success')
-  @UseGuards(AccessTokenGuard)
   getInvitationsUsersSuccess() {}
 
   @ApiOperation({
@@ -137,7 +144,6 @@ export class AdminController {
   })
   @ApiOkResponse({ description: 'OK' })
   @Delete('invitations/users/:userId/success')
-  @UseGuards(AccessTokenGuard)
   deleteInvitationsUsersSuccess(@Param('userId') userId: number) {}
 
   @ApiOperation({
@@ -146,7 +152,6 @@ export class AdminController {
   })
   @ApiOkResponse({ description: 'OK' })
   @Post('matchings')
-  @UseGuards(AccessTokenGuard)
   postMatchings() {}
 
   @ApiOperation({
@@ -157,7 +162,6 @@ export class AdminController {
     type: [GetMatchingsDto],
   })
   @Get('matchings')
-  @UseGuards(AccessTokenGuard)
   getMatchings() {}
 
   @ApiOperation({
@@ -166,7 +170,6 @@ export class AdminController {
   })
   @ApiOkResponse({ description: 'OK' })
   @Put('matchings/:matchingId/chat')
-  @UseGuards(AccessTokenGuard)
   putMatchingsMatchingIdChat(@Param('matchingId') matchingId: number) {}
 
   @ApiOperation({
@@ -175,6 +178,5 @@ export class AdminController {
   })
   @ApiOkResponse({ description: 'OK' })
   @Delete('matchings/:matchingId')
-  @UseGuards(AccessTokenGuard)
   deleteMatchingMatchingId(@Param('matchingId') matchingId: number) {}
 }
