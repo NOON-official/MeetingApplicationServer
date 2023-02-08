@@ -139,8 +139,8 @@ export class UsersController {
     schema: {
       example: {
         coupons: [
-          { id: 1, type: 1, expiresAt: '2023-01-22' },
-          { id: 2, type: 2, expiresAt: '2023-01-22' },
+          { id: 1, typeId: 1, expiresAt: '2023-01-22' },
+          { id: 2, typeId: 2, expiresAt: '2023-01-22' },
         ],
       },
     },
@@ -190,8 +190,8 @@ export class UsersController {
     schema: {
       example: {
         orders: [
-          { id: 1, productType: 1, totalAmount: 5000, couponType: null, createdAt: '2023-01-20T21:37:26.886Z' },
-          { id: 1, productType: 1, totalAmount: 0, couponType: 2, createdAt: '2023-01-20T21:37:26.886Z' },
+          { id: 1, productId: 1, totalAmount: 5000, couponTypeId: null, createdAt: '2023-01-20T21:37:26.886Z' },
+          { id: 1, productId: 1, totalAmount: 0, couponTypeId: 2, createdAt: '2023-01-20T21:37:26.886Z' },
         ],
       },
     },

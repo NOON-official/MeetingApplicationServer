@@ -40,9 +40,9 @@ export class OrdersRepository extends Repository<Order> {
       .leftJoinAndSelect('order.coupon', 'coupon')
       .select([
         'order.id AS id',
-        'order.productType AS productType',
+        'order.productId AS productId',
         'order.totalAmount AS totalAmount',
-        'coupon.type AS couponType',
+        'coupon.typeId AS couponTypeId',
         'order.createdAt AS createdAt',
       ])
       .where('order.userId = :userId', { userId })

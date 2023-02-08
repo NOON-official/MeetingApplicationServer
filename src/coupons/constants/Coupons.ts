@@ -6,7 +6,7 @@ export interface CouponType {
   id: number;
 }
 
-export const Coupons: CouponType[] = [
+export const CouponTypes: CouponType[] = [
   {
     name: '미팅학개론 50% 할인 쿠폰',
     discountRate: 50,

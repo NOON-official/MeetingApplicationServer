@@ -4,7 +4,7 @@ import { UserCoupon } from './../users/interfaces/user-coupon.interface';
 import { CouponsRepository } from './repositories/coupons.repository';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { Coupon } from './entities/coupon.entity';
-import { Coupons, CouponType } from './constants/coupons';
+import { CouponTypes, CouponType } from './constants/coupons';
 import { RegisterCouponDto } from './dtos/register-coupon.dto';
 import * as moment from 'moment-timezone';
 import { UsersService } from 'src/users/users.service';
@@ -33,8 +33,8 @@ export class CouponsService {
     return this.couponsRepository.getCouponsByUserId(userId);
   }
 
-  async getCouponsPagedata(): Promise<{ Coupons: CouponType[] }> {
-    return { Coupons };
+  async getCouponTypesPagedata(): Promise<{ CouponTypes: CouponType[] }> {
+    return { CouponTypes };
   }
 
   async registerCoupon(userId: number, registerCouponDto: RegisterCouponDto): Promise<void> {
@@ -64,8 +64,8 @@ export class CouponsService {
   }
 
   async createCouponWithUserId(userId: number, createCouponDto: CreateCouponDto): Promise<void> {
-    const couponType = createCouponDto.type;
-    const isExistingType = Coupons.find((c) => c.id === couponType);
+    const couponTypeId = createCouponDto.couponTypeId;
+    const isExistingType = CouponTypes.find((c) => c.id === couponTypeId);
 
     // 해당 쿠폰 타입이 존재하지 않는 경우
     if (!isExistingType) {
@@ -73,6 +73,6 @@ export class CouponsService {
     }
 
     const user = await this.usersService.getUserById(userId);
-    return this.couponsRepository.createCouponWithUser(user, createCouponDto.type, createCouponDto.expiresAt);
+    return this.couponsRepository.createCouponWithUser(user, createCouponDto.couponTypeId, createCouponDto.expiresAt);
   }
 }

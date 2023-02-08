@@ -21,7 +21,7 @@ export class Coupon extends BaseEntity {
   code: string;
 
   @Column({ type: 'int' })
-  type: number;
+  typeId: number;
 
   @Column({ type: 'date', nullable: true })
   expiresAt: Date;

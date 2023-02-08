@@ -10,7 +10,7 @@ export class CreateCouponDto {
   })
   @IsNotEmpty()
   @IsInt()
-  readonly type: number;
+  readonly couponTypeId: number;
 
   @ApiProperty({
     description: '쿠폰 만료 일자',

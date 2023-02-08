@@ -1,7 +1,7 @@
 export interface UserOrder {
   id: number;
-  productType: number;
+  productId: number;
   totalAmount: number;
-  couponType: number;
+  couponTypeId: number;
   createdAt: Date;
 }

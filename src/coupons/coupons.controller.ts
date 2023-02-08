@@ -13,7 +13,7 @@ import {
 } from '@nestjs/swagger/dist';
 import { Controller, Put } from '@nestjs/common';
 import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
-import { Coupons, CouponType } from './constants/coupons';
+import { CouponTypes, CouponType } from './constants/coupons';
 import { RegisterCouponDto } from './dtos/register-coupon.dto';
 import { GetUser } from 'src/common/get-user.decorator';
 import { CreateCouponDto } from './dtos/create-coupon.dto';
@@ -32,14 +32,14 @@ export class CouponsController {
   @ApiOkResponse({
     schema: {
       example: {
-        Coupons,
+        CouponTypes,
       },
     },
   })
   @Get('pagedata')
   @UseGuards(AccessTokenGuard)
-  getCouponsPagedata(): Promise<{ Coupons: CouponType[] }> {
-    return this.couponsService.getCouponsPagedata();
+  getCouponTypesPagedata(): Promise<{ CouponTypes: CouponType[] }> {
+    return this.couponsService.getCouponTypesPagedata();
   }
 
   @ApiOperation({
@@ -55,7 +55,7 @@ export class CouponsController {
 
   @ApiOperation({
     summary: '쿠폰 생성',
-    description: '로그인한 유저에게 쿠폰 발급 \n\n * ex) 친구초대 4명을 채운 경우 (type: 2, 만료 기한: 두 달)',
+    description: '로그인한 유저에게 쿠폰 발급 \n\n * ex) 친구초대 4명을 채운 경우 (couponTypeId: 2, 만료 기한: 두 달)',
   })
   @ApiBearerAuth()
   @ApiCreatedResponse({ description: 'Created' })
