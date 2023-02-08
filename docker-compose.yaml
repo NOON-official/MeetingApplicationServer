@@ -6,6 +6,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: 1234
       MYSQL_DATABASE: meetinghakgaeron-local
+      TZ: UTC
     ports:
       - 3306:3306
 

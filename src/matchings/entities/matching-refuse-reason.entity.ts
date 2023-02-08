@@ -32,11 +32,11 @@ export class MatchingRefuseReason extends BaseEntity {
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 
-  @OneToOne(() => Matching, { cascade: true })
+  @OneToOne(() => Matching, { onDelete: 'CASCADE' })
   @JoinColumn()
   matching: Matching;
 
-  @OneToOne(() => Team, { cascade: true })
+  @OneToOne(() => Team, { onDelete: 'CASCADE' })
   @JoinColumn()
   team: Team;
 }

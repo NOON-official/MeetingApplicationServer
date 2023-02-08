@@ -39,7 +39,7 @@ export class TicketsRepository extends Repository<Ticket> {
   async useTicketById(ticketId: number): Promise<void> {
     await this.createQueryBuilder()
       .update(Ticket)
-      .set({ usedAt: moment().tz('Asia/Seoul').format() })
+      .set({ usedAt: moment().format() })
       .where('id = :ticketId', { ticketId })
       .execute();
   }

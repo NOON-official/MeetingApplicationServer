@@ -55,7 +55,7 @@ export class CouponsController {
 
   @ApiOperation({
     summary: '쿠폰 생성',
-    description: '로그인한 유저에게 쿠폰 발급 \n\n * ex) 친구초대 4명을 채운 경우',
+    description: '로그인한 유저에게 쿠폰 발급 \n\n * ex) 친구초대 4명을 채운 경우 (type: 2, 만료 기한: 두 달)',
   })
   @ApiBearerAuth()
   @ApiCreatedResponse({ description: 'Created' })

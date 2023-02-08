@@ -19,7 +19,7 @@ export class CouponsRepository extends Repository<Coupon> {
   }
 
   async updateUsedAt(couponId: number): Promise<void> {
-    await this.update({ id: couponId }, { usedAt: moment().tz('Asia/Seoul').format() });
+    await this.update({ id: couponId }, { usedAt: moment().format() });
   }
 
   async getCouponCountByUserId(userId: number): Promise<{ couponCount: number }> {
