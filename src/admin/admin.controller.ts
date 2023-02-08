@@ -1,3 +1,4 @@
+import { AdminService } from './admin.service';
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import {
@@ -20,6 +21,8 @@ import { TeamStatus } from 'src/teams/entities/team-status.enum';
 @ApiNotFoundResponse({ description: 'Not Found' })
 @Controller('admin')
 export class AdminController {
+  constructor(private adminService: AdminService) {}
+
   @ApiOperation({
     summary: '유저 전체 조회',
     description: '관리자 페이지 내 사용',
@@ -111,12 +114,14 @@ export class AdminController {
 
   @ApiBearerAuth()
   @ApiOperation({
-    summary: '삭제 적용(매칭 실패 처리) -- 보류',
-    description: '관리자페이지 내 사용 \n\n currentRount = startRound + 3',
+    summary: '삭제 적용',
+    description: '관리자페이지 내 사용 \n\n 해당 팀 soft delete 처리',
   })
-  @Put('teams/:teamId/fail')
+  @Delete('teams/:teamId')
   @UseGuards(AccessTokenGuard)
-  putAdminTeamsTeamIdFail() {}
+  deleteAdminTeamsTeamId(@Param('teamId') teamId: number): Promise<void> {
+    return this.adminService.deleteTeamByTeamId(teamId);
+  }
 
   @ApiOperation({
     summary: '친구초대 4명 달성 유저 조회 --- 보류',
