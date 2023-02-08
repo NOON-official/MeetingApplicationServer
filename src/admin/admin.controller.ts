@@ -14,11 +14,15 @@ import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 import { GetMatchingsDto } from 'src/matchings/dtos/get-matchings.dto';
 import { TeamGender } from 'src/teams/entities/team-gender.enum';
 import { TeamStatus } from 'src/teams/entities/team-status.enum';
+import { Roles } from 'src/common/roles.decorator';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 
 @ApiTags('ADMIN')
 @ApiBearerAuth()
 @ApiUnauthorizedResponse({ description: 'Unauthorized' })
 @ApiNotFoundResponse({ description: 'Not Found' })
+@Roles('admin')
+@UseGuards(AccessTokenGuard, RolesGuard)
 @Controller('admin')
 export class AdminController {
   constructor(private adminService: AdminService) {}
@@ -58,7 +62,6 @@ export class AdminController {
     },
   })
   @Get('users')
-  @UseGuards(AccessTokenGuard)
   getAdminUsers() {}
 
   @ApiBearerAuth()
@@ -105,7 +108,6 @@ export class AdminController {
     },
   })
   @Get('teams')
-  @UseGuards(AccessTokenGuard)
   getAdminTeams(
     @Query('status') status: TeamStatus,
     @Query('membercount') membercount: '2' | '3',
@@ -118,7 +120,6 @@ export class AdminController {
     description: '관리자페이지 내 사용 \n\n 해당 팀 soft delete 처리',
   })
   @Delete('teams/:teamId')
-  @UseGuards(AccessTokenGuard)
   deleteAdminTeamsTeamId(@Param('teamId') teamId: number): Promise<void> {
     return this.adminService.deleteTeamByTeamId(teamId);
   }
@@ -135,7 +136,6 @@ export class AdminController {
     },
   })
   @Get('invitations/users/success')
-  @UseGuards(AccessTokenGuard)
   getInvitationsUsersSuccess() {}
 
   @ApiOperation({
@@ -144,7 +144,6 @@ export class AdminController {
   })
   @ApiOkResponse({ description: 'OK' })
   @Delete('invitations/users/:userId/success')
-  @UseGuards(AccessTokenGuard)
   deleteInvitationsUsersSuccess(@Param('userId') userId: number) {}
 
   @ApiOperation({
@@ -153,7 +152,6 @@ export class AdminController {
   })
   @ApiOkResponse({ description: 'OK' })
   @Post('matchings')
-  @UseGuards(AccessTokenGuard)
   postMatchings() {}
 
   @ApiOperation({
@@ -164,7 +162,6 @@ export class AdminController {
     type: [GetMatchingsDto],
   })
   @Get('matchings')
-  @UseGuards(AccessTokenGuard)
   getMatchings() {}
 
   @ApiOperation({
@@ -173,7 +170,6 @@ export class AdminController {
   })
   @ApiOkResponse({ description: 'OK' })
   @Put('matchings/:matchingId/chat')
-  @UseGuards(AccessTokenGuard)
   putMatchingsMatchingIdChat(@Param('matchingId') matchingId: number) {}
 
   @ApiOperation({
@@ -182,6 +178,5 @@ export class AdminController {
   })
   @ApiOkResponse({ description: 'OK' })
   @Delete('matchings/:matchingId')
-  @UseGuards(AccessTokenGuard)
   deleteMatchingMatchingId(@Param('matchingId') matchingId: number) {}
 }
