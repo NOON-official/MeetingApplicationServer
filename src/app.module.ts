@@ -28,7 +28,7 @@ import type { ClientOpts } from 'redis';
       database: process.env.DB_DATABASE,
       entities: [__dirname + '/**/*.entity.{js,ts}'],
       synchronize: Boolean(process.env.DB_SYNCHRONIZE),
-      timezone: '+09:00',
+      timezone: 'Z',
     }),
     CacheModule.register<ClientOpts>({
       store: redisStore,
