@@ -81,11 +81,13 @@ export class TeamsRepository extends Repository<Team> {
   // 유저 신청 내역 조회
   async getTeamsByUserId(userId: number): Promise<{ teamsWithMatching: Team[] }> {
     // 팀 성별 가져오기
-    const { gender: teamGender } = await this.createQueryBuilder('team')
+    const result = await this.createQueryBuilder('team')
       .select('team.gender')
       .where('team.ownerId = :userId', { userId })
       .withDeleted()
       .getOne();
+
+    const teamGender = result?.gender ?? null; // 신청 정보가 없는 경우 null 저장
 
     // 팀 + 매칭 기록 조회
     const teamsWithMatching = await this.createQueryBuilder('team')
