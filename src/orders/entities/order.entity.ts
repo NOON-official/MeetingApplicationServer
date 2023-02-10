@@ -34,10 +34,10 @@ export class Order extends BaseEntity {
   @Column({ type: 'int' })
   totalAmount: number;
 
-  @Column({ type: 'varchar', length: 30, nullable: true })
+  @Column({ type: 'varchar', length: 200, nullable: true })
   tossPaymentKey: string;
 
-  @Column({ type: 'varchar', length: 30, nullable: true })
+  @Column({ type: 'varchar', length: 64, nullable: true })
   tossOrderId: string;
 
   @Column({ type: 'varchar', length: 30, nullable: true })
