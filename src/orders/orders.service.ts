@@ -45,7 +45,7 @@ export class OrdersService {
     const { data } = await firstValueFrom(
       this.httpService.post(url, tossData, requestConfig).pipe(
         catchError((error) => {
-          throw new HttpException(error.response.data, 404);
+          throw new HttpException(error.response.data, error.response.status);
         }),
       ),
     );
