@@ -37,7 +37,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
       port: +process.env.REDIS_PORT,
       password: process.env.REDIS_PASSWORD,
       isGlobal: true,
-      ttl: 3 * 60, // 제한시간 3분/
+      ttl: 3 * 60, // 제한시간 3분
     }),
     EventEmitterModule.forRoot(),
     AuthModule,
