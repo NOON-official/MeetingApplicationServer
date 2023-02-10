@@ -178,5 +178,7 @@ export class AdminController {
   })
   @ApiOkResponse({ description: 'OK' })
   @Delete('matchings/:matchingId')
-  deleteMatchingMatchingId(@Param('matchingId') matchingId: number) {}
+  deleteMatchingMatchingId(@Param('matchingId') matchingId: number): Promise<void> {
+    return this.adminService.deleteMatchingByMatchingId(matchingId);
+  }
 }

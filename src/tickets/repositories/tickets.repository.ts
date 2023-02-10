@@ -51,4 +51,18 @@ export class TicketsRepository extends Repository<Ticket> {
       .where('id = :ticketId', { ticketId })
       .execute();
   }
+
+  async getTicketById(ticketId: number): Promise<Ticket> {
+    const ticket = this.findOne({
+      where: {
+        id: ticketId,
+      },
+      withDeleted: true,
+    });
+    return ticket;
+  }
+
+  async deleteTicketById(ticketId: number): Promise<void> {
+    await this.createQueryBuilder('ticket').softDelete().from(Ticket).where('id = :ticketId', { ticketId }).execute();
+  }
 }

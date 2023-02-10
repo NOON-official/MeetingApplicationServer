@@ -169,4 +169,40 @@ export class MatchingsService {
       createMatchingRefuseReasonDto,
     );
   }
+
+  async deleteMatchingById(matchingId: number): Promise<void> {
+    const matching = await this.getMatchingById(matchingId);
+
+    // 해당 매칭 정보가 없는 경우
+    if (!matching || !!matching.deletedAt) {
+      throw new NotFoundException(`Can't find matching with id ${matchingId}`);
+    }
+
+    // 매칭 soft delete
+    await this.matchingsRepository.deleteMatchingById(matchingId);
+
+    // 관련 데이터 soft delete
+    const maleTeamId = matching?.maleTeam?.id;
+    const maleTeamIsDeleted = matching?.maleTeam?.deletedAt;
+    const femaleTeamId = matching?.femaleTeam?.id;
+    const femaleTeamIsDeleted = matching?.femaleTeam?.deletedAt;
+    const maleTeamTicketId = matching?.maleTeamTicket?.id;
+    const femaleTeamTicketId = matching?.femaleTeamTicket?.id;
+
+    if (!!maleTeamId && !maleTeamIsDeleted) {
+      await this.teamsService.deleteTeamById(maleTeamId);
+    }
+
+    if (!!femaleTeamId && !femaleTeamIsDeleted) {
+      await this.teamsService.deleteTeamById(femaleTeamId);
+    }
+
+    if (!!maleTeamTicketId) {
+      await this.ticketsService.deleteTicketById(maleTeamTicketId);
+    }
+
+    if (!!femaleTeamTicketId) {
+      await this.ticketsService.deleteTicketById(femaleTeamTicketId);
+    }
+  }
 }
