@@ -167,7 +167,7 @@ export class TeamsRepository extends Repository<Team> {
       .execute();
   }
 
-  async deleteTeamByTeamId(teamId: number): Promise<void> {
+  async deleteTeamById(teamId: number): Promise<void> {
     await this.createQueryBuilder('team').softDelete().from(Team).where('id = :teamId', { teamId }).execute();
   }
 }

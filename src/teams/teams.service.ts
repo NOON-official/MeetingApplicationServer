@@ -177,7 +177,7 @@ export class TeamsService {
     }
   }
 
-  async deleteTeamByTeamId(teamId: number): Promise<void> {
+  async deleteTeamById(teamId: number): Promise<void> {
     const team = await this.getTeamById(teamId);
 
     // 해당 팀 정보가 없는 경우
@@ -185,7 +185,7 @@ export class TeamsService {
       throw new NotFoundException(`Can't find team with id ${teamId}`);
     }
 
-    await this.teamsRepository.deleteTeamByTeamId(teamId);
+    await this.teamsRepository.deleteTeamById(teamId);
   }
 
   async getTeamById(teamId: number): Promise<Team> {
@@ -244,7 +244,7 @@ export class TeamsService {
     await this.teamsRepository.createTeamMember(newMembers, newTeam);
 
     // 3. 기존 팀 삭제하기(soft delete)
-    await this.deleteTeamByTeamId(teamId);
+    await this.deleteTeamById(teamId);
   }
 
   async getMatchingIdByTeamId(teamId: number): Promise<{ matchingId: number }> {

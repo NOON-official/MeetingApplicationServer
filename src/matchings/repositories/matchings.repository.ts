@@ -90,4 +90,12 @@ export class MatchingsRepository extends Repository<Matching> {
         .execute();
     }
   }
+
+  async deleteMatchingById(matchingId: number): Promise<void> {
+    await this.createQueryBuilder('matching')
+      .softDelete()
+      .from(Matching)
+      .where('id = :matchingId', { matchingId })
+      .execute();
+  }
 }

@@ -1,6 +1,6 @@
 import { Order } from './../orders/entities/order.entity';
 import { User } from './../users/entities/user.entity';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { TicketsRepository } from './repositories/tickets.repository';
 import { Ticket } from './entities/ticket.entity';
 
@@ -26,5 +26,20 @@ export class TicketsService {
 
   async refundTicketById(ticketId: number): Promise<void> {
     await this.ticketsRepository.refundTicketById(ticketId);
+  }
+
+  async getTicketById(ticketId: number): Promise<Ticket> {
+    return this.ticketsRepository.getTicketById(ticketId);
+  }
+
+  async deleteTicketById(ticketId: number): Promise<void> {
+    const ticket = await this.getTicketById(ticketId);
+
+    // 해당 팀 정보가 없는 경우
+    if (!ticket || !!ticket.deletedAt) {
+      throw new NotFoundException(`Can't find ticket with id ${ticketId}`);
+    }
+
+    await this.ticketsRepository.deleteTicketById(ticketId);
   }
 }
