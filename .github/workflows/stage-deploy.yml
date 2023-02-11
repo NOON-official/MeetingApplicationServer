@@ -13,6 +13,7 @@ jobs:
       - name: multiple command
         uses: appleboy/ssh-action@master
         with:
+          node-version: 18.12.1
           host: ${{ secrets.STAGE_HOST }}
           username: ${{ secrets.USER_NAME }}
           key: ${{ secrets.SSH_KEY }}
