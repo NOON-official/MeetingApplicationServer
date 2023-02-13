@@ -58,23 +58,53 @@ export class TeamsController {
     summary: '현재 신청팀 수 조회',
     description: '매칭 실패 횟수 3회 미만인 팀 포함 \n\n 최소 팀 수: 3, 최대 팀 수: 10',
   })
-  @ApiQuery({ name: 'status', enum: [TeamStatus.applied] })
-  @ApiQuery({ name: 'membercount', enum: ['2', '3'] })
-  @ApiQuery({ name: 'gender', enum: TeamGender })
   @ApiOkResponse({
     schema: {
       example: {
-        teamCount: 8,
+        '2vs2': {
+          male: 8,
+          female: 6,
+        },
+        '3vs3': {
+          male: 4,
+          female: 5,
+        },
       },
     },
   })
-  @Get('count')
-  getTeamsCount(
-    @Query('status') status: TeamStatus.applied,
-    @Query('membercount') membercount: '2' | '3',
-    @Query('gender') gender: TeamGender,
-  ): Promise<{ teamCount: number }> {
-    return this.teamsService.getTeamsCountByStatusAndMembercountAndGender(status, membercount, gender);
+  @Get('counts')
+  async getTeamsCounts(): Promise<Record<'2vs2' | '3vs3', { male: number; female: number }>> {
+    const { teamCount: male2 } = await this.teamsService.getTeamsCountByStatusAndMembercountAndGender(
+      TeamStatus.applied,
+      '2',
+      TeamGender.male,
+    );
+    const { teamCount: female2 } = await this.teamsService.getTeamsCountByStatusAndMembercountAndGender(
+      TeamStatus.applied,
+      '2',
+      TeamGender.female,
+    );
+    const { teamCount: male3 } = await this.teamsService.getTeamsCountByStatusAndMembercountAndGender(
+      TeamStatus.applied,
+      '3',
+      TeamGender.male,
+    );
+    const { teamCount: female3 } = await this.teamsService.getTeamsCountByStatusAndMembercountAndGender(
+      TeamStatus.applied,
+      '3',
+      TeamGender.female,
+    );
+
+    return {
+      '2vs2': {
+        male: male2,
+        female: female2,
+      },
+      '3vs3': {
+        male: male3,
+        female: female3,
+      },
+    };
   }
 
   @ApiBearerAuth()
