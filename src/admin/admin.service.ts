@@ -1,6 +1,9 @@
 import { MatchingsService } from './../matchings/matchings.service';
 import { TeamsService } from './../teams/teams.service';
 import { Injectable } from '@nestjs/common';
+import { AdminGetTeamDto } from './dtos/admin-get-team.dto';
+import { TeamGender } from 'src/teams/entities/team-gender.enum';
+import { MatchingStatus } from 'src/matchings/interfaces/matching-status.enum';
 
 @Injectable()
 export class AdminService {
@@ -12,5 +15,13 @@ export class AdminService {
 
   async deleteMatchingByMatchingId(matchingId: number): Promise<void> {
     return this.matchingsService.deleteMatchingById(matchingId);
+  }
+
+  async getTeamsByStatusAndMembercountAndGender(
+    status: MatchingStatus,
+    membercount: '2' | '3',
+    gender: TeamGender,
+  ): Promise<{ teams: AdminGetTeamDto[] }> {
+    return this.teamsService.getTeamsByStatusAndMembercountAndGender(status, membercount, gender);
   }
 }

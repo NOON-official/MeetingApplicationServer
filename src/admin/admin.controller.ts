@@ -1,3 +1,5 @@
+import { MatchingStatus } from './../matchings/interfaces/matching-status.enum';
+import { AdminGetTeamDto } from './dtos/admin-get-team.dto';
 import { AdminService } from './admin.service';
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
@@ -13,7 +15,6 @@ import {
 import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 import { GetMatchingsDto } from 'src/matchings/dtos/get-matchings.dto';
 import { TeamGender } from 'src/teams/entities/team-gender.enum';
-import { TeamStatus } from 'src/teams/entities/team-status.enum';
 import { Roles } from 'src/common/roles.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 
@@ -70,7 +71,7 @@ export class AdminController {
     description:
       '관리자페이지 내 사용 \n\n * applied = 신청자 \n\n * waiting = 수락/거절 대기자 \n\n * failed = 매칭 실패 회원 \n\n * refused = 거절 당한 회원 \n\n 아직 매칭되지 않은 경우: partnerTeamId=null, matchedAt=null \n\n 매칭실패하지 않은 경우: failedAt=null \n\n 거절당하지 않은 경우: refusedAt=null',
   })
-  @ApiQuery({ name: 'status', enum: TeamStatus })
+  @ApiQuery({ name: 'status', enum: MatchingStatus })
   @ApiQuery({ name: 'membercount', enum: ['2', '3'] })
   @ApiQuery({ name: 'gender', enum: TeamGender })
   @ApiOkResponse({
@@ -78,30 +79,23 @@ export class AdminController {
       example: {
         teams: [
           {
-            id: 1,
-            ownerId: 1,
+            teamId: 2,
+            matchingCount: 0,
+            nickname: '미팅이',
             intro: '안녕하세요',
-            currentRound: 1,
-            createdAt: '2023-01-20T21:37:26.886Z',
-            nickname: '미팅이1',
+            memberCount: 2,
             phone: '01012345678',
-            partnerTeamId: 1,
+            averageAge: 23,
+            prefAge: [23, 27],
+            areas: [1, 3],
+            universities: [1, 42, 345],
+            prefSameUniversity: true,
+            drink: 5,
+            partnerTeamId: 2,
+            appliedAt: '2023-01-20T21:37:26.886Z',
             matchedAt: '2023-01-20T21:37:26.886Z',
             failedAt: '2023-01-20T21:37:26.886Z',
             refusedAt: '2023-01-20T21:37:26.886Z',
-          },
-          {
-            id: 2,
-            ownerId: 3,
-            intro: '안녕하세요',
-            currentRound: 1,
-            createdAt: '2023-01-20T21:37:26.886Z',
-            nickname: '미팅이2',
-            phone: '01012345678',
-            partnerTeamId: null,
-            matchedAt: null,
-            failedAt: null,
-            refusedAt: null,
           },
         ],
       },
@@ -109,10 +103,12 @@ export class AdminController {
   })
   @Get('teams')
   getAdminTeams(
-    @Query('status') status: TeamStatus,
+    @Query('status') status: MatchingStatus,
     @Query('membercount') membercount: '2' | '3',
     @Query('gender') gender: TeamGender,
-  ) {}
+  ): Promise<{ teams: AdminGetTeamDto[] }> {
+    return this.adminService.getTeamsByStatusAndMembercountAndGender(status, membercount, gender);
+  }
 
   @ApiBearerAuth()
   @ApiOperation({
