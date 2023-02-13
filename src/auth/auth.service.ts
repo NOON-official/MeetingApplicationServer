@@ -72,7 +72,7 @@ export class AuthService {
     res.cookie('refresh', refreshToken, {
       signed: true, // 암호화
       httpOnly: true, // 브라우저에서 접근 불가능
-      secure: process.env.NODE_ENV === 'development' ? false : true, // https 환경에서만 접근 허용
+      // secure: process.env.NODE_ENV === 'production' ? true : false, // https 환경에서만 접근 허용
       maxAge: +this.configService.get<string>('COOKIE_MAX_AGE'), // msec
     });
 
