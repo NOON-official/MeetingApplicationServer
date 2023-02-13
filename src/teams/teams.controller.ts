@@ -49,7 +49,7 @@ export class TeamsController {
       },
     },
   })
-  @Get('members/count/oneWeek')
+  @Get('members/count/one-week')
   getTeamsMembersCountOneWeek(): Promise<{ memberCount: number }> {
     return this.teamsService.getMembersCountOneWeek();
   }
@@ -64,17 +64,50 @@ export class TeamsController {
   @ApiOkResponse({
     schema: {
       example: {
-        teamCount: 8,
+        '2vs2': {
+          male: 8,
+          female: 6,
+        },
+        '3vs3': {
+          male: 4,
+          female: 5,
+        },
       },
     },
   })
-  @Get('count')
-  getTeamsCount(
-    @Query('status') status: MatchingStatus.APPLIED,
-    @Query('membercount') membercount: '2' | '3',
-    @Query('gender') gender: TeamGender,
-  ): Promise<{ teamCount: number }> {
-    return this.teamsService.getTeamsCountByStatusAndMembercountAndGender(status, membercount, gender);
+  @Get('counts')
+  async getTeamsCounts(): Promise<Record<'2vs2' | '3vs3', { male: number; female: number }>> {
+    const { teamCount: male2 } = await this.teamsService.getTeamsCountByStatusAndMembercountAndGender(
+      MatchingStatus.APPLIED,
+      '2',
+      TeamGender.male,
+    );
+    const { teamCount: female2 } = await this.teamsService.getTeamsCountByStatusAndMembercountAndGender(
+      MatchingStatus.APPLIED,
+      '2',
+      TeamGender.female,
+    );
+    const { teamCount: male3 } = await this.teamsService.getTeamsCountByStatusAndMembercountAndGender(
+      MatchingStatus.APPLIED,
+      '3',
+      TeamGender.male,
+    );
+    const { teamCount: female3 } = await this.teamsService.getTeamsCountByStatusAndMembercountAndGender(
+      MatchingStatus.APPLIED,
+      '3',
+      TeamGender.female,
+    );
+
+    return {
+      '2vs2': {
+        male: male2,
+        female: female2,
+      },
+      '3vs3': {
+        male: male3,
+        female: female3,
+      },
+    };
   }
 
   @ApiBearerAuth()
