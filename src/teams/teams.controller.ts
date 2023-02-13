@@ -49,7 +49,7 @@ export class TeamsController {
       },
     },
   })
-  @Get('members/count/oneWeek')
+  @Get('members/count/one-week')
   getTeamsMembersCountOneWeek(): Promise<{ memberCount: number }> {
     return this.teamsService.getMembersCountOneWeek();
   }
