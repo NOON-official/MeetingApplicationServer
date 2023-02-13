@@ -1,6 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class GetMatchingsDto {
+export class AdminGetMatchingDto {
+  @ApiProperty({
+    description: '매칭 ID',
+    example: 1,
+  })
+  matchingId: number;
+
   @ApiProperty({
     description: '남자팀 ID',
     example: 1,
@@ -38,14 +44,14 @@ export class GetMatchingsDto {
   femaleTeamPhone: string;
 
   @ApiProperty({
-    description: '카톡방 생성일시',
-    example: null,
-  })
-  chatCreatedAt?: Date;
-
-  @ApiProperty({
     description: '생성일시(매칭 시간)',
     example: '2023-01-20T21:37:26.886Z',
   })
-  createdAt: Date;
+  matchedAt: Date;
+
+  @ApiProperty({
+    description: '카톡방 생성여부',
+    example: false,
+  })
+  chatIsCreated: boolean;
 }

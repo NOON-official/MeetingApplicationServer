@@ -1,3 +1,4 @@
+import { AdminGetMatchingDto } from './dtos/admin-get-matching.dto';
 import { MatchingStatus } from './../matchings/interfaces/matching-status.enum';
 import { AdminGetTeamDto } from './dtos/admin-get-team.dto';
 import { AdminService } from './admin.service';
@@ -13,7 +14,6 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
-import { GetMatchingsDto } from 'src/matchings/dtos/get-matchings.dto';
 import { TeamGender } from 'src/teams/entities/team-gender.enum';
 import { Roles } from 'src/common/roles.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
@@ -156,17 +156,35 @@ export class AdminController {
 
   @ApiOperation({
     summary: '매칭완료자 조회',
-    description: '관리자페이지 내 사용',
+    description: 'chatIsCreated가 true일 경우 체크박스 채워주세요!',
   })
   @ApiOkResponse({
-    type: [GetMatchingsDto],
+    schema: {
+      example: {
+        matchings: [
+          {
+            matchingId: 1,
+            maleTeamId: 1,
+            maleTeamNickname: '미팅이1',
+            maleTeamPhone: '01012345678',
+            femaleTeamId: 2,
+            femaleTeamNickname: '미팅이2',
+            femaleTeamPhone: '01012345678',
+            matchedAt: '2023-01-20T21:37:26.886Z',
+            chatIsCreated: false,
+          },
+        ],
+      },
+    },
   })
   @Get('matchings')
-  getMatchings() {}
+  getMatchings(): Promise<{ matchings: AdminGetMatchingDto[] }> {
+    return this.adminService.getMatchingsByStatus(MatchingStatus.SUCCEEDED);
+  }
 
   @ApiOperation({
-    summary: '채팅방 생성 완료 일시 저장',
-    description: '관리자페이지 내 사용',
+    summary: '채팅방 생성 여부 저장',
+    description: '매칭 완료자 조회 페이지에서 체크 박스 선택 시 해당 API 호출해서 저장해주시면 됩니다',
   })
   @ApiOkResponse({ description: 'OK' })
   @Put('matchings/:matchingId/chat')
@@ -174,7 +192,7 @@ export class AdminController {
 
   @ApiOperation({
     summary: '매칭 삭제하기',
-    description: '관리자페이지-매칭완료자에서 사용 \n\n',
+    description: '매칭완료자 페이지에서 사용 \n\n 체크박스 선택된(채팅방 생성된) 매칭ID를 보내주시면 됩니다.',
   })
   @ApiOkResponse({ description: 'OK' })
   @Delete('matchings/:matchingId')
