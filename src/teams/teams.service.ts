@@ -264,7 +264,17 @@ export class TeamsService {
 
     // 수락/거절 대기자 조회
     if (status === MatchingStatus.MATCHED) {
-      return this.teamsRepository.getWaitingTeamsByMembercountAndGender(membercount, gender);
+      return this.teamsRepository.getMatchedTeamsByMembercountAndGender(membercount, gender);
+    }
+
+    // 매칭 실패 회원 조회
+    if (status === MatchingStatus.FAILED) {
+      return this.teamsRepository.getFailedTeamsByMembercountAndGender(membercount, gender);
+    }
+
+    // 거절 당한 회원 조회
+    if (status === MatchingStatus.REFUSED) {
+      return this.teamsRepository.getRefusedTeamsByMembercountAndGender(membercount, gender);
     }
   }
 }
