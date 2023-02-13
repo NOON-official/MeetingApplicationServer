@@ -1,3 +1,4 @@
+import { AdminGetMatchingDto } from './dtos/admin-get-matching.dto';
 import { MatchingsService } from './../matchings/matchings.service';
 import { TeamsService } from './../teams/teams.service';
 import { Injectable } from '@nestjs/common';
@@ -23,5 +24,9 @@ export class AdminService {
     gender: TeamGender,
   ): Promise<{ teams: AdminGetTeamDto[] }> {
     return this.teamsService.getTeamsByStatusAndMembercountAndGender(status, membercount, gender);
+  }
+
+  async getMatchingsByStatus(status: MatchingStatus): Promise<{ matchings: AdminGetMatchingDto[] }> {
+    return this.matchingsService.getMatchingsByStatus(status);
   }
 }
