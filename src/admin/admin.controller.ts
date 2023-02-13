@@ -69,9 +69,12 @@ export class AdminController {
   @ApiOperation({
     summary: '신청자 조회',
     description:
-      '관리자페이지 내 사용 \n\n * applied = 신청자 \n\n * waiting = 수락/거절 대기자 \n\n * failed = 매칭 실패 회원 \n\n * refused = 거절 당한 회원 \n\n 아직 매칭되지 않은 경우: partnerTeamId=null, matchedAt=null \n\n 매칭실패하지 않은 경우: failedAt=null \n\n 거절당하지 않은 경우: refusedAt=null',
+      '관리자페이지 내 사용 \n\n * APPLIED = 신청자 \n\n * MATCHED = 수락/거절 대기자 \n\n * FAILED = 매칭 실패 회원 \n\n * REFUSED = 거절 당한 회원 \n\n 아직 매칭되지 않은 경우: partnerTeamId=null, matchedAt=null \n\n 매칭실패하지 않은 경우: failedAt=null \n\n 거절당하지 않은 경우: refusedAt=null',
   })
-  @ApiQuery({ name: 'status', enum: MatchingStatus })
+  @ApiQuery({
+    name: 'status',
+    enum: [MatchingStatus.APPLIED, MatchingStatus.MATCHED, MatchingStatus.FAILED, MatchingStatus.REFUSED],
+  })
   @ApiQuery({ name: 'membercount', enum: ['2', '3'] })
   @ApiQuery({ name: 'gender', enum: TeamGender })
   @ApiOkResponse({
@@ -103,7 +106,8 @@ export class AdminController {
   })
   @Get('teams')
   getAdminTeams(
-    @Query('status') status: MatchingStatus,
+    @Query('status')
+    status: MatchingStatus.APPLIED | MatchingStatus.MATCHED | MatchingStatus.FAILED | MatchingStatus.REFUSED,
     @Query('membercount') membercount: '2' | '3',
     @Query('gender') gender: TeamGender,
   ): Promise<{ teams: AdminGetTeamDto[] }> {
