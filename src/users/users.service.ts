@@ -1,5 +1,5 @@
+import { MatchingStatusConstant } from './constants/matching-status.constant';
 import { MatchingRound } from './../matchings/constants/matching-round';
-import { MatchingsService } from './../matchings/matchings.service';
 import { SavePhoneDto } from './../auth/dtos/save-phone.dto';
 import { OrdersService } from './../orders/orders.service';
 import { UserAgreement } from './entities/user-agreement.entity';
@@ -19,6 +19,7 @@ import { BadRequestException } from '@nestjs/common/exceptions';
 import { UserOrder } from './interfaces/user-order.interface';
 import { MatchingStatus } from 'src/matchings/interfaces/matching-status.enum';
 import * as moment from 'moment-timezone';
+import { AdminGetUserDto } from 'src/admin/dtos/admin-get-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -213,5 +214,56 @@ export class UsersService {
       // CASE 5. 상대팀 거절 (OR 무응답)
       if (partnerTeamIsAccepted !== true) return { matchingStatus: MatchingStatus.PARTNER_TEAM_REFUSED };
     }
+  }
+
+  async getCouponCountByTypeIdAndUserId(typeId: number, userId: number): Promise<{ couponCount: number }> {
+    return this.couponsService.getCouponCountByTypeIdAndUserId(typeId, userId);
+  }
+
+  async getAllUsers(): Promise<{ users: AdminGetUserDto[] }> {
+    const users = await this.usersRepository.getAllUsers();
+    const result = [];
+
+    for (const u of users) {
+      const { matchingStatus } = await this.getUserMatchingStatusByUserId(u.id);
+
+      // 유저 매칭 상태
+      let matchingStatusConstant: string;
+      if (matchingStatus === null) {
+        matchingStatusConstant = MatchingStatusConstant.NOT_APPLIED;
+      } else {
+        matchingStatusConstant = MatchingStatusConstant[`${matchingStatus}`];
+      }
+
+      // 유저 이용권 개수
+      const { ticketCount } = await this.getTicketCountByUserId(u.id);
+
+      // 유저 50% 쿠폰 개수
+      const { couponCount: discount50CouponCount } = await this.getCouponCountByTypeIdAndUserId(1, u.id);
+
+      // 유저 무료 쿠폰 개수
+      const { couponCount: freeCouponCount } = await this.getCouponCountByTypeIdAndUserId(2, u.id);
+
+      // 유저 친구 초대 횟수
+      const { invitationCount: userInvitationCount } =
+        await this.invitationsService.getInvitationCountWithDeletedByUserId(u.id);
+
+      const user = {
+        userId: u.id,
+        nickname: u.nickname,
+        matchingStatus: matchingStatusConstant,
+        phone: u.phone,
+        createdAt: u.createdAt,
+        referralID: u.referralId,
+        ticketCount,
+        discount50CouponCount,
+        freeCouponCount,
+        userInvitationCount,
+      };
+
+      result.push(user);
+    }
+
+    return { users: result };
   }
 }

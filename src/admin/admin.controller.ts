@@ -17,6 +17,7 @@ import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 import { TeamGender } from 'src/teams/entities/team-gender.enum';
 import { Roles } from 'src/common/roles.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { AdminGetUserDto } from './dtos/admin-get-user.dto';
 
 @ApiTags('ADMIN')
 @ApiBearerAuth()
@@ -37,33 +38,37 @@ export class AdminController {
       example: {
         users: [
           {
-            id: 1,
+            userId: 1,
             nickname: '미팅이1',
-            status: '신청대기',
+            matchingStatus: '신청대기',
             phone: '01012345678',
             createdAt: '2023-01-2023-01-20T21:37:26.886Z',
             referralId: 'LD4GSTO3',
             ticketCount: 5,
             discount50CouponCount: 1,
             freeCouponCount: 0,
+            userInvitaionCount: 1,
           },
           {
-            id: 1,
+            userId: 2,
             nickname: '미팅이2',
-            status: '진행중',
+            matchingStatus: '신청대기',
             phone: '01012345678',
             createdAt: '2023-01-2023-01-20T21:37:26.886Z',
             referralId: 'LD4GSTO3',
             ticketCount: 5,
             discount50CouponCount: 1,
             freeCouponCount: 0,
+            userInvitaionCount: 1,
           },
         ],
       },
     },
   })
   @Get('users')
-  getAdminUsers() {}
+  getAdminUsers(): Promise<{ users: AdminGetUserDto[] }> {
+    return this.adminService.getAllUsers();
+  }
 
   @ApiBearerAuth()
   @ApiOperation({
