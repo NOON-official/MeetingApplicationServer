@@ -314,7 +314,7 @@ export class TeamsRepository extends Repository<Team> {
   }
 
   // 관리자페이지 거절 당한 회원 조회
-  async getRefusedTeamsByMembercountAndGender(
+  async getPartnerTeamRefusedTeamsByMembercountAndGender(
     membercount: '2' | '3',
     gender: TeamGender,
   ): Promise<{ teams: AdminGetTeamDto[] }> {
