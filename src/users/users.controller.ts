@@ -223,7 +223,7 @@ export class UsersController {
   @ApiOperation({
     summary: '유저 매칭 상태 조회',
     description:
-      '매칭 신청 전인 경우 matchingStatus: null \n\n matchingStatus: APPLIED / FAILED / MATCHED / ACCEPTED / SUCCEEDED / REFUSED / NOT_RESPONDED',
+      '매칭 신청 전인 경우 matchingStatus: null \n\n matchingStatus: APPLIED / FAILED / MATCHED / OURTEAM_ACCEPTED / SUCCEEDED / PARTNER_TEAM_REFUSED / OURTEAM_REFUSED / NOT_RESPONDED',
   })
   @ApiOkResponse({
     content: {
@@ -245,17 +245,21 @@ export class UsersController {
             value: { matchingStatus: MatchingStatus.MATCHED },
             description: '페이지: 매칭조회5',
           },
-          '우리팀 수락 완료': {
-            value: { matchingStatus: MatchingStatus.ACCEPTED },
+          '우리팀 수락': {
+            value: { matchingStatus: MatchingStatus.OURTEAM_ACCEPTED },
             description: '페이지: 매칭조회6',
           },
           '매칭 성공 (상호 수락)': {
             value: { matchingStatus: MatchingStatus.SUCCEEDED },
             description: '페이지: 매칭조회7',
           },
-          '매칭 거절 당함': {
-            value: { matchingStatus: MatchingStatus.REFUSED },
+          '상대팀 거절': {
+            value: { matchingStatus: MatchingStatus.PARTNER_TEAM_REFUSED },
             description: '페이지: 매칭조회8',
+          },
+          '우리팀 거절': {
+            value: { matchingStatus: MatchingStatus.OURTEAM_REFUSED },
+            description: '페이지: 매칭조회11',
           },
           무응답: {
             value: { matchingStatus: MatchingStatus.NOT_RESPONDED },
@@ -265,7 +269,9 @@ export class UsersController {
       },
     },
   })
-  @Get('matching/status')
+  @Get('matchings/status')
   @UseGuards(AccessTokenGuard)
-  getUsersMatchingStatus(@GetUser() user: PassportUser) {}
+  getUsersMatchingStatus(@GetUser() user: PassportUser): Promise<{ matchingStatus: MatchingStatus }> {
+    return this.usersService.getUserMatchingStatusByUserId(user.sub);
+  }
 }

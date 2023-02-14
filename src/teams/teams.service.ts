@@ -273,8 +273,8 @@ export class TeamsService {
     }
 
     // 거절 당한 회원 조회
-    if (status === MatchingStatus.REFUSED) {
-      return this.teamsRepository.getRefusedTeamsByMembercountAndGender(membercount, gender);
+    if (status === MatchingStatus.PARTNER_TEAM_REFUSED) {
+      return this.teamsRepository.getPartnerTeamRefusedTeamsByMembercountAndGender(membercount, gender);
     }
   }
 }
