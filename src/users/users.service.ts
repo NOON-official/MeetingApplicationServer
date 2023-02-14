@@ -1,3 +1,5 @@
+import { MatchingRound } from './../matchings/constants/matching-round';
+import { MatchingsService } from './../matchings/matchings.service';
 import { SavePhoneDto } from './../auth/dtos/save-phone.dto';
 import { OrdersService } from './../orders/orders.service';
 import { UserAgreement } from './entities/user-agreement.entity';
@@ -15,6 +17,8 @@ import { KakaoUser } from 'src/auth/interfaces/kakao-user.interface';
 import { TicketsService } from 'src/tickets/tickets.service';
 import { BadRequestException } from '@nestjs/common/exceptions';
 import { UserOrder } from './interfaces/user-order.interface';
+import { MatchingStatus } from 'src/matchings/interfaces/matching-status.enum';
+import * as moment from 'moment-timezone';
 
 @Injectable()
 export class UsersService {
@@ -139,5 +143,75 @@ export class UsersService {
 
   async getTeamIdByUserId(userId: number): Promise<{ teamId: number }> {
     return this.teamsService.getTeamIdByUserId(userId);
+  }
+
+  async getUserMatchingStatusByUserId(userId: number): Promise<{ matchingStatus: MatchingStatus }> {
+    const { teamId } = await this.teamsService.getTeamIdByUserId(userId);
+
+    // CASE 0. 매칭 신청 전
+    if (!teamId) {
+      return { matchingStatus: null };
+    }
+
+    const team = await this.teamsService.getTeamById(teamId);
+    const ourteamGender = team.gender === 1 ? 'male' : 'female';
+    const matching = team[`${ourteamGender}TeamMatching`];
+
+    // 매칭 정보 X
+    if (matching === null) {
+      // CASE 1. 매칭 신청 완료 - 매칭 횟수 3회 미만
+      if (team.currentRound - team.startRound < MatchingRound.MAX_TRIAL) {
+        return { matchingStatus: MatchingStatus.APPLIED };
+      }
+      // CASE 2. 매칭 실패 - 매칭 횟수 3회 이상
+      else {
+        return { matchingStatus: MatchingStatus.FAILED };
+      }
+    }
+
+    // 매칭 정보 O
+    const partnerTeamGender = team.gender === 1 ? 'female' : 'male';
+
+    const ourteamIsAccepted = matching[`${ourteamGender}TeamIsAccepted`];
+    const partnerTeamIsAccepted = matching[`${partnerTeamGender}TeamIsAccepted`];
+
+    // CASE 3. 매칭 성공 - 상호 수락
+    if (ourteamIsAccepted === true && partnerTeamIsAccepted === true) {
+      return { matchingStatus: MatchingStatus.SUCCEEDED };
+    }
+
+    // CASE 4. 우리팀 거절
+    if (ourteamIsAccepted === false) {
+      return { matchingStatus: MatchingStatus.OURTEAM_REFUSED };
+    }
+
+    const now = new Date();
+    const timeLimit = new Date(moment(matching.createdAt).add(1, 'd').format());
+
+    // 매칭된지 24시간 이내
+    if (now < timeLimit) {
+      // CASE 5. 상대팀 거절
+      if (partnerTeamIsAccepted === false) {
+        return { matchingStatus: MatchingStatus.PARTNER_TEAM_REFUSED };
+      }
+
+      // CASE 6. 우리팀 수락
+      if (ourteamIsAccepted === true) {
+        return { matchingStatus: MatchingStatus.OURTEAM_ACCEPTED };
+      }
+
+      // CASE 7. 매칭 완료 - 우리팀 무응답 & 상대팀 거절 X
+      return { matchingStatus: MatchingStatus.MATCHED };
+    }
+    // 매칭된지 24시간 이후
+    else {
+      // CASE 8. 우리팀 무응답
+      if (ourteamIsAccepted === null) {
+        return { matchingStatus: MatchingStatus.NOT_RESPONDED };
+      }
+
+      // CASE 5. 상대팀 거절 (OR 무응답)
+      if (partnerTeamIsAccepted !== true) return { matchingStatus: MatchingStatus.PARTNER_TEAM_REFUSED };
+    }
   }
 }
