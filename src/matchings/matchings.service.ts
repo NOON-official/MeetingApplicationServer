@@ -214,4 +214,14 @@ export class MatchingsService {
       return this.matchingsRepository.getSucceededMatchings();
     }
   }
+
+  async saveChatCreatedAtByMatchingId(matchingId: number): Promise<void> {
+    const matching = await this.getMatchingById(matchingId);
+
+    if (!matching || !!matching.deletedAt) {
+      throw new NotFoundException(`Can't find matching with id ${matchingId}`);
+    }
+
+    return this.matchingsRepository.updateChatCreatedAtByMatchingId(matchingId);
+  }
 }

@@ -29,4 +29,8 @@ export class AdminService {
   async getMatchingsByStatus(status: MatchingStatus): Promise<{ matchings: AdminGetMatchingDto[] }> {
     return this.matchingsService.getMatchingsByStatus(status);
   }
+
+  async saveChatCreatedAtByMatchingId(matchingId: number): Promise<void> {
+    return this.matchingsService.saveChatCreatedAtByMatchingId(matchingId);
+  }
 }

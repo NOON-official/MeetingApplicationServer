@@ -192,7 +192,9 @@ export class AdminController {
   })
   @ApiOkResponse({ description: 'OK' })
   @Put('matchings/:matchingId/chat')
-  putMatchingsMatchingIdChat(@Param('matchingId') matchingId: number) {}
+  putMatchingsMatchingIdChat(@Param('matchingId') matchingId: number): Promise<void> {
+    return this.adminService.saveChatCreatedAtByMatchingId(matchingId);
+  }
 
   @ApiOperation({
     summary: '매칭 삭제하기',
