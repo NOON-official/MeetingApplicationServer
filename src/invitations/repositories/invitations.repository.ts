@@ -28,4 +28,13 @@ export class InvitationsRepository extends Repository<Invitation> {
 
     return invitation;
   }
+
+  async getInvitationCountWithDeletedByUserId(userId: number): Promise<{ invitationCount: number }> {
+    const invitationCount = await this.createQueryBuilder('invitation')
+      .where('invitation.inviterId = :userId', { userId })
+      .withDeleted()
+      .getCount();
+
+    return { invitationCount };
+  }
 }

@@ -46,4 +46,10 @@ export class InvitationsService {
 
     return await this.invitationsRepository.getInvitationCountByUserId(userId);
   }
+
+  async getInvitationCountWithDeletedByUserId(userId: number): Promise<{ invitationCount: number }> {
+    await this.usersService.getUserById(userId);
+
+    return await this.invitationsRepository.getInvitationCountWithDeletedByUserId(userId);
+  }
 }

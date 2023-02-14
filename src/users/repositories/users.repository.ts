@@ -92,4 +92,8 @@ export class UsersRepository extends Repository<User> {
       throw new NotFoundException(`Can't find user with id ${userId}`);
     }
   }
+
+  async getAllUsers(): Promise<User[]> {
+    return await this.find();
+  }
 }
