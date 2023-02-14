@@ -3,6 +3,7 @@ import { Matching } from './../entities/matching.entity';
 import { CustomRepository } from 'src/database/typeorm-ex.decorator';
 import { Repository } from 'typeorm';
 import { Ticket } from 'src/tickets/entities/ticket.entity';
+import * as moment from 'moment-timezone';
 
 @CustomRepository(Matching)
 export class MatchingsRepository extends Repository<Matching> {
@@ -128,5 +129,13 @@ export class MatchingsRepository extends Repository<Matching> {
     });
 
     return { matchings };
+  }
+
+  async updateChatCreatedAtByMatchingId(matchingId: number): Promise<void> {
+    await this.createQueryBuilder()
+      .update(Matching)
+      .set({ chatCreatedAt: moment().format() })
+      .where('id = :matchingId', { matchingId })
+      .execute();
   }
 }
