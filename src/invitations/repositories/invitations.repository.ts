@@ -2,6 +2,7 @@ import { User } from 'src/users/entities/user.entity';
 import { CustomRepository } from 'src/database/typeorm-ex.decorator';
 import { Invitation } from '../entities/invitation.entity';
 import { Repository } from 'typeorm';
+import { AdminGetInvitationSuccessUserDto } from 'src/admin/dtos/admin-get-invitation-success-user.dto';
 
 @CustomRepository(Invitation)
 export class InvitationsRepository extends Repository<Invitation> {
@@ -36,5 +37,26 @@ export class InvitationsRepository extends Repository<Invitation> {
       .getCount();
 
     return { invitationCount };
+  }
+
+  async getUsersWithInvitationCount(): Promise<{ users: AdminGetInvitationSuccessUserDto[] }> {
+    const users = await this.createQueryBuilder('invitation')
+      .select([
+        'user.id AS userId',
+        'MAX(invitation.createdAt) AS createdAt',
+        'user.nickname AS nickname',
+        'user.phone AS phone',
+        'FLOOR(COUNT(invitation.inviterId) / 4) AS invitationSuccessCount',
+      ])
+      .leftJoin('invitation.inviter', 'user')
+      .groupBy('invitation.inviterId')
+      .having('FLOOR(COUNT(invitation.inviterId) / 4) > 0') // 성공 횟수 1 이상
+      .getRawMany();
+
+    users.map((u) => {
+      u.invitationSuccessCount = Number(u.invitationSuccessCount);
+    });
+
+    return { users };
   }
 }
