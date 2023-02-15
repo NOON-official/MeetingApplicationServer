@@ -1,3 +1,4 @@
+import { InvitationsService } from './../invitations/invitations.service';
 import { UsersService } from 'src/users/users.service';
 import { AdminGetMatchingDto } from './dtos/admin-get-matching.dto';
 import { MatchingsService } from './../matchings/matchings.service';
@@ -15,6 +16,7 @@ export class AdminService {
     private teamsService: TeamsService,
     private matchingsService: MatchingsService,
     private usersService: UsersService,
+    private invitationsService: InvitationsService,
   ) {}
 
   async deleteTeamByTeamId(teamId: number): Promise<void> {
@@ -47,5 +49,9 @@ export class AdminService {
 
   async getInvitationSuccessUsers(): Promise<{ users: AdminGetInvitationSuccessUserDto[] }> {
     return this.usersService.getInvitationSuccessUsers();
+  }
+
+  async deleteInvitationSuccessByUserId(userId: number): Promise<void> {
+    return this.invitationsService.deleteInvitationSuccessByUserId(userId);
   }
 }

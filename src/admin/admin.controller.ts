@@ -164,7 +164,9 @@ export class AdminController {
   })
   @ApiOkResponse({ description: 'OK' })
   @Delete('invitations/users/:userId/success')
-  deleteInvitationsUsersSuccess(@Param('userId') userId: number) {}
+  deleteInvitationsUsersSuccess(@Param('userId') userId: number): Promise<void> {
+    return this.adminService.deleteInvitationSuccessByUserId(userId);
+  }
 
   @ApiOperation({
     summary: '매칭 적용(매칭 알고리즘)',

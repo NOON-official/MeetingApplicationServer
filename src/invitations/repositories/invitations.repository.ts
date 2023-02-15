@@ -3,6 +3,7 @@ import { CustomRepository } from 'src/database/typeorm-ex.decorator';
 import { Invitation } from '../entities/invitation.entity';
 import { Repository } from 'typeorm';
 import { AdminGetInvitationSuccessUserDto } from 'src/admin/dtos/admin-get-invitation-success-user.dto';
+import { INVITATION_SUCCESS_COUNT } from '../constants/invitation-success-count.constant';
 
 @CustomRepository(Invitation)
 export class InvitationsRepository extends Repository<Invitation> {
@@ -46,11 +47,11 @@ export class InvitationsRepository extends Repository<Invitation> {
         'MAX(invitation.createdAt) AS createdAt',
         'user.nickname AS nickname',
         'user.phone AS phone',
-        'FLOOR(COUNT(invitation.inviterId) / 4) AS invitationSuccessCount',
+        `FLOOR(COUNT(invitation.inviterId) / ${INVITATION_SUCCESS_COUNT}) AS invitationSuccessCount`,
       ])
       .leftJoin('invitation.inviter', 'user')
       .groupBy('invitation.inviterId')
-      .having('FLOOR(COUNT(invitation.inviterId) / 4) > 0') // 성공 횟수 1 이상
+      .having(`FLOOR(COUNT(invitation.inviterId) / ${INVITATION_SUCCESS_COUNT}) > 0`) // 성공 횟수 1 이상
       .getRawMany();
 
     users.map((u) => {
@@ -58,5 +59,16 @@ export class InvitationsRepository extends Repository<Invitation> {
     });
 
     return { users };
+  }
+
+  async deleteInvitationSuccessByUserIdAndDeleteLimit(userId: number, deleteLimit: number): Promise<void> {
+    await this.createQueryBuilder('invitation')
+      .select()
+      .where('inviterId = :userId', { userId })
+      .andWhere('invitation.deletedAt IS NULL')
+      .orderBy('invitation.createdAt', 'ASC')
+      .limit(deleteLimit)
+      .softDelete()
+      .execute();
   }
 }
