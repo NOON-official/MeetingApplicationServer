@@ -20,6 +20,7 @@ import { UserOrder } from './interfaces/user-order.interface';
 import { MatchingStatus } from 'src/matchings/interfaces/matching-status.enum';
 import * as moment from 'moment-timezone';
 import { AdminGetUserDto } from 'src/admin/dtos/admin-get-user.dto';
+import { AdminGetInvitationSuccessUserDto } from 'src/admin/dtos/admin-get-invitation-success-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -265,5 +266,9 @@ export class UsersService {
     }
 
     return { users: result };
+  }
+
+  async getInvitationSuccessUsers(): Promise<{ users: AdminGetInvitationSuccessUserDto[] }> {
+    return await this.invitationsService.getUsersWithInvitationCount();
   }
 }

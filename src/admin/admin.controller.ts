@@ -1,3 +1,4 @@
+import { AdminGetInvitationSuccessUserDto } from './dtos/admin-get-invitation-success-user.dto';
 import { AdminGetMatchingDto } from './dtos/admin-get-matching.dto';
 import { MatchingStatus } from './../matchings/interfaces/matching-status.enum';
 import { AdminGetTeamDto } from './dtos/admin-get-team.dto';
@@ -134,18 +135,28 @@ export class AdminController {
   }
 
   @ApiOperation({
-    summary: '친구초대 4명 달성 유저 조회 --- 보류',
-    description: '관리자페이지 내 사용 \n\n 커피쿠폰 미지급 상태인 유저만 조회',
+    summary: '친구초대 4명 달성 유저 조회',
+    description: '커피쿠폰 미지급 상태인 유저만 조회 \n\n createdAt은 가장 마지막에 친구 초대한 일시',
   })
   @ApiOkResponse({
     schema: {
       example: {
-        users: [{ id: 1, userId: 2, nickname: '미팅이', phone: '01012345678', createdAt: '2023-01-20T21:37:26.886Z' }],
+        users: [
+          {
+            userId: 2,
+            createdAt: '2023-01-20T21:37:26.886Z',
+            nickname: '미팅이',
+            phone: '01012345678',
+            invitationSuccessCount: 3,
+          },
+        ],
       },
     },
   })
   @Get('invitations/users/success')
-  getInvitationsUsersSuccess() {}
+  getInvitationsUsersSuccess(): Promise<{ users: AdminGetInvitationSuccessUserDto[] }> {
+    return this.adminService.getInvitationSuccessUsers();
+  }
 
   @ApiOperation({
     summary: '친구초대 4명 달성 유저 삭제',

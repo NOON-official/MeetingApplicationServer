@@ -7,6 +7,7 @@ import { AdminGetTeamDto } from './dtos/admin-get-team.dto';
 import { TeamGender } from 'src/teams/entities/team-gender.enum';
 import { MatchingStatus } from 'src/matchings/interfaces/matching-status.enum';
 import { AdminGetUserDto } from './dtos/admin-get-user.dto';
+import { AdminGetInvitationSuccessUserDto } from './dtos/admin-get-invitation-success-user.dto';
 
 @Injectable()
 export class AdminService {
@@ -42,5 +43,9 @@ export class AdminService {
 
   async getAllUsers(): Promise<{ users: AdminGetUserDto[] }> {
     return this.usersService.getAllUsers();
+  }
+
+  async getInvitationSuccessUsers(): Promise<{ users: AdminGetInvitationSuccessUserDto[] }> {
+    return this.usersService.getInvitationSuccessUsers();
   }
 }

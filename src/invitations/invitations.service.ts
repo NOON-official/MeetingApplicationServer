@@ -5,6 +5,7 @@ import { ForbiddenException, forwardRef, Inject, Injectable } from '@nestjs/comm
 import { UsersService } from 'src/users/users.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InvitationCreatedEvent } from './events/invitation-created.event';
+import { AdminGetInvitationSuccessUserDto } from 'src/admin/dtos/admin-get-invitation-success-user.dto';
 
 @Injectable()
 export class InvitationsService {
@@ -51,5 +52,9 @@ export class InvitationsService {
     await this.usersService.getUserById(userId);
 
     return await this.invitationsRepository.getInvitationCountWithDeletedByUserId(userId);
+  }
+
+  async getUsersWithInvitationCount(): Promise<{ users: AdminGetInvitationSuccessUserDto[] }> {
+    return await this.invitationsRepository.getUsersWithInvitationCount();
   }
 }
