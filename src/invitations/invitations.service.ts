@@ -6,6 +6,7 @@ import { UsersService } from 'src/users/users.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InvitationCreatedEvent } from './events/invitation-created.event';
 import { AdminGetInvitationSuccessUserDto } from 'src/admin/dtos/admin-get-invitation-success-user.dto';
+import { INVITATION_SUCCESS_COUNT } from './constants/invitation-success-count.constant';
 
 @Injectable()
 export class InvitationsService {
@@ -56,5 +57,15 @@ export class InvitationsService {
 
   async getUsersWithInvitationCount(): Promise<{ users: AdminGetInvitationSuccessUserDto[] }> {
     return await this.invitationsRepository.getUsersWithInvitationCount();
+  }
+
+  async deleteInvitationSuccessByUserId(userId: number): Promise<void> {
+    const { invitationCount } = await this.getInvitationCountByUserId(userId);
+
+    // 삭제할 invitation 개수
+    const deleteLimit = Math.floor(invitationCount / INVITATION_SUCCESS_COUNT) * INVITATION_SUCCESS_COUNT;
+
+    // 해당 개수만큼 삭제
+    await this.invitationsRepository.deleteInvitationSuccessByUserIdAndDeleteLimit(userId, deleteLimit);
   }
 }
