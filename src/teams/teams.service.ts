@@ -11,7 +11,7 @@ import { UserTeam } from 'src/users/interfaces/user-team.interface';
 import { TeamGender } from './entities/team-gender.enum';
 import { teamPagedata } from './interfaces/team-pagedata.interface';
 import { Genders } from './constants/genders';
-import { Universities } from './constants/universities';
+import Universities from './constants/universities.json';
 import { Areas } from './constants/areas';
 import { Mbties } from './constants/mbties';
 import { Roles } from './constants/roles';

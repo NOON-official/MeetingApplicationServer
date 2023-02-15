@@ -224,4 +224,15 @@ export class MatchingsService {
 
     return this.matchingsRepository.updateChatCreatedAtByMatchingId(matchingId);
   }
+
+  // 매칭 실행
+  async doMatching(): Promise<void> {
+    // 1. 현재 라운드의 인원 가져오기 (블랙리스트 제외, 매칭 3회 미만)
+    // 2. 남/녀 팀으로 구분
+    // 3. 대학 레벨 매칭 (동일대학 거부 여부 확인, 가장 높은 대학 기준)
+    // 4. 선호 지역 매칭
+    // 5. 날짜 매칭
+    // 6. 주량 레벨 매칭 (절대값 차이가 4 미만이도록)
+    // 7. 나이 매칭 (본인 선호 나이에 상대방 나이 매칭)
+  }
 }
