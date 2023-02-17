@@ -224,4 +224,8 @@ export class MatchingsService {
 
     return this.matchingsRepository.updateChatCreatedAtByMatchingId(matchingId);
   }
+
+  async saveMatchings(matchings: Matching[]): Promise<Matching[]> {
+    return this.matchingsRepository.save(matchings);
+  }
 }

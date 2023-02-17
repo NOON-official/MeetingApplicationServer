@@ -61,7 +61,7 @@ export class AdminGetTeamDto {
   universities?: number[];
 
   @ApiProperty({
-    description: '상대방 학교',
+    description: '상대방 학교 같은 대학 허용여부',
     example: true,
   })
   prefSameUniversity: boolean;

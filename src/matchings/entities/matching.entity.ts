@@ -38,12 +38,18 @@ export class Matching extends BaseEntity {
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt: Date;
 
+  @Column({ type: 'int' })
+  maleTeamId: number;
+
   @OneToOne(() => Team, (team) => team.maleTeamMatching, { onDelete: 'CASCADE' })
-  @JoinColumn()
+  @JoinColumn({ name: 'maleTeamId' })
   maleTeam: Team;
 
+  @Column({ type: 'int' })
+  femaleTeamId: number;
+
   @OneToOne(() => Team, (team) => team.femaleTeamMatching, { onDelete: 'CASCADE' })
-  @JoinColumn()
+  @JoinColumn({ name: 'femaleTeamId' })
   femaleTeam: Team;
 
   @OneToOne(() => Ticket, (ticket) => ticket.maleTeamMatching, { onDelete: 'CASCADE' })
