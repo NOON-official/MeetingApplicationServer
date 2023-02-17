@@ -44,7 +44,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
   app.use(cookieParser(cookieSecret));
-  app.enableCors({ credentials: true, origin: clientUrl });
+  app.enableCors({ credentials: true, origin: [clientUrl, `www.${clientUrl}`] });
 
   await app.listen(port);
   Logger.log(`Application running on port ${port}`);
