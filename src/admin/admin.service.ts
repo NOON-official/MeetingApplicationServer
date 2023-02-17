@@ -78,8 +78,6 @@ export class AdminService {
       );
       const femaleTeamCount = femaleTeams.length;
 
-      // 이용권 체크
-
       const univIdToGrade = (id: number) => Universities.find((u) => u.id === id)?.grade;
 
       const matchings: Matching[] = [];
