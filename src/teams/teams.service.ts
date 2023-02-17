@@ -20,11 +20,13 @@ import { Vibes } from './constants/vibes';
 import { UpdateTeamDto } from './dtos/update-team.dto';
 import { Team } from './entities/team.entity';
 import { AdminGetTeamDto } from 'src/admin/dtos/admin-get-team.dto';
+import { TeamAvailableDatesRepository } from './repositories/team-available-dates.repository';
 
 @Injectable()
 export class TeamsService {
   constructor(
     private teamsRepository: TeamsRepository,
+    private teamAvailableDatesRepository: TeamAvailableDatesRepository,
     @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
     @Inject(forwardRef(() => MatchingsService))
@@ -276,5 +278,14 @@ export class TeamsService {
     if (status === MatchingStatus.PARTNER_TEAM_REFUSED) {
       return this.teamsRepository.getPartnerTeamRefusedTeamsByMembercountAndGender(membercount, gender);
     }
+  }
+
+  async getMaxRound(): Promise<{ maxRound: number }> {
+    return this.teamsRepository.getMaxRound();
+  }
+
+  async getAvailableDates(teamId: number): Promise<Date[]> {
+    const availableDates = await this.teamAvailableDatesRepository.findBy({ id: teamId });
+    return availableDates.map((availableDate) => availableDate.teamAvailableDate);
   }
 }

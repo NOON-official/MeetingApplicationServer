@@ -4,7 +4,7 @@ import { MatchingStatus } from './../matchings/interfaces/matching-status.enum';
 import { AdminGetTeamDto } from './dtos/admin-get-team.dto';
 import { AdminService } from './admin.service';
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Post, Put, Query, UseGuards, Body } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiNotFoundResponse,
@@ -174,7 +174,9 @@ export class AdminController {
   })
   @ApiOkResponse({ description: 'OK' })
   @Post('matchings')
-  postMatchings() {}
+  postMatchings(@Param('memberCount') memberCount: '2' | '3') {
+    return this.adminService.doMatching(memberCount);
+  }
 
   @ApiOperation({
     summary: '매칭완료자 조회',
