@@ -54,7 +54,7 @@ export class TeamsRepository extends Repository<Team> {
   }
 
   // 팀 가능 날짜 저장
-  async createTeamAvailableDate(teamAvailableDates: Date[], team: Team): Promise<void> {
+  async createTeamAvailableDate(teamAvailableDates: string[], team: Team): Promise<void> {
     await this.createQueryBuilder()
       .insert()
       .into(TeamAvailableDate)

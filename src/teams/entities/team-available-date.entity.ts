@@ -1,5 +1,5 @@
 import { Team } from 'src/teams/entities/team.entity';
-import { BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from 'typeorm';
 
 @Entity()
 @Unique(['id'])
@@ -8,8 +8,12 @@ export class TeamAvailableDate extends BaseEntity {
   id: number;
 
   @Column({ type: 'date' })
-  teamAvailableDate: Date;
+  teamAvailableDate: string;
+
+  @Column({ type: 'int' })
+  teamId: number;
 
   @ManyToOne(() => Team, (team) => team.teamAvailableDates, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'teamId' })
   team: Team;
 }

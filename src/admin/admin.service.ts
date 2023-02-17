@@ -143,9 +143,14 @@ export class AdminService {
           continue;
         }
 
-        // 7. 나이 매칭 (본인 선호 나이에 상대방 나이 매칭)
+        // 7. 나이 매칭 (서로의 선호 나이에 상대방 나이 매칭)
         const matched = drinkMatched.filter((maleTeam) => {
-          return femaleTeam.prefAge[0] <= maleTeam.averageAge && femaleTeam.prefAge[1] >= maleTeam.averageAge;
+          if (femaleTeam.prefAge[0] <= maleTeam.averageAge && femaleTeam.prefAge[1] >= maleTeam.averageAge) {
+            if (maleTeam.prefAge[0] <= femaleTeam.averageAge && maleTeam.prefAge[1] >= femaleTeam.averageAge) {
+              return true;
+            }
+          }
+          return false;
         });
         if (matched.length === 0) {
           console.log('Failed at Age Match : ' + femaleTeam.teamId);
