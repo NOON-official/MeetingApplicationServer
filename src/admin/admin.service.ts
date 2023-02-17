@@ -65,20 +65,32 @@ export class AdminService {
     for (const memberCount of memberCounts) {
       // 1. 현재 라운드의 팀 가져오기 (매칭 3회 미만)
       // 2. 남/녀 팀으로 구분
-      const { teams: maleTeams } = await this.teamsService.getTeamsByStatusAndMembercountAndGender(
+      const { teams: maleTeamsData } = await this.teamsService.getTeamsByStatusAndMembercountAndGender(
         MatchingStatus.APPLIED,
         memberCount,
         TeamGender.male,
       );
-      const maleTeamCount = maleTeams.length;
-      const { teams: femaleTeams } = await this.teamsService.getTeamsByStatusAndMembercountAndGender(
+      const maleTeamCount = maleTeamsData.length;
+      const { teams: femaleTeamsData } = await this.teamsService.getTeamsByStatusAndMembercountAndGender(
         MatchingStatus.APPLIED,
         memberCount,
         TeamGender.female,
       );
-      const femaleTeamCount = femaleTeams.length;
+      const femaleTeamCount = femaleTeamsData.length;
 
+      // 알고리즘 최적화를 위한 정렬
       const univIdToGrade = (id: number) => Universities.find((u) => u.id === id)?.grade;
+      const maleTeams = maleTeamsData.map((team) => ({
+        ...team,
+        maxUnivGrade: Math.max(...team.universities?.map(univIdToGrade)),
+      }));
+      maleTeams.sort((a, b) => b.maxUnivGrade - a.maxUnivGrade);
+
+      const femaleTeams = femaleTeamsData.map((team) => ({
+        ...team,
+        maxUnivGrade: Math.max(...team.universities?.map(univIdToGrade)),
+      }));
+      femaleTeams.sort((a, b) => b.maxUnivGrade - a.maxUnivGrade);
 
       const matchings: Matching[] = [];
       const failedFemaleTeamIds: number[] = [];
@@ -86,7 +98,6 @@ export class AdminService {
       for (const femaleTeam of femaleTeams) {
         // 3. 대학 레벨 매칭 (동일대학 거부 여부 확인, 가장 높은 대학 기준)
         // 여성팀 기준으로 1 낮거나 이상인 대학 필터링
-        const maxUnivLevel = Math.max(...femaleTeam.universities?.map(univIdToGrade));
         const univMatched = maleTeams.filter((maleTeam) => {
           if (!femaleTeam.prefSameUniversity) {
             const hasSameUniv = maleTeam.universities.some((id) => femaleTeam.universities.includes(id));
@@ -94,8 +105,7 @@ export class AdminService {
               return false;
             }
           }
-          const maleUnivLevel = Math.max(...maleTeam.universities?.map(univIdToGrade));
-          return maleUnivLevel >= maxUnivLevel - 1;
+          return maleTeam.maxUnivGrade >= femaleTeam.maxUnivGrade - 1;
         });
         if (univMatched.length === 0) {
           console.log('Failed at University Match : ' + femaleTeam.teamId);
