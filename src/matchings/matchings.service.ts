@@ -8,6 +8,8 @@ import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/commo
 import { Matching } from './entities/matching.entity';
 import { GetMatchingDto } from './dtos/get-matching.dto';
 import { UsersService } from 'src/users/users.service';
+import { MatchingStatus } from './interfaces/matching-status.enum';
+import { AdminGetMatchingDto } from 'src/admin/dtos/admin-get-matching.dto';
 
 @Injectable()
 export class MatchingsService {
@@ -204,5 +206,22 @@ export class MatchingsService {
     if (!!femaleTeamTicketId) {
       await this.ticketsService.deleteTicketById(femaleTeamTicketId);
     }
+  }
+
+  async getMatchingsByStatus(status: MatchingStatus): Promise<{ matchings: AdminGetMatchingDto[] }> {
+    // 수락/거절 대기자 조회
+    if (status === MatchingStatus.SUCCEEDED) {
+      return this.matchingsRepository.getSucceededMatchings();
+    }
+  }
+
+  async saveChatCreatedAtByMatchingId(matchingId: number): Promise<void> {
+    const matching = await this.getMatchingById(matchingId);
+
+    if (!matching || !!matching.deletedAt) {
+      throw new NotFoundException(`Can't find matching with id ${matchingId}`);
+    }
+
+    return this.matchingsRepository.updateChatCreatedAtByMatchingId(matchingId);
   }
 }

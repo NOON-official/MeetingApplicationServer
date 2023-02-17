@@ -1,7 +1,9 @@
+import { AdminGetMatchingDto } from './../../admin/dtos/admin-get-matching.dto';
 import { Matching } from './../entities/matching.entity';
 import { CustomRepository } from 'src/database/typeorm-ex.decorator';
 import { Repository } from 'typeorm';
 import { Ticket } from 'src/tickets/entities/ticket.entity';
+import * as moment from 'moment-timezone';
 
 @CustomRepository(Matching)
 export class MatchingsRepository extends Repository<Matching> {
@@ -95,6 +97,44 @@ export class MatchingsRepository extends Repository<Matching> {
     await this.createQueryBuilder('matching')
       .softDelete()
       .from(Matching)
+      .where('id = :matchingId', { matchingId })
+      .execute();
+  }
+
+  // 관리자페이지 매칭완료자 조회
+  async getSucceededMatchings(): Promise<{ matchings: AdminGetMatchingDto[] }> {
+    const matchings = await this.createQueryBuilder('matching')
+      .select([
+        'matching.id AS matchingId',
+        'maleTeam.id AS maleTeamId',
+        'maleTeamUser.nickname AS maleTeamNickName',
+        'maleTeamUser.phone AS maleTeamPhone',
+        'femaleTeam.id AS femaleTeamId',
+        'femaleTeamUser.nickname AS femaleTeamNickName',
+        'femaleTeamUser.phone AS femaleTeamPhone',
+        'matching.createdAt AS matchedAt',
+        `IF(matching.chatCreatedAt IS NOT NULL, 'true', 'false') AS chatIsCreated`,
+      ])
+      .leftJoin('matching.maleTeam', 'maleTeam')
+      .leftJoin('matching.femaleTeam', 'femaleTeam')
+      .leftJoin('maleTeam.user', 'maleTeamUser')
+      .leftJoin('femaleTeam.user', 'femaleTeamUser')
+      // 매칭 완료자 조회 (상호 수락한 경우)
+      .where('matching.maleTeamIsAccepted = true')
+      .andWhere('matching.femaleTeamIsAccepted = true')
+      .getRawMany();
+
+    matchings.map((m) => {
+      m.chatIsCreated = m.chatIsCreated === 'true' ? true : false;
+    });
+
+    return { matchings };
+  }
+
+  async updateChatCreatedAtByMatchingId(matchingId: number): Promise<void> {
+    await this.createQueryBuilder()
+      .update(Matching)
+      .set({ chatCreatedAt: moment().format() })
       .where('id = :matchingId', { matchingId })
       .execute();
   }

@@ -1,3 +1,4 @@
+import { MatchingStatus } from './../matchings/interfaces/matching-status.enum';
 import { PassportUser } from './../auth/interfaces/passport-user.interface';
 import { GetUser } from './../common/get-user.decorator';
 import { TeamsService } from './teams.service';
@@ -11,7 +12,6 @@ import { Areas } from './constants/areas';
 import { Genders } from './constants/genders';
 import { Universities } from './constants/universities';
 import { TeamGender } from './entities/team-gender.enum';
-import { TeamStatus } from './entities/team-status.enum';
 import { AccessTokenGuard } from './../auth/guards/access-token.guard';
 import { Param, Query, Body } from '@nestjs/common/decorators';
 import {
@@ -58,6 +58,9 @@ export class TeamsController {
     summary: '현재 신청팀 수 조회',
     description: '매칭 실패 횟수 3회 미만인 팀 포함 \n\n 최소 팀 수: 3, 최대 팀 수: 10',
   })
+  @ApiQuery({ name: 'status', enum: [MatchingStatus.APPLIED] })
+  @ApiQuery({ name: 'membercount', enum: ['2', '3'] })
+  @ApiQuery({ name: 'gender', enum: TeamGender })
   @ApiOkResponse({
     schema: {
       example: {
@@ -75,22 +78,22 @@ export class TeamsController {
   @Get('counts')
   async getTeamsCounts(): Promise<Record<'2vs2' | '3vs3', { male: number; female: number }>> {
     const { teamCount: male2 } = await this.teamsService.getTeamsCountByStatusAndMembercountAndGender(
-      TeamStatus.applied,
+      MatchingStatus.APPLIED,
       '2',
       TeamGender.male,
     );
     const { teamCount: female2 } = await this.teamsService.getTeamsCountByStatusAndMembercountAndGender(
-      TeamStatus.applied,
+      MatchingStatus.APPLIED,
       '2',
       TeamGender.female,
     );
     const { teamCount: male3 } = await this.teamsService.getTeamsCountByStatusAndMembercountAndGender(
-      TeamStatus.applied,
+      MatchingStatus.APPLIED,
       '3',
       TeamGender.male,
     );
     const { teamCount: female3 } = await this.teamsService.getTeamsCountByStatusAndMembercountAndGender(
-      TeamStatus.applied,
+      MatchingStatus.APPLIED,
       '3',
       TeamGender.female,
     );

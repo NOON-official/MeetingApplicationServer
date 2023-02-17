@@ -74,4 +74,17 @@ export class CouponsRepository extends Repository<Coupon> {
       })
       .execute();
   }
+
+  async getCouponCountByTypeIdAndUserId(typeId: number, userId: number): Promise<{ couponCount: number }> {
+    const today = moment().tz('Asia/Seoul').format('YYYY-MM-DD');
+
+    const couponCount = await this.createQueryBuilder('coupon')
+      .where('coupon.userId = :userId', { userId })
+      .andWhere('coupon.typeId = :typeId', { typeId })
+      .andWhere('coupon.usedAt IS NULL')
+      .andWhere('coupon.expiresAt IS null OR coupon.expiresAt >= :today', { today })
+      .getCount();
+
+    return { couponCount };
+  }
 }

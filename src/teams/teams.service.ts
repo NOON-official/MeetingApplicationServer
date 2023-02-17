@@ -1,3 +1,4 @@
+import { MatchingStatus } from 'src/matchings/interfaces/matching-status.enum';
 import { MatchingsService } from './../matchings/matchings.service';
 import { GetTeamDto } from './dtos/get-team.dto';
 import { BadRequestException } from '@nestjs/common/exceptions';
@@ -7,7 +8,6 @@ import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/commo
 import { TeamsRepository } from './repositories/teams.repository';
 import { UsersService } from 'src/users/users.service';
 import { UserTeam } from 'src/users/interfaces/user-team.interface';
-import { TeamStatus } from './entities/team-status.enum';
 import { TeamGender } from './entities/team-gender.enum';
 import { teamPagedata } from './interfaces/team-pagedata.interface';
 import { Genders } from './constants/genders';
@@ -19,6 +19,7 @@ import { SameUniversities } from './constants/same-universities';
 import { Vibes } from './constants/vibes';
 import { UpdateTeamDto } from './dtos/update-team.dto';
 import { Team } from './entities/team.entity';
+import { AdminGetTeamDto } from 'src/admin/dtos/admin-get-team.dto';
 
 @Injectable()
 export class TeamsService {
@@ -90,7 +91,7 @@ export class TeamsService {
   }
 
   async getTeamsCountByStatusAndMembercountAndGender(
-    status: TeamStatus.applied,
+    status: MatchingStatus.APPLIED,
     membercount: '2' | '3',
     gender: TeamGender,
   ): Promise<{ teamCount: number }> {
@@ -249,5 +250,31 @@ export class TeamsService {
 
   async getMatchingIdByTeamId(teamId: number): Promise<{ matchingId: number }> {
     return this.matchingsService.getMatchingIdByTeamId(teamId);
+  }
+
+  async getTeamsByStatusAndMembercountAndGender(
+    status: MatchingStatus,
+    membercount: '2' | '3',
+    gender: TeamGender,
+  ): Promise<{ teams: AdminGetTeamDto[] }> {
+    // 신청자 조회
+    if (status === MatchingStatus.APPLIED) {
+      return this.teamsRepository.getAppliedTeamsByMembercountAndGender(membercount, gender);
+    }
+
+    // 수락/거절 대기자 조회
+    if (status === MatchingStatus.MATCHED) {
+      return this.teamsRepository.getMatchedTeamsByMembercountAndGender(membercount, gender);
+    }
+
+    // 매칭 실패 회원 조회
+    if (status === MatchingStatus.FAILED) {
+      return this.teamsRepository.getFailedTeamsByMembercountAndGender(membercount, gender);
+    }
+
+    // 거절 당한 회원 조회
+    if (status === MatchingStatus.PARTNER_TEAM_REFUSED) {
+      return this.teamsRepository.getPartnerTeamRefusedTeamsByMembercountAndGender(membercount, gender);
+    }
   }
 }

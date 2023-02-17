@@ -75,4 +75,8 @@ export class CouponsService {
     const user = await this.usersService.getUserById(userId);
     return this.couponsRepository.createCouponWithUser(user, createCouponDto.couponTypeId, createCouponDto.expiresAt);
   }
+
+  async getCouponCountByTypeIdAndUserId(typeId: number, userId: number): Promise<{ couponCount: number }> {
+    return this.couponsRepository.getCouponCountByTypeIdAndUserId(typeId, userId);
+  }
 }

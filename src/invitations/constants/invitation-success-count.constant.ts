@@ -1,0 +1,1 @@
+export const INVITATION_SUCCESS_COUNT = 4;

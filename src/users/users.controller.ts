@@ -1,3 +1,4 @@
+import { MatchingStatus } from './../matchings/interfaces/matching-status.enum';
 import { UserAgreement } from './entities/user-agreement.entity';
 import { UserCoupon } from './interfaces/user-coupon.interface';
 import { UserTeam } from './interfaces/user-team.interface';
@@ -217,5 +218,60 @@ export class UsersController {
   @UseGuards(AccessTokenGuard)
   getUsersTeamId(@GetUser() user: PassportUser): Promise<{ teamId: number }> {
     return this.usersService.getTeamIdByUserId(user.sub);
+  }
+
+  @ApiOperation({
+    summary: '유저 매칭 상태 조회',
+    description:
+      '매칭 신청 전인 경우 matchingStatus: null \n\n matchingStatus: APPLIED / FAILED / MATCHED / OURTEAM_ACCEPTED / SUCCEEDED / PARTNER_TEAM_REFUSED / OURTEAM_REFUSED / NOT_RESPONDED',
+  })
+  @ApiOkResponse({
+    content: {
+      'application/json': {
+        examples: {
+          '매칭 신청 전': {
+            value: { matchingStatus: null },
+            description: '페이지: 매칭조회2',
+          },
+          '매칭 신청 완료': {
+            value: { matchingStatus: MatchingStatus.APPLIED },
+            description: '페이지: 매칭조회3',
+          },
+          '매칭 실패': {
+            value: { matchingStatus: MatchingStatus.FAILED },
+            description: '페이지: 매칭조회4',
+          },
+          '매칭 완료': {
+            value: { matchingStatus: MatchingStatus.MATCHED },
+            description: '페이지: 매칭조회5',
+          },
+          '우리팀 수락': {
+            value: { matchingStatus: MatchingStatus.OURTEAM_ACCEPTED },
+            description: '페이지: 매칭조회6',
+          },
+          '매칭 성공 (상호 수락)': {
+            value: { matchingStatus: MatchingStatus.SUCCEEDED },
+            description: '페이지: 매칭조회7',
+          },
+          '상대팀 거절': {
+            value: { matchingStatus: MatchingStatus.PARTNER_TEAM_REFUSED },
+            description: '페이지: 매칭조회8',
+          },
+          '우리팀 거절': {
+            value: { matchingStatus: MatchingStatus.OURTEAM_REFUSED },
+            description: '페이지: 매칭조회11',
+          },
+          무응답: {
+            value: { matchingStatus: MatchingStatus.NOT_RESPONDED },
+            description: '페이지: 매칭조회12',
+          },
+        },
+      },
+    },
+  })
+  @Get('matchings/status')
+  @UseGuards(AccessTokenGuard)
+  getUsersMatchingStatus(@GetUser() user: PassportUser): Promise<{ matchingStatus: MatchingStatus }> {
+    return this.usersService.getUserMatchingStatusByUserId(user.sub);
   }
 }
