@@ -74,7 +74,7 @@ export class AdminService {
       const { teams: femaleTeams } = await this.teamsService.getTeamsByStatusAndMembercountAndGender(
         MatchingStatus.APPLIED,
         memberCount,
-        TeamGender.male,
+        TeamGender.female,
       );
       const femaleTeamCount = femaleTeams.length;
 
