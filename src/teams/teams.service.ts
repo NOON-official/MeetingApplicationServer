@@ -292,4 +292,8 @@ export class TeamsService {
   async updateCurrentRound(teamIds: number[], currentRound: number): Promise<void> {
     return this.teamsRepository.updateCurrentRound(teamIds, currentRound);
   }
+
+  async updateLastFailReasons(teamIds: number[], reasons: string[]): Promise<void> {
+    return this.teamsRepository.updateLastFailReasons(teamIds, reasons);
+  }
 }

@@ -373,4 +373,11 @@ export class TeamsRepository extends Repository<Team> {
   async updateCurrentRound(teamIds: number[], currentRound: number): Promise<void> {
     await this.createQueryBuilder().update(Team).whereInIds(teamIds).set({ currentRound }).execute();
   }
+
+  async updateLastFailReasons(teamIds: number[], reasons: string[]): Promise<void> {
+    const promises = teamIds.map((id, i) =>
+      this.createQueryBuilder().update(Team).where('id = :id', { id }).set({ lastFailReason: reasons[i] }).execute(),
+    );
+    await Promise.all(promises);
+  }
 }

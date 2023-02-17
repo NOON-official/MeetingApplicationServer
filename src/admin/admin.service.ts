@@ -94,6 +94,7 @@ export class AdminService {
 
       const matchings: Matching[] = [];
       const failedFemaleTeamIds: number[] = [];
+      const failedFemaleTeamReasons: string[] = [];
 
       for (const femaleTeam of femaleTeams) {
         // 3. 대학 레벨 매칭 (동일대학 거부 여부 확인, 가장 높은 대학 기준)
@@ -108,8 +109,8 @@ export class AdminService {
           return maleTeam.maxUnivGrade >= femaleTeam.maxUnivGrade - 1;
         });
         if (univMatched.length === 0) {
-          console.log('Failed at University Match : ' + femaleTeam.teamId);
           failedFemaleTeamIds.push(femaleTeam.teamId);
+          failedFemaleTeamReasons.push('University');
           continue;
         }
 
@@ -124,8 +125,8 @@ export class AdminService {
           });
         });
         if (areaMatched.length === 0) {
-          console.log('Failed at Area Match : ' + femaleTeam.teamId);
           failedFemaleTeamIds.push(femaleTeam.teamId);
+          failedFemaleTeamReasons.push('Area');
           continue;
         }
 
@@ -138,8 +139,8 @@ export class AdminService {
         const dateMatchResults = await Promise.all(dateMatchPromises);
         const dateMatched = areaMatched.filter((_, i) => dateMatchResults[i]);
         if (dateMatched.length === 0) {
-          console.log('Failed at Date Match : ' + femaleTeam.teamId);
           failedFemaleTeamIds.push(femaleTeam.teamId);
+          failedFemaleTeamReasons.push('Date');
           continue;
         }
 
@@ -148,8 +149,8 @@ export class AdminService {
           return Math.abs(femaleTeam.drink - maleTeam.drink) < 4;
         });
         if (drinkMatched.length === 0) {
-          console.log('Failed at Drink Match : ' + femaleTeam.teamId);
           failedFemaleTeamIds.push(femaleTeam.teamId);
+          failedFemaleTeamReasons.push('Drink');
           continue;
         }
 
@@ -163,8 +164,8 @@ export class AdminService {
           return false;
         });
         if (matched.length === 0) {
-          console.log('Failed at Age Match : ' + femaleTeam.teamId);
           failedFemaleTeamIds.push(femaleTeam.teamId);
+          failedFemaleTeamReasons.push('Age');
           continue;
         }
 
@@ -184,12 +185,15 @@ export class AdminService {
 
       await this.matchingsService.saveMatchings(matchings);
 
+      // 운영에서는 지워도 됨
       console.log(
         `${memberCount}:${memberCount}매칭 - 남 : ${maleTeamCount} / 여 : ${femaleTeamCount} / 성공 : ${matchings.length}쌍`,
       );
+
       // 남은 팀들 라운드 업데이트
       const failedMaleTeamIds = maleTeams.map((t) => t.teamId);
       await this.teamsService.updateCurrentRound([...failedMaleTeamIds, ...failedFemaleTeamIds], maxRound + 1);
+      await this.teamsService.updateLastFailReasons(failedFemaleTeamIds, failedFemaleTeamReasons);
     }
   }
 }
