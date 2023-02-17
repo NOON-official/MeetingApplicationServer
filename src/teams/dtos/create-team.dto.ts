@@ -100,9 +100,8 @@ export class CreateTeamDto {
   })
   @IsNotEmpty()
   @IsDate({ each: true })
-  @Type(() => Date)
   @ArrayMinSize(4)
-  readonly availableDates: Date[];
+  readonly availableDates: string[];
 
   @ApiProperty({
     description: '지역',
