@@ -369,4 +369,8 @@ export class TeamsRepository extends Repository<Team> {
 
     return { teams };
   }
+
+  async updateCurrentRound(teamIds: number[], currentRound: number): Promise<void> {
+    await this.createQueryBuilder().update(Team).whereInIds(teamIds).set({ currentRound }).execute();
+  }
 }

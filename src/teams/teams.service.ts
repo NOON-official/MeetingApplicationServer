@@ -11,7 +11,7 @@ import { UserTeam } from 'src/users/interfaces/user-team.interface';
 import { TeamGender } from './entities/team-gender.enum';
 import { teamPagedata } from './interfaces/team-pagedata.interface';
 import { Genders } from './constants/genders';
-import Universities from './constants/universities.json';
+import * as Universities from './constants/universities.json';
 import { Areas } from './constants/areas';
 import { Mbties } from './constants/mbties';
 import { Roles } from './constants/roles';
@@ -287,5 +287,9 @@ export class TeamsService {
   async getAvailableDates(teamId: number): Promise<Date[]> {
     const availableDates = await this.teamAvailableDatesRepository.findBy({ id: teamId });
     return availableDates.map((availableDate) => availableDate.teamAvailableDate);
+  }
+
+  async updateCurrentRound(teamIds: number[], currentRound: number): Promise<void> {
+    return this.teamsRepository.updateCurrentRound(teamIds, currentRound);
   }
 }

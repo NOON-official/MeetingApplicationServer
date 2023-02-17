@@ -10,7 +10,7 @@ import { Roles } from './constants/roles';
 import { Mbties } from './constants/mbties';
 import { Areas } from './constants/areas';
 import { Genders } from './constants/genders';
-import Universities from './constants/universities.json';
+import * as Universities from './constants/universities.json';
 import { TeamGender } from './entities/team-gender.enum';
 import { AccessTokenGuard } from './../auth/guards/access-token.guard';
 import { Param, Query, Body } from '@nestjs/common/decorators';

@@ -9,7 +9,7 @@ import { TeamGender } from 'src/teams/entities/team-gender.enum';
 import { MatchingStatus } from 'src/matchings/interfaces/matching-status.enum';
 import { AdminGetUserDto } from './dtos/admin-get-user.dto';
 import { AdminGetInvitationSuccessUserDto } from './dtos/admin-get-invitation-success-user.dto';
-import Universities from '../teams/constants/universities.json';
+import * as Universities from '../teams/constants/universities.json';
 import { AREA_IGNORE_ID } from 'src/teams/constants/areas';
 import { Matching } from 'src/matchings/entities/matching.entity';
 
@@ -60,8 +60,9 @@ export class AdminService {
 
   async doMatching(): Promise<void> {
     const memberCounts: ('2' | '3')[] = ['2', '3'];
+    const { maxRound } = await this.teamsService.getMaxRound();
+
     for (const memberCount of memberCounts) {
-      console.log(`Start ${memberCount}:${memberCount} Matching...`);
       // 1. 현재 라운드의 팀 가져오기 (매칭 3회 미만)
       // 2. 남/녀 팀으로 구분
       const { teams: maleTeams } = await this.teamsService.getTeamsByStatusAndMembercountAndGender(
@@ -69,18 +70,22 @@ export class AdminService {
         memberCount,
         TeamGender.male,
       );
+      const maleTeamCount = maleTeams.length;
       const { teams: femaleTeams } = await this.teamsService.getTeamsByStatusAndMembercountAndGender(
         MatchingStatus.APPLIED,
         memberCount,
         TeamGender.male,
       );
+      const femaleTeamCount = femaleTeams.length;
+
+      // 이용권 체크
 
       const univIdToGrade = (id: number) => Universities.find((u) => u.id === id)?.grade;
 
       const matchings: Matching[] = [];
+      const failedFemaleTeamIds: number[] = [];
 
       for (const femaleTeam of femaleTeams) {
-        console.log('Team ID : ' + femaleTeam.teamId);
         // 3. 대학 레벨 매칭 (동일대학 거부 여부 확인, 가장 높은 대학 기준)
         // 여성팀 기준으로 1 낮거나 이상인 대학 필터링
         const maxUnivLevel = Math.max(...femaleTeam.universities?.map(univIdToGrade));
@@ -94,7 +99,11 @@ export class AdminService {
           const maleUnivLevel = Math.max(...maleTeam.universities?.map(univIdToGrade));
           return maleUnivLevel >= maxUnivLevel - 1;
         });
-        console.log('University Matched : ' + univMatched.length);
+        if (univMatched.length === 0) {
+          console.log('Failed at University Match : ' + femaleTeam.teamId);
+          failedFemaleTeamIds.push(femaleTeam.teamId);
+          continue;
+        }
 
         // 4. 선호 지역 매칭
         const areaMatched = univMatched.filter((maleTeam) => {
@@ -106,7 +115,11 @@ export class AdminService {
             return femaleTeam.areas.includes(area);
           });
         });
-        console.log('Area Matched : ' + areaMatched.length);
+        if (areaMatched.length === 0) {
+          console.log('Failed at Area Match : ' + femaleTeam.teamId);
+          failedFemaleTeamIds.push(femaleTeam.teamId);
+          continue;
+        }
 
         // 5. 날짜 매칭
         const availableDates = await this.teamsService.getAvailableDates(femaleTeam.teamId);
@@ -116,19 +129,31 @@ export class AdminService {
         });
         const dateMatchResults = await Promise.all(dateMatchPromises);
         const dateMatched = areaMatched.filter((_, i) => dateMatchResults[i]);
-        console.log('Date Matched : ' + dateMatched.length);
+        if (dateMatched.length === 0) {
+          console.log('Failed at Date Match : ' + femaleTeam.teamId);
+          failedFemaleTeamIds.push(femaleTeam.teamId);
+          continue;
+        }
 
         // 6. 주량 레벨 매칭 (절대값 차이가 4 미만이도록)
         const drinkMatched = dateMatched.filter((maleTeam) => {
           return Math.abs(femaleTeam.drink - maleTeam.drink) < 4;
         });
-        console.log('Drink Matched : ' + drinkMatched.length);
+        if (drinkMatched.length === 0) {
+          console.log('Failed at Drink Match : ' + femaleTeam.teamId);
+          failedFemaleTeamIds.push(femaleTeam.teamId);
+          continue;
+        }
 
         // 7. 나이 매칭 (본인 선호 나이에 상대방 나이 매칭)
         const matched = drinkMatched.filter((maleTeam) => {
-          return femaleTeam.prefAge[0] >= maleTeam.averageAge && femaleTeam.prefAge[1] <= maleTeam.averageAge;
+          return femaleTeam.prefAge[0] <= maleTeam.averageAge && femaleTeam.prefAge[1] >= maleTeam.averageAge;
         });
-        console.log('Matched : ' + matched.length);
+        if (matched.length === 0) {
+          console.log('Failed at Age Match : ' + femaleTeam.teamId);
+          failedFemaleTeamIds.push(femaleTeam.teamId);
+          continue;
+        }
 
         // 매칭된 팀 연결
         if (matched.length > 0) {
@@ -138,10 +163,20 @@ export class AdminService {
           matching.femaleTeamId = femaleTeam.teamId;
 
           matchings.push(matching);
+
+          const deleteIndex = maleTeams.indexOf(maleTeam);
+          maleTeams.splice(deleteIndex, 1);
         }
       }
 
       await this.matchingsService.saveMatchings(matchings);
+
+      console.log(
+        `${memberCount}:${memberCount}매칭 - 남 : ${maleTeamCount} / 여 : ${femaleTeamCount} / 성공 : ${matchings.length}쌍`,
+      );
+      // 남은 팀들 라운드 업데이트
+      const failedMaleTeamIds = maleTeams.map((t) => t.teamId);
+      await this.teamsService.updateCurrentRound([...failedMaleTeamIds, ...failedFemaleTeamIds], maxRound + 1);
     }
   }
 }
