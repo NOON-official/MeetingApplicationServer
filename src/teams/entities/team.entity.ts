@@ -57,6 +57,9 @@ export class Team extends BaseEntity {
   @Column({ type: 'int' })
   currentRound: number;
 
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  lastFailReason: string;
+
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 
