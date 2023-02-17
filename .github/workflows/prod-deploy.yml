@@ -1,0 +1,21 @@
+name: prod-deploy
+
+on:
+  push:
+    branches:
+      - prod # 브랜치에서 push 이벤트가 일어났을 때 실행
+
+jobs:
+  AUTO_DEPLOY:
+    name: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: multiple command
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER_NAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd ~/server
+            ./deploy.sh
