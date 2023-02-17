@@ -11,7 +11,7 @@ import { UserTeam } from 'src/users/interfaces/user-team.interface';
 import { TeamGender } from './entities/team-gender.enum';
 import { teamPagedata } from './interfaces/team-pagedata.interface';
 import { Genders } from './constants/genders';
-import { Universities } from './constants/universities';
+import * as Universities from './constants/universities.json';
 import { Areas } from './constants/areas';
 import { Mbties } from './constants/mbties';
 import { Roles } from './constants/roles';
@@ -20,11 +20,13 @@ import { Vibes } from './constants/vibes';
 import { UpdateTeamDto } from './dtos/update-team.dto';
 import { Team } from './entities/team.entity';
 import { AdminGetTeamDto } from 'src/admin/dtos/admin-get-team.dto';
+import { TeamAvailableDatesRepository } from './repositories/team-available-dates.repository';
 
 @Injectable()
 export class TeamsService {
   constructor(
     private teamsRepository: TeamsRepository,
+    private teamAvailableDatesRepository: TeamAvailableDatesRepository,
     @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
     @Inject(forwardRef(() => MatchingsService))
@@ -276,5 +278,18 @@ export class TeamsService {
     if (status === MatchingStatus.PARTNER_TEAM_REFUSED) {
       return this.teamsRepository.getPartnerTeamRefusedTeamsByMembercountAndGender(membercount, gender);
     }
+  }
+
+  async getMaxRound(): Promise<{ maxRound: number }> {
+    return this.teamsRepository.getMaxRound();
+  }
+
+  async getAvailableDates(teamId: number): Promise<Date[]> {
+    const availableDates = await this.teamAvailableDatesRepository.findBy({ id: teamId });
+    return availableDates.map((availableDate) => availableDate.teamAvailableDate);
+  }
+
+  async updateCurrentRound(teamIds: number[], currentRound: number): Promise<void> {
+    return this.teamsRepository.updateCurrentRound(teamIds, currentRound);
   }
 }
