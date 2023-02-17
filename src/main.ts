@@ -17,6 +17,7 @@ async function bootstrap() {
     .setTitle('미팅학개론')
     .setDescription('미팅학개론 ver.2 API 명세서')
     .setVersion('2.0')
+    .addServer('/api')
     .addTag('AUTH')
     .addTag('USER')
     .addTag('TEAM')
@@ -39,6 +40,8 @@ async function bootstrap() {
       transform: true,
     }),
   );
+
+  app.setGlobalPrefix('api');
 
   app.use(cookieParser(cookieSecret));
   app.enableCors({ credentials: true, origin: clientUrl });

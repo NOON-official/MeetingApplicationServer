@@ -30,7 +30,7 @@ export class AuthController {
   @ApiOperation({
     summary: '카카오 로그인',
     description:
-      '프론트엔드에서 href 형태로 요청 보내주시면 됩니다. \n\n ex) \\<a href="http:\\//localhost:5000/auth/signin/kakao">로그인\\</a> \n\n <a href="http://localhost:5000/auth/signin/kakao">카카오 로그인 테스트</a>',
+      '프론트엔드에서 href 형태로 요청 보내주시면 됩니다. \n\n ex) \\<a href="http:\\//localhost:5000/api/auth/signin/kakao">로그인\\</a> \n\n <a href="http://localhost:5000/api/auth/signin/kakao">카카오 로그인 테스트</a>',
   })
   @ApiResponse({
     description:
