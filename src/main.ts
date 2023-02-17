@@ -13,6 +13,8 @@ async function bootstrap() {
   const port = configService.get<string>('SERVER_PORT');
   const cookieSecret = configService.get<string>('COOKIE_SECRET');
   const clientUrl = configService.get<string>('CLIENT_URL');
+  const clientUrlWithWWW = configService.get<string>('CLIENT_URL_WITH_WWW') ?? null;
+
   const swaggerConfig = new DocumentBuilder()
     .setTitle('미팅학개론')
     .setDescription('미팅학개론 ver.2 API 명세서')
@@ -44,7 +46,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
   app.use(cookieParser(cookieSecret));
-  app.enableCors({ credentials: true, origin: [clientUrl, `www.${clientUrl}`] });
+  app.enableCors({ credentials: true, origin: !!clientUrlWithWWW ? [clientUrl, clientUrlWithWWW] : [clientUrl] });
 
   await app.listen(port);
   Logger.log(`Application running on port ${port}`);
