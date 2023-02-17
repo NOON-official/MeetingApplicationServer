@@ -174,8 +174,8 @@ export class AdminController {
   })
   @ApiOkResponse({ description: 'OK' })
   @Post('matchings')
-  postMatchings(@Param('memberCount') memberCount: '2' | '3') {
-    return this.adminService.doMatching(memberCount);
+  postMatchings(): Promise<void> {
+    return this.adminService.doMatching();
   }
 
   @ApiOperation({
