@@ -88,7 +88,7 @@ export class AdminService {
         // 여성팀 기준으로 1 낮거나 이상인 대학 필터링
         const maxUnivLevel = Math.max(...femaleTeam.universities?.map(univIdToGrade));
         const univMatched = maleTeams.filter((maleTeam) => {
-          if (femaleTeam.prefSameUniversity) {
+          if (!femaleTeam.prefSameUniversity) {
             const hasSameUniv = maleTeam.universities.some((id) => femaleTeam.universities.includes(id));
             if (hasSameUniv) {
               return false;
