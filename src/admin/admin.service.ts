@@ -1,3 +1,5 @@
+import { MatchingFailedEvent } from './../matchings/events/matching-failed.event';
+import { MatchingMatchedEvent } from './../matchings/events/matching-matched.event';
 import { InvitationsService } from './../invitations/invitations.service';
 import { UsersService } from 'src/users/users.service';
 import { AdminGetMatchingDto } from './dtos/admin-get-matching.dto';
@@ -12,6 +14,8 @@ import { AdminGetInvitationSuccessUserDto } from './dtos/admin-get-invitation-su
 import * as Universities from '../teams/constants/universities.json';
 import { AREA_IGNORE_ID } from 'src/teams/constants/areas';
 import { Matching } from 'src/matchings/entities/matching.entity';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { MatchingRound } from 'src/matchings/constants/matching-round';
 
 @Injectable()
 export class AdminService {
@@ -20,6 +24,7 @@ export class AdminService {
     private matchingsService: MatchingsService,
     private usersService: UsersService,
     private invitationsService: InvitationsService,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async deleteTeamByTeamId(teamId: number): Promise<void> {
@@ -61,6 +66,9 @@ export class AdminService {
   async doMatching(): Promise<void> {
     const memberCounts: ('2' | '3')[] = ['2', '3'];
     const { maxRound } = await this.teamsService.getMaxRound();
+
+    const matchedTeamIds = []; // 매칭된 팀ID
+    const failedTeamIds = []; // 매칭 3회 이상 실패한 팀ID
 
     for (const memberCount of memberCounts) {
       // 1. 현재 라운드의 팀 가져오기 (매칭 3회 미만)
@@ -176,6 +184,10 @@ export class AdminService {
           matching.maleTeamId = maleTeam.teamId;
           matching.femaleTeamId = femaleTeam.teamId;
 
+          // 매칭된 팀ID
+          matchedTeamIds.push(maleTeam.teamId);
+          matchedTeamIds.push(femaleTeam.teamId);
+
           matchings.push(matching);
 
           const deleteIndex = maleTeams.indexOf(maleTeam);
@@ -194,6 +206,37 @@ export class AdminService {
       const failedMaleTeamIds = maleTeams.map((t) => t.teamId);
       await this.teamsService.updateCurrentRound([...failedMaleTeamIds, ...failedFemaleTeamIds], maxRound + 1);
       await this.teamsService.updateLastFailReasons(failedFemaleTeamIds, failedFemaleTeamReasons);
+
+      // 매칭 3회 이상 실패한 남자팀 ID
+      for (const teamId of failedMaleTeamIds) {
+        const team = await this.teamsService.getTeamById(teamId);
+        if (team.currentRound - team.startRound >= MatchingRound.MAX_TRIAL) {
+          failedTeamIds.push(teamId);
+        }
+      }
+
+      // 매칭 3회 이상 실패한 여자팀 ID
+      for (const teamId of failedFemaleTeamIds) {
+        const team = await this.teamsService.getTeamById(teamId);
+        if (team.currentRound - team.startRound >= MatchingRound.MAX_TRIAL) {
+          failedTeamIds.push(teamId);
+        }
+      }
+
+      const matchingMatchedEvent = new MatchingMatchedEvent();
+      const matchingFailedEvent = new MatchingFailedEvent();
+
+      // 매칭되어 수락/거절 대기중인 유저에게 문자 보내기
+      matchedTeamIds.forEach((id) => {
+        matchingMatchedEvent.teamId = id;
+        this.eventEmitter.emit('matching.matched', matchingMatchedEvent);
+      });
+
+      // 매칭 3회 이상 실패한 유저에게 문자 보내기
+      failedTeamIds.forEach((id) => {
+        matchingFailedEvent.teamId = id;
+        this.eventEmitter.emit('matching.failed', matchingFailedEvent);
+      });
     }
   }
 }
