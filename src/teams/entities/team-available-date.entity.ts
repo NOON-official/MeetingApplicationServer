@@ -8,7 +8,7 @@ export class TeamAvailableDate extends BaseEntity {
   id: number;
 
   @Column({ type: 'date' })
-  teamAvailableDate: string;
+  teamAvailableDate: Date;
 
   @Column({ type: 'int' })
   teamId: number;
