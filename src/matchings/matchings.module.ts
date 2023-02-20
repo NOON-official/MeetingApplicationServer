@@ -1,3 +1,5 @@
+import { MatchingPartnerTeamRefusedListener } from './listeners/matching-partner-team-refused.listener';
+import { MatchingSucceededListener } from './listeners/matching-succeeded.listener';
 import { TicketsModule } from 'src/tickets/tickets.module';
 import { UsersModule } from './../users/users.module';
 import { TeamsModule } from './../teams/teams.module';
@@ -15,7 +17,7 @@ import { MatchingsService } from './matchings.service';
     forwardRef(() => UsersModule),
     forwardRef(() => TicketsModule),
   ],
-  providers: [MatchingsService],
+  providers: [MatchingsService, MatchingSucceededListener, MatchingPartnerTeamRefusedListener],
   controllers: [MatchingsController],
   exports: [MatchingsService],
 })

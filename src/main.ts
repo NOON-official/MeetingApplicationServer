@@ -15,25 +15,28 @@ async function bootstrap() {
   const clientUrl = configService.get<string>('CLIENT_URL');
   const clientUrlWithWWW = configService.get<string>('CLIENT_URL_WITH_WWW') ?? null;
 
-  const swaggerConfig = new DocumentBuilder()
-    .setTitle('미팅학개론')
-    .setDescription('미팅학개론 ver.2 API 명세서')
-    .setVersion('2.0')
-    .addServer('/api')
-    .addTag('AUTH')
-    .addTag('USER')
-    .addTag('TEAM')
-    .addTag('ORDER')
-    .addTag('COUPON')
-    .addTag('INVITATION')
-    .addTag('MATCHING')
-    .addTag('ADMIN')
-    .addBearerAuth()
-    .addCookieAuth('refresh')
-    .build();
+  // 개발 환경일 경우만 명세서 빌드
+  if (process.env.NODE_ENV === 'development') {
+    const swaggerConfig = new DocumentBuilder()
+      .setTitle('미팅학개론')
+      .setDescription('미팅학개론 ver.2 API 명세서')
+      .setVersion('2.0')
+      .addServer('/api')
+      .addTag('AUTH')
+      .addTag('USER')
+      .addTag('TEAM')
+      .addTag('ORDER')
+      .addTag('COUPON')
+      .addTag('INVITATION')
+      .addTag('MATCHING')
+      .addTag('ADMIN')
+      .addBearerAuth()
+      .addCookieAuth('refresh')
+      .build();
 
-  const document = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('api', app, document);
+    const document = SwaggerModule.createDocument(app, swaggerConfig);
+    SwaggerModule.setup('api', app, document);
+  }
 
   app.useGlobalPipes(
     new ValidationPipe({
