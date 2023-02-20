@@ -11,6 +11,7 @@ export const postNaverCloudSMS = async (
   contentType: ContentType,
   receivePhoneNumber: string,
   content: string,
+  subject?: string,
 ) => {
   const configService = new ConfigService();
   const httpService = new HttpService();
@@ -37,6 +38,7 @@ export const postNaverCloudSMS = async (
     contentType, // 일반 메시지
     countryCode: '82', // 국가 번호
     from: sendPhoneNumber, // 발신 번호
+    subject,
     content, // 문자 내용
     messages: [
       {
