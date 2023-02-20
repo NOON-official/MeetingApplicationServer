@@ -8,5 +8,5 @@ export const MatchingPartnerTeamRefusedContentConstant = {
   
   (이건 비밀 꿀팁인데.. 자기소개서와 ID카드를 더 매력적으로 꾸며보시는건 어떨까요!?)
   
-  지금 재미칭하러 가기. [meetingo.me]`,
+  지금 재매칭하러 가기. [meetingo.me]`,
 };
