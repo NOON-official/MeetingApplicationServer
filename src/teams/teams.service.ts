@@ -284,7 +284,7 @@ export class TeamsService {
     return this.teamsRepository.getMaxRound();
   }
 
-  async getAvailableDates(teamId: number): Promise<string[]> {
+  async getAvailableDates(teamId: number): Promise<Date[]> {
     const availableDates = await this.teamAvailableDatesRepository.findBy({ teamId: teamId });
     return availableDates.map((availableDate) => availableDate.teamAvailableDate);
   }

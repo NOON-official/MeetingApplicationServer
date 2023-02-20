@@ -67,7 +67,7 @@ export class GetTeamDto {
     description: '미팅 선호 날짜',
     example: ['2023-01-22', '2023-01-23', '2023-01-24'],
   })
-  availableDates: string[];
+  availableDates: Date[];
 
   @ApiProperty({
     description: '지역',
