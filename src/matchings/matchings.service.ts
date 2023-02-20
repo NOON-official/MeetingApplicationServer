@@ -1,3 +1,4 @@
+import { MatchingPartnerTeamRefusedEvent } from './events/matching-partner-team-refused.event';
 import { TeamsService } from './../teams/teams.service';
 import { MatchingRefuseReasonsRepository } from './repositories/matching-refuse-reasons.repository';
 import { CreateMatchingRefuseReasonDto } from './dtos/create-matching-refuse-reason.dto';
@@ -10,6 +11,8 @@ import { GetMatchingDto } from './dtos/get-matching.dto';
 import { UsersService } from 'src/users/users.service';
 import { MatchingStatus } from './interfaces/matching-status.enum';
 import { AdminGetMatchingDto } from 'src/admin/dtos/admin-get-matching.dto';
+import { MatchingSucceededEvent } from './events/matching-succeeded.event';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class MatchingsService {
@@ -22,6 +25,7 @@ export class MatchingsService {
     private ticketsService: TicketsService,
     @Inject(forwardRef(() => TeamsService))
     private teamsService: TeamsService,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async getMatchingByTeamId(teamId: number): Promise<Matching> {
@@ -108,6 +112,20 @@ export class MatchingsService {
     // 이용권 사용 처리
     await this.ticketsService.useTicketById(ticket.id);
 
+    // 상대팀이 이미 수락한 경우 두 팀 모두 매칭성공 문자 발송
+    if (
+      (gender === 'male' && matching.femaleTeamIsAccepted === true) ||
+      (gender === 'female' && matching.maleTeamIsAccepted === true)
+    ) {
+      const succeededTeamIds = [matching.maleTeamId, matching.femaleTeamId];
+
+      const matchingSucceededEvent = new MatchingSucceededEvent();
+      succeededTeamIds.forEach((id) => {
+        matchingSucceededEvent.teamId = id;
+        this.eventEmitter.emit('matching.succeeded', matchingSucceededEvent);
+      });
+    }
+
     return this.matchingsRepository.acceptMatchingByGender(matchingId, gender, ticket);
   }
 
@@ -130,18 +148,30 @@ export class MatchingsService {
     }
 
     if (gender === 'male') {
-      // 상대팀이 이미 수락한 경우, 상대팀 이용권 환불
+      // 상대팀이 이미 수락한 경우
       if (matching.femaleTeamIsAccepted === true) {
+        // 1) 상대팀 이용권 환불
         await this.ticketsService.refundTicketById(matching.femaleTeamTicket.id);
         await this.matchingsRepository.deleteTicketInfoByGender(matchingId, 'female');
+
+        // 2) 상대팀에 매칭 거절 당함 문자 보내기
+        const matchingPartnerTeamRefusedEvent = new MatchingPartnerTeamRefusedEvent();
+        matchingPartnerTeamRefusedEvent.teamId = matching.femaleTeamId;
+        this.eventEmitter.emit('matching.partnerTeamRefused', matchingPartnerTeamRefusedEvent);
       }
     }
 
     if (gender === 'female') {
-      // 상대팀이 이미 수락한 경우, 상대팀 이용권 환불
+      // 상대팀이 이미 수락한 경우
       if (matching.maleTeamIsAccepted === true) {
+        // 1) 상대팀 이용권 환불
         await this.ticketsService.refundTicketById(matching.maleTeamTicket.id);
         await this.matchingsRepository.deleteTicketInfoByGender(matchingId, 'male');
+
+        // 2) 상대팀에 매칭 거절 당함 문자 보내기
+        const matchingPartnerTeamRefusedEvent = new MatchingPartnerTeamRefusedEvent();
+        matchingPartnerTeamRefusedEvent.teamId = matching.maleTeamId;
+        this.eventEmitter.emit('matching.partnerTeamRefused', matchingPartnerTeamRefusedEvent);
       }
     }
 

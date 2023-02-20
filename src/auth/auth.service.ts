@@ -1,4 +1,4 @@
-import { BadRequestException, HttpException } from '@nestjs/common/exceptions';
+import { BadRequestException } from '@nestjs/common/exceptions';
 import { VerifyPhoneCodeDto } from './dtos/verify-phone-code.dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { ConfigService } from '@nestjs/config';
@@ -9,17 +9,15 @@ import { CACHE_MANAGER, ForbiddenException, Inject, NotFoundException } from '@n
 import { Response } from 'express';
 import { SavePhoneDto } from './dtos/save-phone.dto';
 import { Cache } from 'cache-manager';
-import { catchError, firstValueFrom } from 'rxjs';
-import { HttpService } from '@nestjs/axios';
-import { Method } from 'axios';
-import * as crypto from 'crypto';
+import { postNaverCloudSMS } from 'src/common/sms/post-navercloud-sms';
+import { SmsType } from 'src/common/sms/enums/sms-type.enum';
+import { ContentType } from 'src/common/sms/enums/content-type.enum';
 
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
     private configService: ConfigService,
-    private readonly httpService: HttpService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
@@ -108,66 +106,6 @@ export class AuthService {
     return await this.usersService.deleteAccount(userId);
   }
 
-  async getNaverCloudSignature(method: Method, url: string, timestamp: string, accessKey: string, secretKey: string) {
-    const message = [];
-    const space = ' '; // one space
-    const newLine = '\n'; // new line
-
-    const hmac = crypto.createHmac('sha256', secretKey);
-    const verificationUrl = url.split('https://sens.apigw.ntruss.com')[1];
-
-    message.push(method);
-    message.push(space);
-    message.push(verificationUrl);
-    message.push(newLine);
-    message.push(timestamp);
-    message.push(newLine);
-    message.push(accessKey);
-
-    const signature = hmac.update(message.join('')).digest('base64').toString();
-
-    return signature;
-  }
-
-  async postNaverCloudSMS(sendPhoneNumber: string, receivePhoneNumber: string, content: string) {
-    const accessKey = this.configService.get<string>('NAVERCLOUD_ACCESS_KEY');
-    const secretKey = this.configService.get<string>('NAVERCLOUD_SECRET_KEY');
-    const serviceId = this.configService.get<string>('NAVERCLOUD_SENS_SERVICE_ID');
-
-    const url = `https://sens.apigw.ntruss.com/sms/v2/services/${serviceId}/messages`;
-    const timestamp = Date.now().toString();
-
-    const requestConfig = {
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-        'x-ncp-iam-access-key': accessKey,
-        'x-ncp-apigw-timestamp': timestamp,
-        'x-ncp-apigw-signature-v2': await this.getNaverCloudSignature('POST', url, timestamp, accessKey, secretKey),
-      },
-    };
-
-    const requestData = {
-      type: 'SMS',
-      contentType: 'COMM', // 일반 메시지
-      countryCode: '82', // 국가 번호
-      from: sendPhoneNumber, // 발신 번호
-      content, // 문자 내용
-      messages: [
-        {
-          to: receivePhoneNumber, // 수신 번호
-        },
-      ],
-    };
-
-    await firstValueFrom(
-      this.httpService.post(url, requestData, requestConfig).pipe(
-        catchError((error) => {
-          throw new HttpException(error.response.data, error.response.status);
-        }),
-      ),
-    );
-  }
-
   async postVerificationCode(savePhoneDto: SavePhoneDto): Promise<void> {
     // 1. 인증 코드 생성
     const receivePhoneNumber = savePhoneDto.phone;
@@ -177,10 +115,9 @@ export class AuthService {
     await this.cacheManager.set(receivePhoneNumber, code); // 제한시간 3분
 
     // 3. 문자로 인증 코드 발송
-    const sendPhoneNumber = this.configService.get<string>('SEND_MESSAGE_PHONE_NUMBER');
     const content = `[미팅학개론] 인증번호 [${code}]를 입력해주세요.`;
 
-    await this.postNaverCloudSMS(sendPhoneNumber, receivePhoneNumber, content);
+    await postNaverCloudSMS(SmsType.SMS, ContentType.COMM, receivePhoneNumber, content);
   }
 
   async verifyCodeAndSavePhone(userId: number, verifyPhoneCodeDto: VerifyPhoneCodeDto): Promise<void> {
