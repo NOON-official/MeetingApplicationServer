@@ -1,3 +1,5 @@
+import { AdminModule } from './../admin/admin.module';
+import { TeamCreatedListener } from './listeners/team-created.listener';
 import { MatchingsModule } from './../matchings/matchings.module';
 import { UsersModule } from './../users/users.module';
 import { TeamsRepository } from './repositories/teams.repository';
@@ -13,8 +15,9 @@ import { TeamsService } from './teams.service';
     TypeOrmExModule.forCustomRepository([TeamsRepository, TeamMembersRepository, TeamAvailableDatesRepository]),
     forwardRef(() => UsersModule),
     forwardRef(() => MatchingsModule),
+    forwardRef(() => AdminModule),
   ],
-  providers: [TeamsService],
+  providers: [TeamsService, TeamCreatedListener],
   controllers: [TeamsController],
   exports: [TeamsService],
 })
