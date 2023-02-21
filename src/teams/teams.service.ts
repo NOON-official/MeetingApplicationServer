@@ -1,3 +1,4 @@
+import { AdminGetPartnerTeamNotRespondedTeamDto } from './../admin/dtos/admin-get-partner-team-not-responded-team.dto';
 import { MatchingStatus } from 'src/matchings/interfaces/matching-status.enum';
 import { MatchingsService } from './../matchings/matchings.service';
 import { GetTeamDto } from './dtos/get-team.dto';
@@ -295,5 +296,12 @@ export class TeamsService {
 
   async updateLastFailReasons(teamIds: number[], reasons: string[]): Promise<void> {
     return this.teamsRepository.updateLastFailReasons(teamIds, reasons);
+  }
+
+  // 상대팀 무응답이고 아직 환불받지 않은 팀 조회
+  async getPartnerTeamNotRespondedTeamsByGender(
+    gender: TeamGender,
+  ): Promise<{ teams: AdminGetPartnerTeamNotRespondedTeamDto[] }> {
+    return this.teamsRepository.getPartnerTeamNotRespondedTeamsByGender(gender);
   }
 }
