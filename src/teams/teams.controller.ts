@@ -13,7 +13,7 @@ import { Genders } from './constants/genders';
 import * as Universities from './constants/universities.json';
 import { TeamGender } from './entities/team-gender.enum';
 import { AccessTokenGuard } from './../auth/guards/access-token.guard';
-import { Param, Query, Body } from '@nestjs/common/decorators';
+import { Param, Body } from '@nestjs/common/decorators';
 import {
   ApiBearerAuth,
   ApiNotFoundResponse,

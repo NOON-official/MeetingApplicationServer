@@ -1,3 +1,4 @@
+import { AdminGetPartnerTeamNotRespondedTeamDto } from './../../admin/dtos/admin-get-partner-team-not-responded-team.dto';
 import { MatchingStatus } from 'src/matchings/interfaces/matching-status.enum';
 import { CreateMemberDto } from './../dtos/create-team.dto';
 import { CreateTeam } from './../interfaces/create-team.interface';
@@ -345,7 +346,7 @@ export class TeamsRepository extends Repository<Team> {
       // 성별, 인원수 필터링
       .where('memberCount = :membercount', { membercount })
       .andWhere('team.gender = :genderNum', { genderNum: gender === TeamGender.male ? 1 : 2 })
-      //  거절 당한 회원 조회 (매칭 내역 O & 상대팀 거절/무응답)
+      // 거절 당한 회원 조회 (매칭 내역 O & 상대팀 거절/무응답)
       .andWhere('matching.id IS NOT NULL')
       // 우리팀이 거절한 경우는 제외
       .andWhere(`matching.${gender}TeamIsAccepted IS NOT false`)
@@ -379,5 +380,37 @@ export class TeamsRepository extends Repository<Team> {
       this.createQueryBuilder().update(Team).where('id = :id', { id }).set({ lastFailReason: reasons[i] }).execute(),
     );
     await Promise.all(promises);
+  }
+
+  // 상대팀 무응답이고, 아직 환불되지 않은 팀 조회
+  async getPartnerTeamNotRespondedTeamsByGender(
+    gender: TeamGender,
+  ): Promise<{ teams: AdminGetPartnerTeamNotRespondedTeamDto[] }> {
+    const teams = await this.createQueryBuilder('team')
+      .select([
+        'team.id AS teamId',
+        'team.gender AS gender',
+        'user.phone AS phone',
+        'matching.id AS matchingId',
+        `${gender === 'male' ? 'matching.maleTeamTicketId' : 'matching.femaleTeamTicketId'} AS ticketId`,
+      ])
+      .leftJoin(`team.${gender}TeamMatching`, 'matching')
+      .leftJoin(`team.user`, 'user')
+      // 성별 필터링
+      .where('team.gender = :genderNum', { genderNum: gender === TeamGender.male ? 1 : 2 })
+      // 매칭 내역 O
+      .andWhere('matching.id IS NOT NULL')
+      // 우리팀이 수락하고 상대팀이 24시간 이내 무응답한 경우
+      .andWhere(
+        `matching.${gender}TeamIsAccepted IS true AND matching.${
+          gender === 'male' ? 'female' : 'male'
+        }TeamIsAccepted IS NULL AND DATE_ADD(matching.createdAt, INTERVAL 1 DAY) < NOW()`,
+      )
+      // 아직 이용권 환불받지 않은 경우
+      .andWhere(`matching.${gender}TeamTicketId IS NOT NULL`)
+      .groupBy('team.id')
+      .getRawMany();
+
+    return { teams };
   }
 }
