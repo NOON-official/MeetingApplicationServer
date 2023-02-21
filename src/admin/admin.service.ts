@@ -5,7 +5,7 @@ import { UsersService } from 'src/users/users.service';
 import { AdminGetMatchingDto } from './dtos/admin-get-matching.dto';
 import { MatchingsService } from './../matchings/matchings.service';
 import { TeamsService } from './../teams/teams.service';
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { AdminGetTeamDto } from './dtos/admin-get-team.dto';
 import { TeamGender } from 'src/teams/entities/team-gender.enum';
 import { MatchingStatus } from 'src/matchings/interfaces/matching-status.enum';
@@ -20,9 +20,13 @@ import { MatchingRound } from 'src/matchings/constants/matching-round';
 @Injectable()
 export class AdminService {
   constructor(
+    @Inject(forwardRef(() => TeamsService))
     private teamsService: TeamsService,
+    @Inject(forwardRef(() => MatchingsService))
     private matchingsService: MatchingsService,
+    @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
+    @Inject(forwardRef(() => InvitationsService))
     private invitationsService: InvitationsService,
     private eventEmitter: EventEmitter2,
   ) {}
@@ -222,21 +226,20 @@ export class AdminService {
           failedTeamIds.push(teamId);
         }
       }
-
-      const matchingMatchedEvent = new MatchingMatchedEvent();
-      const matchingFailedEvent = new MatchingFailedEvent();
-
-      // 매칭되어 수락/거절 대기중인 유저에게 문자 보내기
-      matchedTeamIds.forEach((id) => {
-        matchingMatchedEvent.teamId = id;
-        this.eventEmitter.emit('matching.matched', matchingMatchedEvent);
-      });
-
-      // 매칭 3회 이상 실패한 유저에게 문자 보내기
-      failedTeamIds.forEach((id) => {
-        matchingFailedEvent.teamId = id;
-        this.eventEmitter.emit('matching.failed', matchingFailedEvent);
-      });
     }
+    const matchingMatchedEvent = new MatchingMatchedEvent();
+    const matchingFailedEvent = new MatchingFailedEvent();
+
+    // 매칭되어 수락/거절 대기중인 유저에게 문자 보내기
+    matchedTeamIds.forEach((id) => {
+      matchingMatchedEvent.teamId = id;
+      this.eventEmitter.emit('matching.matched', matchingMatchedEvent);
+    });
+
+    // 매칭 3회 이상 실패한 유저에게 문자 보내기
+    failedTeamIds.forEach((id) => {
+      matchingFailedEvent.teamId = id;
+      this.eventEmitter.emit('matching.failed', matchingFailedEvent);
+    });
   }
 }
