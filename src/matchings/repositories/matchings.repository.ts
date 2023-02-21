@@ -77,7 +77,7 @@ export class MatchingsRepository extends Repository<Matching> {
     }
   }
 
-  async deleteTicketInfoByGender(matchingId: number, gender: 'male' | 'female'): Promise<void> {
+  async deleteTicketInfoByMatchingIdAndGender(matchingId: number, gender: 'male' | 'female'): Promise<void> {
     if (gender === 'male') {
       await this.createQueryBuilder()
         .update(Matching)

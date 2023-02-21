@@ -1,3 +1,4 @@
+import { TeamGender } from 'src/teams/entities/team-gender.enum';
 import { MatchingPartnerTeamRefusedEvent } from './events/matching-partner-team-refused.event';
 import { TeamsService } from './../teams/teams.service';
 import { MatchingRefuseReasonsRepository } from './repositories/matching-refuse-reasons.repository';
@@ -129,6 +130,10 @@ export class MatchingsService {
     return this.matchingsRepository.acceptMatchingByGender(matchingId, gender, ticket);
   }
 
+  async deleteTicketInfoByMatchingIdAndGender(matchingId: number, gender: TeamGender) {
+    return this.matchingsRepository.deleteTicketInfoByMatchingIdAndGender(matchingId, gender);
+  }
+
   async refuseMatchingByTeamId(matchingId: number, teamId: number): Promise<void> {
     const matching = await this.getMatchingById(matchingId);
 
@@ -152,7 +157,7 @@ export class MatchingsService {
       if (matching.femaleTeamIsAccepted === true) {
         // 1) 상대팀 이용권 환불
         await this.ticketsService.refundTicketById(matching.femaleTeamTicket.id);
-        await this.matchingsRepository.deleteTicketInfoByGender(matchingId, 'female');
+        await this.deleteTicketInfoByMatchingIdAndGender(matchingId, TeamGender.female);
 
         // 2) 상대팀에 매칭 거절 당함 문자 보내기
         const matchingPartnerTeamRefusedEvent = new MatchingPartnerTeamRefusedEvent();
@@ -166,7 +171,7 @@ export class MatchingsService {
       if (matching.maleTeamIsAccepted === true) {
         // 1) 상대팀 이용권 환불
         await this.ticketsService.refundTicketById(matching.maleTeamTicket.id);
-        await this.matchingsRepository.deleteTicketInfoByGender(matchingId, 'male');
+        await this.deleteTicketInfoByMatchingIdAndGender(matchingId, TeamGender.male);
 
         // 2) 상대팀에 매칭 거절 당함 문자 보내기
         const matchingPartnerTeamRefusedEvent = new MatchingPartnerTeamRefusedEvent();
