@@ -22,6 +22,7 @@ import { UpdateTeamDto } from './dtos/update-team.dto';
 import { Team } from './entities/team.entity';
 import { AdminGetTeamDto } from 'src/admin/dtos/admin-get-team.dto';
 import { TeamAvailableDatesRepository } from './repositories/team-available-dates.repository';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class TeamsService {
@@ -32,6 +33,7 @@ export class TeamsService {
     private usersService: UsersService,
     @Inject(forwardRef(() => MatchingsService))
     private matchingsService: MatchingsService,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async createTeam(createTeamDto: CreateTeamDto, userId: number): Promise<void> {
@@ -70,6 +72,9 @@ export class TeamsService {
 
     // 팀 멤버 저장
     await this.teamsRepository.createTeamMember(members, team);
+
+    // 신청팀 수가 다 찼을 경우 매칭 알고리즘 실행 - 자동화 적용 시 주석 해제하기
+    // this.eventEmitter.emit('team.created');
   }
 
   // 신청 내역 조회
@@ -249,6 +254,9 @@ export class TeamsService {
 
     // 3. 기존 팀 삭제하기(soft delete)
     await this.deleteTeamById(teamId);
+
+    // 신청팀 수가 다 찼을 경우 매칭 알고리즘 실행 - 자동화 적용 시 주석 해제하기
+    // this.eventEmitter.emit('team.created');
   }
 
   async getMatchingIdByTeamId(teamId: number): Promise<{ matchingId: number }> {
