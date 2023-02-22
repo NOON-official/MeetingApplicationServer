@@ -1,6 +1,6 @@
 import { MatchingStatus } from './../matchings/interfaces/matching-status.enum';
 import { PassportUser } from './../auth/interfaces/passport-user.interface';
-import { GetUser } from './../common/get-user.decorator';
+import { GetUser } from '../common/decorators/get-user.decorator';
 import { TeamsService } from './teams.service';
 import { GetTeamDto } from './dtos/get-team.dto';
 import { CreateTeamDto } from './dtos/create-team.dto';

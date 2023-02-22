@@ -15,7 +15,7 @@ import { Controller, Put } from '@nestjs/common';
 import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 import { CouponTypes, CouponType } from './constants/coupons';
 import { RegisterCouponDto } from './dtos/register-coupon.dto';
-import { GetUser } from 'src/common/get-user.decorator';
+import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { CreateCouponDto } from './dtos/create-coupon.dto';
 
 @ApiTags('COUPON')
