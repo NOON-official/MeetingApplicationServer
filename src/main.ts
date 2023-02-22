@@ -5,9 +5,12 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
 import { DocumentBuilder } from '@nestjs/swagger';
 import { SwaggerModule } from '@nestjs/swagger/dist';
+import { LoggerService } from './common/utils/logger-service.util';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: new LoggerService('SERVER'),
+  });
   const configService = app.get(ConfigService);
 
   const port = configService.get<string>('SERVER_PORT');
