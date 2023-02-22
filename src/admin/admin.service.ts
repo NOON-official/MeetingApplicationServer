@@ -16,6 +16,7 @@ import { AREA_IGNORE_ID } from 'src/teams/constants/areas';
 import { Matching } from 'src/matchings/entities/matching.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { MatchingRound } from 'src/matchings/constants/matching-round';
+import { LoggerService } from 'src/common/utils/logger-service.util';
 
 @Injectable()
 export class AdminService {
@@ -68,6 +69,8 @@ export class AdminService {
   }
 
   async doMatching(): Promise<void> {
+    const loggerService = new LoggerService('ADMIN');
+
     const memberCounts: ('2' | '3')[] = ['2', '3'];
     const { maxRound } = await this.teamsService.getMaxRound();
 
@@ -201,11 +204,6 @@ export class AdminService {
 
       await this.matchingsService.saveMatchings(matchings);
 
-      // 운영에서는 지워도 됨
-      console.log(
-        `${memberCount}:${memberCount}매칭 - 남 : ${maleTeamCount} / 여 : ${femaleTeamCount} / 성공 : ${matchings.length}쌍`,
-      );
-
       // 남은 팀들 라운드 업데이트
       const failedMaleTeamIds = maleTeams.map((t) => t.teamId);
       await this.teamsService.updateCurrentRound([...failedMaleTeamIds, ...failedFemaleTeamIds], maxRound + 1);
@@ -226,7 +224,12 @@ export class AdminService {
           failedTeamIds.push(teamId);
         }
       }
+
+      loggerService.verbose(
+        `[${memberCount}:${memberCount} 매칭] 신청자(남자 ${maleTeamCount}팀/여자 ${femaleTeamCount}팀) 성공(${matchings.length}쌍) 3회 이상 실패(${failedTeamIds.length}팀)`,
+      );
     }
+
     const matchingMatchedEvent = new MatchingMatchedEvent();
     const matchingFailedEvent = new MatchingFailedEvent();
 
