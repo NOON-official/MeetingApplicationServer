@@ -120,8 +120,9 @@ export class MatchingsService {
     ) {
       const succeededTeamIds = [matching.maleTeamId, matching.femaleTeamId];
 
-      const matchingSucceededEvent = new MatchingSucceededEvent();
       succeededTeamIds.forEach((id) => {
+        const matchingSucceededEvent = new MatchingSucceededEvent();
+
         matchingSucceededEvent.teamId = id;
         this.eventEmitter.emit('matching.succeeded', matchingSucceededEvent);
       });
