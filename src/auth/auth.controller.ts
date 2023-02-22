@@ -20,7 +20,7 @@ import {
   ApiResponse,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger/dist/decorators';
-import { GetUser } from 'src/common/get-user.decorator';
+import { GetUser } from 'src/common/decorators/get-user.decorator';
 
 @ApiTags('AUTH')
 @Controller('auth')

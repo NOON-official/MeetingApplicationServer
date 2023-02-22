@@ -14,7 +14,7 @@ import { Controller, Post, UseGuards } from '@nestjs/common';
 import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 import { Products, ProductType } from './constants/products';
 import { CreateOrderDto } from './dtos/create-order.dto';
-import { GetUser } from 'src/common/get-user.decorator';
+import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { OrdersService } from './orders.service';
 
 @ApiTags('ORDER')
