@@ -230,17 +230,18 @@ export class AdminService {
       );
     }
 
-    const matchingMatchedEvent = new MatchingMatchedEvent();
-    const matchingFailedEvent = new MatchingFailedEvent();
-
     // 매칭되어 수락/거절 대기중인 유저에게 문자 보내기
-    matchedTeamIds.forEach((id) => {
+    matchedTeamIds.forEach(async (id) => {
+      const matchingMatchedEvent = new MatchingMatchedEvent();
+
       matchingMatchedEvent.teamId = id;
       this.eventEmitter.emit('matching.matched', matchingMatchedEvent);
     });
 
     // 매칭 3회 이상 실패한 유저에게 문자 보내기
     failedTeamIds.forEach((id) => {
+      const matchingFailedEvent = new MatchingFailedEvent();
+
       matchingFailedEvent.teamId = id;
       this.eventEmitter.emit('matching.failed', matchingFailedEvent);
     });
