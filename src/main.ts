@@ -15,8 +15,8 @@ async function bootstrap() {
   const clientUrl = configService.get<string>('CLIENT_URL');
   const clientUrlWithWWW = configService.get<string>('CLIENT_URL_WITH_WWW') ?? null;
 
-  // 개발 환경일 경우만 명세서 빌드
-  if (process.env.NODE_ENV === 'development') {
+  // 개발 환경일 경우만 명세서 빌드 -- 배포시 두번째 조건 삭제하기
+  if (process.env.NODE_ENV === 'development' || clientUrl.includes('stage')) {
     const swaggerConfig = new DocumentBuilder()
       .setTitle('미팅학개론')
       .setDescription('미팅학개론 ver.2 API 명세서')
