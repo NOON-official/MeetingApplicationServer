@@ -16,7 +16,7 @@ import {
 } from '@nestjs/swagger';
 import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 import { TeamGender } from 'src/teams/entities/team-gender.enum';
-import { Roles } from 'src/common/roles.decorator';
+import { Roles } from 'src/common/decorators/roles.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { AdminGetUserDto } from './dtos/admin-get-user.dto';
 
