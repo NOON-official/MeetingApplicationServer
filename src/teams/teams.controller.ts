@@ -1,3 +1,4 @@
+import { MatchingRound } from 'src/matchings/constants/matching-round';
 import { MatchingStatus } from './../matchings/interfaces/matching-status.enum';
 import { PassportUser } from './../auth/interfaces/passport-user.interface';
 import { GetUser } from '../common/decorators/get-user.decorator';
@@ -58,9 +59,6 @@ export class TeamsController {
     summary: '현재 신청팀 수 조회',
     description: '매칭 실패 횟수 3회 미만인 팀 포함 \n\n 최소 팀 수: 3, 최대 팀 수: 10',
   })
-  @ApiQuery({ name: 'status', enum: [MatchingStatus.APPLIED] })
-  @ApiQuery({ name: 'membercount', enum: ['2', '3'] })
-  @ApiQuery({ name: 'gender', enum: TeamGender })
   @ApiOkResponse({
     schema: {
       example: {
@@ -76,7 +74,13 @@ export class TeamsController {
     },
   })
   @Get('counts')
-  async getTeamsCounts(): Promise<Record<'2vs2' | '3vs3', { male: number; female: number }>> {
+  async getTeamsCounts(): Promise<{
+    teamsPerRound: number;
+    '2vs2': { male: number; female: number };
+    '3vs3': { male: number; female: number };
+  }> {
+    const teamsPerRound = MatchingRound.MAX_TEAM;
+
     const { teamCount: male2 } = await this.teamsService.getTeamsCountByStatusAndMembercountAndGender(
       MatchingStatus.APPLIED,
       '2',
@@ -99,6 +103,7 @@ export class TeamsController {
     );
 
     return {
+      teamsPerRound,
       '2vs2': {
         male: male2,
         female: female2,
