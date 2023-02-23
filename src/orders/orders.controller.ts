@@ -1,6 +1,5 @@
 import { PassportUser } from './../auth/interfaces/passport-user.interface';
 import { Body, Get } from '@nestjs/common';
-/* eslint-disable @typescript-eslint/no-empty-function */
 import { ApiOperation } from '@nestjs/swagger';
 import {
   ApiBearerAuth,
@@ -52,5 +51,17 @@ export class OrdersController {
   @UseGuards(AccessTokenGuard)
   postOrders(@GetUser() user: PassportUser, @Body() createOrderDto: CreateOrderDto): Promise<void> {
     return this.ordersService.createOrder(user.sub, createOrderDto);
+  }
+
+  @ApiOperation({
+    summary: '페이플 파트너 인증',
+    description: '파트너 인증 후 페이플 결제 요청(결제창 호출) 가능',
+  })
+  @ApiBearerAuth()
+  @ApiCreatedResponse({ description: 'Created' })
+  @Get('payple/auth')
+  @UseGuards(AccessTokenGuard)
+  getOrdersPaypleAuth() {
+    return this.ordersService.getPaypleAuth();
   }
 }
