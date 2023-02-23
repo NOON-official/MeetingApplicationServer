@@ -124,7 +124,7 @@ export class TeamsRepository extends Repository<Team> {
     return { memberCount };
   }
 
-  async getTeamsCountByStatusAndMembercountAndGender(
+  async getTeamCountByStatusAndMembercountAndGender(
     status: MatchingStatus.APPLIED,
     membercount: '2' | '3',
     gender: TeamGender,

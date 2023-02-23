@@ -17,22 +17,22 @@ export class TeamCreatedListener {
   // 팀 정보 저장 시 현재 신청팀 수 확인 후 매칭 알고리즘 실행
   @OnEvent('team.created')
   async handleTeamCreatedEvent() {
-    const { teamCount: male2 } = await this.teamsService.getTeamsCountByStatusAndMembercountAndGender(
+    const { teamCount: male2 } = await this.teamsService.getTeamCountByStatusAndMembercountAndGender(
       MatchingStatus.APPLIED,
       '2',
       TeamGender.male,
     );
-    const { teamCount: female2 } = await this.teamsService.getTeamsCountByStatusAndMembercountAndGender(
+    const { teamCount: female2 } = await this.teamsService.getTeamCountByStatusAndMembercountAndGender(
       MatchingStatus.APPLIED,
       '2',
       TeamGender.female,
     );
-    const { teamCount: male3 } = await this.teamsService.getTeamsCountByStatusAndMembercountAndGender(
+    const { teamCount: male3 } = await this.teamsService.getTeamCountByStatusAndMembercountAndGender(
       MatchingStatus.APPLIED,
       '3',
       TeamGender.male,
     );
-    const { teamCount: female3 } = await this.teamsService.getTeamsCountByStatusAndMembercountAndGender(
+    const { teamCount: female3 } = await this.teamsService.getTeamCountByStatusAndMembercountAndGender(
       MatchingStatus.APPLIED,
       '3',
       TeamGender.female,

@@ -98,22 +98,72 @@ export class TeamsService {
     return this.teamsRepository.getMembersCountOneWeek();
   }
 
-  async getTeamsCountByStatusAndMembercountAndGender(
+  async getTeamCountByStatusAndMembercountAndGender(
     status: MatchingStatus.APPLIED,
     membercount: '2' | '3',
     gender: TeamGender,
   ): Promise<{ teamCount: number }> {
-    let { teamCount } = await this.teamsRepository.getTeamsCountByStatusAndMembercountAndGender(
-      status,
-      membercount,
-      gender,
+    return this.teamsRepository.getTeamCountByStatusAndMembercountAndGender(status, membercount, gender);
+  }
+
+  async getTeamCount(): Promise<{
+    teamsPerRound: number;
+    '2vs2': { male: number; female: number };
+    '3vs3': { male: number; female: number };
+  }> {
+    const teamsPerRound = MatchingRound.MAX_TEAM;
+
+    let { teamCount: male2 } = await this.getTeamCountByStatusAndMembercountAndGender(
+      MatchingStatus.APPLIED,
+      '2',
+      TeamGender.male,
     );
 
     // 최소 팀 수 미만인 경우 OR 최대 팀 수 이상인 경우 값 조정
-    if (teamCount < MatchingRound.MIN_TEAM) teamCount = MatchingRound.MIN_TEAM;
-    if (teamCount > MatchingRound.MAX_TEAM) teamCount = MatchingRound.MAX_TEAM;
+    if (male2 < MatchingRound.MIN_TEAM) male2 = MatchingRound.MIN_TEAM;
+    if (male2 > MatchingRound.MAX_TEAM) male2 = MatchingRound.MAX_TEAM;
 
-    return { teamCount };
+    let { teamCount: female2 } = await this.getTeamCountByStatusAndMembercountAndGender(
+      MatchingStatus.APPLIED,
+      '2',
+      TeamGender.female,
+    );
+
+    // 최소 팀 수 미만인 경우 OR 최대 팀 수 이상인 경우 값 조정
+    if (female2 < MatchingRound.MIN_TEAM) female2 = MatchingRound.MIN_TEAM;
+    if (female2 > MatchingRound.MAX_TEAM) female2 = MatchingRound.MAX_TEAM;
+
+    let { teamCount: male3 } = await this.getTeamCountByStatusAndMembercountAndGender(
+      MatchingStatus.APPLIED,
+      '3',
+      TeamGender.male,
+    );
+
+    // 최소 팀 수 미만인 경우 OR 최대 팀 수 이상인 경우 값 조정
+    if (male3 < MatchingRound.MIN_TEAM) male3 = MatchingRound.MIN_TEAM;
+    if (male3 > MatchingRound.MAX_TEAM) male3 = MatchingRound.MAX_TEAM;
+
+    let { teamCount: female3 } = await this.getTeamCountByStatusAndMembercountAndGender(
+      MatchingStatus.APPLIED,
+      '3',
+      TeamGender.female,
+    );
+
+    // 최소 팀 수 미만인 경우 OR 최대 팀 수 이상인 경우 값 조정
+    if (female3 < MatchingRound.MIN_TEAM) female3 = MatchingRound.MIN_TEAM;
+    if (female3 > MatchingRound.MAX_TEAM) female3 = MatchingRound.MAX_TEAM;
+
+    return {
+      teamsPerRound,
+      '2vs2': {
+        male: male2,
+        female: female2,
+      },
+      '3vs3': {
+        male: male3,
+        female: female3,
+      },
+    };
   }
 
   async getTeamPagedata(): Promise<{
