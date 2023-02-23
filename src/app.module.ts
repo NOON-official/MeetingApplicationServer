@@ -1,3 +1,4 @@
+import { SigninMiddleware } from './common/middlewares/signin.middleware';
 import { CacheModule, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -59,5 +60,6 @@ import { LoggerMiddleware } from './common/middlewares/logger.middleware';
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(LoggerMiddleware).forRoutes('*');
+    consumer.apply(SigninMiddleware).forRoutes('/auth/signin/kakao');
   }
 }

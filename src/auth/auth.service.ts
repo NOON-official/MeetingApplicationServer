@@ -6,7 +6,7 @@ import { JwtService } from '@nestjs/jwt/dist';
 import { KakaoUser } from './interfaces/kakao-user.interface';
 import { UsersService } from './../users/users.service';
 import { CACHE_MANAGER, ForbiddenException, Inject, NotFoundException } from '@nestjs/common';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { SavePhoneDto } from './dtos/save-phone.dto';
 import { Cache } from 'cache-manager';
 import { postNaverCloudSMS } from 'src/common/sms/post-navercloud-sms';
@@ -39,7 +39,7 @@ export class AuthService {
     return refreshToken;
   }
 
-  async signInWithKakao(kakaoUser: KakaoUser, res: Response): Promise<string> {
+  async signInWithKakao(kakaoUser: KakaoUser, req: Request, res: Response): Promise<string> {
     let user = await this.usersService.getUserByKakaoUid(kakaoUser.kakaoUid);
 
     // 회원가입X
@@ -75,8 +75,7 @@ export class AuthService {
     });
 
     // client redirect url 설정
-    const clientSignInCallbackUri = this.configService.get<string>('CLIENT_SIGNIN_CALLBACK_URI');
-    const clientRedirectUrl = `${clientSignInCallbackUri}?access=${accessToken}`;
+    const clientRedirectUrl = `${req?.cookies?.signinRedirectUrl}?access=${accessToken}`;
 
     return clientRedirectUrl;
   }
