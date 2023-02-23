@@ -8,4 +8,8 @@ export interface CreateOrder {
   tossMethod?: string;
   tossOrderName?: string;
   tossAmount?: number;
+  paypleOrderId?: string;
+  paypleMethod?: string;
+  paypleOrderName?: string;
+  paypleAmount?: number;
 }

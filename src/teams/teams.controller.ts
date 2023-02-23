@@ -1,5 +1,3 @@
-import { MatchingRound } from 'src/matchings/constants/matching-round';
-import { MatchingStatus } from './../matchings/interfaces/matching-status.enum';
 import { PassportUser } from './../auth/interfaces/passport-user.interface';
 import { GetUser } from '../common/decorators/get-user.decorator';
 import { TeamsService } from './teams.service';
@@ -12,7 +10,6 @@ import { Mbties } from './constants/mbties';
 import { Areas } from './constants/areas';
 import { Genders } from './constants/genders';
 import * as Universities from './constants/universities.json';
-import { TeamGender } from './entities/team-gender.enum';
 import { AccessTokenGuard } from './../auth/guards/access-token.guard';
 import { Param, Body } from '@nestjs/common/decorators';
 import {
@@ -20,11 +17,9 @@ import {
   ApiNotFoundResponse,
   ApiUnauthorizedResponse,
   ApiOkResponse,
-  ApiQuery,
   ApiCreatedResponse,
   ApiForbiddenResponse,
 } from '@nestjs/swagger/dist';
-/* eslint-disable @typescript-eslint/no-empty-function */
 import { ApiOperation } from '@nestjs/swagger';
 import { ApiTags } from '@nestjs/swagger/dist';
 import { Controller, Get, Post, Patch, Delete, UseGuards } from '@nestjs/common';
@@ -62,6 +57,7 @@ export class TeamsController {
   @ApiOkResponse({
     schema: {
       example: {
+        teamsPerRound: 10,
         '2vs2': {
           male: 8,
           female: 6,
@@ -73,46 +69,13 @@ export class TeamsController {
       },
     },
   })
-  @Get('counts')
-  async getTeamsCounts(): Promise<{
+  @Get('count')
+  async getTeamsCount(): Promise<{
     teamsPerRound: number;
     '2vs2': { male: number; female: number };
     '3vs3': { male: number; female: number };
   }> {
-    const teamsPerRound = MatchingRound.MAX_TEAM;
-
-    const { teamCount: male2 } = await this.teamsService.getTeamsCountByStatusAndMembercountAndGender(
-      MatchingStatus.APPLIED,
-      '2',
-      TeamGender.male,
-    );
-    const { teamCount: female2 } = await this.teamsService.getTeamsCountByStatusAndMembercountAndGender(
-      MatchingStatus.APPLIED,
-      '2',
-      TeamGender.female,
-    );
-    const { teamCount: male3 } = await this.teamsService.getTeamsCountByStatusAndMembercountAndGender(
-      MatchingStatus.APPLIED,
-      '3',
-      TeamGender.male,
-    );
-    const { teamCount: female3 } = await this.teamsService.getTeamsCountByStatusAndMembercountAndGender(
-      MatchingStatus.APPLIED,
-      '3',
-      TeamGender.female,
-    );
-
-    return {
-      teamsPerRound,
-      '2vs2': {
-        male: male2,
-        female: female2,
-      },
-      '3vs3': {
-        male: male3,
-        female: female3,
-      },
-    };
+    return this.teamsService.getTeamCount();
   }
 
   @ApiBearerAuth()
