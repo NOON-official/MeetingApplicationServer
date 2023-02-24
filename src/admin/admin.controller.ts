@@ -3,8 +3,7 @@ import { AdminGetMatchingDto } from './dtos/admin-get-matching.dto';
 import { MatchingStatus } from './../matchings/interfaces/matching-status.enum';
 import { AdminGetTeamDto } from './dtos/admin-get-team.dto';
 import { AdminService } from './admin.service';
-/* eslint-disable @typescript-eslint/no-empty-function */
-import { Controller, Delete, Get, Param, Post, Put, Query, UseGuards, Body } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiNotFoundResponse,
@@ -29,6 +28,34 @@ import { AdminGetUserDto } from './dtos/admin-get-user.dto';
 @Controller('admin')
 export class AdminController {
   constructor(private adminService: AdminService) {}
+
+  @ApiOperation({
+    summary: '현재 신청팀 수 조회',
+    description: '매칭 실패 횟수 3회 미만인 팀 포함',
+  })
+  @ApiOkResponse({
+    schema: {
+      example: {
+        teamsPerRound: 10,
+        '2vs2': {
+          male: 8,
+          female: 6,
+        },
+        '3vs3': {
+          male: 4,
+          female: 5,
+        },
+      },
+    },
+  })
+  @Get('teams/count')
+  async getAdminTeamsCount(): Promise<{
+    teamsPerRound: number;
+    '2vs2': { male: number; female: number };
+    '3vs3': { male: number; female: number };
+  }> {
+    return this.adminService.getAdminTeamCount();
+  }
 
   @ApiOperation({
     summary: '유저 전체 조회',

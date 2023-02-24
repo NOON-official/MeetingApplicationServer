@@ -246,4 +246,48 @@ export class AdminService {
       this.eventEmitter.emit('matching.failed', matchingFailedEvent);
     });
   }
+
+  async getAdminTeamCount(): Promise<{
+    teamsPerRound: number;
+    '2vs2': { male: number; female: number };
+    '3vs3': { male: number; female: number };
+  }> {
+    const teamsPerRound = MatchingRound.MAX_TEAM;
+
+    const { teamCount: male2 } = await this.teamsService.getTeamCountByStatusAndMembercountAndGender(
+      MatchingStatus.APPLIED,
+      '2',
+      TeamGender.male,
+    );
+
+    const { teamCount: female2 } = await this.teamsService.getTeamCountByStatusAndMembercountAndGender(
+      MatchingStatus.APPLIED,
+      '2',
+      TeamGender.female,
+    );
+
+    const { teamCount: male3 } = await this.teamsService.getTeamCountByStatusAndMembercountAndGender(
+      MatchingStatus.APPLIED,
+      '3',
+      TeamGender.male,
+    );
+
+    const { teamCount: female3 } = await this.teamsService.getTeamCountByStatusAndMembercountAndGender(
+      MatchingStatus.APPLIED,
+      '3',
+      TeamGender.female,
+    );
+
+    return {
+      teamsPerRound,
+      '2vs2': {
+        male: male2,
+        female: female2,
+      },
+      '3vs3': {
+        male: male3,
+        female: female3,
+      },
+    };
+  }
 }

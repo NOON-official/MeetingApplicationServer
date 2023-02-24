@@ -6,9 +6,9 @@ import { AccessTokenGuard } from './guards/access-token.guard';
 import { RefreshTokenGuard } from './guards/refresh-token.guard';
 import { AuthService } from './auth.service';
 import { KakaoUser } from './interfaces/kakao-user.interface';
-import { Controller, Get, HttpStatus, UseGuards, Res, Redirect, Delete, Post, Body } from '@nestjs/common';
+import { Controller, Get, HttpStatus, UseGuards, Res, Redirect, Delete, Post, Body, Req } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger/dist';
 import {
   ApiCookieAuth,
@@ -46,8 +46,12 @@ export class AuthController {
   @Get('kakao/callback')
   @UseGuards(AuthGuard('kakao'))
   @Redirect()
-  async getAuthKakaoCallback(@GetUser() user: KakaoUser, @Res() res: Response): Promise<{ url: string }> {
-    const clientRedirectUrl = await this.authService.signInWithKakao(user, res);
+  async getAuthKakaoCallback(
+    @GetUser() user: KakaoUser,
+    @Req() req: Request,
+    @Res() res: Response,
+  ): Promise<{ url: string }> {
+    const clientRedirectUrl = await this.authService.signInWithKakao(user, req, res);
 
     return { url: clientRedirectUrl };
   }

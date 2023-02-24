@@ -49,6 +49,18 @@ export class Order extends BaseEntity {
   @Column({ type: 'int', nullable: true })
   tossAmount: number;
 
+  @Column({ type: 'varchar', length: 64, nullable: true })
+  paypleOrderId: string;
+
+  @Column({ type: 'varchar', length: 30, nullable: true })
+  paypleOrderName: string;
+
+  @Column({ type: 'varchar', length: 30, nullable: true })
+  paypleMethod: string;
+
+  @Column({ type: 'int', nullable: true })
+  paypleAmount: number;
+
   @Column({ type: 'timestamp', nullable: true })
   refundedAt: Date;
 
