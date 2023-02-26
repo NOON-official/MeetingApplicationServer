@@ -104,7 +104,8 @@ export class OrdersService {
     }
 
     // 쿠폰을 이미 사용한 경우
-    if (!!coupon.usedAt) {
+    const order = await this.ordersRepository.getOrderByCouponId(coupon.id);
+    if (!!order || !!coupon.usedAt) {
       throw new ForbiddenException('already used coupon');
     }
 

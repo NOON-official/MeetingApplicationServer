@@ -352,11 +352,11 @@ export class TeamsRepository extends Repository<Team> {
       .andWhere(`matching.${gender}TeamIsAccepted IS NOT false`)
       // 상대팀이 거절했거나 OR 우리팀이 수락하고 상대팀이 24시간 이내 무응답한 경우
       .andWhere(
-        `matching.${
+        `(matching.${
           gender === 'male' ? 'female' : 'male'
         }TeamIsAccepted IS false OR (matching.${gender}TeamIsAccepted IS true AND matching.${
           gender === 'male' ? 'female' : 'male'
-        }TeamIsAccepted IS NULL AND DATE_ADD(matching.createdAt, INTERVAL 1 DAY) < NOW())`,
+        }TeamIsAccepted IS NULL AND DATE_ADD(matching.createdAt, INTERVAL 1 DAY) < NOW()))`,
       )
       .groupBy('team.id')
       .getRawMany();
