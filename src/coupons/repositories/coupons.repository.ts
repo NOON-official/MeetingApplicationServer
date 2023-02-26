@@ -28,7 +28,7 @@ export class CouponsRepository extends Repository<Coupon> {
     const couponCount = await this.createQueryBuilder('coupon')
       .where('coupon.userId = :userId', { userId })
       .andWhere('coupon.usedAt IS NULL')
-      .andWhere('coupon.expiresAt IS null OR coupon.expiresAt >= :today', { today })
+      .andWhere('(coupon.expiresAt IS null OR coupon.expiresAt >= :today)', { today })
       .getCount();
 
     return { couponCount };
@@ -43,7 +43,7 @@ export class CouponsRepository extends Repository<Coupon> {
       .addSelect('coupon.expiresAt')
       .where('coupon.userId = :userId', { userId })
       .andWhere('coupon.usedAt IS NULL')
-      .andWhere('coupon.expiresAt IS null OR coupon.expiresAt >= :today', { today })
+      .andWhere('(coupon.expiresAt IS null OR coupon.expiresAt >= :today)', { today })
       .getMany();
 
     return { coupons };
@@ -82,7 +82,7 @@ export class CouponsRepository extends Repository<Coupon> {
       .where('coupon.userId = :userId', { userId })
       .andWhere('coupon.typeId = :typeId', { typeId })
       .andWhere('coupon.usedAt IS NULL')
-      .andWhere('coupon.expiresAt IS null OR coupon.expiresAt >= :today', { today })
+      .andWhere('(coupon.expiresAt IS null OR coupon.expiresAt >= :today)', { today })
       .getCount();
 
     return { couponCount };

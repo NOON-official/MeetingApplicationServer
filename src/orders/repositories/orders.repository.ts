@@ -50,4 +50,10 @@ export class OrdersRepository extends Repository<Order> {
 
     return { orders };
   }
+
+  async getOrderByCouponId(couponId: number): Promise<Order> {
+    const order = await this.createQueryBuilder('order').where('order.couponId = :couponId', { couponId }).getOne();
+
+    return order;
+  }
 }
