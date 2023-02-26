@@ -19,6 +19,7 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
     const payload: KakaoUser = {
       kakaoUid: kakaoUser.id,
       nickname: kakaoUser.properties.nickname,
+      accessToken,
       ageRange:
         kakaoUser.kakao_account.has_age_range && !kakaoUser.kakao_account.age_range_needs_agreement
           ? kakaoUser.kakao_account.age_range
