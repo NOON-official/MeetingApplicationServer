@@ -1,7 +1,6 @@
 import { VerifyPhoneCodeDto } from './dtos/verify-phone-code.dto';
 import { SavePhoneDto } from './dtos/save-phone.dto';
 import { PassportUser } from './interfaces/passport-user.interface';
-/* eslint-disable @typescript-eslint/no-empty-function */
 import { AccessTokenGuard } from './guards/access-token.guard';
 import { RefreshTokenGuard } from './guards/refresh-token.guard';
 import { AuthService } from './auth.service';
@@ -113,8 +112,14 @@ export class AuthController {
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @Get('signout')
   @UseGuards(AccessTokenGuard)
-  getAuthSignout(@GetUser() user: PassportUser, @Res({ passthrough: true }) res: Response): Promise<void> {
-    return this.authService.signOut(user['sub'], res);
+  getAuthSignout(@GetUser() user: PassportUser, @Res() res: Response): Promise<void> {
+    return this.authService.signOutWithKakao(user['sub'], res);
+  }
+
+  @ApiExcludeEndpoint()
+  @Get('kakao/signout/callback')
+  getAuthKakaoSignoutCallback(@Req() req: Request): Promise<void> {
+    return this.authService.signOut(req);
   }
 
   @ApiOperation({
@@ -126,7 +131,11 @@ export class AuthController {
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @Delete('account')
   @UseGuards(AccessTokenGuard)
-  deleteAuthAccount(@GetUser() user: PassportUser): Promise<void> {
-    return this.authService.deleteAccount(user.sub);
+  deleteAuthAccount(
+    @GetUser() user: PassportUser,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<void> {
+    return this.authService.deleteAccount(user.sub, req, res);
   }
 }
