@@ -1,3 +1,4 @@
+import { BadRequestException } from '@nestjs/common/exceptions';
 import { TicketsService } from './../tickets/tickets.service';
 import { Coupon } from 'src/coupons/entities/coupon.entity';
 import { CouponTypes } from '../coupons/constants/coupons';
@@ -211,6 +212,10 @@ export class OrdersService {
       const { paymentKey, orderId, amount } = createOrderDto.toss;
 
       tossConfirmedResult = await this.confirmTossPayments(paymentKey, orderId, amount);
+    }
+
+    if (!paypleConfirmedResult.amount) {
+      throw new BadRequestException('잔액이 부족합니다');
     }
 
     const createOrderData: CreateOrder = {
