@@ -50,13 +50,15 @@ export const postNaverCloudSMS = async (
     ],
   };
 
-  await firstValueFrom(
-    httpService.post(url, requestData, requestConfig).pipe(
-      catchError((error) => {
-        throw new HttpException(error.response.data, error.response.status);
-      }),
-    ),
-  );
+  if (!!receivePhoneNumber) {
+    await firstValueFrom(
+      httpService.post(url, requestData, requestConfig).pipe(
+        catchError((error) => {
+          throw new HttpException(error.response.data, error.response.status);
+        }),
+      ),
+    );
 
-  loggerService.verbose(`[수신 번호] ${receivePhoneNumber} [문자 내용] ${content}`);
+    loggerService.verbose(`[수신 번호] ${receivePhoneNumber} [문자 내용] ${content}`);
+  }
 };

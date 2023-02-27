@@ -206,16 +206,16 @@ export class OrdersService {
       const { authKey, payReqKey, payerId } = createOrderDto.payple;
 
       paypleConfirmedResult = await this.confirmPayple(authKey, payReqKey, payerId);
+
+      if (!!paypleConfirmedResult && !paypleConfirmedResult.amount) {
+        throw new BadRequestException('잔액이 부족합니다');
+      }
     }
     // 토스페이먼츠 결제 승인 API 호출
     else if (!!createOrderDto.toss) {
       const { paymentKey, orderId, amount } = createOrderDto.toss;
 
       tossConfirmedResult = await this.confirmTossPayments(paymentKey, orderId, amount);
-    }
-
-    if (!paypleConfirmedResult.amount) {
-      throw new BadRequestException('잔액이 부족합니다');
     }
 
     const createOrderData: CreateOrder = {
