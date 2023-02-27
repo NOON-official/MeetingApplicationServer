@@ -6,6 +6,7 @@ import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { TeamGender } from 'src/teams/entities/team-gender.enum';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { LoggerService } from 'src/common/utils/logger-service.util';
 
 @Injectable()
 export class TasksService {
@@ -15,6 +16,31 @@ export class TasksService {
     private matchingsService: MatchingsService,
     private eventEmitter: EventEmitter2,
   ) {}
+
+  // 매 시간(정각)마다 실행
+  @Cron(CronExpression.EVERY_HOUR)
+  async handleEventListenerCount() {
+    const loggerService = new LoggerService('EVENT');
+
+    // 이벤트 리스너 개수 출력
+    loggerService.verbose(
+      `[Event Listener]\n            Event Name             | Listener Count\n----------------------------------------------------\n       'invitation.created'        |      ${this.eventEmitter.listenerCount(
+        'invitation.created',
+      )}개\n        'matching.failed'          |      ${this.eventEmitter.listenerCount(
+        'matching.failed',
+      )}개\n        'matching.matched'         |      ${this.eventEmitter.listenerCount(
+        'matching.matched',
+      )}개\n'matching.partnerTeamNotResponded' |      ${this.eventEmitter.listenerCount(
+        'matching.partnerTeamNotResponded',
+      )}개\n   'matching.partnerTeamRefused'   |      ${this.eventEmitter.listenerCount(
+        'matching.partnerTeamRefused',
+      )}개\n       'matching.succeeded'        |      ${this.eventEmitter.listenerCount(
+        'matching.succeeded',
+      )}개\n          'team.created'           |      ${this.eventEmitter.listenerCount(
+        'team.created',
+      )}개\n                                       총 ${this.eventEmitter.listenerCount()}개`,
+    );
+  }
 
   // 매 분(0초)마다 실행
   @Cron(CronExpression.EVERY_MINUTE)
