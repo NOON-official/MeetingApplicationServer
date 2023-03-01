@@ -12,7 +12,7 @@ import {
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 import { CreateInvitationDto } from './dtos/create-invitation.dto';
-import { GetUser } from 'src/common/get-user.decorator';
+import { GetUser } from 'src/common/decorators/get-user.decorator';
 
 @ApiTags('INVITATION')
 @ApiBearerAuth()

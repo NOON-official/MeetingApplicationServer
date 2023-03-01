@@ -1,4 +1,5 @@
-import { CacheModule, Module } from '@nestjs/common';
+import { SigninMiddleware } from './common/middlewares/signin.middleware';
+import { CacheModule, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
@@ -13,6 +14,9 @@ import { AdminModule } from './admin/admin.module';
 import * as redisStore from 'cache-manager-redis-store';
 import type { ClientOpts } from 'redis';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { ScheduleModule } from '@nestjs/schedule';
+import { TasksModule } from './tasks/tasks.module';
+import { LoggerMiddleware } from './common/middlewares/logger.middleware';
 
 @Module({
   imports: [
@@ -40,6 +44,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
       ttl: 3 * 60, // 제한시간 3분
     }),
     EventEmitterModule.forRoot(),
+    ScheduleModule.forRoot(),
     AuthModule,
     UsersModule,
     TeamsModule,
@@ -49,6 +54,12 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     CouponsModule,
     TicketsModule,
     AdminModule,
+    TasksModule,
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+    consumer.apply(SigninMiddleware).forRoutes('/auth/signin/kakao');
+  }
+}

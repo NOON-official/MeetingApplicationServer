@@ -5,6 +5,7 @@ import { HttpService } from '@nestjs/axios';
 import { ContentType } from './enums/content-type.enum';
 import { SmsType } from './enums/sms-type.enum';
 import { getNaverCloudSignature } from './get-navercloud-signature';
+import { LoggerService } from '../utils/logger-service.util';
 
 export const postNaverCloudSMS = async (
   smsType: SmsType,
@@ -13,6 +14,8 @@ export const postNaverCloudSMS = async (
   content: string,
   subject?: string,
 ) => {
+  const loggerService = new LoggerService('SMS');
+
   const configService = new ConfigService();
   const httpService = new HttpService();
 
@@ -47,11 +50,15 @@ export const postNaverCloudSMS = async (
     ],
   };
 
-  await firstValueFrom(
-    httpService.post(url, requestData, requestConfig).pipe(
-      catchError((error) => {
-        throw new HttpException(error.response.data, error.response.status);
-      }),
-    ),
-  );
+  if (!!receivePhoneNumber) {
+    await firstValueFrom(
+      httpService.post(url, requestData, requestConfig).pipe(
+        catchError((error) => {
+          throw new HttpException(error.response.data, error.response.status);
+        }),
+      ),
+    );
+
+    loggerService.verbose(`[수신 번호] ${receivePhoneNumber} [문자 내용] ${content}`);
+  }
 };

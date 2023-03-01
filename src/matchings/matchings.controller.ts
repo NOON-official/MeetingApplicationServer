@@ -14,7 +14,7 @@ import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 import { GetMatchingDto } from './dtos/get-matching.dto';
 import { CreateMatchingRefuseReasonDto } from './dtos/create-matching-refuse-reason.dto';
 import { MatchingOwnerGuard } from 'src/auth/guards/matching-owner.guard';
-import { GetUser } from 'src/common/get-user.decorator';
+import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { PassportUser } from 'src/auth/interfaces/passport-user.interface';
 @ApiTags('MATCHING')
 @ApiBearerAuth()

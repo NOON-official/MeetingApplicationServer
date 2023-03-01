@@ -1,3 +1,4 @@
+import { BadRequestException } from '@nestjs/common/exceptions';
 import { TicketsService } from './../tickets/tickets.service';
 import { Coupon } from 'src/coupons/entities/coupon.entity';
 import { CouponTypes } from '../coupons/constants/coupons';
@@ -27,6 +28,49 @@ export class OrdersService {
     @Inject(forwardRef(() => TicketsService))
     private ticketsService: TicketsService,
   ) {}
+
+  // 페이플 결제 승인
+  async confirmPayple(authKey: string, payReqKey: string, payerId: string): Promise<any> {
+    const paypleUrl = this.configService.get<string>('PAYPLE_URL');
+    const paypleCstId = this.configService.get<string>('PAYPLE_CST_ID');
+    const paypleCustKey = this.configService.get<string>('PAYPLE_CUST_KEY');
+
+    const serverUrl = this.configService.get<string>('SERVER_URL');
+
+    const requestUrl = `${paypleUrl}/php/PayCardConfirmAct.php?ACT_=PAYM`;
+
+    const requestData = {
+      PCD_CST_ID: paypleCstId,
+      PCD_CUST_KEY: paypleCustKey,
+      PCD_AUTH_KEY: authKey,
+      PCD_PAY_REQKEY: payReqKey,
+      PCD_PAYER_ID: payerId,
+    };
+
+    const requestHeader = {
+      headers: {
+        'Content-Type': 'application/json',
+        referer: serverUrl,
+      },
+    };
+
+    const { data } = await firstValueFrom(
+      this.httpService.post(requestUrl, JSON.stringify(requestData), requestHeader).pipe(
+        catchError((error) => {
+          throw new HttpException(error.response.data, error.response.status);
+        }),
+      ),
+    );
+
+    const result = {
+      orderId: data.PCD_PAY_OID,
+      method: data.PCD_PAY_TYPE,
+      orderName: data.PCD_PAY_GOODS,
+      amount: data.PCD_PAY_TOTAL,
+    };
+
+    return result;
+  }
 
   // 토스 결제 승인
   async confirmTossPayments(paymentKey: string, orderId: string, amount: number): Promise<any> {
@@ -61,7 +105,8 @@ export class OrdersService {
     }
 
     // 쿠폰을 이미 사용한 경우
-    if (!!coupon.usedAt) {
+    const order = await this.ordersRepository.getOrderByCouponId(coupon.id);
+    if (!!order || !!coupon.usedAt) {
       throw new ForbiddenException('already used coupon');
     }
 
@@ -90,6 +135,7 @@ export class OrdersService {
     discountAmount: number,
     totalAmount: number,
     tossAmount?: number,
+    paypleAmount?: number,
     coupon?: Coupon,
   ): Promise<void> {
     // 1. 상품 가격 확인
@@ -109,15 +155,23 @@ export class OrdersService {
         throw new ForbiddenException('invalid amount');
       }
 
+      // 페이플 결제 금액이 있는 경우 결제 가격 확인
+      if (!!paypleAmount && paypleAmount !== finalTotalAmount) {
+        throw new ForbiddenException('invalid amount');
+      }
       // 토스 결제 금액이 있는 경우 결제 가격 확인
-      if (!!tossAmount && tossAmount !== finalTotalAmount) {
+      else if (!!tossAmount && tossAmount !== finalTotalAmount) {
         throw new ForbiddenException('invalid amount');
       }
     }
     // 3. 쿠폰 없는 경우
     else {
+      //페이플 결제 가격 확인
+      if (!!paypleAmount && paypleAmount !== finalPrice) {
+        throw new ForbiddenException('invalid amount');
+      }
       //토스 결제 가격 확인
-      if (!!tossAmount && tossAmount !== finalPrice) {
+      else if (!!tossAmount && tossAmount !== finalPrice) {
         throw new ForbiddenException('invalid amount');
       }
     }
@@ -140,15 +194,28 @@ export class OrdersService {
       createOrderDto.discountAmount,
       createOrderDto.totalAmount,
       createOrderDto.toss?.amount,
+      createOrderDto.payple?.amount,
       coupon,
     );
 
+    let paypleConfirmedResult: any;
+    let tossConfirmedResult: any;
+
+    // 페이플 결제 승인 API 호출
+    if (!!createOrderDto.payple) {
+      const { authKey, payReqKey, payerId } = createOrderDto.payple;
+
+      paypleConfirmedResult = await this.confirmPayple(authKey, payReqKey, payerId);
+
+      if (!!paypleConfirmedResult && !paypleConfirmedResult.amount) {
+        throw new BadRequestException('잔액이 부족합니다');
+      }
+    }
     // 토스페이먼츠 결제 승인 API 호출
-    let confirmedResult: any;
-    if (!!createOrderDto.toss) {
+    else if (!!createOrderDto.toss) {
       const { paymentKey, orderId, amount } = createOrderDto.toss;
 
-      confirmedResult = await this.confirmTossPayments(paymentKey, orderId, amount);
+      tossConfirmedResult = await this.confirmTossPayments(paymentKey, orderId, amount);
     }
 
     const createOrderData: CreateOrder = {
@@ -156,11 +223,15 @@ export class OrdersService {
       price: createOrderDto.price,
       discountAmount: createOrderDto.discountAmount,
       totalAmount: createOrderDto.totalAmount,
-      tossPaymentKey: confirmedResult?.paymentKey ?? null,
-      tossOrderId: confirmedResult?.orderId ?? null,
-      tossMethod: confirmedResult?.method ?? null,
-      tossOrderName: confirmedResult?.orderName ?? null,
+      tossPaymentKey: tossConfirmedResult?.paymentKey ?? null,
+      tossOrderId: tossConfirmedResult?.orderId ?? null,
+      tossMethod: tossConfirmedResult?.method ?? null,
+      tossOrderName: tossConfirmedResult?.orderName ?? null,
       tossAmount: createOrderDto.toss?.amount ?? null,
+      paypleOrderId: paypleConfirmedResult?.orderId ?? null,
+      paypleMethod: paypleConfirmedResult?.method ?? null,
+      paypleOrderName: paypleConfirmedResult?.orderName ?? null,
+      paypleAmount: paypleConfirmedResult?.amount ?? null,
     };
 
     const user = await this.usersService.getUserById(userId);
@@ -183,5 +254,32 @@ export class OrdersService {
 
   async getProductsPagedata(): Promise<{ Products: ProductType[] }> {
     return { Products };
+  }
+
+  async getPaypleAuth() {
+    const paypleUrl = this.configService.get<string>('PAYPLE_URL');
+    const paypleCstId = this.configService.get<string>('PAYPLE_CST_ID');
+    const paypleCustKey = this.configService.get<string>('PAYPLE_CUST_KEY');
+
+    const clientUrl = this.configService.get<string>('CLIENT_URL');
+
+    const requestUrl = `${paypleUrl}/php/auth.php`;
+    const requestData = { cst_id: paypleCstId, custKey: paypleCustKey };
+    const requestHeader = {
+      headers: {
+        'Content-Type': 'application/json',
+        referer: clientUrl,
+      },
+    };
+
+    const { data } = await firstValueFrom(
+      this.httpService.post(requestUrl, JSON.stringify(requestData), requestHeader).pipe(
+        catchError((error) => {
+          throw new HttpException(error.response.data, error.response.status);
+        }),
+      ),
+    );
+
+    return data;
   }
 }

@@ -1,4 +1,4 @@
-import { BadRequestException } from '@nestjs/common/exceptions';
+import { BadRequestException, HttpException } from '@nestjs/common/exceptions';
 import { VerifyPhoneCodeDto } from './dtos/verify-phone-code.dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { ConfigService } from '@nestjs/config';
@@ -6,20 +6,31 @@ import { JwtService } from '@nestjs/jwt/dist';
 import { KakaoUser } from './interfaces/kakao-user.interface';
 import { UsersService } from './../users/users.service';
 import { CACHE_MANAGER, ForbiddenException, Inject, NotFoundException } from '@nestjs/common';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { SavePhoneDto } from './dtos/save-phone.dto';
 import { Cache } from 'cache-manager';
 import { postNaverCloudSMS } from 'src/common/sms/post-navercloud-sms';
 import { SmsType } from 'src/common/sms/enums/sms-type.enum';
 import { ContentType } from 'src/common/sms/enums/content-type.enum';
+import { HttpService } from '@nestjs/axios';
+import { catchError, firstValueFrom } from 'rxjs';
 
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private readonly httpService: HttpService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
+
+  // refesh token, kakao access token 쿠키 옵션
+  private readonly cookieOptions = {
+    signed: true, // 암호화
+    httpOnly: true, // 브라우저에서 접근 불가능
+    // secure: process.env.NODE_ENV === 'production' ? true : false, // https 환경에서만 접근 허용
+    maxAge: +this.configService.get<string>('COOKIE_MAX_AGE'), // msec
+  };
 
   async IssueAccessToken(payload: JwtPayload): Promise<string> {
     const accessToken = await this.jwtService.signAsync(payload, {
@@ -39,7 +50,7 @@ export class AuthService {
     return refreshToken;
   }
 
-  async signInWithKakao(kakaoUser: KakaoUser, res: Response): Promise<string> {
+  async signInWithKakao(kakaoUser: KakaoUser, req: Request, res: Response): Promise<string> {
     let user = await this.usersService.getUserByKakaoUid(kakaoUser.kakaoUid);
 
     // 회원가입X
@@ -66,17 +77,13 @@ export class AuthService {
 
     // refresh token을 DB와 쿠키에저장
     await this.usersService.updateUserRefreshToken(user.id, refreshToken);
+    res.cookie('refresh', refreshToken, this.cookieOptions);
 
-    res.cookie('refresh', refreshToken, {
-      signed: true, // 암호화
-      httpOnly: true, // 브라우저에서 접근 불가능
-      // secure: process.env.NODE_ENV === 'production' ? true : false, // https 환경에서만 접근 허용
-      maxAge: +this.configService.get<string>('COOKIE_MAX_AGE'), // msec
-    });
+    // 카카오 access token 저장
+    res.cookie('kakaoAccessToken', kakaoUser.accessToken, this.cookieOptions);
 
     // client redirect url 설정
-    const clientSignInCallbackUri = this.configService.get<string>('CLIENT_SIGNIN_CALLBACK_URI');
-    const clientRedirectUrl = `${clientSignInCallbackUri}?access=${accessToken}`;
+    const clientRedirectUrl = `${req?.cookies?.signinRedirectUrl}?access=${accessToken}`;
 
     return clientRedirectUrl;
   }
@@ -96,14 +103,60 @@ export class AuthService {
     return { accessToken };
   }
 
-  async signOut(userId: number, res: Response): Promise<void> {
-    await this.usersService.deleteUserRefreshToken(userId);
+  async signOutWithKakao(userId: number, res: Response): Promise<void> {
+    const clientId = this.configService.get<string>('KAKAO_REST_API_KEY');
+    const signoutRedirectUri = this.configService.get<string>('KAKAO_SIGNOUT_REDIRECT_URI');
+    const state = userId;
 
-    res.clearCookie('refresh').status(200).send('OK');
+    const url = `https://kauth.kakao.com/oauth/logout?client_id=${clientId}&logout_redirect_uri=${signoutRedirectUri}&state=${state}`;
+
+    // 쿠키에 저장된 refresh token, kakaoAccessToken 삭제
+    res.clearCookie('refresh').clearCookie('kakaoAccessToken').status(200).send('OK');
+
+    // 카카오톡 - 카카오 계정과 함께 로그아웃 API 호출
+    await firstValueFrom(
+      this.httpService.get(url).pipe(
+        catchError((error) => {
+          throw new HttpException(error.response.data, error.response.status);
+        }),
+      ),
+    );
   }
 
-  async deleteAccount(userId: number): Promise<void> {
-    return await this.usersService.deleteAccount(userId);
+  // 카카오 로그아웃 Redirect 시 호출
+  async signOut(req: Request): Promise<void> {
+    const { state: userId } = req.query;
+
+    // DB에 저장된 refresh token 삭제
+    await this.usersService.deleteUserRefreshToken(Number(userId));
+  }
+
+  async deleteAccount(userId: number, req: Request, res: Response): Promise<void> {
+    const kakaoAccessToken = req?.signedCookies?.kakaoAccessToken;
+
+    const url = `https://kapi.kakao.com/v1/user/unlink`;
+
+    const config = {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: `Bearer ${kakaoAccessToken}`,
+      },
+    };
+
+    // 카카오계정 연결끊기 요청
+    await firstValueFrom(
+      this.httpService.post(url, null, config).pipe(
+        catchError((error) => {
+          throw new HttpException(error.response.data, error.response.status);
+        }),
+      ),
+    );
+
+    // 서비스 내 유저 삭제
+    await this.usersService.deleteAccount(userId);
+
+    // 쿠키에 저장된 refresh token, kakaoAccessToken 삭제
+    res.clearCookie('refresh').clearCookie('kakaoAccessToken').status(200).send('OK');
   }
 
   async postVerificationCode(savePhoneDto: SavePhoneDto): Promise<void> {

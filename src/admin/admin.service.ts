@@ -5,7 +5,7 @@ import { UsersService } from 'src/users/users.service';
 import { AdminGetMatchingDto } from './dtos/admin-get-matching.dto';
 import { MatchingsService } from './../matchings/matchings.service';
 import { TeamsService } from './../teams/teams.service';
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { AdminGetTeamDto } from './dtos/admin-get-team.dto';
 import { TeamGender } from 'src/teams/entities/team-gender.enum';
 import { MatchingStatus } from 'src/matchings/interfaces/matching-status.enum';
@@ -16,13 +16,18 @@ import { AREA_IGNORE_ID } from 'src/teams/constants/areas';
 import { Matching } from 'src/matchings/entities/matching.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { MatchingRound } from 'src/matchings/constants/matching-round';
+import { LoggerService } from 'src/common/utils/logger-service.util';
 
 @Injectable()
 export class AdminService {
   constructor(
+    @Inject(forwardRef(() => TeamsService))
     private teamsService: TeamsService,
+    @Inject(forwardRef(() => MatchingsService))
     private matchingsService: MatchingsService,
+    @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
+    @Inject(forwardRef(() => InvitationsService))
     private invitationsService: InvitationsService,
     private eventEmitter: EventEmitter2,
   ) {}
@@ -64,6 +69,8 @@ export class AdminService {
   }
 
   async doMatching(): Promise<void> {
+    const loggerService = new LoggerService('ADMIN');
+
     const memberCounts: ('2' | '3')[] = ['2', '3'];
     const { maxRound } = await this.teamsService.getMaxRound();
 
@@ -197,11 +204,6 @@ export class AdminService {
 
       await this.matchingsService.saveMatchings(matchings);
 
-      // 운영에서는 지워도 됨
-      console.log(
-        `${memberCount}:${memberCount}매칭 - 남 : ${maleTeamCount} / 여 : ${femaleTeamCount} / 성공 : ${matchings.length}쌍`,
-      );
-
       // 남은 팀들 라운드 업데이트
       const failedMaleTeamIds = maleTeams.map((t) => t.teamId);
       await this.teamsService.updateCurrentRound([...failedMaleTeamIds, ...failedFemaleTeamIds], maxRound + 1);
@@ -223,20 +225,69 @@ export class AdminService {
         }
       }
 
+      loggerService.verbose(
+        `[${memberCount}:${memberCount} 매칭] 신청자(남자 ${maleTeamCount}팀/여자 ${femaleTeamCount}팀) 성공(${matchings.length}쌍) 3회 이상 실패(${failedTeamIds.length}팀)`,
+      );
+    }
+
+    // 매칭되어 수락/거절 대기중인 유저에게 문자 보내기
+    matchedTeamIds.forEach(async (id) => {
       const matchingMatchedEvent = new MatchingMatchedEvent();
+
+      matchingMatchedEvent.teamId = id;
+      this.eventEmitter.emit('matching.matched', matchingMatchedEvent);
+    });
+
+    // 매칭 3회 이상 실패한 유저에게 문자 보내기
+    failedTeamIds.forEach((id) => {
       const matchingFailedEvent = new MatchingFailedEvent();
 
-      // 매칭되어 수락/거절 대기중인 유저에게 문자 보내기
-      matchedTeamIds.forEach((id) => {
-        matchingMatchedEvent.teamId = id;
-        this.eventEmitter.emit('matching.matched', matchingMatchedEvent);
-      });
+      matchingFailedEvent.teamId = id;
+      this.eventEmitter.emit('matching.failed', matchingFailedEvent);
+    });
+  }
 
-      // 매칭 3회 이상 실패한 유저에게 문자 보내기
-      failedTeamIds.forEach((id) => {
-        matchingFailedEvent.teamId = id;
-        this.eventEmitter.emit('matching.failed', matchingFailedEvent);
-      });
-    }
+  async getAdminTeamCount(): Promise<{
+    teamsPerRound: number;
+    '2vs2': { male: number; female: number };
+    '3vs3': { male: number; female: number };
+  }> {
+    const teamsPerRound = MatchingRound.MAX_TEAM;
+
+    const { teamCount: male2 } = await this.teamsService.getTeamCountByStatusAndMembercountAndGender(
+      MatchingStatus.APPLIED,
+      '2',
+      TeamGender.male,
+    );
+
+    const { teamCount: female2 } = await this.teamsService.getTeamCountByStatusAndMembercountAndGender(
+      MatchingStatus.APPLIED,
+      '2',
+      TeamGender.female,
+    );
+
+    const { teamCount: male3 } = await this.teamsService.getTeamCountByStatusAndMembercountAndGender(
+      MatchingStatus.APPLIED,
+      '3',
+      TeamGender.male,
+    );
+
+    const { teamCount: female3 } = await this.teamsService.getTeamCountByStatusAndMembercountAndGender(
+      MatchingStatus.APPLIED,
+      '3',
+      TeamGender.female,
+    );
+
+    return {
+      teamsPerRound,
+      '2vs2': {
+        male: male2,
+        female: female2,
+      },
+      '3vs3': {
+        male: male3,
+        female: female3,
+      },
+    };
   }
 }
