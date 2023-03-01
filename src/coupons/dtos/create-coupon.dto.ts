@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { IsNotEmpty, IsOptional, IsDate, IsInt } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsInt, IsISO8601, Length } from 'class-validator';
 
 export class CreateCouponDto {
   @ApiProperty({
@@ -17,7 +16,7 @@ export class CreateCouponDto {
     example: '2023-02-07',
   })
   @IsOptional()
-  @IsDate()
-  @Type(() => Date)
+  @IsISO8601({ strict: true })
+  @Length(10, 10)
   readonly expiresAt?: Date;
 }
