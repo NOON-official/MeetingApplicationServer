@@ -26,6 +26,8 @@ export class TasksService {
     loggerService.verbose(
       `[Event Listener]\n            Event Name             | Listener Count\n----------------------------------------------------\n       'invitation.created'        |      ${this.eventEmitter.listenerCount(
         'invitation.created',
+      )}개\n      'invitation.succeeded'       |      ${this.eventEmitter.listenerCount(
+        'invitation.succeeded',
       )}개\n        'matching.failed'          |      ${this.eventEmitter.listenerCount(
         'matching.failed',
       )}개\n        'matching.matched'         |      ${this.eventEmitter.listenerCount(
