@@ -17,6 +17,15 @@ async function bootstrap() {
   const cookieSecret = configService.get<string>('COOKIE_SECRET');
   const clientUrl = configService.get<string>('CLIENT_URL');
   const clientUrlWithWWW = configService.get<string>('CLIENT_URL_WITH_WWW') ?? null;
+  const adminUrl = configService.get<string>('ADMIN_URL') ?? null;
+
+  const corsOrigins = [clientUrl];
+  if (clientUrlWithWWW) {
+    corsOrigins.push(clientUrlWithWWW);
+  }
+  if (adminUrl) {
+    corsOrigins.push(adminUrl);
+  }
 
   // 개발 환경일 경우만 명세서 빌드 -- 배포시 두번째 조건 삭제하기
   if (process.env.NODE_ENV === 'development' || clientUrl.includes('stage')) {
@@ -52,7 +61,10 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
   app.use(cookieParser(cookieSecret));
-  app.enableCors({ credentials: true, origin: !!clientUrlWithWWW ? [clientUrl, clientUrlWithWWW] : [clientUrl] });
+  app.enableCors({
+    credentials: true,
+    origin: corsOrigins,
+  });
 
   await app.listen(port);
   Logger.log(`Application running on port ${port}`);
