@@ -1,3 +1,4 @@
+import { InvitationSucceededListener } from './listeners/invitation-succeeded.listener';
 import { CouponsModule } from './../coupons/coupons.module';
 import { InvitationsRepository } from './repositories/invitations.repository';
 import { TypeOrmExModule } from './../database/typeorm-ex.module';
@@ -13,7 +14,7 @@ import { InvitationCreatedListener } from './listeners/invitation-created.listen
     forwardRef(() => UsersModule),
     forwardRef(() => CouponsModule),
   ],
-  providers: [InvitationsService, InvitationCreatedListener],
+  providers: [InvitationsService, InvitationCreatedListener, InvitationSucceededListener],
   controllers: [InvitationsController],
   exports: [InvitationsService],
 })

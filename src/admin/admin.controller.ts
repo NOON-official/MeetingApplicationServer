@@ -75,7 +75,7 @@ export class AdminController {
             ticketCount: 5,
             discount50CouponCount: 1,
             freeCouponCount: 0,
-            userInvitaionCount: 1,
+            userInvitationCount: 1,
           },
           {
             userId: 2,
@@ -87,7 +87,7 @@ export class AdminController {
             ticketCount: 5,
             discount50CouponCount: 1,
             freeCouponCount: 0,
-            userInvitaionCount: 1,
+            userInvitationCount: 1,
           },
         ],
       },

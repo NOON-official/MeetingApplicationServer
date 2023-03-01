@@ -1,3 +1,4 @@
+import { InvitationSucceededEvent } from './events/invitation-succeeded.event';
 import { BadRequestException } from '@nestjs/common/exceptions';
 import { CreateInvitationDto } from './dtos/create-invitation.dto';
 import { InvitationsRepository } from './repositories/invitations.repository';
@@ -40,7 +41,18 @@ export class InvitationsService {
     invitationCreatedEvent.inviteeId = invitee.id;
     this.eventEmitter.emit('invitation.created', invitationCreatedEvent);
 
-    return this.invitationsRepository.createInvitation(inviter, invitee);
+    // 초대 내역 저장
+    await this.invitationsRepository.createInvitation(inviter, invitee);
+
+    // 초대자가 친구 초대 4회 달성한 경우 1회 이용권 쿠폰 발급
+    const { invitationCount } = await this.getInvitationCountByUserId(inviter.id);
+
+    // 초대횟수가 4의 배수인 경우
+    if (invitationCount !== 0 && invitationCount % 4 === 0) {
+      const invitationSucceededEvent = new InvitationSucceededEvent();
+      invitationSucceededEvent.inviterId = inviter.id;
+      this.eventEmitter.emit('invitation.succeeded', invitationSucceededEvent);
+    }
   }
 
   async getInvitationCountByUserId(userId: number): Promise<{ invitationCount: number }> {
