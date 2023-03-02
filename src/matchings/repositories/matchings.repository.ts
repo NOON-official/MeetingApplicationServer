@@ -107,10 +107,10 @@ export class MatchingsRepository extends Repository<Matching> {
       .select([
         'matching.id AS matchingId',
         'maleTeam.id AS maleTeamId',
-        'maleTeamUser.nickname AS maleTeamNickName',
+        'maleTeamUser.nickname AS maleTeamNickname',
         'maleTeamUser.phone AS maleTeamPhone',
         'femaleTeam.id AS femaleTeamId',
-        'femaleTeamUser.nickname AS femaleTeamNickName',
+        'femaleTeamUser.nickname AS femaleTeamNickname',
         'femaleTeamUser.phone AS femaleTeamPhone',
         'matching.createdAt AS matchedAt',
         `IF(matching.chatCreatedAt IS NOT NULL, 'true', 'false') AS chatIsCreated`,
