@@ -255,7 +255,7 @@ export class UsersService {
         matchingStatus: matchingStatusConstant,
         phone: u.phone,
         createdAt: u.createdAt,
-        referralID: u.referralId,
+        referralId: u.referralId,
         ticketCount,
         discount50CouponCount,
         freeCouponCount,
