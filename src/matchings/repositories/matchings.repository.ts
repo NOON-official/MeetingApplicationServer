@@ -115,6 +115,8 @@ export class MatchingsRepository extends Repository<Matching> {
         'matching.createdAt AS matchedAt',
         `IF(matching.chatCreatedAt IS NOT NULL, 'true', 'false') AS chatIsCreated`,
       ])
+      // 매칭 그만두기한 팀도 조회해야 하므로 withDeleted 추가
+      .withDeleted()
       .leftJoin('matching.maleTeam', 'maleTeam')
       .leftJoin('matching.femaleTeam', 'femaleTeam')
       .leftJoin('maleTeam.user', 'maleTeamUser')
@@ -122,6 +124,8 @@ export class MatchingsRepository extends Repository<Matching> {
       // 매칭 완료자 조회 (상호 수락한 경우)
       .where('matching.maleTeamIsAccepted = true')
       .andWhere('matching.femaleTeamIsAccepted = true')
+      // 삭제된 매칭은 조회 X
+      .andWhere('matching.deletedAt IS NULL')
       .getRawMany();
 
     matchings.map((m) => {
