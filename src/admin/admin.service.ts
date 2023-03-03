@@ -1,3 +1,5 @@
+import { CreateCouponDto } from './../coupons/dtos/create-coupon.dto';
+import { CouponsService } from 'src/coupons/coupons.service';
 import { MatchingFailedEvent } from './../matchings/events/matching-failed.event';
 import { MatchingMatchedEvent } from './../matchings/events/matching-matched.event';
 import { InvitationsService } from './../invitations/invitations.service';
@@ -29,6 +31,8 @@ export class AdminService {
     private usersService: UsersService,
     @Inject(forwardRef(() => InvitationsService))
     private invitationsService: InvitationsService,
+    @Inject(forwardRef(() => CouponsService))
+    private couponsService: CouponsService,
     private eventEmitter: EventEmitter2,
   ) {}
 
@@ -289,5 +293,9 @@ export class AdminService {
         female: female3,
       },
     };
+  }
+
+  async createCouponWithUserId(userId: number, createCouponDto: CreateCouponDto): Promise<void> {
+    return await this.couponsService.createCouponWithUserId(userId, createCouponDto);
   }
 }

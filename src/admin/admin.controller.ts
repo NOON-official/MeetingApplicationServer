@@ -1,9 +1,10 @@
+import { CreateCouponDto } from './../coupons/dtos/create-coupon.dto';
 import { AdminGetInvitationSuccessUserDto } from './dtos/admin-get-invitation-success-user.dto';
 import { AdminGetMatchingDto } from './dtos/admin-get-matching.dto';
 import { MatchingStatus } from './../matchings/interfaces/matching-status.enum';
 import { AdminGetTeamDto } from './dtos/admin-get-team.dto';
 import { AdminService } from './admin.service';
-import { Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiNotFoundResponse,
@@ -75,7 +76,7 @@ export class AdminController {
             ticketCount: 5,
             discount50CouponCount: 1,
             freeCouponCount: 0,
-            userInvitaionCount: 1,
+            userInvitationCount: 1,
           },
           {
             userId: 2,
@@ -87,7 +88,7 @@ export class AdminController {
             ticketCount: 5,
             discount50CouponCount: 1,
             freeCouponCount: 0,
-            userInvitaionCount: 1,
+            userInvitationCount: 1,
           },
         ],
       },
@@ -251,5 +252,15 @@ export class AdminController {
   @Delete('matchings/:matchingId')
   deleteMatchingMatchingId(@Param('matchingId') matchingId: number): Promise<void> {
     return this.adminService.deleteMatchingByMatchingId(matchingId);
+  }
+
+  @ApiOperation({
+    summary: '쿠폰 지급하기',
+    description: '매칭완료자 페이지에서 사용 \n\n 체크박스 선택된(채팅방 생성된) 매칭ID를 보내주시면 됩니다.',
+  })
+  @ApiOkResponse({ description: 'OK' })
+  @Post('users/coupons/:userId')
+  postUsersCouponsUserId(@Param('userId') userId: number, @Body() createCouponDto: CreateCouponDto): Promise<void> {
+    return this.adminService.createCouponWithUserId(userId, createCouponDto);
   }
 }

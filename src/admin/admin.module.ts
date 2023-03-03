@@ -1,3 +1,4 @@
+import { CouponsModule } from './../coupons/coupons.module';
 import { MatchingFailedListener } from './../matchings/listeners/matching-failed.listener';
 import { InvitationsModule } from './../invitations/invitations.module';
 import { MatchingsModule } from './../matchings/matchings.module';
@@ -14,6 +15,7 @@ import { MatchingMatchedListener } from 'src/matchings/listeners/matching-matche
     forwardRef(() => UsersModule),
     forwardRef(() => MatchingsModule),
     forwardRef(() => InvitationsModule),
+    forwardRef(() => CouponsModule),
   ],
   providers: [AdminService, MatchingMatchedListener, MatchingFailedListener],
   controllers: [AdminController],
