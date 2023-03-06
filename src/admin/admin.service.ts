@@ -134,15 +134,18 @@ export class AdminService {
         }
 
         // 4. 선호 지역 매칭
-        const areaMatched = univMatched.filter((maleTeam) => {
-          return maleTeam.areas.some((area) => {
-            // 상관없음의 경우
-            if (area === AREA_IGNORE_ID) {
-              return true;
-            }
-            return femaleTeam.areas.includes(area);
-          });
-        });
+        // (여자쪽이 상관없음이면 모두 허용)
+        const areaMatched = femaleTeam.areas.includes(AREA_IGNORE_ID)
+          ? univMatched
+          : univMatched.filter((maleTeam) => {
+              return maleTeam.areas.some((area) => {
+                // 남자쪽이 상관없음일 경우
+                if (area === AREA_IGNORE_ID) {
+                  return true;
+                }
+                return femaleTeam.areas.includes(area);
+              });
+            });
         if (areaMatched.length === 0) {
           failedFemaleTeamIds.push(femaleTeam.teamId);
           failedFemaleTeamReasons.push('Area');
@@ -230,7 +233,7 @@ export class AdminService {
       }
 
       loggerService.verbose(
-        `[${memberCount}:${memberCount} 매칭] 신청자(남자 ${maleTeamCount}팀/여자 ${femaleTeamCount}팀) 성공(${matchings.length}쌍) 3회 이상 실패(${failedTeamIds.length}팀)`,
+        `[${memberCount}:${memberCount} 매칭] 신청자(남자 ${maleTeamCount}팀/여자 ${femaleTeamCount}팀) 성공(${matchings.length}쌍) ${MatchingRound.MAX_TRIAL}회 이상 실패(${failedTeamIds.length}팀)`,
       );
     }
 
