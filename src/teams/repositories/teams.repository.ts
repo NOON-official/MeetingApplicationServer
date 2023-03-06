@@ -195,6 +195,7 @@ export class TeamsRepository extends Repository<Team> {
         `${gender === 'male' ? 'matching.femaleTeamId' : 'matching.maleTeamId'} AS partnerTeamId`,
         'team.createdAt AS appliedAt',
         'matching.createdAt AS matchedAt',
+        'team.lastFailReason AS lastFailReason',
       ])
       .leftJoin(`team.${gender}TeamMatching`, 'matching')
       .leftJoin(`team.user`, 'user')
@@ -291,6 +292,7 @@ export class TeamsRepository extends Repository<Team> {
         'team.createdAt AS appliedAt',
         'matching.createdAt AS matchedAt',
         'team.updatedAt AS failedAt',
+        'team.lastFailReason AS lastFailReason',
       ])
       .leftJoin(`team.${gender}TeamMatching`, 'matching')
       .leftJoin(`team.user`, 'user')
