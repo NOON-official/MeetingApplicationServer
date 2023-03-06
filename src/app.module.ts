@@ -32,7 +32,7 @@ import { LoggerMiddleware } from './common/middlewares/logger.middleware';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
       entities: [__dirname + '/**/*.entity.{js,ts}'],
-      synchronize: Boolean(process.env.DB_SYNCHRONIZE),
+      synchronize: process.env.DB_SYNCHRONIZE === 'true' ? true : false,
       timezone: 'Z',
     }),
     CacheModule.register<ClientOpts>({
