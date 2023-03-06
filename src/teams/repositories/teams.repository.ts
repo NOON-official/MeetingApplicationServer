@@ -202,7 +202,7 @@ export class TeamsRepository extends Repository<Team> {
       // 성별, 인원수 필터링
       .where('memberCount = :membercount', { membercount })
       .andWhere('team.gender = :genderNum', { genderNum: gender === TeamGender.male ? 1 : 2 })
-      //  신청자 조회 (매칭 내역 X & 매칭 실패 횟수 3회 미만)
+      //  신청자 조회 (매칭 내역 X & 매칭 최대 횟수 미만)
       .andWhere('matching.id IS NULL')
       .andWhere('team.currentRound - team.startRound < :maxTrial', { maxTrial: MatchingRound.MAX_TRIAL })
       .groupBy('team.id')
@@ -298,7 +298,7 @@ export class TeamsRepository extends Repository<Team> {
       // 성별, 인원수 필터링
       .where('memberCount = :membercount', { membercount })
       .andWhere('team.gender = :genderNum', { genderNum: gender === TeamGender.male ? 1 : 2 })
-      // 매칭 실패 회원 조회 (매칭 내역 X & 매칭 실패 횟수 3회 이상)
+      // 매칭 실패 회원 조회 (매칭 내역 X & 매칭 최대 횟수 이상)
       .andWhere('matching.id IS NULL')
       .andWhere('team.currentRound - team.startRound >= :maxTrial', { maxTrial: MatchingRound.MAX_TRIAL })
       .groupBy('team.id')
