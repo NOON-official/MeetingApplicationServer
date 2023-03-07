@@ -97,6 +97,12 @@ export class AdminGetTeamDto {
   failedAt?: Date;
 
   @ApiProperty({
+    description: '마지막 실패 이유',
+    example: 'Date',
+  })
+  lastFailReason?: string;
+
+  @ApiProperty({
     description: '거절당한 일시',
     example: '2023-01-20T21:37:26.886Z',
   })
