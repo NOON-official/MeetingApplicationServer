@@ -5,7 +5,6 @@ import { UserTeam } from './interfaces/user-team.interface';
 import { CreateAgreementDto } from './dtos/create-agreement.dto';
 import { AccessTokenGuard } from './../auth/guards/access-token.guard';
 import { UseGuards } from '@nestjs/common';
-/* eslint-disable @typescript-eslint/no-empty-function */
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
@@ -17,7 +16,7 @@ import {
 import { UsersService } from './users.service';
 import { Controller, Get } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
-import { Body, Post, Put } from '@nestjs/common/decorators';
+import { Body, Post } from '@nestjs/common/decorators';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { PassportUser } from 'src/auth/interfaces/passport-user.interface';
 import { UserOrder } from './interfaces/user-order.interface';
