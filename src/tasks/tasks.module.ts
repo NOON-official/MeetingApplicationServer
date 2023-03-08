@@ -1,3 +1,4 @@
+import { MatchingOurteamNotRespondedListener } from './../matchings/listeners/matching-ourteam-not-responded.listener';
 import { MatchingPartnerTeamNotRespondedListener } from './../matchings/listeners/matching-partner-team-not-responded.listener';
 import { MatchingsModule } from './../matchings/matchings.module';
 import { TicketsModule } from 'src/tickets/tickets.module';
@@ -7,6 +8,6 @@ import { TasksService } from './tasks.service';
 
 @Module({
   imports: [TeamsModule, TicketsModule, MatchingsModule],
-  providers: [TasksService, MatchingPartnerTeamNotRespondedListener],
+  providers: [TasksService, MatchingPartnerTeamNotRespondedListener, MatchingOurteamNotRespondedListener],
 })
 export class TasksModule {}

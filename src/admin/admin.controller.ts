@@ -133,6 +133,7 @@ export class AdminController {
             matchedAt: '2023-01-20T21:37:26.886Z',
             failedAt: '2023-01-20T21:37:26.886Z',
             refusedAt: '2023-01-20T21:37:26.886Z',
+            lastFailReason: 'Date',
           },
         ],
       },

@@ -7,6 +7,9 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { TeamGender } from 'src/teams/entities/team-gender.enum';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { LoggerService } from 'src/common/utils/logger-service.util';
+import { MatchingStatus } from 'src/matchings/interfaces/matching-status.enum';
+import * as moment from 'moment-timezone';
+import { MatchingOurteamNotRespondedEvent } from 'src/matchings/events/matching-ourteam-not-responded.event';
 
 @Injectable()
 export class TasksService {
@@ -17,8 +20,8 @@ export class TasksService {
     private eventEmitter: EventEmitter2,
   ) {}
 
-  // 매 시간(정각)마다 실행
-  @Cron(CronExpression.EVERY_HOUR)
+  // 두 시간마다 실행
+  @Cron(CronExpression.EVERY_2_HOURS)
   async handleEventListenerCount() {
     const loggerService = new LoggerService('EVENT');
 
@@ -34,6 +37,8 @@ export class TasksService {
         'matching.matched',
       )}개\n'matching.partnerTeamNotResponded' |      ${this.eventEmitter.listenerCount(
         'matching.partnerTeamNotResponded',
+      )}개\n  'matching.ourteamNotResponded'   |      ${this.eventEmitter.listenerCount(
+        'matching.ourteamNotResponded',
       )}개\n   'matching.partnerTeamRefused'   |      ${this.eventEmitter.listenerCount(
         'matching.partnerTeamRefused',
       )}개\n       'matching.succeeded'        |      ${this.eventEmitter.listenerCount(
@@ -76,6 +81,55 @@ export class TasksService {
       // 2) 매칭 거절 당함 문자 보내기
       matchingPartnerTeamNotRespondedEvent.teamId = femaleTeam.teamId;
       this.eventEmitter.emit('matching.partnerTeamNotResponded', matchingPartnerTeamNotRespondedEvent);
+    }
+  }
+
+  // 매 분(0초)마다 실행
+  // 수락/거절 대기자 종료 3시간 전 문자 발송
+  @Cron(CronExpression.EVERY_MINUTE)
+  async handleNotRespondedTeams() {
+    // 수락/거절 대기자 조회
+    const { teams: matchedMaleTwoTeams } = await this.teamsService.getTeamsByStatusAndMembercountAndGender(
+      MatchingStatus.MATCHED,
+      '2',
+      TeamGender.male,
+    );
+
+    const { teams: matchedMaleThreeTeams } = await this.teamsService.getTeamsByStatusAndMembercountAndGender(
+      MatchingStatus.MATCHED,
+      '3',
+      TeamGender.male,
+    );
+
+    const { teams: matchedFemaleTwoTeams } = await this.teamsService.getTeamsByStatusAndMembercountAndGender(
+      MatchingStatus.MATCHED,
+      '2',
+      TeamGender.female,
+    );
+
+    const { teams: matchedFemaleThreeTeams } = await this.teamsService.getTeamsByStatusAndMembercountAndGender(
+      MatchingStatus.MATCHED,
+      '3',
+      TeamGender.female,
+    );
+
+    const matchedTeams = matchedMaleTwoTeams.concat(
+      matchedMaleThreeTeams,
+      matchedFemaleTwoTeams,
+      matchedFemaleThreeTeams,
+    );
+
+    for await (const matchedTeam of matchedTeams) {
+      const now = moment(new Date()).format('YYYY-MM-DD HH:mm');
+      const beforeThreeHours = moment(matchedTeam.matchedAt).add(21, 'hours').format('YYYY-MM-DD HH:mm');
+
+      if (now === beforeThreeHours) {
+        const matchingOurteamNotRespondedEvent = new MatchingOurteamNotRespondedEvent();
+
+        // 종료 3시간 전 알림 문자 보내기
+        matchingOurteamNotRespondedEvent.teamId = matchedTeam.teamId;
+        this.eventEmitter.emit('matching.ourteamNotResponded', matchingOurteamNotRespondedEvent);
+      }
     }
   }
 }

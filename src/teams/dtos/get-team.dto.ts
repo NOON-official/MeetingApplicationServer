@@ -124,6 +124,12 @@ export class GetTeamDto {
   currentRound: number;
 
   @ApiProperty({
+    description: '마지막 실패 이유',
+    example: 'Date',
+  })
+  lastFailReason?: string;
+
+  @ApiProperty({
     description: '생성일시',
     example: '2023-01-20T21:37:26.886Z',
   })
@@ -134,6 +140,12 @@ export class GetTeamDto {
     example: '2023-01-20T21:37:26.886Z',
   })
   updatedAt: Date;
+
+  @ApiProperty({
+    description: '팀 정보 수정일시',
+    example: '2023-01-20T21:37:26.886Z',
+  })
+  modifiedAt?: Date;
 
   @ApiProperty({
     description: '삭제일시',
