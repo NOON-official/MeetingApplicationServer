@@ -95,6 +95,9 @@ export class TeamsRepository extends Repository<Team> {
     const teamsWithMatching = await this.createQueryBuilder('team')
       .leftJoinAndSelect(teamGender === 1 ? 'team.maleTeamMatching' : 'team.femaleTeamMatching', 'matching')
       .where('team.ownerId = :userId', { userId })
+      .orderBy({
+        'team.createdAt': 'ASC',
+      })
       .withDeleted()
       .getMany();
 
@@ -150,7 +153,11 @@ export class TeamsRepository extends Repository<Team> {
   }
 
   async updateTeam(teamId: number, teamData: UpdateTeam): Promise<void> {
-    await this.createQueryBuilder().update(Team).set(teamData).where('id = :teamId', { teamId }).execute();
+    await this.createQueryBuilder()
+      .update(Team)
+      .set({ ...teamData, modifiedAt: () => 'NOW()' })
+      .where('id = :teamId', { teamId })
+      .execute();
   }
 
   async deleteTeamAvailableDateByTeamId(teamId: number): Promise<void> {
@@ -193,7 +200,7 @@ export class TeamsRepository extends Repository<Team> {
         'team.prefSameUniversity AS prefSameUniversity',
         'team.drink AS drink',
         `${gender === 'male' ? 'matching.femaleTeamId' : 'matching.maleTeamId'} AS partnerTeamId`,
-        'team.createdAt AS appliedAt',
+        `IF(team.modifiedAt IS NOT NULL, team.modifiedAt, team.createdAt) AS appliedAt`,
         'matching.createdAt AS matchedAt',
         'team.lastFailReason AS lastFailReason',
       ])
@@ -207,6 +214,7 @@ export class TeamsRepository extends Repository<Team> {
       .andWhere('matching.id IS NULL')
       .andWhere('team.currentRound - team.startRound < :maxTrial', { maxTrial: MatchingRound.MAX_TRIAL })
       .groupBy('team.id')
+      .orderBy('COALESCE(team.modifiedAt, team.createdAt)', 'ASC') // modifiedAt이 있는 경우 modifiedAt 기준
       .getRawMany();
 
     teams.map((t) => {
@@ -240,8 +248,9 @@ export class TeamsRepository extends Repository<Team> {
         'team.prefSameUniversity AS prefSameUniversity',
         'team.drink AS drink',
         `${gender === 'male' ? 'matching.femaleTeamId' : 'matching.maleTeamId'} AS partnerTeamId`,
-        'team.createdAt AS appliedAt',
+        `IF(team.modifiedAt IS NOT NULL, team.modifiedAt, team.createdAt) AS appliedAt`,
         'matching.createdAt AS matchedAt',
+        'team.lastFailReason AS lastFailReason',
       ])
       .leftJoin(`team.${gender}TeamMatching`, 'matching')
       .leftJoin(`team.user`, 'user')
@@ -289,7 +298,7 @@ export class TeamsRepository extends Repository<Team> {
         'team.prefSameUniversity AS prefSameUniversity',
         'team.drink AS drink',
         `${gender === 'male' ? 'matching.femaleTeamId' : 'matching.maleTeamId'} AS partnerTeamId`,
-        'team.createdAt AS appliedAt',
+        `IF(team.modifiedAt IS NOT NULL, team.modifiedAt, team.createdAt) AS appliedAt`,
         'matching.createdAt AS matchedAt',
         'team.updatedAt AS failedAt',
         'team.lastFailReason AS lastFailReason',
@@ -336,11 +345,12 @@ export class TeamsRepository extends Repository<Team> {
         'team.prefSameUniversity AS prefSameUniversity',
         'team.drink AS drink',
         `${gender === 'male' ? 'matching.femaleTeamId' : 'matching.maleTeamId'} AS partnerTeamId`,
-        'team.createdAt AS appliedAt',
+        `IF(team.modifiedAt IS NOT NULL, team.modifiedAt, team.createdAt) AS appliedAt`,
         'matching.createdAt AS matchedAt',
         `IF(matching.${
           gender === 'male' ? 'female' : 'male'
         }TeamIsAccepted IS NULL, DATE_ADD(matching.createdAt, INTERVAL 1 DAY), matching.updatedAt) AS refusedAt`, // 무응답인 경우 매칭일시 + 1일을 거절 시간으로 반환
+        'team.lastFailReason AS lastFailReason',
       ])
       .leftJoin(`team.${gender}TeamMatching`, 'matching')
       .leftJoin(`team.user`, 'user')
