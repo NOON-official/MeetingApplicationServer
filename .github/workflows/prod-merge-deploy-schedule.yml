@@ -1,0 +1,33 @@
+name: Prod Merge & Deploy Schedule
+
+on:
+  pull_request:
+    branches:
+      - prod
+    types:
+      - opened
+      - edited
+  schedule:
+    - cron: '0 20 * * *' # 실행 시간: UTC 20:00(한국 05:00)
+
+jobs:
+  merge: # 1. pull request merge
+    runs-on: ubuntu-latest
+    steps:
+      - uses: gr2m/merge-schedule-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  deploy: # 2. ec2 배포
+    needs: merge # merge가 완료된 후 실행
+    name: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: multiple command
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER_NAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd ~/server
+            ./deploy.sh
