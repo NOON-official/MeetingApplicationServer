@@ -208,6 +208,19 @@ export class AdminController {
   }
 
   @ApiOperation({
+    summary: '매칭 적용(수동 매칭)',
+    description: '관리자페이지 내 사용 \n\n 남자팀과 여자팀을 1:1 수동 매칭',
+  })
+  @ApiOkResponse({ description: 'OK' })
+  @Post('matchings/:maleTeamId/:femaleTeamId')
+  postMatchingsMaleTeamIdFemaleTeamId(
+    @Param('maleTeamId') maleTeamId: number,
+    @Param('femaleTeamId') femaleTeamId: number,
+  ): Promise<void> {
+    return this.adminService.createMatchingByMaleTeamIdAndFemaleTeamId(maleTeamId, femaleTeamId);
+  }
+
+  @ApiOperation({
     summary: '매칭완료자 조회',
     description: 'chatIsCreated가 true일 경우 체크박스 채워주세요!',
   })

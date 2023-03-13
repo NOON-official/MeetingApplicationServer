@@ -142,4 +142,12 @@ export class MatchingsRepository extends Repository<Matching> {
       .where('id = :matchingId', { matchingId })
       .execute();
   }
+
+  async createMatchings(matchings: Matching[]): Promise<Matching[]> {
+    return this.save(matchings);
+  }
+
+  async createMatching(matching: Matching): Promise<Matching> {
+    return this.save(matching);
+  }
 }
