@@ -7,7 +7,7 @@ import { UsersService } from 'src/users/users.service';
 import { AdminGetMatchingDto } from './dtos/admin-get-matching.dto';
 import { MatchingsService } from './../matchings/matchings.service';
 import { TeamsService } from './../teams/teams.service';
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { AdminGetTeamDto } from './dtos/admin-get-team.dto';
 import { TeamGender } from 'src/teams/entities/team-gender.enum';
 import { MatchingStatus } from 'src/matchings/interfaces/matching-status.enum';
@@ -233,7 +233,9 @@ export class AdminService {
       }
 
       loggerService.verbose(
-        `[${memberCount}:${memberCount} 매칭] 신청자(남자 ${maleTeamCount}팀/여자 ${femaleTeamCount}팀) 성공(${matchings.length}쌍) ${MatchingRound.MAX_TRIAL}회 이상 실패(${failedTeamIds.length}팀)`,
+        `[${memberCount}:${memberCount} 매칭] 신청자(남자 ${maleTeamCount}팀/여자 ${femaleTeamCount}팀) 성공(${
+          matchings.length
+        }쌍) ${MatchingRound.MAX_TRIAL}회 이상 실패(${failedMaleTeamIds.length + failedFemaleTeamIds.length}팀)`,
       );
     }
 
@@ -300,5 +302,63 @@ export class AdminService {
 
   async createCouponWithUserId(userId: number, createCouponDto: CreateCouponDto): Promise<void> {
     return await this.couponsService.createCouponWithUserId(userId, createCouponDto);
+  }
+
+  async createMatchingByMaleTeamIdAndFemaleTeamId(maleTeamId: number, femaleTeamId: number): Promise<void> {
+    const loggerService = new LoggerService('ADMIN');
+
+    const maleTeam = await this.teamsService.getTeamById(maleTeamId);
+    const femaleTeam = await this.teamsService.getTeamById(femaleTeamId);
+
+    // 해당 팀 정보가 없는 경우
+    if (!maleTeam || !!maleTeam.deletedAt) {
+      throw new NotFoundException(`Can't find team with id ${maleTeamId}`);
+    }
+
+    if (!femaleTeam || !!femaleTeam.deletedAt) {
+      throw new NotFoundException(`Can't find team with id ${femaleTeamId}`);
+    }
+
+    // 이미 매칭중인 경우
+    if (!!maleTeam.maleTeamMatching || !!femaleTeam.femaleTeamMatching) {
+      throw new BadRequestException('matching is already exists');
+    }
+
+    // 이미 매칭 실패한 팀인 경우
+    if (
+      maleTeam.currentRound - maleTeam.startRound >= MatchingRound.MAX_TRIAL ||
+      femaleTeam.currentRound - femaleTeam.startRound >= MatchingRound.MAX_TRIAL
+    ) {
+      throw new BadRequestException('already failed team');
+    }
+
+    // 팀 성별이 잘못된 경우
+    if (maleTeam.gender !== 1 || femaleTeam.gender !== 2) {
+      throw new BadRequestException('invalid team gender');
+    }
+
+    // 팀 인원수가 일치하지 않는 경우
+    if (maleTeam.memberCount !== femaleTeam.memberCount) {
+      throw new BadRequestException('invalid team member count');
+    }
+
+    const matching = new Matching();
+    matching.maleTeamId = maleTeamId;
+    matching.femaleTeamId = femaleTeamId;
+
+    // 매칭 정보 저장
+    await this.matchingsService.createMatching(matching);
+
+    loggerService.verbose(`[${maleTeam.memberCount}:${maleTeam.memberCount} 매칭] 성공(1쌍)`);
+
+    const matchedTeamIds = [maleTeamId, femaleTeamId];
+
+    // 매칭되어 수락/거절 대기중인 유저에게 문자 보내기
+    matchedTeamIds.forEach(async (id) => {
+      const matchingMatchedEvent = new MatchingMatchedEvent();
+
+      matchingMatchedEvent.teamId = id;
+      this.eventEmitter.emit('matching.matched', matchingMatchedEvent);
+    });
   }
 }

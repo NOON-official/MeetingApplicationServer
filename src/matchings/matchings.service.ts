@@ -262,6 +262,10 @@ export class MatchingsService {
   }
 
   async saveMatchings(matchings: Matching[]): Promise<Matching[]> {
-    return this.matchingsRepository.save(matchings);
+    return this.matchingsRepository.createMatchings(matchings);
+  }
+
+  async createMatching(matching: Matching): Promise<Matching> {
+    return this.matchingsRepository.createMatching(matching);
   }
 }
