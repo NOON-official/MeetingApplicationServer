@@ -65,4 +65,16 @@ export class TicketsRepository extends Repository<Ticket> {
   async deleteTicketById(ticketId: number): Promise<void> {
     await this.createQueryBuilder('ticket').softDelete().from(Ticket).where('id = :ticketId', { ticketId }).execute();
   }
+
+  async deleteTicketsByUserIdAndDeleteLimit(userId: number, deleteLimit: number): Promise<void> {
+    await this.createQueryBuilder('ticket')
+      .select()
+      .where('ticket.userId = :userId', { userId })
+      .andWhere('ticket.usedAt IS NULL')
+      .andWhere('ticket.deletedAt IS NULL')
+      .orderBy('ticket.createdAt', 'ASC')
+      .limit(deleteLimit)
+      .softDelete()
+      .execute();
+  }
 }
