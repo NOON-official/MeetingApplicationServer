@@ -277,4 +277,17 @@ export class AdminController {
   postUsersCouponsUserId(@Param('userId') userId: number, @Body() createCouponDto: CreateCouponDto): Promise<void> {
     return this.adminService.createCouponWithUserId(userId, createCouponDto);
   }
+
+  @ApiOperation({
+    summary: '이용권 삭제하기',
+    description: 'ticketCount 수만큼 유저 이용권 삭제',
+  })
+  @ApiOkResponse({ description: 'OK' })
+  @Delete('users/:userId/tickets/:ticketCount')
+  deleteUsersUserIdTicketsTicketCount(
+    @Param('userId') userId: number,
+    @Param('ticketCount') ticketCount: number,
+  ): Promise<void> {
+    return this.adminService.deleteTicketsByUserIdAndTicketCount(userId, ticketCount);
+  }
 }

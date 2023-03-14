@@ -1,3 +1,4 @@
+import { TicketsService } from './../tickets/tickets.service';
 import { CreateCouponDto } from './../coupons/dtos/create-coupon.dto';
 import { CouponsService } from 'src/coupons/coupons.service';
 import { MatchingFailedEvent } from './../matchings/events/matching-failed.event';
@@ -33,6 +34,8 @@ export class AdminService {
     private invitationsService: InvitationsService,
     @Inject(forwardRef(() => CouponsService))
     private couponsService: CouponsService,
+    @Inject(forwardRef(() => TicketsService))
+    private ticketsService: TicketsService,
     private eventEmitter: EventEmitter2,
   ) {}
 
@@ -360,5 +363,20 @@ export class AdminService {
       matchingMatchedEvent.teamId = id;
       this.eventEmitter.emit('matching.matched', matchingMatchedEvent);
     });
+  }
+
+  async deleteTicketsByUserIdAndTicketCount(userId: number, ticketCount: number): Promise<void> {
+    // 존재하는 유저인지 확인
+    await this.usersService.getUserById(userId);
+
+    // 유저 미사용 이용권 개수 조회
+    const { ticketCount: existingTicketCount } = await this.ticketsService.getTicketCountByUserId(userId);
+
+    if (ticketCount === 0 || ticketCount > existingTicketCount) {
+      throw new BadRequestException('invalid ticket count');
+    }
+
+    // 이용권 개수만큼 삭제
+    return this.ticketsService.deleteTicketsByUserIdAndDeleteLimit(userId, ticketCount);
   }
 }
