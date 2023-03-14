@@ -42,4 +42,9 @@ export class TicketsService {
 
     await this.ticketsRepository.deleteTicketById(ticketId);
   }
+
+  async deleteTicketsByUserIdAndDeleteLimit(userId: number, deleteLimit: number): Promise<void> {
+    // deleteLimit 개수만큼 삭제
+    await this.ticketsRepository.deleteTicketsByUserIdAndDeleteLimit(userId, deleteLimit);
+  }
 }
