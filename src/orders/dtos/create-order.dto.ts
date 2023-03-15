@@ -24,36 +24,6 @@ export class TossPaymentsDto {
   readonly orderId: string;
 }
 
-export class PaypleDto {
-  @ApiProperty({
-    description: '페이플 CERT 결제요청 후 리턴받은 인증 토큰',
-    example: 'a688c...',
-  })
-  @IsString()
-  readonly authKey: string;
-
-  @ApiProperty({
-    description: '페이플 CERT 결제요청 후 리턴받은 최종 승인요청용 키',
-    example: 'Vnx...',
-  })
-  @IsString()
-  readonly payReqKey: string;
-
-  @ApiProperty({
-    description: '페이플 빌링키 (등록 후 발급받은 키값 입력)',
-    example: 'd0to...',
-  })
-  @IsString()
-  readonly payerId: string;
-
-  @ApiProperty({
-    description: '페이플 결제 금액',
-    example: 9000,
-  })
-  @IsNumber()
-  readonly amount: number;
-}
-
 export class CreateOrderDto {
   @ApiProperty({
     description: '상품 타입(이용권 구매 페이지데이터 id값)',
@@ -111,10 +81,4 @@ export class CreateOrderDto {
   })
   @IsOptional()
   readonly toss?: TossPaymentsDto;
-
-  @ApiProperty({
-    description: '페이플 결제 정보 \n\n 결제정보가 없는 경우(0원) null 가능',
-  })
-  @IsOptional()
-  readonly payple?: PaypleDto;
 }
