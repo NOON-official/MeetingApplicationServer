@@ -19,12 +19,13 @@ export class MatchingMatchedListener {
   async handleMatchingMatchedEvent(event: MatchingMatchedEvent) {
     const team = await this.teamsService.getTeamById(event.teamId);
 
-    postNaverCloudSMS(
-      SmsType.LMS,
-      ContentType.COMM,
-      team.user.phone,
-      MatchingMatchedContentConstant.CONTENT,
-      MatchingMatchedContentConstant.SUBJECT,
-    );
+    !team.user.deletedAt && // 회원 탈퇴한 경우 제외
+      postNaverCloudSMS(
+        SmsType.LMS,
+        ContentType.COMM,
+        team.user.phone,
+        MatchingMatchedContentConstant.CONTENT,
+        MatchingMatchedContentConstant.SUBJECT,
+      );
   }
 }

@@ -71,4 +71,13 @@ export class InvitationsRepository extends Repository<Invitation> {
       .softDelete()
       .execute();
   }
+
+  // 초대자의 초대정보 삭제
+  async deleteInvitationsByUserId(userId: number): Promise<void> {
+    await this.createQueryBuilder('invitation')
+      .select()
+      .where('invitation.inviterId = :userId', { userId })
+      .softDelete()
+      .execute();
+  }
 }

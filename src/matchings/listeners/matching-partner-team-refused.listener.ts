@@ -19,12 +19,13 @@ export class MatchingPartnerTeamRefusedListener {
   async handleMatchingPartnerTeamRefusedEvent(event: MatchingPartnerTeamRefusedEvent) {
     const team = await this.teamsService.getTeamById(event.teamId);
 
-    postNaverCloudSMS(
-      SmsType.LMS,
-      ContentType.COMM,
-      team.user.phone,
-      MatchingPartnerTeamRefusedContentConstant.CONTENT,
-      MatchingPartnerTeamRefusedContentConstant.SUBJECT,
-    );
+    !team.user.deletedAt && // 회원 탈퇴한 경우 제외
+      postNaverCloudSMS(
+        SmsType.LMS,
+        ContentType.COMM,
+        team.user.phone,
+        MatchingPartnerTeamRefusedContentConstant.CONTENT,
+        MatchingPartnerTeamRefusedContentConstant.SUBJECT,
+      );
   }
 }

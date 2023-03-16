@@ -29,49 +29,6 @@ export class OrdersService {
     private ticketsService: TicketsService,
   ) {}
 
-  // 페이플 결제 승인
-  async confirmPayple(authKey: string, payReqKey: string, payerId: string): Promise<any> {
-    const paypleUrl = this.configService.get<string>('PAYPLE_URL');
-    const paypleCstId = this.configService.get<string>('PAYPLE_CST_ID');
-    const paypleCustKey = this.configService.get<string>('PAYPLE_CUST_KEY');
-
-    const serverUrl = this.configService.get<string>('SERVER_URL');
-
-    const requestUrl = `${paypleUrl}/php/PayCardConfirmAct.php?ACT_=PAYM`;
-
-    const requestData = {
-      PCD_CST_ID: paypleCstId,
-      PCD_CUST_KEY: paypleCustKey,
-      PCD_AUTH_KEY: authKey,
-      PCD_PAY_REQKEY: payReqKey,
-      PCD_PAYER_ID: payerId,
-    };
-
-    const requestHeader = {
-      headers: {
-        'Content-Type': 'application/json',
-        referer: serverUrl,
-      },
-    };
-
-    const { data } = await firstValueFrom(
-      this.httpService.post(requestUrl, JSON.stringify(requestData), requestHeader).pipe(
-        catchError((error) => {
-          throw new HttpException(error.response.data, error.response.status);
-        }),
-      ),
-    );
-
-    const result = {
-      orderId: data.PCD_PAY_OID,
-      method: data.PCD_PAY_TYPE,
-      orderName: data.PCD_PAY_GOODS,
-      amount: data.PCD_PAY_TOTAL,
-    };
-
-    return result;
-  }
-
   // 토스 결제 승인
   async confirmTossPayments(paymentKey: string, orderId: string, amount: number): Promise<any> {
     const tossSecretKey = this.configService.get<string>('TOSS_SECRET_KEY');
@@ -135,7 +92,6 @@ export class OrdersService {
     discountAmount: number,
     totalAmount: number,
     tossAmount?: number,
-    paypleAmount?: number,
     coupon?: Coupon,
   ): Promise<void> {
     // 1. 상품 가격 확인
@@ -155,23 +111,15 @@ export class OrdersService {
         throw new ForbiddenException('invalid amount');
       }
 
-      // 페이플 결제 금액이 있는 경우 결제 가격 확인
-      if (!!paypleAmount && paypleAmount !== finalTotalAmount) {
-        throw new ForbiddenException('invalid amount');
-      }
       // 토스 결제 금액이 있는 경우 결제 가격 확인
-      else if (!!tossAmount && tossAmount !== finalTotalAmount) {
+      if (!!tossAmount && tossAmount !== finalTotalAmount) {
         throw new ForbiddenException('invalid amount');
       }
     }
     // 3. 쿠폰 없는 경우
     else {
-      //페이플 결제 가격 확인
-      if (!!paypleAmount && paypleAmount !== finalPrice) {
-        throw new ForbiddenException('invalid amount');
-      }
       //토스 결제 가격 확인
-      else if (!!tossAmount && tossAmount !== finalPrice) {
+      if (!!tossAmount && tossAmount !== finalPrice) {
         throw new ForbiddenException('invalid amount');
       }
     }
@@ -194,28 +142,20 @@ export class OrdersService {
       createOrderDto.discountAmount,
       createOrderDto.totalAmount,
       createOrderDto.toss?.amount,
-      createOrderDto.payple?.amount,
       coupon,
     );
 
-    let paypleConfirmedResult: any;
     let tossConfirmedResult: any;
 
-    // 페이플 결제 승인 API 호출
-    if (!!createOrderDto.payple) {
-      const { authKey, payReqKey, payerId } = createOrderDto.payple;
-
-      paypleConfirmedResult = await this.confirmPayple(authKey, payReqKey, payerId);
-
-      if (!!paypleConfirmedResult && !paypleConfirmedResult.amount) {
-        throw new BadRequestException('잔액이 부족합니다');
-      }
-    }
     // 토스페이먼츠 결제 승인 API 호출
-    else if (!!createOrderDto.toss) {
+    if (!!createOrderDto.toss) {
       const { paymentKey, orderId, amount } = createOrderDto.toss;
 
       tossConfirmedResult = await this.confirmTossPayments(paymentKey, orderId, amount);
+
+      if (!!tossConfirmedResult && !tossConfirmedResult.totalAmount) {
+        throw new BadRequestException('잔액이 부족합니다');
+      }
     }
 
     const createOrderData: CreateOrder = {
@@ -227,11 +167,7 @@ export class OrdersService {
       tossOrderId: tossConfirmedResult?.orderId ?? null,
       tossMethod: tossConfirmedResult?.method ?? null,
       tossOrderName: tossConfirmedResult?.orderName ?? null,
-      tossAmount: createOrderDto.toss?.amount ?? null,
-      paypleOrderId: paypleConfirmedResult?.orderId ?? null,
-      paypleMethod: paypleConfirmedResult?.method ?? null,
-      paypleOrderName: paypleConfirmedResult?.orderName ?? null,
-      paypleAmount: paypleConfirmedResult?.amount ?? null,
+      tossAmount: tossConfirmedResult?.totalAmount ?? null,
     };
 
     const user = await this.usersService.getUserById(userId);
@@ -256,30 +192,7 @@ export class OrdersService {
     return { Products };
   }
 
-  async getPaypleAuth() {
-    const paypleUrl = this.configService.get<string>('PAYPLE_URL');
-    const paypleCstId = this.configService.get<string>('PAYPLE_CST_ID');
-    const paypleCustKey = this.configService.get<string>('PAYPLE_CUST_KEY');
-
-    const clientUrl = this.configService.get<string>('CLIENT_URL');
-
-    const requestUrl = `${paypleUrl}/php/auth.php`;
-    const requestData = { cst_id: paypleCstId, custKey: paypleCustKey };
-    const requestHeader = {
-      headers: {
-        'Content-Type': 'application/json',
-        referer: clientUrl,
-      },
-    };
-
-    const { data } = await firstValueFrom(
-      this.httpService.post(requestUrl, JSON.stringify(requestData), requestHeader).pipe(
-        catchError((error) => {
-          throw new HttpException(error.response.data, error.response.status);
-        }),
-      ),
-    );
-
-    return data;
+  async deleteOrdersByUserId(userId: number): Promise<void> {
+    return this.ordersRepository.deleteOrdersByUserId(userId);
   }
 }
