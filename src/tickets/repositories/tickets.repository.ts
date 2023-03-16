@@ -47,7 +47,7 @@ export class TicketsRepository extends Repository<Ticket> {
   async refundTicketById(ticketId: number): Promise<void> {
     await this.createQueryBuilder()
       .update(Ticket)
-      .set({ usedAt: null, deletedAt: null })
+      .set({ usedAt: null })
       .where('id = :ticketId', { ticketId })
       .execute();
   }
@@ -74,6 +74,14 @@ export class TicketsRepository extends Repository<Ticket> {
       .andWhere('ticket.deletedAt IS NULL')
       .orderBy('ticket.createdAt', 'ASC')
       .limit(deleteLimit)
+      .softDelete()
+      .execute();
+  }
+
+  async deleteTicketsByUserId(userId: number): Promise<void> {
+    await this.createQueryBuilder('ticket')
+      .select()
+      .where('ticket.userId = :userId', { userId })
       .softDelete()
       .execute();
   }

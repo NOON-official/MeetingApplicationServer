@@ -1,3 +1,7 @@
+import { InvitationsModule } from './../invitations/invitations.module';
+import { CouponsModule } from './../coupons/coupons.module';
+import { OrdersModule } from './../orders/orders.module';
+import { TicketsModule } from './../tickets/tickets.module';
 import { MatchingsModule } from './../matchings/matchings.module';
 import { TeamsModule } from 'src/teams/teams.module';
 import { KakaoStrategy } from './strategies/kakao.strategy';
@@ -17,6 +21,10 @@ import { HttpModule } from '@nestjs/axios';
     UsersModule,
     forwardRef(() => TeamsModule),
     forwardRef(() => MatchingsModule),
+    forwardRef(() => TicketsModule),
+    forwardRef(() => OrdersModule),
+    forwardRef(() => CouponsModule),
+    forwardRef(() => InvitationsModule),
   ],
   providers: [AuthService, KakaoStrategy, AccessTokenStrategy, RefreshTokenStrategy],
   controllers: [AuthController],

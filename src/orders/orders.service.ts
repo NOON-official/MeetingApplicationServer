@@ -191,4 +191,8 @@ export class OrdersService {
   async getProductsPagedata(): Promise<{ Products: ProductType[] }> {
     return { Products };
   }
+
+  async deleteOrdersByUserId(userId: number): Promise<void> {
+    return this.ordersRepository.deleteOrdersByUserId(userId);
+  }
 }

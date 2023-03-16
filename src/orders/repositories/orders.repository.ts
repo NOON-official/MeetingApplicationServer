@@ -56,4 +56,8 @@ export class OrdersRepository extends Repository<Order> {
 
     return order;
   }
+
+  async deleteOrdersByUserId(userId: number): Promise<void> {
+    await this.createQueryBuilder('order').select().where('order.userId = :userId', { userId }).softDelete().execute();
+  }
 }
