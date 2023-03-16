@@ -87,4 +87,12 @@ export class CouponsRepository extends Repository<Coupon> {
 
     return { couponCount };
   }
+
+  async deleteCouponsByUserId(userId: number): Promise<void> {
+    await this.createQueryBuilder('coupon')
+      .select()
+      .where('coupon.userId = :userId', { userId })
+      .softDelete()
+      .execute();
+  }
 }

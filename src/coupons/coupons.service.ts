@@ -79,4 +79,8 @@ export class CouponsService {
   async getCouponCountByTypeIdAndUserId(typeId: number, userId: number): Promise<{ couponCount: number }> {
     return this.couponsRepository.getCouponCountByTypeIdAndUserId(typeId, userId);
   }
+
+  async deleteCouponsByUserId(userId: number): Promise<void> {
+    return this.couponsRepository.deleteCouponsByUserId(userId);
+  }
 }

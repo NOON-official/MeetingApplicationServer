@@ -1,3 +1,8 @@
+import { InvitationsService } from './../invitations/invitations.service';
+import { CouponsService } from './../coupons/coupons.service';
+import { OrdersService } from './../orders/orders.service';
+import { TeamsService } from './../teams/teams.service';
+import { TicketsService } from 'src/tickets/tickets.service';
 import { BadRequestException, HttpException } from '@nestjs/common/exceptions';
 import { VerifyPhoneCodeDto } from './dtos/verify-phone-code.dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
@@ -18,6 +23,11 @@ import { catchError, firstValueFrom } from 'rxjs';
 export class AuthService {
   constructor(
     private usersService: UsersService,
+    private ticketsService: TicketsService,
+    private teamsService: TeamsService,
+    private ordersService: OrdersService,
+    private couponsService: CouponsService,
+    private invitationsService: InvitationsService,
     private jwtService: JwtService,
     private configService: ConfigService,
     private readonly httpService: HttpService,
@@ -154,6 +164,22 @@ export class AuthService {
 
     // 서비스 내 유저 삭제
     await this.usersService.deleteAccount(userId);
+
+    // 해당 유저 관련 데이터 삭제 -- 매칭 정보 제외
+    // 1) 이용권 삭제
+    await this.ticketsService.deleteTicketsByUserId(userId);
+
+    // 2) 팀 정보 삭제
+    await this.teamsService.deleteTeamsByUserId(userId);
+
+    // 3) 주문 정보 삭제
+    await this.ordersService.deleteOrdersByUserId(userId);
+
+    // 4) 쿠폰 삭제
+    await this.couponsService.deleteCouponsByUserId(userId);
+
+    // 5) 초대 정보 삭제 (초대자인 경우)
+    await this.invitationsService.deleteInvitationsByUserId(userId);
 
     // 쿠키에 저장된 refresh token, kakaoAccessToken 삭제
     res.clearCookie('refresh').clearCookie('kakaoAccessToken').status(200).send('OK');

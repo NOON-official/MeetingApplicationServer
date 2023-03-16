@@ -35,7 +35,7 @@ export class TicketsService {
   async deleteTicketById(ticketId: number): Promise<void> {
     const ticket = await this.getTicketById(ticketId);
 
-    // 해당 팀 정보가 없는 경우
+    // 해당 이용권 정보가 없는 경우
     if (!ticket || !!ticket.deletedAt) {
       throw new NotFoundException(`Can't find ticket with id ${ticketId}`);
     }
@@ -46,5 +46,9 @@ export class TicketsService {
   async deleteTicketsByUserIdAndDeleteLimit(userId: number, deleteLimit: number): Promise<void> {
     // deleteLimit 개수만큼 삭제
     await this.ticketsRepository.deleteTicketsByUserIdAndDeleteLimit(userId, deleteLimit);
+  }
+
+  async deleteTicketsByUserId(userId: number): Promise<void> {
+    return this.ticketsRepository.deleteTicketsByUserId(userId);
   }
 }
