@@ -425,4 +425,8 @@ export class TeamsRepository extends Repository<Team> {
 
     return { teams };
   }
+
+  async deleteTeamsByUserId(userId: number): Promise<void> {
+    await this.createQueryBuilder('team').select().where('team.ownerId = :userId', { userId }).softDelete().execute();
+  }
 }

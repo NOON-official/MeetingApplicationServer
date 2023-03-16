@@ -362,4 +362,8 @@ export class TeamsService {
   ): Promise<{ teams: AdminGetPartnerTeamNotRespondedTeamDto[] }> {
     return this.teamsRepository.getPartnerTeamNotRespondedTeamsByGender(gender);
   }
+
+  async deleteTeamsByUserId(userId: number): Promise<void> {
+    return this.teamsRepository.deleteTeamsByUserId(userId);
+  }
 }

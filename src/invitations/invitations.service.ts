@@ -80,4 +80,8 @@ export class InvitationsService {
     // 해당 개수만큼 삭제
     await this.invitationsRepository.deleteInvitationSuccessByUserIdAndDeleteLimit(userId, deleteLimit);
   }
+
+  async deleteInvitationsByUserId(userId: number): Promise<void> {
+    return this.invitationsRepository.deleteInvitationsByUserId(userId);
+  }
 }

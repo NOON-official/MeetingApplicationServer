@@ -14,7 +14,7 @@ export class MatchingSucceededListener {
     private teamsService: TeamsService,
   ) {}
 
-  // 매칭 성공(상호 수락)한 유저에게 문자 보내기
+  // 매칭 성공(상호 수락)한 유저에게 문자 보내기 -- 회원 탈퇴 유저 포함
   @OnEvent('matching.succeeded', { async: true })
   async handleMatchingSucceededEvent(event: MatchingSucceededEvent) {
     const team = await this.teamsService.getTeamById(event.teamId);
