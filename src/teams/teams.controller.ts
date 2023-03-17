@@ -36,7 +36,7 @@ export class TeamsController {
 
   @ApiOperation({
     summary: '주간 사용자 수 조회',
-    description: '팀 수 * 멤버 수',
+    description: '최근 일주일 간 팀 수 * 멤버 수',
   })
   @ApiOkResponse({
     schema: {
@@ -48,6 +48,22 @@ export class TeamsController {
   @Get('members/count/one-week')
   getTeamsMembersCountOneWeek(): Promise<{ memberCount: number }> {
     return this.teamsService.getMembersCountOneWeek();
+  }
+
+  @ApiOperation({
+    summary: '누적 사용자 수 조회',
+    description: '전체 기간 팀 수 * 멤버 수',
+  })
+  @ApiOkResponse({
+    schema: {
+      example: {
+        memberCount: 1000,
+      },
+    },
+  })
+  @Get('members/count/total')
+  getTeamsMembersCountTotal(): Promise<{ memberCount: number }> {
+    return this.teamsService.getMembersCountTotal();
   }
 
   @ApiOperation({
