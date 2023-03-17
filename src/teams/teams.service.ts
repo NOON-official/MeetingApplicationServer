@@ -98,6 +98,10 @@ export class TeamsService {
     return this.teamsRepository.getMembersCountOneWeek();
   }
 
+  async getMembersCountTotal(): Promise<{ memberCount: number }> {
+    return this.teamsRepository.getMembersCountTotal();
+  }
+
   async getTeamCountByStatusAndMembercountAndGender(
     status: MatchingStatus.APPLIED,
     membercount: '2' | '3',
