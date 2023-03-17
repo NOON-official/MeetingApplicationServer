@@ -127,6 +127,17 @@ export class TeamsRepository extends Repository<Team> {
     return { memberCount };
   }
 
+  async getMembersCountTotal(): Promise<{ memberCount: number }> {
+    let { memberCount } = await this.createQueryBuilder('team')
+      .select('SUM(team.memberCount) AS memberCount')
+      .withDeleted()
+      .getRawOne();
+
+    memberCount ? (memberCount = Number(memberCount)) : (memberCount = 0);
+
+    return { memberCount };
+  }
+
   async getTeamCountByStatusAndMembercountAndGender(
     status: MatchingStatus.APPLIED,
     membercount: '2' | '3',
