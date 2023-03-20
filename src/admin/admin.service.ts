@@ -20,6 +20,7 @@ import { Matching } from 'src/matchings/entities/matching.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { MatchingRound } from 'src/matchings/constants/matching-round';
 import { LoggerService } from 'src/common/utils/logger-service.util';
+import { AdminGetOurteamRefusedTeamDto } from './dtos/admin-get-ourteam-refused-team.dto';
 
 @Injectable()
 export class AdminService {
@@ -53,6 +54,10 @@ export class AdminService {
     gender: TeamGender,
   ): Promise<{ teams: AdminGetTeamDto[] }> {
     return this.teamsService.getTeamsByStatusAndMembercountAndGender(status, membercount, gender);
+  }
+
+  async getOurteamRefusedTeams(): Promise<{ teams: AdminGetOurteamRefusedTeamDto[] }> {
+    return this.teamsService.getOurteamRefusedTeams();
   }
 
   async getMatchingsByStatus(status: MatchingStatus): Promise<{ matchings: AdminGetMatchingDto[] }> {
