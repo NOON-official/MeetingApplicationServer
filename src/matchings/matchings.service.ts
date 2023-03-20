@@ -1,3 +1,4 @@
+import { UpdateMatchingRefuseReasonDto } from './dtos/update-matching-refuse-reason.dto';
 import { TeamGender } from 'src/teams/entities/team-gender.enum';
 import { MatchingPartnerTeamRefusedEvent } from './events/matching-partner-team-refused.event';
 import { TeamsService } from './../teams/teams.service';
@@ -14,6 +15,7 @@ import { MatchingStatus } from './interfaces/matching-status.enum';
 import { AdminGetMatchingDto } from 'src/admin/dtos/admin-get-matching.dto';
 import { MatchingSucceededEvent } from './events/matching-succeeded.event';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { AdminGetOurteamRefusedTeamDto } from 'src/admin/dtos/admin-get-ourteam-refused-team.dto';
 
 @Injectable()
 export class MatchingsService {
@@ -201,10 +203,55 @@ export class MatchingsService {
       throw new NotFoundException(`Can't find team with id ${teamId}`);
     }
 
+    // 매칭에 해당하는 팀이 아닌 경우
+    if (matching.maleTeamId !== teamId && matching.femaleTeamId !== teamId) {
+      throw new BadRequestException('invalid access');
+    }
+
+    const matchingRefuseReason =
+      await this.matchingRefuseReasonsRepository.getMatchingRefuseReasonByMatchingIdAndTeamId(matchingId, teamId);
+
+    // 이미 매칭 거절 이유가 존재하는 경우
+    if (!!matchingRefuseReason) {
+      throw new BadRequestException('matching refuse reason is already exists');
+    }
+
     return this.matchingRefuseReasonsRepository.createMatchingRefuseReason(
       matching,
       team,
       createMatchingRefuseReasonDto,
+    );
+  }
+
+  async updateMatchingRefuseReason(
+    matchingId: number,
+    teamId: number,
+    updateMatchingRefuseReasonDto: UpdateMatchingRefuseReasonDto,
+  ): Promise<void> {
+    const matching = await this.getMatchingById(matchingId);
+
+    if (!matching || !!matching.deletedAt) {
+      throw new NotFoundException(`Can't find matching with id ${matchingId}`);
+    }
+
+    const team = await this.teamsService.getTeamById(teamId);
+
+    if (!team || !!team.deletedAt) {
+      throw new NotFoundException(`Can't find team with id ${teamId}`);
+    }
+
+    const matchingRefuseReason =
+      await this.matchingRefuseReasonsRepository.getMatchingRefuseReasonByMatchingIdAndTeamId(matchingId, teamId);
+
+    // 매칭 거절 이유가 없는 경우
+    if (!matchingRefuseReason) {
+      throw new NotFoundException(`Can't find matching refuse reason`);
+    }
+
+    return this.matchingRefuseReasonsRepository.updateMatchingRefuseReason(
+      matchingId,
+      teamId,
+      updateMatchingRefuseReasonDto,
     );
   }
 
@@ -267,5 +314,9 @@ export class MatchingsService {
 
   async createMatching(matching: Matching): Promise<Matching> {
     return this.matchingsRepository.createMatching(matching);
+  }
+
+  async getMatchingRefuseReasons(): Promise<{ teams: AdminGetOurteamRefusedTeamDto[] }> {
+    return this.matchingRefuseReasonsRepository.getMatchingRefuseReasons();
   }
 }
