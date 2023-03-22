@@ -60,6 +60,10 @@ export class AdminService {
     return this.teamsService.getOurteamRefusedTeams();
   }
 
+  async deleteOurteamRefusedTeamByTeamId(teamId: number): Promise<void> {
+    return this.teamsService.deleteOurteamRefusedTeamByTeamId(teamId);
+  }
+
   async getMatchingsByStatus(status: MatchingStatus): Promise<{ matchings: AdminGetMatchingDto[] }> {
     return this.matchingsService.getMatchingsByStatus(status);
   }

@@ -348,6 +348,10 @@ export class TeamsService {
     return this.matchingsService.getMatchingRefuseReasons();
   }
 
+  async deleteOurteamRefusedTeamByTeamId(teamId: number): Promise<void> {
+    return this.matchingsService.deleteMatchingRefuseReasonByTeamId(teamId);
+  }
+
   async getMaxRound(): Promise<{ maxRound: number }> {
     return this.teamsRepository.getMaxRound();
   }

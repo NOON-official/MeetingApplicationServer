@@ -156,8 +156,8 @@ export class AdminController {
 
   @ApiBearerAuth()
   @ApiOperation({
-    summary: '매칭 거절 회원 조회',
-    description: '관리자페이지 내 사용 \n\n 매칭 거절한 회원 및 거절 이유 조회',
+    summary: '매칭 거절 팀 및 거절 이유 조회',
+    description: '관리자페이지 내 사용 \n\n 매칭 거절한 팀 및 거절 이유 조회',
   })
   @ApiOkResponse({
     schema: {
@@ -178,6 +178,16 @@ export class AdminController {
   @Get('teams/ourteam-refused')
   getAdminTeamsOurteamRefused(): Promise<{ teams: AdminGetOurteamRefusedTeamDto[] }> {
     return this.adminService.getOurteamRefusedTeams();
+  }
+
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: '매칭 거절 이유 삭제',
+    description: '관리자페이지 내 사용 \n\n 팀 ID에 해당하는 매칭 거절 이유 삭제',
+  })
+  @Delete('teams/ourteam-refused/:teamId')
+  deleteAdminTeamsOurteamRefusedTeamId(@Param('teamId') teamId: number): Promise<void> {
+    return this.adminService.deleteOurteamRefusedTeamByTeamId(teamId);
   }
 
   @ApiBearerAuth()

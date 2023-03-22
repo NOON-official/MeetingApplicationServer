@@ -84,6 +84,14 @@ export class MatchingRefuseReasonsRepository extends Repository<MatchingRefuseRe
     return { teams };
   }
 
+  async deleteMatchingRefuseReasonByTeamId(teamId: number): Promise<void> {
+    const matchingRefuseReason = await this.createQueryBuilder('matchingRefuseReason')
+      .where('matchingRefuseReason.teamId = :teamId', { teamId })
+      .getOne();
+
+    await this.softDelete({ id: matchingRefuseReason.id });
+  }
+
   async getMatchingRefuseReasonByMatchingIdAndTeamId(
     matchingId: number,
     teamId: number,

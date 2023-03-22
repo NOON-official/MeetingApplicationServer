@@ -319,4 +319,8 @@ export class MatchingsService {
   async getMatchingRefuseReasons(): Promise<{ teams: AdminGetOurteamRefusedTeamDto[] }> {
     return this.matchingRefuseReasonsRepository.getMatchingRefuseReasons();
   }
+
+  async deleteMatchingRefuseReasonByTeamId(teamId: number): Promise<void> {
+    return this.matchingRefuseReasonsRepository.deleteMatchingRefuseReasonByTeamId(teamId);
+  }
 }
