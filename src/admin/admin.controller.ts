@@ -1,3 +1,4 @@
+import { AdminGetOurteamRefusedTeamDto } from './dtos/admin-get-ourteam-refused-team.dto';
 import { CreateCouponDto } from './../coupons/dtos/create-coupon.dto';
 import { AdminGetInvitationSuccessUserDto } from './dtos/admin-get-invitation-success-user.dto';
 import { AdminGetMatchingDto } from './dtos/admin-get-matching.dto';
@@ -140,7 +141,7 @@ export class AdminController {
     },
   })
   @Get('teams')
-  getAdminTeams(
+  getAdminTeamsStatusMembercountGender(
     @Query('status')
     status:
       | MatchingStatus.APPLIED
@@ -151,6 +152,42 @@ export class AdminController {
     @Query('gender') gender: TeamGender,
   ): Promise<{ teams: AdminGetTeamDto[] }> {
     return this.adminService.getTeamsByStatusAndMembercountAndGender(status, membercount, gender);
+  }
+
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: '매칭 거절 팀 및 거절 이유 조회',
+    description: '관리자페이지 내 사용 \n\n 매칭 거절한 팀 및 거절 이유 조회',
+  })
+  @ApiOkResponse({
+    schema: {
+      example: {
+        teams: [
+          {
+            teamId: 2,
+            nickname: '미팅이',
+            gender: '남',
+            phone: '01012345678',
+            matchingRefuseReason: '학교 / 자기소개서 / 내부 사정 / 그냥',
+            refusedAt: '2023-01-20T21:37:26.886Z',
+          },
+        ],
+      },
+    },
+  })
+  @Get('teams/ourteam-refused')
+  getAdminTeamsOurteamRefused(): Promise<{ teams: AdminGetOurteamRefusedTeamDto[] }> {
+    return this.adminService.getOurteamRefusedTeams();
+  }
+
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: '매칭 거절 이유 삭제',
+    description: '관리자페이지 내 사용 \n\n 팀 ID에 해당하는 매칭 거절 이유 삭제',
+  })
+  @Delete('teams/ourteam-refused/:teamId')
+  deleteAdminTeamsOurteamRefusedTeamId(@Param('teamId') teamId: number): Promise<void> {
+    return this.adminService.deleteOurteamRefusedTeamByTeamId(teamId);
   }
 
   @ApiBearerAuth()

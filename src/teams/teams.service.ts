@@ -23,6 +23,7 @@ import { Team } from './entities/team.entity';
 import { AdminGetTeamDto } from 'src/admin/dtos/admin-get-team.dto';
 import { TeamAvailableDatesRepository } from './repositories/team-available-dates.repository';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { AdminGetOurteamRefusedTeamDto } from 'src/admin/dtos/admin-get-ourteam-refused-team.dto';
 
 @Injectable()
 export class TeamsService {
@@ -341,6 +342,14 @@ export class TeamsService {
     if (status === MatchingStatus.PARTNER_TEAM_REFUSED) {
       return this.teamsRepository.getPartnerTeamRefusedTeamsByMembercountAndGender(membercount, gender);
     }
+  }
+
+  async getOurteamRefusedTeams(): Promise<{ teams: AdminGetOurteamRefusedTeamDto[] }> {
+    return this.matchingsService.getMatchingRefuseReasons();
+  }
+
+  async deleteOurteamRefusedTeamByTeamId(teamId: number): Promise<void> {
+    return this.matchingsService.deleteMatchingRefuseReasonByTeamId(teamId);
   }
 
   async getMaxRound(): Promise<{ maxRound: number }> {

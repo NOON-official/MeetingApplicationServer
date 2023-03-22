@@ -1,3 +1,4 @@
+import { UpdateMatchingRefuseReasonDto } from './dtos/update-matching-refuse-reason.dto';
 import { MatchingsService } from './matchings.service';
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { ApiOperation } from '@nestjs/swagger';
@@ -9,7 +10,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger/dist';
-import { Body, Controller, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, UseGuards, Patch } from '@nestjs/common';
 import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 import { GetMatchingDto } from './dtos/get-matching.dto';
 import { CreateMatchingRefuseReasonDto } from './dtos/create-matching-refuse-reason.dto';
@@ -73,6 +74,8 @@ export class MatchingsController {
 
   @ApiOperation({
     summary: '매칭 거절 이유 보내기',
+    description:
+      '매칭 결과 조회 페이지에서 [거절하기] 버튼 클릭 시 default value 상태로 해당 API를 호출해주시면 됩니다. (데이터베이스 내 row 생성 용도)',
   })
   @ApiCreatedResponse({ description: 'Created' })
   @Post(':matchingId/teams/:teamId/refuse-reason')
@@ -83,5 +86,21 @@ export class MatchingsController {
     @Body() createMatchingRefuseReasonDto: CreateMatchingRefuseReasonDto,
   ): Promise<void> {
     return this.matchingsService.createMatchingRefuseReason(matchingId, teamId, createMatchingRefuseReasonDto);
+  }
+
+  @ApiOperation({
+    summary: '매칭 거절 이유 수정하기',
+    description:
+      '유저가 매칭 거절 이유 선택 후 [결과 보내기] 버튼 클릭 시 해당 API를 호출해주시면 됩니다. \n\n * request body에 수정이 필요한 프로퍼티만 보내주시면 됩니다.',
+  })
+  @ApiOkResponse({ description: 'OK' })
+  @Patch(':matchingId/teams/:teamId/refuse-reason')
+  @UseGuards(AccessTokenGuard, MatchingOwnerGuard)
+  patchMatchingsMatchingIdTeamsTeamIdRefuseReason(
+    @Param('matchingId') matchingId: number,
+    @Param('teamId') teamId: number,
+    @Body() updateMatchingRefuseReasonDto: UpdateMatchingRefuseReasonDto,
+  ): Promise<void> {
+    return this.matchingsService.updateMatchingRefuseReason(matchingId, teamId, updateMatchingRefuseReasonDto);
   }
 }
