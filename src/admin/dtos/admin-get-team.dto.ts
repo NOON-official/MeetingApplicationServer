@@ -107,4 +107,16 @@ export class AdminGetTeamDto {
     example: '2023-01-20T21:37:26.886Z',
   })
   refusedAt?: Date;
+
+  @ApiProperty({
+    description: '회원 ID',
+    example: 1,
+  })
+  userId: number;
+
+  @ApiProperty({
+    description: '거절한 회원 ID들',
+    example: [11, 22, 33],
+  })
+  refusedUserIds?: number[] | null;
 }

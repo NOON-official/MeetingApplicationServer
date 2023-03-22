@@ -167,6 +167,12 @@ export class MatchingsService {
         matchingPartnerTeamRefusedEvent.teamId = matching.femaleTeamId;
         this.eventEmitter.emit('matching.partnerTeamRefused', matchingPartnerTeamRefusedEvent);
       }
+
+      // 거절한 상대를 user 테이블에 기록
+      this.usersService.updateRefusedUserIds(matching.maleTeam.user.id, [
+        ...(matching.maleTeam.user.refusedUserIds || []),
+        matching.femaleTeam.user.id,
+      ]);
     }
 
     if (gender === 'female') {
@@ -181,6 +187,12 @@ export class MatchingsService {
         matchingPartnerTeamRefusedEvent.teamId = matching.maleTeamId;
         this.eventEmitter.emit('matching.partnerTeamRefused', matchingPartnerTeamRefusedEvent);
       }
+
+      // 거절한 상대를 user 테이블에 기록
+      this.usersService.updateRefusedUserIds(matching.femaleTeam.user.id, [
+        ...(matching.femaleTeam.user.refusedUserIds || []),
+        matching.maleTeam.user.id,
+      ]);
     }
 
     return this.matchingsRepository.refuseMatchingByGender(matchingId, gender);
