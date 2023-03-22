@@ -214,6 +214,8 @@ export class TeamsRepository extends Repository<Team> {
         `IF(team.modifiedAt IS NOT NULL, team.modifiedAt, team.createdAt) AS appliedAt`,
         'matching.createdAt AS matchedAt',
         'team.lastFailReason AS lastFailReason',
+        'user.id AS userId',
+        'user.refusedUserIds AS refusedUserIds',
       ])
       .leftJoin(`team.${gender}TeamMatching`, 'matching')
       .leftJoin(`team.user`, 'user')
@@ -262,6 +264,8 @@ export class TeamsRepository extends Repository<Team> {
         `IF(team.modifiedAt IS NOT NULL, team.modifiedAt, team.createdAt) AS appliedAt`,
         'matching.createdAt AS matchedAt',
         'team.lastFailReason AS lastFailReason',
+        'user.id AS userId',
+        'user.refusedUserIds AS refusedUserIds',
       ])
       .leftJoin(`team.${gender}TeamMatching`, 'matching')
       .leftJoin(`team.user`, 'user')
@@ -313,6 +317,8 @@ export class TeamsRepository extends Repository<Team> {
         'matching.createdAt AS matchedAt',
         'team.updatedAt AS failedAt',
         'team.lastFailReason AS lastFailReason',
+        'user.id AS userId',
+        'user.refusedUserIds AS refusedUserIds',
       ])
       .leftJoin(`team.${gender}TeamMatching`, 'matching')
       .leftJoin(`team.user`, 'user')
@@ -362,6 +368,8 @@ export class TeamsRepository extends Repository<Team> {
           gender === 'male' ? 'female' : 'male'
         }TeamIsAccepted IS NULL, DATE_ADD(matching.createdAt, INTERVAL 1 DAY), matching.updatedAt) AS refusedAt`, // 무응답인 경우 매칭일시 + 1일을 거절 시간으로 반환
         'team.lastFailReason AS lastFailReason',
+        'user.id AS userId',
+        'user.refusedUserIds AS refusedUserIds',
       ])
       .leftJoin(`team.${gender}TeamMatching`, 'matching')
       .leftJoin(`team.user`, 'user')
