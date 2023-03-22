@@ -44,6 +44,9 @@ export class User extends BaseEntity {
   @Column({ nullable: true })
   refreshToken: string;
 
+  @Column({ type: 'json', nullable: true })
+  refusedUserId: number[];
+
   @Column({ type: 'boolean', default: false })
   isAdmin: boolean;
 
