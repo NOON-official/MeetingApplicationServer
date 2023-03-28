@@ -271,4 +271,8 @@ export class UsersService {
   async getInvitationSuccessUsers(): Promise<{ users: AdminGetInvitationSuccessUserDto[] }> {
     return await this.invitationsService.getUsersWithInvitationCount();
   }
+
+  async updateRefusedUserIds(userId: number, refusedUserIds: number[]) {
+    return this.usersRepository.updateRefusedUserIds(userId, refusedUserIds);
+  }
 }

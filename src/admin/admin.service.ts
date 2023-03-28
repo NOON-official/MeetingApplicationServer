@@ -128,9 +128,21 @@ export class AdminService {
       const failedFemaleTeamReasons: string[] = [];
 
       for (const femaleTeam of femaleTeams) {
+        // 서로 거절한적 있는지 체크
+        const notRefused = maleTeams.filter(
+          (maleTeam) =>
+            !maleTeam.refusedUserIds?.includes(femaleTeam.userId) &&
+            !femaleTeam.refusedUserIds?.includes(maleTeam.userId),
+        );
+        if (notRefused.length === 0) {
+          failedFemaleTeamIds.push(femaleTeam.teamId);
+          failedFemaleTeamReasons.push('Refused');
+          continue;
+        }
+
         // 3. 대학 레벨 매칭 (동일대학 거부 여부 확인, 가장 높은 대학 기준)
         // 여성팀 기준으로 1 낮거나 이상인 대학 필터링
-        const univMatched = maleTeams.filter((maleTeam) => {
+        const univMatched = notRefused.filter((maleTeam) => {
           if (!femaleTeam.prefSameUniversity) {
             const hasSameUniv = maleTeam.universities.some((id) => femaleTeam.universities.includes(id));
             if (hasSameUniv) {

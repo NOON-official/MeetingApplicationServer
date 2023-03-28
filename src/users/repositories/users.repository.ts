@@ -96,4 +96,8 @@ export class UsersRepository extends Repository<User> {
   async getAllUsers(): Promise<User[]> {
     return await this.find();
   }
+
+  async updateRefusedUserIds(userId: number, refusedUserIds: number[]) {
+    await this.update({ id: userId }, { refusedUserIds });
+  }
 }
