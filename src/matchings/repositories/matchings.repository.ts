@@ -39,8 +39,6 @@ export class MatchingsRepository extends Repository<Matching> {
       .leftJoinAndSelect('matching.femaleTeam', 'femaleTeam')
       .leftJoinAndSelect('matching.maleTeamTicket', 'maleTeamTicket')
       .leftJoinAndSelect('matching.femaleTeamTicket', 'femaleTeamTicket')
-      .leftJoinAndSelect('maleTeam.user', 'maleTeam.user')
-      .leftJoinAndSelect('femaleTeam.user', 'femaleTeam.user')
       .where('matching.id = :matchingId', { matchingId })
       .getOne();
 

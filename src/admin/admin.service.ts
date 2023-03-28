@@ -134,6 +134,11 @@ export class AdminService {
             !maleTeam.refusedUserIds?.includes(femaleTeam.userId) &&
             !femaleTeam.refusedUserIds?.includes(maleTeam.userId),
         );
+        if (notRefused.length === 0) {
+          failedFemaleTeamIds.push(femaleTeam.teamId);
+          failedFemaleTeamReasons.push('Refused');
+          continue;
+        }
 
         // 3. 대학 레벨 매칭 (동일대학 거부 여부 확인, 가장 높은 대학 기준)
         // 여성팀 기준으로 1 낮거나 이상인 대학 필터링

@@ -169,9 +169,10 @@ export class MatchingsService {
       }
 
       // 거절한 상대를 user 테이블에 기록
-      this.usersService.updateRefusedUserIds(matching.maleTeam.user.id, [
-        ...(matching.maleTeam.user.refusedUserIds || []),
-        matching.femaleTeam.user.id,
+      const maleTeamUser = await this.usersService.getUserById(matching.maleTeam.ownerId);
+      this.usersService.updateRefusedUserIds(matching.maleTeam.ownerId, [
+        ...(maleTeamUser.refusedUserIds?.filter((id) => id !== matching.femaleTeam.ownerId) || []),
+        matching.femaleTeam.ownerId,
       ]);
     }
 
@@ -189,9 +190,10 @@ export class MatchingsService {
       }
 
       // 거절한 상대를 user 테이블에 기록
-      this.usersService.updateRefusedUserIds(matching.femaleTeam.user.id, [
-        ...(matching.femaleTeam.user.refusedUserIds || []),
-        matching.maleTeam.user.id,
+      const femaleTeamUser = await this.usersService.getUserById(matching.femaleTeam.ownerId);
+      this.usersService.updateRefusedUserIds(matching.femaleTeam.ownerId, [
+        ...(femaleTeamUser.refusedUserIds?.filter((id) => id !== matching.maleTeam.ownerId) || []),
+        matching.maleTeam.ownerId,
       ]);
     }
 
