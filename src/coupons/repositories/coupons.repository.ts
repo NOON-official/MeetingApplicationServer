@@ -59,16 +59,28 @@ export class CouponsRepository extends Repository<Coupon> {
     return coupon;
   }
 
+  async getCouponsByUserIdAndCode(userId: number, couponCode: string): Promise<Coupon[]> {
+    const coupons = await this.createQueryBuilder('coupon')
+      .select()
+      .where('coupon.userId = :userId', { userId })
+      .andWhere('coupon.code = :couponCode', { couponCode })
+      .withDeleted()
+      .getMany();
+
+    return coupons; // 쿠폰이 없는 경우 빈 배열 반환
+  }
+
   async registerCoupon(couponId: number, userId: number): Promise<void> {
     await this.createQueryBuilder().relation(Coupon, 'user').of(couponId).set(userId);
   }
 
-  async createCouponWithUser(user: User, couponTypeId: number, expiresAt?: Date): Promise<void> {
+  async createCouponWithUser(user: User, couponTypeId: number, couponCode?: string, expiresAt?: Date): Promise<void> {
     await this.createQueryBuilder()
       .insert()
       .into(Coupon)
       .values({
         typeId: couponTypeId,
+        code: couponCode,
         expiresAt,
         user,
       })
