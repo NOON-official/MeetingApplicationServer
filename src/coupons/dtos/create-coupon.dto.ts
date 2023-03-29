@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsInt, IsISO8601, Length } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsInt, IsISO8601, Length, IsString } from 'class-validator';
 
 export class CreateCouponDto {
   @ApiProperty({
@@ -10,6 +10,15 @@ export class CreateCouponDto {
   @IsNotEmpty()
   @IsInt()
   readonly couponTypeId: number;
+
+  @ApiProperty({
+    description: '쿠폰 코드',
+    example: 'GIFT',
+  })
+  @IsOptional()
+  @IsString()
+  @Length(0, 30)
+  readonly couponCode?: string;
 
   @ApiProperty({
     description: '쿠폰 만료 일자',
