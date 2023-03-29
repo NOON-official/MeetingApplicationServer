@@ -1,7 +1,7 @@
 import { BadRequestException } from '@nestjs/common/exceptions';
 import { TicketsService } from './../tickets/tickets.service';
 import { Coupon } from 'src/coupons/entities/coupon.entity';
-import { CouponTypes } from '../coupons/constants/coupons';
+import { CouponTypes } from '../coupons/constants/coupons.constant';
 import { Products, ProductType } from './constants/products';
 import { CouponsService } from './../coupons/coupons.service';
 import { CreateOrder } from './interfaces/create-order.interface';
