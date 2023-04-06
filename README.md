@@ -19,6 +19,12 @@
 <br>
 <br>
 
+## 💕 ERD
+![미팅학개론erd](https://user-images.githubusercontent.com/78714820/230391443-f7f5d349-4d83-422c-9d4a-d228dc268ede.png)
+
+<br>
+<br>
+
 ## 💕 Running the app
 
 ```
