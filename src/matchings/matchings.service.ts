@@ -337,4 +337,15 @@ export class MatchingsService {
   async deleteMatchingRefuseReasonByTeamId(teamId: number): Promise<void> {
     return this.matchingRefuseReasonsRepository.deleteMatchingRefuseReasonByTeamId(teamId);
   }
+
+  async getAverageTimeOneWeek(): Promise<{ hours: number; minutes: number }> {
+    const { averageMatchedSeconds } = await this.matchingsRepository.getMatchingAverageSecondsOneWeeks();
+
+    const averageMatchedMinutes = Math.trunc(averageMatchedSeconds / 60);
+
+    const hours = Math.trunc(averageMatchedMinutes / 60);
+    const minutes = averageMatchedMinutes % 60;
+
+    return { hours, minutes };
+  }
 }
