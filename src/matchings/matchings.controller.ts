@@ -26,6 +26,22 @@ export class MatchingsController {
   constructor(private matchingsService: MatchingsService) {}
 
   @ApiOperation({
+    summary: '주간 평균 매칭 시간 조회',
+  })
+  @ApiOkResponse({
+    schema: {
+      example: {
+        hours: 1,
+        minutes: 30,
+      },
+    },
+  })
+  @Get('average-time/one-week')
+  getMatchingsAverageTimeOneWeek(): Promise<{ hours: number; minutes: number }> {
+    return this.matchingsService.getAverageTimeOneWeek();
+  }
+
+  @ApiOperation({
     summary: '매칭 정보 조회',
     description:
       '매칭 정보가 없는 경우 null 반환 \n\n createdAt 기준 24시간 이상 초과 & 상대팀 무응답인 경우 -> 거절당함 페이지 \n\n createdAt 기준 24시간 이상 초과 & 상대팀 거절인 경우 -> 거절당함 페이지',
