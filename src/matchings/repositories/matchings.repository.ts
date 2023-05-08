@@ -184,7 +184,7 @@ export class MatchingsRepository extends Repository<Matching> {
 
     // 하루 이내 매칭 케이스 없는 경우
     if (maleTeamMatchedtimes.length === 0 && femaleTeamMatchedtimes.length === 0) {
-      const averageMatchedSeconds = Math.floor(Math.random() * 18000) + 18000;
+      const averageMatchedSeconds = 31240;
       return { averageMatchedSeconds };
     }
 
