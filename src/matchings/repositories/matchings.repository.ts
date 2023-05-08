@@ -150,4 +150,56 @@ export class MatchingsRepository extends Repository<Matching> {
   async createMatching(matching: Matching): Promise<Matching> {
     return this.save(matching);
   }
+
+  async getMatchingAverageSecondsOneWeeks(): Promise<{ averageMatchedSeconds: number }> {
+    // 남자팀 매칭 소요 시간(초) = 매칭된 시간 - 신청 시간(팀 정보 수정 시간)
+    const maleTeamMatchedtimes = await this.createQueryBuilder('matching')
+      .select([
+        'TIME_TO_SEC(TIMEDIFF(matching.createdAt, IF(maleTeam.modifiedAt IS NOT NULL, maleTeam.modifiedAt, maleTeam.createdAt))) AS seconds',
+      ])
+      .withDeleted()
+      .leftJoin('matching.maleTeam', 'maleTeam')
+      // 일주일 이내
+      .where('DATE_SUB(CURDATE(), INTERVAL 7 DAY) <= matching.createdAt')
+      // 24시간 이내 매칭된 경우
+      .andWhere(
+        'HOUR(TIMEDIFF(matching.createdAt, IF(maleTeam.modifiedAt IS NOT NULL, maleTeam.modifiedAt, maleTeam.createdAt))) <= 24',
+      )
+      .getRawMany();
+
+    // 여자팀 매칭 소요 시간(초) = 매칭된 시간 - 신청 시간(팀 정보 수정 시간)
+    const femaleTeamMatchedtimes = await this.createQueryBuilder('matching')
+      .select([
+        'TIME_TO_SEC(TIMEDIFF(matching.createdAt, IF(femaleTeam.modifiedAt IS NOT NULL, femaleTeam.modifiedAt, femaleTeam.createdAt))) AS seconds',
+      ])
+      .withDeleted()
+      .leftJoin('matching.femaleTeam', 'femaleTeam')
+      // 일주일 이내
+      .where('DATE_SUB(CURDATE(), INTERVAL 7 DAY) <= matching.createdAt')
+      // 24시간 이내 매칭된 경우
+      .andWhere(
+        'HOUR(TIMEDIFF(matching.createdAt, IF(femaleTeam.modifiedAt IS NOT NULL, femaleTeam.modifiedAt, femaleTeam.createdAt))) <= 24',
+      )
+      .getRawMany();
+
+    // 하루 이내 매칭 케이스 없는 경우
+    if (maleTeamMatchedtimes.length === 0 && femaleTeamMatchedtimes.length === 0) {
+      const averageMatchedSeconds = 31240;
+      return { averageMatchedSeconds };
+    }
+
+    let matchedSeconds = 0; // 총 매칭 시간(초)
+    for await (const maleTeamMatchedtime of maleTeamMatchedtimes) {
+      matchedSeconds += Number(maleTeamMatchedtime.seconds);
+    }
+    for await (const femaleTeamMatchedtime of femaleTeamMatchedtimes) {
+      matchedSeconds += Number(femaleTeamMatchedtime.seconds);
+    }
+
+    // 평균 매칭 시간(초)
+    let averageMatchedSeconds = matchedSeconds / (maleTeamMatchedtimes.length + femaleTeamMatchedtimes.length);
+    averageMatchedSeconds = Math.trunc(averageMatchedSeconds);
+
+    return { averageMatchedSeconds };
+  }
 }

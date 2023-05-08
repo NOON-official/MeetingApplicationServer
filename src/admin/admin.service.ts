@@ -343,6 +343,19 @@ export class AdminService {
       throw new NotFoundException(`Can't find team with id ${femaleTeamId}`);
     }
 
+    // 팀 성별이 잘못된 경우
+    if (maleTeam.gender !== 1 || femaleTeam.gender !== 2) {
+      throw new BadRequestException('invalid team gender');
+    }
+
+    // 이미 거절한 적 있는 경우
+    if (
+      maleTeam.user.refusedUserIds?.includes(femaleTeam.ownerId) ||
+      femaleTeam.user.refusedUserIds?.includes(maleTeam.ownerId)
+    ) {
+      throw new BadRequestException('already refused teams');
+    }
+
     // 이미 매칭중인 경우
     if (!!maleTeam.maleTeamMatching || !!femaleTeam.femaleTeamMatching) {
       throw new BadRequestException('matching is already exists');
@@ -354,11 +367,6 @@ export class AdminService {
       femaleTeam.currentRound - femaleTeam.startRound >= MatchingRound.MAX_TRIAL
     ) {
       throw new BadRequestException('already failed team');
-    }
-
-    // 팀 성별이 잘못된 경우
-    if (maleTeam.gender !== 1 || femaleTeam.gender !== 2) {
-      throw new BadRequestException('invalid team gender');
     }
 
     // 팀 인원수가 일치하지 않는 경우
