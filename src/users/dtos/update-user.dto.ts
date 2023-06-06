@@ -21,7 +21,7 @@ export class UpdateUserDto {
   readonly birth: number;
 }
 
-export class UpdateUniversityDto{
+export class UpdateUniversityDto {
     @ApiProperty({
         description: '대학교',
         example: '1',
