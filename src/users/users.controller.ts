@@ -16,10 +16,11 @@ import {
 import { UsersService } from './users.service';
 import { Controller, Get } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
-import { Body, Post } from '@nestjs/common/decorators';
+import { Body, Patch, Post } from '@nestjs/common/decorators';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { PassportUser } from 'src/auth/interfaces/passport-user.interface';
 import { UserOrder } from './interfaces/user-order.interface';
+import { UpdateUserDto } from './dtos/update-user.dto';
 
 @ApiTags('USER')
 @ApiBearerAuth()
@@ -81,6 +82,18 @@ export class UsersController {
   @UseGuards(AccessTokenGuard)
   getUsersMyInfo(@GetUser() user: PassportUser): Promise<{ nickname: string; phone: string }> {
     return this.usersService.getMyInfoByUserId(user.sub);
+  }
+
+  @ApiOperation({
+    summary: '유저의 추가 정보 저장',
+    description:
+      '성별, 대학교, 출생년도를 추가로 저장합니다.',
+  })
+  @ApiOkResponse({ description: 'OK' })
+  @Patch('my-info')
+  @UseGuards(AccessTokenGuard)
+  patchUsersMyInfo(@GetUser() user: PassportUser, @Body() updateInfo: UpdateUserDto): Promise<void> {
+    return this.usersService.updateUserInfo(user.sub, updateInfo);
   }
 
   @ApiOperation({

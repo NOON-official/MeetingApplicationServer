@@ -4,6 +4,7 @@ import { CreateUserDto } from './../dtos/create-user.dto';
 import { CustomRepository } from 'src/database/typeorm-ex.decorator';
 import { Repository } from 'typeorm';
 import { NotFoundException } from '@nestjs/common';
+import { UpdateUserDto } from '../dtos/update-user.dto';
 
 @CustomRepository(User)
 export class UsersRepository extends Repository<User> {
@@ -90,6 +91,14 @@ export class UsersRepository extends Repository<User> {
 
   async updateUserPhone(userId: number, phone: SavePhoneDto): Promise<void> {
     const result = await this.update({ id: userId }, phone);
+
+    if (result.affected === 0) {
+      throw new NotFoundException(`Can't find user with id ${userId}`);
+    }
+  }
+
+  async updateUserInfo(userId: number, updateInfo: UpdateUserDto): Promise<void> {
+    const result = await this.update({ id: userId }, updateInfo);
 
     if (result.affected === 0) {
       throw new NotFoundException(`Can't find user with id ${userId}`);
