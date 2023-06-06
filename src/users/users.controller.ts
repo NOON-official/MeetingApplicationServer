@@ -71,7 +71,7 @@ export class UsersController {
       example: {
         nickname: '미팅이',
         phone: '01012345678',
-        gender: 1,
+        gender: 'male',
         university: 1,
         birth: 1996
       },
