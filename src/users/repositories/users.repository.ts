@@ -73,16 +73,19 @@ export class UsersRepository extends Repository<User> {
     return { referralId };
   }
 
-  async getMyInfoByUserId(userId: number): Promise<{ nickname: string; phone: string }> {
+  async getMyInfoByUserId(userId: number): Promise<{ nickname: string; phone: string, gender:string, university:number, birth:number }> {
     await this.getUserById(userId);
 
-    const { nickname, phone } = await this.createQueryBuilder('user')
-      .select('user.nickname')
+    const { nickname, phone, gender, university, birth } = await this.createQueryBuilder('user')
+      .select(['user.nickname'])
       .addSelect('user.phone')
+      .addSelect('user.gender')
+      .addSelect('user.university')
+      .addSelect('user.birth')
       .where('user.id = :userId', { userId })
       .getOne();
 
-    return { nickname, phone };
+    return { nickname, phone, gender, university, birth };
   }
 
   async updateUserPhone(userId: number, phone: SavePhoneDto): Promise<void> {

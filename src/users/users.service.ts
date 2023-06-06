@@ -94,7 +94,7 @@ export class UsersService {
     return this.usersRepository.getReferralIdByUserId(userId);
   }
 
-  async getMyInfoByUserId(userId: number): Promise<{ nickname: string; phone: string }> {
+  async getMyInfoByUserId(userId: number): Promise<{ nickname: string; phone: string, gender:string, university:number, birth:number }> {
     return this.usersRepository.getMyInfoByUserId(userId);
   }
 
