@@ -64,13 +64,16 @@ export class UsersController {
 
   @ApiOperation({
     summary: '내 정보 조회',
-    description: '이름, 전화번호 반환',
+    description: '이름, 전화번호, 성별, 대학교, 출생년도 반환',
   })
   @ApiOkResponse({
     schema: {
       example: {
         nickname: '미팅이',
         phone: '01012345678',
+        gender: 1,
+        university: 1,
+        birth: 1996
       },
     },
   })
