@@ -21,7 +21,7 @@ import { MatchingStatus } from 'src/matchings/interfaces/matching-status.enum';
 import * as moment from 'moment-timezone';
 import { AdminGetUserDto } from 'src/admin/dtos/admin-get-user.dto';
 import { AdminGetInvitationSuccessUserDto } from 'src/admin/dtos/admin-get-invitation-success-user.dto';
-import { UpdateUserDto } from './dtos/update-user.dto';
+import { UpdateUniversityDto, UpdateUserDto } from './dtos/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -109,6 +109,10 @@ export class UsersService {
 
   async updateUserInfo(userId: number, updateInfo: UpdateUserDto): Promise<void> {
     return this.usersRepository.updateUserInfo(userId, updateInfo);
+  }
+
+  async updateUniversity(userId: number, updateUniversity: UpdateUniversityDto){
+    return this.usersRepository.updateUniversity(userId, updateUniversity)
   }
 
   async getTicketCountByUserId(userId: number): Promise<{ ticketCount: number }> {

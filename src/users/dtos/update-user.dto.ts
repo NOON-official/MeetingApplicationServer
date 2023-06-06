@@ -12,15 +12,6 @@ export class UpdateUserDto {
   readonly gender: string;
 
   @ApiProperty({
-    description: '대학교',
-    example: '1',
-    required: true,
-  })
-  @IsNotEmpty()
-  @IsNumber()
-  readonly university: number;
-
-  @ApiProperty({
     description: '출생년도',
     example: 1996,
     required: true,
@@ -28,6 +19,15 @@ export class UpdateUserDto {
   @IsNotEmpty()
   @IsNumber()
   readonly birth: number;
+}
 
-  
+export class UpdateUniversityDto{
+    @ApiProperty({
+        description: '대학교',
+        example: '1',
+        required: true,
+      })
+      @IsNotEmpty()
+      @IsNumber()
+      readonly university: number;
 }
