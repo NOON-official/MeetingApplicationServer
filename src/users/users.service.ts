@@ -21,6 +21,7 @@ import { MatchingStatus } from 'src/matchings/interfaces/matching-status.enum';
 import * as moment from 'moment-timezone';
 import { AdminGetUserDto } from 'src/admin/dtos/admin-get-user.dto';
 import { AdminGetInvitationSuccessUserDto } from 'src/admin/dtos/admin-get-invitation-success-user.dto';
+import { UpdateUniversityDto, UpdateUserDto } from './dtos/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -94,7 +95,7 @@ export class UsersService {
     return this.usersRepository.getReferralIdByUserId(userId);
   }
 
-  async getMyInfoByUserId(userId: number): Promise<{ nickname: string; phone: string }> {
+  async getMyInfoByUserId(userId: number): Promise<{ nickname: string; phone: string, gender:string, university:number, birth:number }> {
     return this.usersRepository.getMyInfoByUserId(userId);
   }
 
@@ -104,6 +105,14 @@ export class UsersService {
 
   async updateUserPhone(userId: number, phone: SavePhoneDto): Promise<void> {
     return this.usersRepository.updateUserPhone(userId, phone);
+  }
+
+  async updateUserInfo(userId: number, updateInfo: UpdateUserDto): Promise<void> {
+    return this.usersRepository.updateUserInfo(userId, updateInfo);
+  }
+
+  async updateUniversity(userId: number, updateUniversity: UpdateUniversityDto){
+    return this.usersRepository.updateUniversity(userId, updateUniversity)
   }
 
   async getTicketCountByUserId(userId: number): Promise<{ ticketCount: number }> {

@@ -4,6 +4,7 @@ import { CreateUserDto } from './../dtos/create-user.dto';
 import { CustomRepository } from 'src/database/typeorm-ex.decorator';
 import { Repository } from 'typeorm';
 import { NotFoundException } from '@nestjs/common';
+import { UpdateUniversityDto, UpdateUserDto } from '../dtos/update-user.dto';
 
 @CustomRepository(User)
 export class UsersRepository extends Repository<User> {
@@ -73,20 +74,39 @@ export class UsersRepository extends Repository<User> {
     return { referralId };
   }
 
-  async getMyInfoByUserId(userId: number): Promise<{ nickname: string; phone: string }> {
+  async getMyInfoByUserId(userId: number): Promise<{ nickname: string; phone: string, gender:string, university:number, birth:number }> {
     await this.getUserById(userId);
 
-    const { nickname, phone } = await this.createQueryBuilder('user')
-      .select('user.nickname')
+    const { nickname, phone, gender, university, birth } = await this.createQueryBuilder('user')
+      .select(['user.nickname'])
       .addSelect('user.phone')
+      .addSelect('user.gender')
+      .addSelect('user.university')
+      .addSelect('user.birth')
       .where('user.id = :userId', { userId })
       .getOne();
 
-    return { nickname, phone };
+    return { nickname, phone, gender, university, birth };
   }
 
   async updateUserPhone(userId: number, phone: SavePhoneDto): Promise<void> {
     const result = await this.update({ id: userId }, phone);
+
+    if (result.affected === 0) {
+      throw new NotFoundException(`Can't find user with id ${userId}`);
+    }
+  }
+
+  async updateUserInfo(userId: number, updateInfo: UpdateUserDto): Promise<void> {
+    const result = await this.update({ id: userId }, updateInfo);
+
+    if (result.affected === 0) {
+      throw new NotFoundException(`Can't find user with id ${userId}`);
+    }
+  }
+
+  async updateUniversity(userId: number, updateUniversity: UpdateUniversityDto){
+    const result = await this.update({ id: userId }, updateUniversity);
 
     if (result.affected === 0) {
       throw new NotFoundException(`Can't find user with id ${userId}`);
