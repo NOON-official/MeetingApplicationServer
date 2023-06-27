@@ -10,6 +10,8 @@ import * as moment from 'moment-timezone';
 import { UsersService } from 'src/users/users.service';
 import { CouponCodes } from './constants/coupon-codes.constant';
 import { CouponExpirationPeriod } from './enums/coupon-expiration-period.enum';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { CouponCreatedEvent } from './events/coupon-created.event';
 
 @Injectable()
 export class CouponsService {
@@ -17,6 +19,7 @@ export class CouponsService {
     private couponsRepository: CouponsRepository,
     @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async getCouponById(couponId: number): Promise<Coupon> {
@@ -109,12 +112,19 @@ export class CouponsService {
     }
 
     const user = await this.usersService.getUserById(userId);
-    return this.couponsRepository.createCouponWithUser(
+    await this.couponsRepository.createCouponWithUser(
       user,
       createCouponDto.couponTypeId,
       createCouponDto.couponCode,
       createCouponDto.expiresAt,
     );
+
+    // 쿠폰 발급된 유저에게 알림 문자 보내기
+    const couponCreatedEvent = new CouponCreatedEvent();
+    couponCreatedEvent.userId = user.id;
+    couponCreatedEvent.couponTypeId = createCouponDto.couponTypeId;
+
+    this.eventEmitter.emit('coupon.created', couponCreatedEvent);
   }
 
   async getCouponCountByTypeIdAndUserId(typeId: number, userId: number): Promise<{ couponCount: number }> {
