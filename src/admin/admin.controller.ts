@@ -307,7 +307,6 @@ export class AdminController {
 
   @ApiOperation({
     summary: '쿠폰 지급하기',
-    description: '매칭완료자 페이지에서 사용 \n\n 체크박스 선택된(채팅방 생성된) 매칭ID를 보내주시면 됩니다.',
   })
   @ApiOkResponse({ description: 'OK' })
   @Post('users/coupons/:userId')
