@@ -169,16 +169,16 @@ export class UsersService {
     const matching = team[`${ourteamGender}TeamMatching`];
 
     // 매칭 정보 X
-    if (matching === null) {
-      // CASE 1. 매칭 신청 완료 - 매칭 최대 횟수 미만
-      if (team.currentRound - team.startRound < MatchingRound.MAX_TRIAL) {
-        return { matchingStatus: MatchingStatus.APPLIED };
-      }
-      // CASE 2. 매칭 실패 - 매칭 최대 횟수 이상
-      else {
-        return { matchingStatus: MatchingStatus.FAILED };
-      }
-    }
+    // if (matching === null) {
+    //   // CASE 1. 매칭 신청 완료 - 매칭 최대 횟수 미만
+    //   if (team.currentRound - team.startRound < MatchingRound.MAX_TRIAL) {
+    //     return { matchingStatus: MatchingStatus.APPLIED };
+    //   }
+    //   // CASE 2. 매칭 실패 - 매칭 최대 횟수 이상
+    //   else {
+    //     return { matchingStatus: MatchingStatus.FAILED };
+    //   }
+    // }
 
     // 매칭 정보 O
     const partnerTeamGender = team.gender === 1 ? 'female' : 'male';

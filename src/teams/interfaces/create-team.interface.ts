@@ -1,11 +1,13 @@
 export interface CreateTeam {
   gender: number;
   memberCount: number;
-  universities: number[];
+  memberCounts: number[];
+  teamAvailableDate: number;
   areas: number[];
+  teamName: string;
   intro: string;
   drink: number;
-  prefSameUniversity: boolean;
   prefAge: number[];
   prefVibes: number[];
+  kakaoId: string;
 }
