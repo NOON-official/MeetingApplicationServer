@@ -3,7 +3,6 @@ import { MatchingStatus } from 'src/matchings/interfaces/matching-status.enum';
 import { CreateMemberDto } from './../dtos/create-team.dto';
 import { CreateTeam } from './../interfaces/create-team.interface';
 import { TeamMember } from './../entities/team-member.entity';
-import { TeamAvailableDate } from './../entities/team-available-date.entity';
 import { Team } from './../entities/team.entity';
 import { CustomRepository } from 'src/database/typeorm-ex.decorator';
 import { Repository } from 'typeorm';
@@ -15,28 +14,13 @@ import { AdminGetTeamDto } from 'src/admin/dtos/admin-get-team.dto';
 
 @CustomRepository(Team)
 export class TeamsRepository extends Repository<Team> {
-  // 최대 라운드 조회
-  async getMaxRound(): Promise<{ maxRound: number }> {
-    let { maxRound } = await this.createQueryBuilder('team').select('MAX(team.currentRound)', 'maxRound').getRawOne();
-
-    if (!maxRound) {
-      maxRound = 0;
-    }
-
-    return { maxRound };
-  }
-
   // 팀 정보 저장
   async createTeam(teamData: CreateTeam, user: User): Promise<{ teamId: number }> {
-    const { maxRound } = await this.getMaxRound();
-
     const result = await this.createQueryBuilder()
       .insert()
       .into(Team)
       .values({
         ...teamData,
-        startRound: maxRound,
-        currentRound: maxRound,
         user,
       })
       .execute();
@@ -52,19 +36,6 @@ export class TeamsRepository extends Repository<Team> {
       withDeleted: true,
     });
     return team;
-  }
-
-  // 팀 가능 날짜 저장
-  async createTeamAvailableDate(teamAvailableDates: Date[], team: Team): Promise<void> {
-    await this.createQueryBuilder()
-      .insert()
-      .into(TeamAvailableDate)
-      .values(
-        teamAvailableDates.map((date) => {
-          return { teamAvailableDate: date, team };
-        }),
-      )
-      .execute();
   }
 
   // 팀 멤버 저장
@@ -140,7 +111,7 @@ export class TeamsRepository extends Repository<Team> {
 
   async getTeamCountByStatusAndMembercountAndGender(
     status: MatchingStatus.APPLIED,
-    membercount: '2' | '3',
+    membercount: '2' | '3' | '4',
     gender: TeamGender,
   ): Promise<{ teamCount: number }> {
     const qb = this.createQueryBuilder('team');
@@ -154,8 +125,6 @@ export class TeamsRepository extends Repository<Team> {
     if (status === MatchingStatus.APPLIED) {
       // 매칭 정보 X
       qb.andWhere('matching.id IS NULL');
-      // 매칭 실패 횟수 3회 미만
-      qb.andWhere('team.currentRound - team.startRound < :maxTrial', { maxTrial: MatchingRound.MAX_TRIAL });
     }
 
     const teamCount = await qb.getCount();
@@ -171,16 +140,8 @@ export class TeamsRepository extends Repository<Team> {
       .execute();
   }
 
-  async deleteTeamAvailableDateByTeamId(teamId: number): Promise<void> {
-    await this.createQueryBuilder('team-available-date')
-      .delete()
-      .from(TeamAvailableDate)
-      .where('teamId = :teamId', { teamId })
-      .execute();
-  }
-
   async deleteTeamMemberByTeamId(teamId: number): Promise<void> {
-    await this.createQueryBuilder('team-available-date')
+    await this.createQueryBuilder('team-members')
       .delete()
       .from(TeamMember)
       .where('teamId = :teamId', { teamId })
@@ -192,28 +153,26 @@ export class TeamsRepository extends Repository<Team> {
   }
 
   // 관리자페이지 신청자 조회
-  async getAppliedTeamsByMembercountAndGender(
-    membercount: '2' | '3',
-    gender: TeamGender,
-  ): Promise<{ teams: AdminGetTeamDto[] }> {
+  async getAppliedTeamsByGender(gender: TeamGender): Promise<{ teams: AdminGetTeamDto[] }> {
     const teams = await this.createQueryBuilder('team')
       .select([
         'team.id AS teamId',
-        '(team.currentRound - team.startRound) AS matchingCount',
         'user.nickname AS nickname',
+        'team.kakaoId AS kakaoId',
+        'team.teamName AS teamName',
         'team.intro AS intro',
         'team.memberCount AS memberCount',
+        'team.memberCounts AS memberCounts',
         'user.phone AS phone',
         'CAST(SUM(members.age) / team.memberCount AS SIGNED) AS averageAge',
         'team.prefAge AS prefAge',
         'team.areas AS areas',
-        'team.universities AS universities',
-        'team.prefSameUniversity AS prefSameUniversity',
+        'user.university AS university',
+        'members.university AS universities',
         'team.drink AS drink',
         `${gender === 'male' ? 'matching.femaleTeamId' : 'matching.maleTeamId'} AS partnerTeamId`,
         `IF(team.modifiedAt IS NOT NULL, team.modifiedAt, team.createdAt) AS appliedAt`,
         'matching.createdAt AS matchedAt',
-        'team.lastFailReason AS lastFailReason',
         'user.id AS userId',
         'user.refusedUserIds AS refusedUserIds',
       ])
@@ -221,19 +180,16 @@ export class TeamsRepository extends Repository<Team> {
       .leftJoin(`team.user`, 'user')
       .leftJoin('team.teamMembers', 'members')
       // 성별, 인원수 필터링
-      .where('memberCount = :membercount', { membercount })
-      .andWhere('team.gender = :genderNum', { genderNum: gender === TeamGender.male ? 1 : 2 })
+      .where('team.gender = :genderNum', { genderNum: gender === TeamGender.male ? 1 : 2 })
       //  신청자 조회 (매칭 내역 X & 매칭 최대 횟수 미만)
       .andWhere('matching.id IS NULL')
-      .andWhere('team.currentRound - team.startRound < :maxTrial', { maxTrial: MatchingRound.MAX_TRIAL })
       .groupBy('team.id')
       .orderBy('COALESCE(team.modifiedAt, team.createdAt)', 'ASC') // modifiedAt이 있는 경우 modifiedAt 기준
       .getRawMany();
 
     teams.map((t) => {
-      t.matchingCount = Number(t.matchingCount);
       t.averageAge = Number(t.averageAge);
-      t.prefSameUniversity = Boolean(t.prefSameUniversity);
+      t.universities = [t.university, ...t.universities];
       t.failedAt = null; // 신청자 프로퍼티 추가
       t.refusedAt = null; // 신청자 프로퍼티 추가
     });
@@ -242,100 +198,90 @@ export class TeamsRepository extends Repository<Team> {
   }
 
   // 관리자페이지 수락/거절 대기자 조회
-  async getMatchedTeamsByMembercountAndGender(
-    membercount: '2' | '3',
-    gender: TeamGender,
-  ): Promise<{ teams: AdminGetTeamDto[] }> {
+  async getMatchedTeamsByGender(gender: TeamGender): Promise<{ teams: AdminGetTeamDto[] }> {
     const teams = await this.createQueryBuilder('team')
-      .select([
-        'team.id AS teamId',
-        '(team.currentRound - team.startRound) AS matchingCount',
-        'user.nickname AS nickname',
-        'team.intro AS intro',
-        'team.memberCount AS memberCount',
-        'user.phone AS phone',
-        'CAST(SUM(members.age) / team.memberCount AS SIGNED) AS averageAge',
-        'team.prefAge AS prefAge',
-        'team.areas AS areas',
-        'team.universities AS universities',
-        'team.prefSameUniversity AS prefSameUniversity',
-        'team.drink AS drink',
-        `${gender === 'male' ? 'matching.femaleTeamId' : 'matching.maleTeamId'} AS partnerTeamId`,
-        `IF(team.modifiedAt IS NOT NULL, team.modifiedAt, team.createdAt) AS appliedAt`,
-        'matching.createdAt AS matchedAt',
-        'team.lastFailReason AS lastFailReason',
-        'user.id AS userId',
-        'user.refusedUserIds AS refusedUserIds',
-      ])
+    .select([
+      'team.id AS teamId',
+      'user.nickname AS nickname',
+      'team.kakaoId AS kakaoId',
+      'team.teamName AS teamName',
+      'team.intro AS intro',
+      'team.memberCount AS memberCount',
+      'team.memberCounts AS memberCounts',
+      'user.phone AS phone',
+      'CAST(SUM(members.age) / team.memberCount AS SIGNED) AS averageAge',
+      'team.prefAge AS prefAge',
+      'team.areas AS areas',
+      'user.university AS university',
+      'members.university AS universities',
+      'team.drink AS drink',
+      `${gender === 'male' ? 'matching.femaleTeamId' : 'matching.maleTeamId'} AS partnerTeamId`,
+      `IF(team.modifiedAt IS NOT NULL, team.modifiedAt, team.createdAt) AS appliedAt`,
+      'matching.createdAt AS matchedAt',
+      'user.id AS userId',
+      'user.refusedUserIds AS refusedUserIds',
+    ])
       .leftJoin(`team.${gender}TeamMatching`, 'matching')
       .leftJoin(`team.user`, 'user')
       .leftJoin('team.teamMembers', 'members')
       // 성별, 인원수 필터링
-      .where('memberCount = :membercount', { membercount })
       .andWhere('team.gender = :genderNum', { genderNum: gender === TeamGender.male ? 1 : 2 })
       //  수락/거절 대기자 조회 (매칭 내역 O & 우리팀 무응답 & 상대팀 거절X)
       .andWhere('matching.id IS NOT NULL')
       .andWhere(`matching.${gender}TeamIsAccepted IS NULL`)
       .andWhere(`matching.${gender === 'male' ? 'female' : 'male'}TeamIsAccepted IS NOT false`)
-      // 매칭된지 24시간 이내인 경우만
-      .andWhere('DATE_ADD(matching.createdAt, INTERVAL 1 DAY) > NOW()')
+      // 매칭된지 7일 이내인 경우만
+      .andWhere('DATE_ADD(matching.createdAt, INTERVAL 7 DAY) > NOW()')
       .groupBy('team.id')
       .getRawMany();
 
     teams.map((t) => {
-      t.matchingCount = Number(t.matchingCount);
       t.averageAge = Number(t.averageAge);
-      t.prefSameUniversity = Boolean(t.prefSameUniversity);
-      t.failedAt = null; // 수락/거절 대기자 프로퍼티 추가
-      t.refusedAt = null; // 수락/거절 대기자 프로퍼티 추가
+      t.universities = [t.university, ...t.universities];
+      t.failedAt = null; // 신청자 프로퍼티 추가
+      t.refusedAt = null; // 신청자 프로퍼티 추가
     });
 
     return { teams };
   }
 
   // 관리자페이지 매칭 실패 회원 조회
-  async getFailedTeamsByMembercountAndGender(
-    membercount: '2' | '3',
-    gender: TeamGender,
-  ): Promise<{ teams: AdminGetTeamDto[] }> {
+  async getFailedTeamsByMembercountAndGender(gender: TeamGender): Promise<{ teams: AdminGetTeamDto[] }> {
     const teams = await this.createQueryBuilder('team')
-      .select([
-        'team.id AS teamId',
-        '(team.currentRound - team.startRound) AS matchingCount',
-        'user.nickname AS nickname',
-        'team.intro AS intro',
-        'team.memberCount AS memberCount',
-        'user.phone AS phone',
-        'CAST(SUM(members.age) / team.memberCount AS SIGNED) AS averageAge',
-        'team.prefAge AS prefAge',
-        'team.areas AS areas',
-        'team.universities AS universities',
-        'team.prefSameUniversity AS prefSameUniversity',
-        'team.drink AS drink',
-        `${gender === 'male' ? 'matching.femaleTeamId' : 'matching.maleTeamId'} AS partnerTeamId`,
-        `IF(team.modifiedAt IS NOT NULL, team.modifiedAt, team.createdAt) AS appliedAt`,
-        'matching.createdAt AS matchedAt',
-        'team.updatedAt AS failedAt',
-        'team.lastFailReason AS lastFailReason',
-        'user.id AS userId',
-        'user.refusedUserIds AS refusedUserIds',
-      ])
+    .select([
+      'team.id AS teamId',
+      'user.nickname AS nickname',
+      'team.kakaoId AS kakaoId',
+      'team.teamName AS teamName',
+      'team.intro AS intro',
+      'team.memberCount AS memberCount',
+      'team.memberCounts AS memberCounts',
+      'user.phone AS phone',
+      'CAST(SUM(members.age) / team.memberCount AS SIGNED) AS averageAge',
+      'team.prefAge AS prefAge',
+      'team.areas AS areas',
+      'user.university AS university',
+      'members.university AS universities',
+      'team.drink AS drink',
+      `${gender === 'male' ? 'matching.femaleTeamId' : 'matching.maleTeamId'} AS partnerTeamId`,
+      `IF(team.modifiedAt IS NOT NULL, team.modifiedAt, team.createdAt) AS appliedAt`,
+      'matching.createdAt AS matchedAt',
+      'user.id AS userId',
+      'user.refusedUserIds AS refusedUserIds',
+    ])
       .leftJoin(`team.${gender}TeamMatching`, 'matching')
       .leftJoin(`team.user`, 'user')
       .leftJoin('team.teamMembers', 'members')
       // 성별, 인원수 필터링
-      .where('memberCount = :membercount', { membercount })
       .andWhere('team.gender = :genderNum', { genderNum: gender === TeamGender.male ? 1 : 2 })
       // 매칭 실패 회원 조회 (매칭 내역 X & 매칭 최대 횟수 이상)
       .andWhere('matching.id IS NULL')
-      .andWhere('team.currentRound - team.startRound >= :maxTrial', { maxTrial: MatchingRound.MAX_TRIAL })
       .groupBy('team.id')
       .getRawMany();
 
     teams.map((t) => {
-      t.matchingCount = Number(t.matchingCount);
       t.averageAge = Number(t.averageAge);
-      t.prefSameUniversity = Boolean(t.prefSameUniversity);
+      t.universities = [t.university, ...t.universities];
       t.refusedAt = null; // 수락/거절 대기자 프로퍼티 추가
     });
 
@@ -343,74 +289,56 @@ export class TeamsRepository extends Repository<Team> {
   }
 
   // 관리자페이지 거절 당한 회원 조회
-  async getPartnerTeamRefusedTeamsByMembercountAndGender(
-    membercount: '2' | '3',
-    gender: TeamGender,
-  ): Promise<{ teams: AdminGetTeamDto[] }> {
+  async getPartnerTeamRefusedTeamsByGender(gender: TeamGender): Promise<{ teams: AdminGetTeamDto[] }> {
     const teams = await this.createQueryBuilder('team')
-      .select([
-        'team.id AS teamId',
-        '(team.currentRound - team.startRound) AS matchingCount',
-        'user.nickname AS nickname',
-        'team.intro AS intro',
-        'team.memberCount AS memberCount',
-        'user.phone AS phone',
-        'CAST(SUM(members.age) / team.memberCount AS SIGNED) AS averageAge',
-        'team.prefAge AS prefAge',
-        'team.areas AS areas',
-        'team.universities AS universities',
-        'team.prefSameUniversity AS prefSameUniversity',
-        'team.drink AS drink',
-        `${gender === 'male' ? 'matching.femaleTeamId' : 'matching.maleTeamId'} AS partnerTeamId`,
-        `IF(team.modifiedAt IS NOT NULL, team.modifiedAt, team.createdAt) AS appliedAt`,
-        'matching.createdAt AS matchedAt',
-        `IF(matching.${
-          gender === 'male' ? 'female' : 'male'
-        }TeamIsAccepted IS NULL, DATE_ADD(matching.createdAt, INTERVAL 1 DAY), matching.updatedAt) AS refusedAt`, // 무응답인 경우 매칭일시 + 1일을 거절 시간으로 반환
-        'team.lastFailReason AS lastFailReason',
-        'user.id AS userId',
-        'user.refusedUserIds AS refusedUserIds',
-      ])
+    .select([
+      'team.id AS teamId',
+      'user.nickname AS nickname',
+      'team.kakaoId AS kakaoId',
+      'team.teamName AS teamName',
+      'team.intro AS intro',
+      'team.memberCount AS memberCount',
+      'team.memberCounts AS memberCounts',
+      'user.phone AS phone',
+      'CAST(SUM(members.age) / team.memberCount AS SIGNED) AS averageAge',
+      'team.prefAge AS prefAge',
+      'team.areas AS areas',
+      'user.university AS university',
+      'members.university AS universities',
+      'team.drink AS drink',
+      `${gender === 'male' ? 'matching.femaleTeamId' : 'matching.maleTeamId'} AS partnerTeamId`,
+      `IF(team.modifiedAt IS NOT NULL, team.modifiedAt, team.createdAt) AS appliedAt`,
+      'matching.createdAt AS matchedAt',
+      'user.id AS userId',
+      'user.refusedUserIds AS refusedUserIds',
+    ])
       .leftJoin(`team.${gender}TeamMatching`, 'matching')
       .leftJoin(`team.user`, 'user')
       .leftJoin('team.teamMembers', 'members')
       // 성별, 인원수 필터링
-      .where('memberCount = :membercount', { membercount })
       .andWhere('team.gender = :genderNum', { genderNum: gender === TeamGender.male ? 1 : 2 })
       // 거절 당한 회원 조회 (매칭 내역 O & 상대팀 거절/무응답)
       .andWhere('matching.id IS NOT NULL')
       // 우리팀이 거절한 경우는 제외
       .andWhere(`matching.${gender}TeamIsAccepted IS NOT false`)
-      // 상대팀이 거절했거나 OR 우리팀이 수락하고 상대팀이 24시간 이내 무응답한 경우
+      // 상대팀이 거절했거나 OR 우리팀이 수락하고 상대팀이 7일 이내 무응답한 경우
       .andWhere(
         `(matching.${
           gender === 'male' ? 'female' : 'male'
         }TeamIsAccepted IS false OR (matching.${gender}TeamIsAccepted IS true AND matching.${
           gender === 'male' ? 'female' : 'male'
-        }TeamIsAccepted IS NULL AND DATE_ADD(matching.createdAt, INTERVAL 1 DAY) < NOW()))`,
+        }TeamIsAccepted IS NULL AND DATE_ADD(matching.createdAt, INTERVAL 7 DAY) < NOW()))`,
       )
       .groupBy('team.id')
       .getRawMany();
 
     teams.map((t) => {
-      t.matchingCount = Number(t.matchingCount);
       t.averageAge = Number(t.averageAge);
-      t.prefSameUniversity = Boolean(t.prefSameUniversity);
+      t.universities = [t.university, ...t.universities];
       t.failedAt = null; // 거절 당한 회원 프로퍼티 추가
     });
 
     return { teams };
-  }
-
-  async updateCurrentRound(teamIds: number[], currentRound: number): Promise<void> {
-    await this.createQueryBuilder().update(Team).whereInIds(teamIds).set({ currentRound }).execute();
-  }
-
-  async updateLastFailReasons(teamIds: number[], reasons: string[]): Promise<void> {
-    const promises = teamIds.map((id, i) =>
-      this.createQueryBuilder().update(Team).where('id = :id', { id }).set({ lastFailReason: reasons[i] }).execute(),
-    );
-    await Promise.all(promises);
   }
 
   // 상대팀 무응답이고, 아직 환불되지 않은 팀 조회
@@ -431,11 +359,11 @@ export class TeamsRepository extends Repository<Team> {
       .where('team.gender = :genderNum', { genderNum: gender === TeamGender.male ? 1 : 2 })
       // 매칭 내역 O
       .andWhere('matching.id IS NOT NULL')
-      // 우리팀이 수락하고 상대팀이 24시간 이내 무응답한 경우
+      // 우리팀이 수락하고 상대팀이 7일 이내 무응답한 경우
       .andWhere(
         `matching.${gender}TeamIsAccepted IS true AND matching.${
           gender === 'male' ? 'female' : 'male'
-        }TeamIsAccepted IS NULL AND DATE_ADD(matching.createdAt, INTERVAL 1 DAY) < NOW()`,
+        }TeamIsAccepted IS NULL AND DATE_ADD(matching.createdAt, INTERVAL 7 DAY) < NOW()`,
       )
       // 아직 이용권 환불받지 않은 경우
       .andWhere(`matching.${gender}TeamTicketId IS NOT NULL`)

@@ -35,8 +35,18 @@ export class CreateMemberDto {
   @IsNotEmpty()
   @IsInt()
   @Min(1)
-  @Max(16)
+  @Max(17)
   readonly mbti: number;
+
+  @ApiProperty({
+    description: '대학교',
+    example: 1,
+    required: true,
+  })
+  @IsInt()
+  @Min(1)
+  @Max(450)
+  readonly university: number;
 
   @ApiProperty({
     description: '닮은꼴',
@@ -60,17 +70,6 @@ export class CreateMemberDto {
 
 export class CreateTeamDto {
   @ApiProperty({
-    description: '성별',
-    example: 1,
-    required: true,
-  })
-  @IsNotEmpty()
-  @IsInt()
-  @Min(1)
-  @Max(2)
-  readonly gender: number;
-
-  @ApiProperty({
     description: '인원수',
     example: 2,
     required: true,
@@ -78,31 +77,27 @@ export class CreateTeamDto {
   @IsNotEmpty()
   @IsInt()
   @Min(2)
-  @Max(3)
+  @Max(4)
   readonly memberCount: number;
 
   @ApiProperty({
-    description: '대학교',
-    example: [1, 42, 345],
-    required: true,
+    description: '인원 변경 가능',
+    example: [2,3],
   })
   @IsInt({ each: true })
-  @Min(1, { each: true })
-  @Max(450, { each: true })
-  @ArrayMinSize(0)
-  @ArrayMaxSize(3)
-  readonly universities?: number[];
+  @ArrayMaxSize(2)
+  readonly memberCounts: number[];
 
   @ApiProperty({
-    description: '미팅 선호 날짜',
-    example: ['2023-01-23', '2023-01-24', '2023-01-25', '2023-01-26'],
+    description: '미팅 선호 일정',
+    example: 3,
     required: true,
   })
   @IsNotEmpty()
-  @IsDate({ each: true })
-  @Type(() => Date)
-  @ArrayMinSize(4)
-  readonly availableDates: Date[];
+  @IsInt()
+  @Min(1)
+  @Max(3)
+  readonly teamAvailableDate: number;
 
   @ApiProperty({
     description: '지역',
@@ -126,8 +121,17 @@ export class CreateTeamDto {
   @ValidateNested({ each: true })
   @Type(() => CreateMemberDto)
   @ArrayMinSize(2)
-  @ArrayMaxSize(3)
+  @ArrayMaxSize(4)
   readonly members: CreateMemberDto[];
+
+  @ApiProperty({
+    description: '팀명',
+    example: '기웅내세요',
+    required: true,
+  })
+  @IsNotEmpty()
+  @IsString()
+  readonly teamName: string;
 
   @ApiProperty({
     description: '한 줄 소개',
@@ -148,15 +152,6 @@ export class CreateTeamDto {
   @Min(1)
   @Max(5)
   readonly drink: number;
-
-  @ApiProperty({
-    description: '상대방 학교',
-    example: true,
-    required: true,
-  })
-  @IsNotEmpty()
-  @IsBoolean()
-  readonly prefSameUniversity: boolean;
 
   @ApiProperty({
     description: '상대방 선호 나이',
@@ -183,4 +178,14 @@ export class CreateTeamDto {
   @ArrayMinSize(1)
   @ArrayMaxSize(5)
   readonly prefVibes: number[];
+
+  @ApiProperty({
+    description: '카카오 아이디',
+    example: 'kiwoong',
+    required: true,
+  })
+  @IsNotEmpty()
+  @IsString()
+  readonly kakaoId: string;
+
 }

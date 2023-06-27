@@ -7,16 +7,22 @@ export class AdminGetTeamDto {
   teamId: number;
 
   @ApiProperty({
-    description: '매칭 횟수 (최소 0, 최대 2)',
-    example: 0,
-  })
-  matchingCount: number;
-
-  @ApiProperty({
     description: '유저 닉네임',
     example: '미팅이',
   })
   nickname: string;
+
+  @ApiProperty({
+    description: '카카오 아이디',
+    example: 'k_woong',
+  })
+  kakaoId: string;
+
+  @ApiProperty({
+    description: '팀 이름',
+    example: '한솔이와 친구들',
+  })
+  teamName: string;
 
   @ApiProperty({
     description: '한 줄 소개',
@@ -29,6 +35,12 @@ export class AdminGetTeamDto {
     example: 2,
   })
   memberCount: number;
+
+  @ApiProperty({
+    description: '가능 인원수',
+    example: [3, 4],
+  })
+  memberCounts: number[];
 
   @ApiProperty({
     description: '핸드폰 번호',
@@ -61,12 +73,6 @@ export class AdminGetTeamDto {
   universities?: number[];
 
   @ApiProperty({
-    description: '상대방 학교 같은 대학 허용여부',
-    example: true,
-  })
-  prefSameUniversity: boolean;
-
-  @ApiProperty({
     description: '주량 레벨',
     example: 5,
   })
@@ -95,12 +101,6 @@ export class AdminGetTeamDto {
     example: '2023-01-20T21:37:26.886Z',
   })
   failedAt?: Date;
-
-  @ApiProperty({
-    description: '마지막 실패 이유',
-    example: 'Date',
-  })
-  lastFailReason?: string;
 
   @ApiProperty({
     description: '거절당한 일시',

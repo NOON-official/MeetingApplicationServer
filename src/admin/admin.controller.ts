@@ -234,28 +234,28 @@ export class AdminController {
     return this.adminService.deleteInvitationSuccessByUserId(userId);
   }
 
-  @ApiOperation({
-    summary: '매칭 적용(매칭 알고리즘)',
-    description: '관리자페이지 내 사용',
-  })
-  @ApiOkResponse({ description: 'OK' })
-  @Post('matchings')
-  postMatchings(): Promise<void> {
-    return this.adminService.doMatching();
-  }
+  // @ApiOperation({
+  //   summary: '매칭 적용(매칭 알고리즘)',
+  //   description: '관리자페이지 내 사용',
+  // })
+  // @ApiOkResponse({ description: 'OK' })
+  // @Post('matchings')
+  // postMatchings(): Promise<void> {
+  //   return this.adminService.doMatching();
+  // }
 
-  @ApiOperation({
-    summary: '매칭 적용(수동 매칭)',
-    description: '관리자페이지 내 사용 \n\n 남자팀과 여자팀을 1:1 수동 매칭',
-  })
-  @ApiOkResponse({ description: 'OK' })
-  @Post('matchings/:maleTeamId/:femaleTeamId')
-  postMatchingsMaleTeamIdFemaleTeamId(
-    @Param('maleTeamId') maleTeamId: number,
-    @Param('femaleTeamId') femaleTeamId: number,
-  ): Promise<void> {
-    return this.adminService.createMatchingByMaleTeamIdAndFemaleTeamId(maleTeamId, femaleTeamId);
-  }
+  // @ApiOperation({
+  //   summary: '매칭 적용(수동 매칭)',
+  //   description: '관리자페이지 내 사용 \n\n 남자팀과 여자팀을 1:1 수동 매칭',
+  // })
+  // @ApiOkResponse({ description: 'OK' })
+  // @Post('matchings/:maleTeamId/:femaleTeamId')
+  // postMatchingsMaleTeamIdFemaleTeamId(
+  //   @Param('maleTeamId') maleTeamId: number,
+  //   @Param('femaleTeamId') femaleTeamId: number,
+  // ): Promise<void> {
+  //   return this.adminService.createMatchingByMaleTeamIdAndFemaleTeamId(maleTeamId, femaleTeamId);
+  // }
 
   @ApiOperation({
     summary: '매칭완료자 조회',

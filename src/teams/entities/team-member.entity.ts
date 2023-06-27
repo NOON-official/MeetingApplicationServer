@@ -10,8 +10,11 @@ export class TeamMember extends BaseEntity {
   @Column({ type: 'int' })
   role: number;
 
-  @Column({ type: 'int' })
+  @Column({ type: 'int', default:17 })
   mbti: number;
+
+  @Column({ type: 'int' })
+  university: number;
 
   @Column({ type: 'varchar', length: 50, nullable: true })
   appearance: string;
