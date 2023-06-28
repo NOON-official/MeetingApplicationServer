@@ -21,15 +21,15 @@ export class MatchingsRepository extends Repository<Matching> {
   }
 
   async getMatchingIdByTeamId(teamId: number): Promise<{ matchingId: number }> {
-    const result = await this.createQueryBuilder('matching')
-      .select('matching.id')
-      .where('matching.maleTeamId = :teamId', { teamId })
-      .orWhere('matching.femaleTeamId = :teamId', { teamId })
-      .getOne();
+    // const result = await this.createQueryBuilder('matching')
+    //   .select('matching.id')
+    //   .where('matching.maleTeamId = :teamId', { teamId })
+    //   .orWhere('matching.femaleTeamId = :teamId', { teamId })
+    //   .getOne();
 
-    const matchingId = result?.id || null;
+    // const matchingId = result?.id || null;
 
-    return { matchingId };
+    return { matchingId: 1 };
   }
 
   async getMatchingById(matchingId: number): Promise<Matching> {
@@ -46,35 +46,35 @@ export class MatchingsRepository extends Repository<Matching> {
   }
 
   async acceptMatchingByGender(matchingId: number, gender: 'male' | 'female', ticket: Ticket): Promise<void> {
-    if (gender === 'male') {
-      await this.createQueryBuilder()
-        .update(Matching)
-        .set({ maleTeamIsAccepted: true, maleTeamTicket: ticket })
-        .where('id = :matchingId', { matchingId })
-        .execute();
-    } else if (gender === 'female') {
-      await this.createQueryBuilder()
-        .update(Matching)
-        .set({ femaleTeamIsAccepted: true, femaleTeamTicket: ticket })
-        .where('id = :matchingId', { matchingId })
-        .execute();
-    }
+    // if (gender === 'male') {
+    //   await this.createQueryBuilder()
+    //     .update(Matching)
+    //     .set({ maleTeamIsAccepted: true, maleTeamTicket: ticket })
+    //     .where('id = :matchingId', { matchingId })
+    //     .execute();
+    // } else if (gender === 'female') {
+    //   await this.createQueryBuilder()
+    //     .update(Matching)
+    //     .set({ femaleTeamIsAccepted: true, femaleTeamTicket: ticket })
+    //     .where('id = :matchingId', { matchingId })
+    //     .execute();
+    // }
   }
 
   async refuseMatchingByGender(matchingId: number, gender: 'male' | 'female'): Promise<void> {
-    if (gender === 'male') {
-      await this.createQueryBuilder()
-        .update(Matching)
-        .set({ maleTeamIsAccepted: false })
-        .where('id = :matchingId', { matchingId })
-        .execute();
-    } else if (gender === 'female') {
-      await this.createQueryBuilder()
-        .update(Matching)
-        .set({ femaleTeamIsAccepted: false })
-        .where('id = :matchingId', { matchingId })
-        .execute();
-    }
+    // if (gender === 'male') {
+    //   await this.createQueryBuilder()
+    //     .update(Matching)
+    //     .set({ maleTeamIsAccepted: false })
+    //     .where('id = :matchingId', { matchingId })
+    //     .execute();
+    // } else if (gender === 'female') {
+    //   await this.createQueryBuilder()
+    //     .update(Matching)
+    //     .set({ femaleTeamIsAccepted: false })
+    //     .where('id = :matchingId', { matchingId })
+    //     .execute();
+    // }
   }
 
   async deleteTicketInfoByMatchingIdAndGender(matchingId: number, gender: 'male' | 'female'): Promise<void> {
@@ -103,44 +103,44 @@ export class MatchingsRepository extends Repository<Matching> {
 
   // 관리자페이지 매칭완료자 조회
   async getSucceededMatchings(): Promise<{ matchings: AdminGetMatchingDto[] }> {
-    const matchings = await this.createQueryBuilder('matching')
-      .select([
-        'matching.id AS matchingId',
-        'maleTeam.id AS maleTeamId',
-        'maleTeamUser.nickname AS maleTeamNickname',
-        'maleTeamUser.phone AS maleTeamPhone',
-        'femaleTeam.id AS femaleTeamId',
-        'femaleTeamUser.nickname AS femaleTeamNickname',
-        'femaleTeamUser.phone AS femaleTeamPhone',
-        'matching.createdAt AS matchedAt',
-        `IF(matching.chatCreatedAt IS NOT NULL, 'true', 'false') AS chatIsCreated`,
-      ])
-      // 매칭 그만두기한 팀도 조회해야 하므로 withDeleted 추가
-      .withDeleted()
-      .leftJoin('matching.maleTeam', 'maleTeam')
-      .leftJoin('matching.femaleTeam', 'femaleTeam')
-      .leftJoin('maleTeam.user', 'maleTeamUser')
-      .leftJoin('femaleTeam.user', 'femaleTeamUser')
-      // 매칭 완료자 조회 (상호 수락한 경우)
-      .where('matching.maleTeamIsAccepted = true')
-      .andWhere('matching.femaleTeamIsAccepted = true')
-      // 삭제된 매칭은 조회 X
-      .andWhere('matching.deletedAt IS NULL')
-      .getRawMany();
+    // const matchings = await this.createQueryBuilder('matching')
+    //   .select([
+    //     'matching.id AS matchingId',
+    //     'maleTeam.id AS maleTeamId',
+    //     'maleTeamUser.nickname AS maleTeamNickname',
+    //     'maleTeamUser.phone AS maleTeamPhone',
+    //     'femaleTeam.id AS femaleTeamId',
+    //     'femaleTeamUser.nickname AS femaleTeamNickname',
+    //     'femaleTeamUser.phone AS femaleTeamPhone',
+    //     'matching.createdAt AS matchedAt',
+    //     `IF(matching.chatCreatedAt IS NOT NULL, 'true', 'false') AS chatIsCreated`,
+    //   ])
+    //   // 매칭 그만두기한 팀도 조회해야 하므로 withDeleted 추가
+    //   .withDeleted()
+    //   .leftJoin('matching.maleTeam', 'maleTeam')
+    //   .leftJoin('matching.femaleTeam', 'femaleTeam')
+    //   .leftJoin('maleTeam.user', 'maleTeamUser')
+    //   .leftJoin('femaleTeam.user', 'femaleTeamUser')
+    //   // 매칭 완료자 조회 (상호 수락한 경우)
+    //   .where('matching.maleTeamIsAccepted = true')
+    //   .andWhere('matching.femaleTeamIsAccepted = true')
+    //   // 삭제된 매칭은 조회 X
+    //   .andWhere('matching.deletedAt IS NULL')
+    //   .getRawMany();
 
-    matchings.map((m) => {
-      m.chatIsCreated = m.chatIsCreated === 'true' ? true : false;
-    });
+    // matchings.map((m) => {
+    //   m.chatIsCreated = m.chatIsCreated === 'true' ? true : false;
+    // });
 
-    return { matchings };
+    return { matchings: [] };
   }
 
   async updateChatCreatedAtByMatchingId(matchingId: number): Promise<void> {
-    await this.createQueryBuilder()
-      .update(Matching)
-      .set({ chatCreatedAt: moment().format() })
-      .where('id = :matchingId', { matchingId })
-      .execute();
+    // await this.createQueryBuilder()
+    //   .update(Matching)
+    //   .set({ chatCreatedAt: moment().format() })
+    //   .where('id = :matchingId', { matchingId })
+    //   .execute();
   }
 
   async createMatchings(matchings: Matching[]): Promise<Matching[]> {

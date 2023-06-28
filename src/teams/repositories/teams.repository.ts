@@ -53,26 +53,27 @@ export class TeamsRepository extends Repository<Team> {
 
   // 유저 신청 내역 조회
   async getTeamsByUserId(userId: number): Promise<{ teamsWithMatching: Team[] }> {
-    // 팀 성별 가져오기
-    const result = await this.createQueryBuilder('team')
-      .select('team.gender')
-      .where('team.ownerId = :userId', { userId })
-      .withDeleted()
-      .getOne();
+    // // 팀 성별 가져오기
+    // const result = await this.createQueryBuilder('team')
+    //   .select('team.gender')
+    //   .where('team.ownerId = :userId', { userId })
+    //   .withDeleted()
+    //   .getOne();
 
-    const teamGender = result?.gender ?? null; // 신청 정보가 없는 경우 null 저장
+    // const teamGender = result?.gender ?? null; // 신청 정보가 없는 경우 null 저장
 
-    // 팀 + 매칭 기록 조회
-    const teamsWithMatching = await this.createQueryBuilder('team')
-      .leftJoinAndSelect(teamGender === 1 ? 'team.maleTeamMatching' : 'team.femaleTeamMatching', 'matching')
-      .where('team.ownerId = :userId', { userId })
-      .orderBy({
-        'team.createdAt': 'ASC',
-      })
-      .withDeleted()
-      .getMany();
+    // // 팀 + 매칭 기록 조회
+    // const teamsWithMatching = await this.createQueryBuilder('team')
+    //   .leftJoinAndSelect(teamGender === 1 ? 'team.maleTeamMatching' : 'team.femaleTeamMatching', 'matching')
+    //   .where('team.ownerId = :userId', { userId })
+    //   .orderBy({
+    //     'team.createdAt': 'ASC',
+    //   })
+    //   .withDeleted()
+    //   .getMany();
 
-    return { teamsWithMatching };
+    // return { teamsWithMatching };
+    return { teamsWithMatching: [] };
   }
 
   async getTeamIdByUserId(userId: number): Promise<{ teamId: number }> {

@@ -42,7 +42,7 @@ export class MatchingsController {
   }
 
   @ApiOperation({
-    summary: '매칭 정보 조회',
+    summary: '매칭 정보 조회 (📌is updating)',
     description:
       '매칭 정보가 없는 경우 null 반환 \n\n createdAt 기준 24시간 이상 초과 & 상대팀 무응답인 경우 -> 거절당함 페이지 \n\n createdAt 기준 24시간 이상 초과 & 상대팀 거절인 경우 -> 거절당함 페이지',
   })
@@ -59,7 +59,7 @@ export class MatchingsController {
   }
 
   @ApiOperation({
-    summary: '매칭 수락하기',
+    summary: '매칭 수락하기 (📌is updating)',
     description:
       '이용권 1개 차감 \n\n 추후 상대팀이 거절한 경우 이용권 환불됨 \n\n 상대팀이 이미 거절한 경우/이용권이 없는 경우 400에러 발생',
   })
@@ -75,7 +75,7 @@ export class MatchingsController {
   }
 
   @ApiOperation({
-    summary: '매칭 거절하기',
+    summary: '매칭 거절하기 (📌is updating)',
     description: '상대팀 이용권 환불 필요',
   })
   @ApiOkResponse({ description: 'OK' })
