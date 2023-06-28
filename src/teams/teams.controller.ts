@@ -195,7 +195,7 @@ export class TeamsController {
 
   @ApiBearerAuth()
   @ApiOperation({
-    summary: '팀의 매칭ID 조회',
+    summary: '팀의 매칭ID 조회 (📌is updating)',
     description: '매칭 정보가 없는 경우 null 반환',
   })
   @ApiOkResponse({

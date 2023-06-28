@@ -74,7 +74,7 @@ export class UsersController {
         phone: '01012345678',
         gender: 'male',
         university: 1,
-        birth: 1996
+        birth: 1996,
       },
     },
   })
@@ -86,8 +86,7 @@ export class UsersController {
 
   @ApiOperation({
     summary: '유저의 추가 정보 저장',
-    description:
-      '성별, 출생년도를 추가로 저장합니다.',
+    description: '성별, 출생년도를 추가로 저장합니다.',
   })
   @ApiOkResponse({ description: 'OK' })
   @Patch('my-info')
@@ -98,8 +97,7 @@ export class UsersController {
 
   @ApiOperation({
     summary: '유저의 대학교 정보 저장',
-    description:
-      '대학교를 추가로 저장합니다.',
+    description: '대학교를 추가로 저장합니다.',
   })
   @ApiOkResponse({ description: 'OK' })
   @Patch('university')
@@ -109,7 +107,7 @@ export class UsersController {
   }
 
   @ApiOperation({
-    summary: '신청 내역 조회',
+    summary: '신청 내역 조회 (📌is updating)',
     description: '인원수, 신청날짜 반환 \n\n chatCreatedAt이 null이 아닌 경우 "매칭 완료"로 표시해주세요.',
   })
   @ApiOkResponse({
@@ -248,7 +246,7 @@ export class UsersController {
   }
 
   @ApiOperation({
-    summary: '유저 매칭 상태 조회',
+    summary: '유저 매칭 상태 조회 (📌is updating)',
     description:
       '매칭 신청 전인 경우 matchingStatus: null \n\n matchingStatus: APPLIED / FAILED / MATCHED / OURTEAM_ACCEPTED / SUCCEEDED / PARTNER_TEAM_REFUSED / OURTEAM_REFUSED / NOT_RESPONDED',
   })

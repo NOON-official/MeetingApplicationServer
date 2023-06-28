@@ -47,7 +47,7 @@ export class TeamsService {
       prefAge,
       prefVibes,
       members,
-      kakaoId
+      kakaoId,
     } = createTeamDto;
 
     // 이미 매칭중인 팀이 있는 경우
@@ -61,7 +61,19 @@ export class TeamsService {
 
     // 팀 정보 저장
     const { teamId } = await this.teamsRepository.createTeam(
-      { gender, memberCount, teamAvailableDate, areas, teamName, intro, drink, prefAge, prefVibes, memberCounts, kakaoId },
+      {
+        gender,
+        memberCount,
+        teamAvailableDate,
+        areas,
+        teamName,
+        intro,
+        drink,
+        prefAge,
+        prefVibes,
+        memberCounts,
+        kakaoId,
+      },
       user,
     );
 
@@ -77,12 +89,13 @@ export class TeamsService {
   // 신청 내역 조회
   async getTeamsByUserId(userId: number): Promise<{ teams: UserTeam[] }> {
     const { teamsWithMatching } = await this.teamsRepository.getTeamsByUserId(userId);
-    const teams = teamsWithMatching.map((t) => ({
-      id: t.id,
-      memberCount: t.memberCount,
-      createdAt: t.createdAt,
-      chatCreatedAt: (t.maleTeamMatching || t.femaleTeamMatching)?.chatCreatedAt ?? null,
-    }));
+    // const teams = teamsWithMatching.map((t) => ({
+    //   id: t.id,
+    //   memberCount: t.memberCount,
+    //   createdAt: t.createdAt,
+    //   chatCreatedAt: (t.maleTeamMatching || t.femaleTeamMatching)?.chatCreatedAt ?? null,
+    // }));
+    const teams = [];
 
     return { teams };
   }
@@ -175,7 +188,6 @@ export class TeamsService {
     if (female4 < MatchingRound.MIN_TEAM) female4 = MatchingRound.MIN_TEAM;
     if (female4 > MatchingRound.MAX_TEAM) female4 = MatchingRound.MAX_TEAM;
 
-
     return {
       teamsPerRound,
       '2vs2': {
@@ -234,7 +246,7 @@ export class TeamsService {
       prefAge,
       prefVibes,
       members,
-      kakaoId
+      kakaoId,
     } = updateTeamDto;
 
     // Team 테이블 정보 업데이트
@@ -248,7 +260,7 @@ export class TeamsService {
       drink,
       prefAge,
       prefVibes,
-      kakaoId
+      kakaoId,
     });
 
     // 팀 멤버 정보 있는 경우 row 삭제 후 다시 생성
@@ -308,7 +320,7 @@ export class TeamsService {
       drink: existingTeam.drink,
       prefAge: existingTeam.prefAge,
       prefVibes: existingTeam.prefVibes,
-      kakaoId: existingTeam.kakaoId
+      kakaoId: existingTeam.kakaoId,
     };
 
     // 2. 새로운 팀 생성하기

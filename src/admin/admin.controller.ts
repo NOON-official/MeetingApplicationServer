@@ -258,7 +258,7 @@ export class AdminController {
   // }
 
   @ApiOperation({
-    summary: '매칭완료자 조회',
+    summary: '매칭완료자 조회 (📌is updating)',
     description: 'chatIsCreated가 true일 경우 체크박스 채워주세요!',
   })
   @ApiOkResponse({
@@ -286,7 +286,7 @@ export class AdminController {
   }
 
   @ApiOperation({
-    summary: '채팅방 생성 여부 저장',
+    summary: '채팅방 생성 여부 저장 (📌is updating)',
     description: '매칭 완료자 조회 페이지에서 체크 박스 선택 시 해당 API 호출해서 저장해주시면 됩니다',
   })
   @ApiOkResponse({ description: 'OK' })
