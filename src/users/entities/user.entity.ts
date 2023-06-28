@@ -38,7 +38,7 @@ export class User extends BaseEntity {
   @Column({ type: 'varchar', length: 10, nullable: true })
   ageRange: string;
 
-  @Column({ type: 'json', nullable:true })
+  @Column({ type: 'int', nullable:true })
   university: number;
 
   @Column({ type: 'int', nullable: true })

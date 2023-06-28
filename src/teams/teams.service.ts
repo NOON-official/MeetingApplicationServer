@@ -21,7 +21,6 @@ import { Vibes } from './constants/vibes';
 import { UpdateTeamDto } from './dtos/update-team.dto';
 import { Team } from './entities/team.entity';
 import { AdminGetTeamDto } from 'src/admin/dtos/admin-get-team.dto';
-import { TeamAvailableDatesRepository } from './repositories/team-available-dates.repository';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { AdminGetOurteamRefusedTeamDto } from 'src/admin/dtos/admin-get-ourteam-refused-team.dto';
 
@@ -29,7 +28,6 @@ import { AdminGetOurteamRefusedTeamDto } from 'src/admin/dtos/admin-get-ourteam-
 export class TeamsService {
   constructor(
     private teamsRepository: TeamsRepository,
-    private teamAvailableDatesRepository: TeamAvailableDatesRepository,
     @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
     @Inject(forwardRef(() => MatchingsService))
@@ -39,17 +37,17 @@ export class TeamsService {
 
   async createTeam(createTeamDto: CreateTeamDto, userId: number): Promise<void> {
     const {
-      gender,
       memberCount,
-      universities,
+      memberCounts,
+      teamAvailableDate,
       areas,
+      teamName,
       intro,
       drink,
-      prefSameUniversity,
       prefAge,
       prefVibes,
-      availableDates,
       members,
+      kakaoId,
     } = createTeamDto;
 
     // 이미 매칭중인 팀이 있는 경우
@@ -59,17 +57,27 @@ export class TeamsService {
     }
 
     const user = await this.usersService.getUserById(userId);
+    const gender = user.gender === 'male' ? 1 : 2;
 
     // 팀 정보 저장
     const { teamId } = await this.teamsRepository.createTeam(
-      { gender, memberCount, universities, areas, intro, drink, prefSameUniversity, prefAge, prefVibes },
+      {
+        gender,
+        memberCount,
+        teamAvailableDate,
+        areas,
+        teamName,
+        intro,
+        drink,
+        prefAge,
+        prefVibes,
+        memberCounts,
+        kakaoId,
+      },
       user,
     );
 
     const team = await this.getTeamById(teamId);
-
-    // 팀 가능 날짜 저장
-    await this.teamsRepository.createTeamAvailableDate(availableDates, team);
 
     // 팀 멤버 저장
     await this.teamsRepository.createTeamMember(members, team);
@@ -81,12 +89,13 @@ export class TeamsService {
   // 신청 내역 조회
   async getTeamsByUserId(userId: number): Promise<{ teams: UserTeam[] }> {
     const { teamsWithMatching } = await this.teamsRepository.getTeamsByUserId(userId);
-    const teams = teamsWithMatching.map((t) => ({
-      id: t.id,
-      memberCount: t.memberCount,
-      createdAt: t.createdAt,
-      chatCreatedAt: (t.maleTeamMatching || t.femaleTeamMatching)?.chatCreatedAt ?? null,
-    }));
+    // const teams = teamsWithMatching.map((t) => ({
+    //   id: t.id,
+    //   memberCount: t.memberCount,
+    //   createdAt: t.createdAt,
+    //   chatCreatedAt: (t.maleTeamMatching || t.femaleTeamMatching)?.chatCreatedAt ?? null,
+    // }));
+    const teams = [];
 
     return { teams };
   }
@@ -105,7 +114,7 @@ export class TeamsService {
 
   async getTeamCountByStatusAndMembercountAndGender(
     status: MatchingStatus.APPLIED,
-    membercount: '2' | '3',
+    membercount: '2' | '3' | '4',
     gender: TeamGender,
   ): Promise<{ teamCount: number }> {
     return this.teamsRepository.getTeamCountByStatusAndMembercountAndGender(status, membercount, gender);
@@ -115,6 +124,7 @@ export class TeamsService {
     teamsPerRound: number;
     '2vs2': { male: number; female: number };
     '3vs3': { male: number; female: number };
+    '4vs4': { male: number; female: number };
   }> {
     const teamsPerRound = MatchingRound.MAX_TEAM;
 
@@ -158,6 +168,26 @@ export class TeamsService {
     if (female3 < MatchingRound.MIN_TEAM) female3 = MatchingRound.MIN_TEAM;
     if (female3 > MatchingRound.MAX_TEAM) female3 = MatchingRound.MAX_TEAM;
 
+    let { teamCount: male4 } = await this.getTeamCountByStatusAndMembercountAndGender(
+      MatchingStatus.APPLIED,
+      '4',
+      TeamGender.male,
+    );
+
+    // 최소 팀 수 미만인 경우 OR 최대 팀 수 이상인 경우 값 조정
+    if (male4 < MatchingRound.MIN_TEAM) male4 = MatchingRound.MIN_TEAM;
+    if (male4 > MatchingRound.MAX_TEAM) male4 = MatchingRound.MAX_TEAM;
+
+    let { teamCount: female4 } = await this.getTeamCountByStatusAndMembercountAndGender(
+      MatchingStatus.APPLIED,
+      '4',
+      TeamGender.female,
+    );
+
+    // 최소 팀 수 미만인 경우 OR 최대 팀 수 이상인 경우 값 조정
+    if (female4 < MatchingRound.MIN_TEAM) female4 = MatchingRound.MIN_TEAM;
+    if (female4 > MatchingRound.MAX_TEAM) female4 = MatchingRound.MAX_TEAM;
+
     return {
       teamsPerRound,
       '2vs2': {
@@ -165,6 +195,10 @@ export class TeamsService {
         female: female2,
       },
       '3vs3': {
+        male: male3,
+        female: female3,
+      },
+      '4vs4': {
         male: male3,
         female: female3,
       },
@@ -197,42 +231,37 @@ export class TeamsService {
     }
 
     // 이미 매칭 실패한 팀인 경우
-    if (team.currentRound - team.startRound >= MatchingRound.MAX_TRIAL) {
-      throw new BadRequestException(`matching already failed team`);
-    }
+    // if (team.currentRound - team.startRound >= MatchingRound.MAX_TRIAL) {
+    //   throw new BadRequestException(`matching already failed team`);
+    // }
 
     const {
-      gender,
       memberCount,
-      universities,
+      memberCounts,
       areas,
+      teamAvailableDate,
+      teamName,
       intro,
       drink,
-      prefSameUniversity,
       prefAge,
       prefVibes,
-      availableDates,
       members,
+      kakaoId,
     } = updateTeamDto;
 
     // Team 테이블 정보 업데이트
     await this.teamsRepository.updateTeam(teamId, {
-      gender,
       memberCount,
-      universities,
+      memberCounts,
       areas,
+      teamAvailableDate,
+      teamName,
       intro,
       drink,
-      prefSameUniversity,
       prefAge,
       prefVibes,
+      kakaoId,
     });
-
-    // 팀 가능 날짜 정보 있는 경우 row 삭제 후 다시 생성
-    if (!!availableDates) {
-      await this.teamsRepository.deleteTeamAvailableDateByTeamId(teamId);
-      await this.teamsRepository.createTeamAvailableDate(availableDates, team);
-    }
 
     // 팀 멤버 정보 있는 경우 row 삭제 후 다시 생성
     if (!!members) {
@@ -260,11 +289,9 @@ export class TeamsService {
     const team = await this.getTeamById(teamId);
 
     team['ownerId'] = team.user.id;
-    team['availableDates'] = team.teamAvailableDates.map((d) => d.teamAvailableDate);
 
     delete Object.assign(team, { ['members']: team['teamMembers'] })['teamMembers']; // 프로퍼티 이름 변경
     delete team.user;
-    delete team.teamAvailableDates;
     delete team.maleTeamMatching;
     delete team.femaleTeamMatching;
 
@@ -285,25 +312,24 @@ export class TeamsService {
     const newTeamData = {
       gender: existingTeam.gender,
       memberCount: existingTeam.memberCount,
-      universities: existingTeam.universities,
+      memberCounts: existingTeam.memberCounts,
+      teamAvailableDate: existingTeam.teamAvailableDate,
       areas: existingTeam.areas,
+      teamName: existingTeam.teamName,
       intro: existingTeam.intro,
       drink: existingTeam.drink,
-      prefSameUniversity: existingTeam.prefSameUniversity,
       prefAge: existingTeam.prefAge,
       prefVibes: existingTeam.prefVibes,
+      kakaoId: existingTeam.kakaoId,
     };
 
     // 2. 새로운 팀 생성하기
     const { teamId: newTeamId } = await this.teamsRepository.createTeam(newTeamData, user);
     const newTeam = await this.getTeamById(newTeamId);
 
-    // 팀 가능 날짜 저장
-    await this.teamsRepository.createTeamAvailableDate(existingTeam.availableDates, newTeam);
-
     // 팀 멤버 저장
     const newMembers = existingTeam.members.map((m) => {
-      return { role: m.role, mbti: m.mbti, appearance: m.appearance, age: m.age };
+      return { role: m.role, mbti: m.mbti, appearance: m.appearance, age: m.age, university: m.university };
     });
     await this.teamsRepository.createTeamMember(newMembers, newTeam);
 
@@ -320,27 +346,27 @@ export class TeamsService {
 
   async getTeamsByStatusAndMembercountAndGender(
     status: MatchingStatus,
-    membercount: '2' | '3',
+    membercount: '2' | '3' | '4',
     gender: TeamGender,
   ): Promise<{ teams: AdminGetTeamDto[] }> {
     // 신청자 조회
     if (status === MatchingStatus.APPLIED) {
-      return this.teamsRepository.getAppliedTeamsByMembercountAndGender(membercount, gender);
+      return this.teamsRepository.getAppliedTeamsByGender(gender);
     }
 
     // 수락/거절 대기자 조회
     if (status === MatchingStatus.MATCHED) {
-      return this.teamsRepository.getMatchedTeamsByMembercountAndGender(membercount, gender);
+      return this.teamsRepository.getMatchedTeamsByGender(gender);
     }
 
     // 매칭 실패 회원 조회
     if (status === MatchingStatus.FAILED) {
-      return this.teamsRepository.getFailedTeamsByMembercountAndGender(membercount, gender);
+      return this.teamsRepository.getFailedTeamsByMembercountAndGender(gender);
     }
 
     // 거절 당한 회원 조회
     if (status === MatchingStatus.PARTNER_TEAM_REFUSED) {
-      return this.teamsRepository.getPartnerTeamRefusedTeamsByMembercountAndGender(membercount, gender);
+      return this.teamsRepository.getPartnerTeamRefusedTeamsByGender(gender);
     }
   }
 
@@ -350,23 +376,6 @@ export class TeamsService {
 
   async deleteOurteamRefusedTeamByTeamId(teamId: number): Promise<void> {
     return this.matchingsService.deleteMatchingRefuseReasonByTeamId(teamId);
-  }
-
-  async getMaxRound(): Promise<{ maxRound: number }> {
-    return this.teamsRepository.getMaxRound();
-  }
-
-  async getAvailableDates(teamId: number): Promise<Date[]> {
-    const availableDates = await this.teamAvailableDatesRepository.findBy({ teamId: teamId });
-    return availableDates.map((availableDate) => availableDate.teamAvailableDate);
-  }
-
-  async updateCurrentRound(teamIds: number[], currentRound: number): Promise<void> {
-    return this.teamsRepository.updateCurrentRound(teamIds, currentRound);
-  }
-
-  async updateLastFailReasons(teamIds: number[], reasons: string[]): Promise<void> {
-    return this.teamsRepository.updateLastFailReasons(teamIds, reasons);
   }
 
   // 상대팀 무응답이고 아직 환불받지 않은 팀 조회

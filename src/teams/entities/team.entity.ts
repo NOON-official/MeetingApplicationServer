@@ -1,5 +1,4 @@
 import { TeamMember } from './team-member.entity';
-import { TeamAvailableDate } from './team-available-date.entity';
 import { MatchingRefuseReason } from './../../matchings/entities/matching-refuse-reason.entity';
 import { Matching } from './../../matchings/entities/matching.entity';
 import {
@@ -24,14 +23,17 @@ export class Team extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
 
+  @Column({type: 'varchar', length:255})
+  teamName: string;
+
   @Column({ type: 'int' })
   gender: number;
 
   @Column({ type: 'int' })
   memberCount: number;
 
-  @Column({ type: 'json' })
-  universities: number[];
+  @Column({ type: 'json', nullable:true })
+  memberCounts: number[];
 
   @Column({ type: 'json' })
   areas: number[];
@@ -42,23 +44,17 @@ export class Team extends BaseEntity {
   @Column({ type: 'int' })
   drink: number;
 
-  @Column({ type: 'boolean' })
-  prefSameUniversity: boolean;
-
   @Column({ type: 'json' })
   prefAge: number[];
 
   @Column({ type: 'json' })
   prefVibes: number[];
 
-  @Column({ type: 'int' })
-  startRound: number;
+  @Column({ type: 'int', default:3 })
+  teamAvailableDate: number;
 
-  @Column({ type: 'int' })
-  currentRound: number;
-
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  lastFailReason: string;
+  @Column({type: 'text'})
+  kakaoId: string;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
@@ -80,9 +76,6 @@ export class Team extends BaseEntity {
 
   @OneToOne(() => MatchingRefuseReason, { cascade: true })
   matchingRefuseReason: MatchingRefuseReason;
-
-  @OneToMany(() => TeamAvailableDate, (teamAvailableDate) => teamAvailableDate.team, { cascade: true, eager: true })
-  teamAvailableDates: TeamAvailableDate[];
 
   @OneToMany(() => TeamMember, (teamMember) => teamMember.team, { cascade: true, eager: true })
   teamMembers: TeamMember[];
