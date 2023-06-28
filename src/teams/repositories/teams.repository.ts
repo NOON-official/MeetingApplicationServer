@@ -168,7 +168,7 @@ export class TeamsRepository extends Repository<Team> {
         'team.prefAge AS prefAge',
         'team.areas AS areas',
         'user.university AS university',
-        'members.university AS universities',
+        'json_arrayagg(members.university) AS universities',
         'team.drink AS drink',
         `${gender === 'male' ? 'matching.femaleTeamId' : 'matching.maleTeamId'} AS partnerTeamId`,
         `IF(team.modifiedAt IS NOT NULL, team.modifiedAt, team.createdAt) AS appliedAt`,
@@ -200,27 +200,27 @@ export class TeamsRepository extends Repository<Team> {
   // 관리자페이지 수락/거절 대기자 조회
   async getMatchedTeamsByGender(gender: TeamGender): Promise<{ teams: AdminGetTeamDto[] }> {
     const teams = await this.createQueryBuilder('team')
-    .select([
-      'team.id AS teamId',
-      'user.nickname AS nickname',
-      'team.kakaoId AS kakaoId',
-      'team.teamName AS teamName',
-      'team.intro AS intro',
-      'team.memberCount AS memberCount',
-      'team.memberCounts AS memberCounts',
-      'user.phone AS phone',
-      'CAST(SUM(members.age) / team.memberCount AS SIGNED) AS averageAge',
-      'team.prefAge AS prefAge',
-      'team.areas AS areas',
-      'user.university AS university',
-      'members.university AS universities',
-      'team.drink AS drink',
-      `${gender === 'male' ? 'matching.femaleTeamId' : 'matching.maleTeamId'} AS partnerTeamId`,
-      `IF(team.modifiedAt IS NOT NULL, team.modifiedAt, team.createdAt) AS appliedAt`,
-      'matching.createdAt AS matchedAt',
-      'user.id AS userId',
-      'user.refusedUserIds AS refusedUserIds',
-    ])
+      .select([
+        'team.id AS teamId',
+        'user.nickname AS nickname',
+        'team.kakaoId AS kakaoId',
+        'team.teamName AS teamName',
+        'team.intro AS intro',
+        'team.memberCount AS memberCount',
+        'team.memberCounts AS memberCounts',
+        'user.phone AS phone',
+        'CAST(SUM(members.age) / team.memberCount AS SIGNED) AS averageAge',
+        'team.prefAge AS prefAge',
+        'team.areas AS areas',
+        'user.university AS university',
+        'json_arrayagg(members.university) AS universities',
+        'team.drink AS drink',
+        `${gender === 'male' ? 'matching.femaleTeamId' : 'matching.maleTeamId'} AS partnerTeamId`,
+        `IF(team.modifiedAt IS NOT NULL, team.modifiedAt, team.createdAt) AS appliedAt`,
+        'matching.createdAt AS matchedAt',
+        'user.id AS userId',
+        'user.refusedUserIds AS refusedUserIds',
+      ])
       .leftJoin(`team.${gender}TeamMatching`, 'matching')
       .leftJoin(`team.user`, 'user')
       .leftJoin('team.teamMembers', 'members')
@@ -248,27 +248,27 @@ export class TeamsRepository extends Repository<Team> {
   // 관리자페이지 매칭 실패 회원 조회
   async getFailedTeamsByMembercountAndGender(gender: TeamGender): Promise<{ teams: AdminGetTeamDto[] }> {
     const teams = await this.createQueryBuilder('team')
-    .select([
-      'team.id AS teamId',
-      'user.nickname AS nickname',
-      'team.kakaoId AS kakaoId',
-      'team.teamName AS teamName',
-      'team.intro AS intro',
-      'team.memberCount AS memberCount',
-      'team.memberCounts AS memberCounts',
-      'user.phone AS phone',
-      'CAST(SUM(members.age) / team.memberCount AS SIGNED) AS averageAge',
-      'team.prefAge AS prefAge',
-      'team.areas AS areas',
-      'user.university AS university',
-      'members.university AS universities',
-      'team.drink AS drink',
-      `${gender === 'male' ? 'matching.femaleTeamId' : 'matching.maleTeamId'} AS partnerTeamId`,
-      `IF(team.modifiedAt IS NOT NULL, team.modifiedAt, team.createdAt) AS appliedAt`,
-      'matching.createdAt AS matchedAt',
-      'user.id AS userId',
-      'user.refusedUserIds AS refusedUserIds',
-    ])
+      .select([
+        'team.id AS teamId',
+        'user.nickname AS nickname',
+        'team.kakaoId AS kakaoId',
+        'team.teamName AS teamName',
+        'team.intro AS intro',
+        'team.memberCount AS memberCount',
+        'team.memberCounts AS memberCounts',
+        'user.phone AS phone',
+        'CAST(SUM(members.age) / team.memberCount AS SIGNED) AS averageAge',
+        'team.prefAge AS prefAge',
+        'team.areas AS areas',
+        'user.university AS university',
+        'json_arrayagg(members.university) AS universities',
+        'team.drink AS drink',
+        `${gender === 'male' ? 'matching.femaleTeamId' : 'matching.maleTeamId'} AS partnerTeamId`,
+        `IF(team.modifiedAt IS NOT NULL, team.modifiedAt, team.createdAt) AS appliedAt`,
+        'matching.createdAt AS matchedAt',
+        'user.id AS userId',
+        'user.refusedUserIds AS refusedUserIds',
+      ])
       .leftJoin(`team.${gender}TeamMatching`, 'matching')
       .leftJoin(`team.user`, 'user')
       .leftJoin('team.teamMembers', 'members')
@@ -291,27 +291,27 @@ export class TeamsRepository extends Repository<Team> {
   // 관리자페이지 거절 당한 회원 조회
   async getPartnerTeamRefusedTeamsByGender(gender: TeamGender): Promise<{ teams: AdminGetTeamDto[] }> {
     const teams = await this.createQueryBuilder('team')
-    .select([
-      'team.id AS teamId',
-      'user.nickname AS nickname',
-      'team.kakaoId AS kakaoId',
-      'team.teamName AS teamName',
-      'team.intro AS intro',
-      'team.memberCount AS memberCount',
-      'team.memberCounts AS memberCounts',
-      'user.phone AS phone',
-      'CAST(SUM(members.age) / team.memberCount AS SIGNED) AS averageAge',
-      'team.prefAge AS prefAge',
-      'team.areas AS areas',
-      'user.university AS university',
-      'members.university AS universities',
-      'team.drink AS drink',
-      `${gender === 'male' ? 'matching.femaleTeamId' : 'matching.maleTeamId'} AS partnerTeamId`,
-      `IF(team.modifiedAt IS NOT NULL, team.modifiedAt, team.createdAt) AS appliedAt`,
-      'matching.createdAt AS matchedAt',
-      'user.id AS userId',
-      'user.refusedUserIds AS refusedUserIds',
-    ])
+      .select([
+        'team.id AS teamId',
+        'user.nickname AS nickname',
+        'team.kakaoId AS kakaoId',
+        'team.teamName AS teamName',
+        'team.intro AS intro',
+        'team.memberCount AS memberCount',
+        'team.memberCounts AS memberCounts',
+        'user.phone AS phone',
+        'CAST(SUM(members.age) / team.memberCount AS SIGNED) AS averageAge',
+        'team.prefAge AS prefAge',
+        'team.areas AS areas',
+        'user.university AS university',
+        'json_arrayagg(members.university) AS universities',
+        'team.drink AS drink',
+        `${gender === 'male' ? 'matching.femaleTeamId' : 'matching.maleTeamId'} AS partnerTeamId`,
+        `IF(team.modifiedAt IS NOT NULL, team.modifiedAt, team.createdAt) AS appliedAt`,
+        'matching.createdAt AS matchedAt',
+        'user.id AS userId',
+        'user.refusedUserIds AS refusedUserIds',
+      ])
       .leftJoin(`team.${gender}TeamMatching`, 'matching')
       .leftJoin(`team.user`, 'user')
       .leftJoin('team.teamMembers', 'members')
