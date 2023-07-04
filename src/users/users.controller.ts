@@ -305,17 +305,6 @@ export class UsersController {
     return;
   }
 
-  @ApiOperation({
-    summary: '유저 매칭 상태 조회 (🔆new)',
-    description: '각 매칭별 상태 조회',
-  })
-  @ApiOkResponse({})
-  @Get('matchings/:matchingId/status')
-  @UseGuards(AccessTokenGuard)
-  getUsersMatchingMatchingIdStatus(@GetUser() user: PassportUser): Promise<void> {
-    return;
-  }
-
   // @ApiOperation({
   //   summary: '유저 매칭 상태 조회 (📌is updating)',
   //   description:
