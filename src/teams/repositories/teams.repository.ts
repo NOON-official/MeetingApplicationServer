@@ -87,17 +87,17 @@ export class TeamsRepository extends Repository<Team> {
     return { teamId };
   }
 
-  async getMembersCountOneWeek(): Promise<{ memberCount: number }> {
-    let { memberCount } = await this.createQueryBuilder('team')
-      .select('SUM(team.memberCount) AS memberCount')
-      .where('DATE_SUB(CURDATE(), INTERVAL 7 DAY) <= team.createdAt')
-      .withDeleted()
-      .getRawOne();
+  // async getMembersCountOneWeek(): Promise<{ memberCount: number }> {
+  //   let { memberCount } = await this.createQueryBuilder('team')
+  //     .select('SUM(team.memberCount) AS memberCount')
+  //     .where('DATE_SUB(CURDATE(), INTERVAL 7 DAY) <= team.createdAt')
+  //     .withDeleted()
+  //     .getRawOne();
 
-    memberCount ? (memberCount = Number(memberCount)) : (memberCount = 0);
+  //   memberCount ? (memberCount = Number(memberCount)) : (memberCount = 0);
 
-    return { memberCount };
-  }
+  //   return { memberCount };
+  // }
 
   async getMembersCountTotal(): Promise<{ memberCount: number }> {
     let { memberCount } = await this.createQueryBuilder('team')

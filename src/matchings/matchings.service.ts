@@ -35,54 +35,54 @@ export class MatchingsService {
     return this.matchingsRepository.getMatchingByTeamId(teamId);
   }
 
-  async getMatchingIdByTeamId(teamId: number): Promise<{ matchingId: number }> {
-    return this.matchingsRepository.getMatchingIdByTeamId(teamId);
-  }
+  // async getMatchingIdByTeamId(teamId: number): Promise<{ matchingId: number }> {
+  //   return this.matchingsRepository.getMatchingIdByTeamId(teamId);
+  // }
 
   async getMatchingById(matchingId: number): Promise<Matching> {
     return this.matchingsRepository.getMatchingById(matchingId);
   }
 
-  async getMatchingInfoById(userId: number, matchingId: number): Promise<GetMatchingDto> {
-    // const matching = await this.getMatchingById(matchingId);
+  // async getMatchingInfoById(userId: number, matchingId: number): Promise<GetMatchingDto> {
+  //   const matching = await this.getMatchingById(matchingId);
 
-    // if (!matching || !!matching.deletedAt) {
-    //   throw new NotFoundException(`Can't find matching with id ${matchingId}`);
-    // }
+  //   if (!matching || !!matching.deletedAt) {
+  //     throw new NotFoundException(`Can't find matching with id ${matchingId}`);
+  //   }
 
-    // const { teamId } = await this.usersService.getTeamIdByUserId(userId);
+  //   const { teamId } = await this.usersService.getTeamIdByUserId(userId);
 
-    // const ourteamGender =
-    //   matching.maleTeam.id === teamId ? 'male' : matching.femaleTeam.id === teamId ? 'female' : null;
+  //   const ourteamGender =
+  //     matching.maleTeam.id === teamId ? 'male' : matching.femaleTeam.id === teamId ? 'female' : null;
 
-    // if (!ourteamGender) {
-    //   throw new NotFoundException(`Can't find matching with id ${matchingId}`);
-    // }
+  //   if (!ourteamGender) {
+  //     throw new NotFoundException(`Can't find matching with id ${matchingId}`);
+  //   }
 
-    // const result = {
-    //   ourteamId: ourteamGender === 'male' ? matching.maleTeam.id : matching.femaleTeam.id,
-    //   partnerTeamId: ourteamGender === 'male' ? matching.femaleTeam.id : matching.maleTeam.id,
-    //   ourteamIsAccepted: ourteamGender === 'male' ? matching.maleTeamIsAccepted : matching.femaleTeamIsAccepted,
-    //   partnerTeamIsAccepted: ourteamGender === 'male' ? matching.femaleTeamIsAccepted : matching.maleTeamIsAccepted,
-    //   chatCreatedAt: matching.chatCreatedAt,
-    //   createdAt: matching.createdAt,
-    //   updatedAt: matching.updatedAt,
-    //   deletedAt: matching.deletedAt,
-    // };
+  //   const result = {
+  //     ourteamId: ourteamGender === 'male' ? matching.maleTeam.id : matching.femaleTeam.id,
+  //     partnerTeamId: ourteamGender === 'male' ? matching.femaleTeam.id : matching.maleTeam.id,
+  //     ourteamIsAccepted: ourteamGender === 'male' ? matching.maleTeamIsAccepted : matching.femaleTeamIsAccepted,
+  //     partnerTeamIsAccepted: ourteamGender === 'male' ? matching.femaleTeamIsAccepted : matching.maleTeamIsAccepted,
+  //     chatCreatedAt: matching.chatCreatedAt,
+  //     createdAt: matching.createdAt,
+  //     updatedAt: matching.updatedAt,
+  //     deletedAt: matching.deletedAt,
+  //   };
 
-    const result = {
-      ourteamId: 1,
-      partnerTeamId: 2,
-      ourteamIsAccepted: null,
-      partnerTeamIsAccepted: true,
-      chatCreatedAt: new Date('2023-01-20T21:37:26.886Z'),
-      createdAt: new Date('2023-01-20T21:37:26.886Z'),
-      updatedAt: new Date('2023-01-20T21:37:26.886Z'),
-      deletedAt: null,
-    };
+  //   const result = {
+  //     ourteamId: 1,
+  //     partnerTeamId: 2,
+  //     ourteamIsAccepted: null,
+  //     partnerTeamIsAccepted: true,
+  //     chatCreatedAt: new Date('2023-01-20T21:37:26.886Z'),
+  //     createdAt: new Date('2023-01-20T21:37:26.886Z'),
+  //     updatedAt: new Date('2023-01-20T21:37:26.886Z'),
+  //     deletedAt: null,
+  //   };
 
-    return result;
-  }
+  //   return result;
+  // }
 
   async acceptMatchingByTeamId(userId: number, matchingId: number, teamId: number): Promise<void> {
     // const matching = await this.getMatchingById(matchingId);
@@ -208,7 +208,7 @@ export class MatchingsService {
     }
 
     // 매칭에 해당하는 팀이 아닌 경우
-    if (matching.maleTeamId !== teamId && matching.femaleTeamId !== teamId) {
+    if (matching.appliedTeamId !== teamId && matching.receivedTeamId !== teamId) {
       throw new BadRequestException('invalid access');
     }
 
@@ -271,27 +271,27 @@ export class MatchingsService {
     await this.matchingsRepository.deleteMatchingById(matchingId);
 
     // 관련 데이터 soft delete
-    const maleTeamId = matching?.maleTeam?.id;
-    const maleTeamIsDeleted = matching?.maleTeam?.deletedAt;
-    const femaleTeamId = matching?.femaleTeam?.id;
-    const femaleTeamIsDeleted = matching?.femaleTeam?.deletedAt;
-    const maleTeamTicketId = matching?.maleTeamTicket?.id;
-    const femaleTeamTicketId = matching?.femaleTeamTicket?.id;
+    const appliedTeamId = matching?.appliedTeam?.id;
+    const appliedTeamIsDeleted = matching?.appliedTeam?.deletedAt;
+    const receivedTeamId = matching?.receivedTeam?.id;
+    const receivedTeamIsDeleted = matching?.receivedTeam?.deletedAt;
+    const appliedTeamTicketId = matching?.appliedTeamTicket?.id;
+    const receivedTeamTicketId = matching?.receivedTeamTicket?.id;
 
-    if (!!maleTeamId && !maleTeamIsDeleted) {
-      await this.teamsService.deleteTeamById(maleTeamId);
+    if (!!appliedTeamId && !appliedTeamIsDeleted) {
+      await this.teamsService.deleteTeamById(appliedTeamId);
     }
 
-    if (!!femaleTeamId && !femaleTeamIsDeleted) {
-      await this.teamsService.deleteTeamById(femaleTeamId);
+    if (!!receivedTeamId && !receivedTeamIsDeleted) {
+      await this.teamsService.deleteTeamById(receivedTeamId);
     }
 
-    if (!!maleTeamTicketId) {
-      await this.ticketsService.deleteTicketById(maleTeamTicketId);
+    if (!!appliedTeamTicketId) {
+      await this.ticketsService.deleteTicketById(appliedTeamTicketId);
     }
 
-    if (!!femaleTeamTicketId) {
-      await this.ticketsService.deleteTicketById(femaleTeamTicketId);
+    if (!!receivedTeamTicketId) {
+      await this.ticketsService.deleteTicketById(receivedTeamTicketId);
     }
   }
 
@@ -328,14 +328,14 @@ export class MatchingsService {
     return this.matchingRefuseReasonsRepository.deleteMatchingRefuseReasonByTeamId(teamId);
   }
 
-  async getAverageTimeOneWeek(): Promise<{ hours: number; minutes: number }> {
-    const { averageMatchedSeconds } = await this.matchingsRepository.getMatchingAverageSecondsOneWeeks();
+  // async getAverageTimeOneWeek(): Promise<{ hours: number; minutes: number }> {
+  //   const { averageMatchedSeconds } = await this.matchingsRepository.getMatchingAverageSecondsOneWeeks();
 
-    const averageMatchedMinutes = Math.trunc(averageMatchedSeconds / 60);
+  //   const averageMatchedMinutes = Math.trunc(averageMatchedSeconds / 60);
 
-    const hours = Math.trunc(averageMatchedMinutes / 60);
-    const minutes = averageMatchedMinutes % 60;
+  //   const hours = Math.trunc(averageMatchedMinutes / 60);
+  //   const minutes = averageMatchedMinutes % 60;
 
-    return { hours, minutes };
-  }
+  //   return { hours, minutes };
+  // }
 }

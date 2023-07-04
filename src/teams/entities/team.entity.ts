@@ -23,7 +23,7 @@ export class Team extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
 
-  @Column({type: 'varchar', length:255})
+  @Column({ type: 'varchar', length: 255 })
   teamName: string;
 
   @Column({ type: 'int' })
@@ -32,7 +32,7 @@ export class Team extends BaseEntity {
   @Column({ type: 'int' })
   memberCount: number;
 
-  @Column({ type: 'json', nullable:true })
+  @Column({ type: 'json', nullable: true })
   memberCounts: number[];
 
   @Column({ type: 'json' })
@@ -50,10 +50,10 @@ export class Team extends BaseEntity {
   @Column({ type: 'json' })
   prefVibes: number[];
 
-  @Column({ type: 'int', default:3 })
+  @Column({ type: 'int', default: 3 })
   teamAvailableDate: number;
 
-  @Column({type: 'text'})
+  @Column({ type: 'text' })
   kakaoId: string;
 
   @CreateDateColumn({ type: 'timestamp' })
@@ -68,11 +68,11 @@ export class Team extends BaseEntity {
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt: Date;
 
-  @OneToOne(() => Matching, (matching) => matching.maleTeam, { cascade: true, eager: true })
-  maleTeamMatching: Matching;
+  @OneToOne(() => Matching, (matching) => matching.appliedTeam, { cascade: true, eager: true })
+  appliedTeamMatching: Matching;
 
-  @OneToOne(() => Matching, (matching) => matching.femaleTeam, { cascade: true, eager: true })
-  femaleTeamMatching: Matching;
+  @OneToOne(() => Matching, (matching) => matching.receivedTeam, { cascade: true, eager: true })
+  receivedTeamMatching: Matching;
 
   @OneToOne(() => MatchingRefuseReason, { cascade: true })
   matchingRefuseReason: MatchingRefuseReason;

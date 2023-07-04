@@ -104,9 +104,9 @@ export class TeamsService {
     return this.teamsRepository.getTeamIdByUserId(userId);
   }
 
-  async getMembersCountOneWeek(): Promise<{ memberCount: number }> {
-    return this.teamsRepository.getMembersCountOneWeek();
-  }
+  // async getMembersCountOneWeek(): Promise<{ memberCount: number }> {
+  //   return this.teamsRepository.getMembersCountOneWeek();
+  // }
 
   async getMembersCountTotal(): Promise<{ memberCount: number }> {
     return this.teamsRepository.getMembersCountTotal();
@@ -120,102 +120,102 @@ export class TeamsService {
     return this.teamsRepository.getTeamCountByStatusAndMembercountAndGender(status, membercount, gender);
   }
 
-  async getTeamCount(): Promise<{
-    teamsPerRound: number;
-    '2vs2': { male: number; female: number };
-    '3vs3': { male: number; female: number };
-    '4vs4': { male: number; female: number };
-  }> {
-    const teamsPerRound = MatchingRound.MAX_TEAM;
+  // async getTeamCount(): Promise<{
+  //   teamsPerRound: number;
+  //   '2vs2': { male: number; female: number };
+  //   '3vs3': { male: number; female: number };
+  //   '4vs4': { male: number; female: number };
+  // }> {
+  //   const teamsPerRound = MatchingRound.MAX_TEAM;
 
-    let { teamCount: male2 } = await this.getTeamCountByStatusAndMembercountAndGender(
-      MatchingStatus.APPLIED,
-      '2',
-      TeamGender.male,
-    );
+  //   let { teamCount: male2 } = await this.getTeamCountByStatusAndMembercountAndGender(
+  //     MatchingStatus.APPLIED,
+  //     '2',
+  //     TeamGender.male,
+  //   );
 
-    // 최소 팀 수 미만인 경우 OR 최대 팀 수 이상인 경우 값 조정
-    if (male2 < MatchingRound.MIN_TEAM) male2 = MatchingRound.MIN_TEAM;
-    if (male2 > MatchingRound.MAX_TEAM) male2 = MatchingRound.MAX_TEAM;
+  //   // 최소 팀 수 미만인 경우 OR 최대 팀 수 이상인 경우 값 조정
+  //   if (male2 < MatchingRound.MIN_TEAM) male2 = MatchingRound.MIN_TEAM;
+  //   if (male2 > MatchingRound.MAX_TEAM) male2 = MatchingRound.MAX_TEAM;
 
-    let { teamCount: female2 } = await this.getTeamCountByStatusAndMembercountAndGender(
-      MatchingStatus.APPLIED,
-      '2',
-      TeamGender.female,
-    );
+  //   let { teamCount: female2 } = await this.getTeamCountByStatusAndMembercountAndGender(
+  //     MatchingStatus.APPLIED,
+  //     '2',
+  //     TeamGender.female,
+  //   );
 
-    // 최소 팀 수 미만인 경우 OR 최대 팀 수 이상인 경우 값 조정
-    if (female2 < MatchingRound.MIN_TEAM) female2 = MatchingRound.MIN_TEAM;
-    if (female2 > MatchingRound.MAX_TEAM) female2 = MatchingRound.MAX_TEAM;
+  //   // 최소 팀 수 미만인 경우 OR 최대 팀 수 이상인 경우 값 조정
+  //   if (female2 < MatchingRound.MIN_TEAM) female2 = MatchingRound.MIN_TEAM;
+  //   if (female2 > MatchingRound.MAX_TEAM) female2 = MatchingRound.MAX_TEAM;
 
-    let { teamCount: male3 } = await this.getTeamCountByStatusAndMembercountAndGender(
-      MatchingStatus.APPLIED,
-      '3',
-      TeamGender.male,
-    );
+  //   let { teamCount: male3 } = await this.getTeamCountByStatusAndMembercountAndGender(
+  //     MatchingStatus.APPLIED,
+  //     '3',
+  //     TeamGender.male,
+  //   );
 
-    // 최소 팀 수 미만인 경우 OR 최대 팀 수 이상인 경우 값 조정
-    if (male3 < MatchingRound.MIN_TEAM) male3 = MatchingRound.MIN_TEAM;
-    if (male3 > MatchingRound.MAX_TEAM) male3 = MatchingRound.MAX_TEAM;
+  //   // 최소 팀 수 미만인 경우 OR 최대 팀 수 이상인 경우 값 조정
+  //   if (male3 < MatchingRound.MIN_TEAM) male3 = MatchingRound.MIN_TEAM;
+  //   if (male3 > MatchingRound.MAX_TEAM) male3 = MatchingRound.MAX_TEAM;
 
-    let { teamCount: female3 } = await this.getTeamCountByStatusAndMembercountAndGender(
-      MatchingStatus.APPLIED,
-      '3',
-      TeamGender.female,
-    );
+  //   let { teamCount: female3 } = await this.getTeamCountByStatusAndMembercountAndGender(
+  //     MatchingStatus.APPLIED,
+  //     '3',
+  //     TeamGender.female,
+  //   );
 
-    // 최소 팀 수 미만인 경우 OR 최대 팀 수 이상인 경우 값 조정
-    if (female3 < MatchingRound.MIN_TEAM) female3 = MatchingRound.MIN_TEAM;
-    if (female3 > MatchingRound.MAX_TEAM) female3 = MatchingRound.MAX_TEAM;
+  //   // 최소 팀 수 미만인 경우 OR 최대 팀 수 이상인 경우 값 조정
+  //   if (female3 < MatchingRound.MIN_TEAM) female3 = MatchingRound.MIN_TEAM;
+  //   if (female3 > MatchingRound.MAX_TEAM) female3 = MatchingRound.MAX_TEAM;
 
-    let { teamCount: male4 } = await this.getTeamCountByStatusAndMembercountAndGender(
-      MatchingStatus.APPLIED,
-      '4',
-      TeamGender.male,
-    );
+  //   let { teamCount: male4 } = await this.getTeamCountByStatusAndMembercountAndGender(
+  //     MatchingStatus.APPLIED,
+  //     '4',
+  //     TeamGender.male,
+  //   );
 
-    // 최소 팀 수 미만인 경우 OR 최대 팀 수 이상인 경우 값 조정
-    if (male4 < MatchingRound.MIN_TEAM) male4 = MatchingRound.MIN_TEAM;
-    if (male4 > MatchingRound.MAX_TEAM) male4 = MatchingRound.MAX_TEAM;
+  //   // 최소 팀 수 미만인 경우 OR 최대 팀 수 이상인 경우 값 조정
+  //   if (male4 < MatchingRound.MIN_TEAM) male4 = MatchingRound.MIN_TEAM;
+  //   if (male4 > MatchingRound.MAX_TEAM) male4 = MatchingRound.MAX_TEAM;
 
-    let { teamCount: female4 } = await this.getTeamCountByStatusAndMembercountAndGender(
-      MatchingStatus.APPLIED,
-      '4',
-      TeamGender.female,
-    );
+  //   let { teamCount: female4 } = await this.getTeamCountByStatusAndMembercountAndGender(
+  //     MatchingStatus.APPLIED,
+  //     '4',
+  //     TeamGender.female,
+  //   );
 
-    // 최소 팀 수 미만인 경우 OR 최대 팀 수 이상인 경우 값 조정
-    if (female4 < MatchingRound.MIN_TEAM) female4 = MatchingRound.MIN_TEAM;
-    if (female4 > MatchingRound.MAX_TEAM) female4 = MatchingRound.MAX_TEAM;
+  //   // 최소 팀 수 미만인 경우 OR 최대 팀 수 이상인 경우 값 조정
+  //   if (female4 < MatchingRound.MIN_TEAM) female4 = MatchingRound.MIN_TEAM;
+  //   if (female4 > MatchingRound.MAX_TEAM) female4 = MatchingRound.MAX_TEAM;
 
-    return {
-      teamsPerRound,
-      '2vs2': {
-        male: male2,
-        female: female2,
-      },
-      '3vs3': {
-        male: male3,
-        female: female3,
-      },
-      '4vs4': {
-        male: male3,
-        female: female3,
-      },
-    };
-  }
+  //   return {
+  //     teamsPerRound,
+  //     '2vs2': {
+  //       male: male2,
+  //       female: female2,
+  //     },
+  //     '3vs3': {
+  //       male: male3,
+  //       female: female3,
+  //     },
+  //     '4vs4': {
+  //       male: male3,
+  //       female: female3,
+  //     },
+  //   };
+  // }
 
-  async getTeamPagedata(): Promise<{
-    Genders: teamPagedata[];
-    Universities: teamPagedata[];
-    Areas: teamPagedata[];
-    Mbties: teamPagedata[];
-    Roles: teamPagedata[];
-    SameUniversities: teamPagedata[];
-    Vibes: teamPagedata[];
-  }> {
-    return { Genders, Universities, Areas, Mbties, Roles, SameUniversities, Vibes };
-  }
+  // async getTeamPagedata(): Promise<{
+  //   Genders: teamPagedata[];
+  //   Universities: teamPagedata[];
+  //   Areas: teamPagedata[];
+  //   Mbties: teamPagedata[];
+  //   Roles: teamPagedata[];
+  //   SameUniversities: teamPagedata[];
+  //   Vibes: teamPagedata[];
+  // }> {
+  //   return { Genders, Universities, Areas, Mbties, Roles, SameUniversities, Vibes };
+  // }
 
   async updateTeam(teamId: number, updateTeamDto: UpdateTeamDto): Promise<void> {
     const team = await this.getTeamById(teamId);
@@ -226,7 +226,7 @@ export class TeamsService {
     }
 
     // 이미 매칭 완료된 팀인 경우
-    if (!!team.maleTeamMatching || !!team.femaleTeamMatching) {
+    if (!!team.appliedTeamMatching || !!team.receivedTeamMatching) {
       throw new BadRequestException(`already matched team`);
     }
 
@@ -292,57 +292,57 @@ export class TeamsService {
 
     delete Object.assign(team, { ['members']: team['teamMembers'] })['teamMembers']; // 프로퍼티 이름 변경
     delete team.user;
-    delete team.maleTeamMatching;
-    delete team.femaleTeamMatching;
+    delete team.appliedTeamMatching;
+    delete team.receivedTeamMatching;
 
     const result = Object.assign(team);
 
     return result;
   }
 
-  async reapplyTeam(teamId: number): Promise<void> {
-    // 1. 기존 팀 정보 가져오기
-    const existingTeam = await this.getApplicationTeamById(teamId);
-    if (!!existingTeam.deletedAt) {
-      throw new NotFoundException(`Can't find team with id ${teamId}`);
-    }
+  // async reapplyTeam(teamId: number): Promise<void> {
+  //   // 1. 기존 팀 정보 가져오기
+  //   const existingTeam = await this.getApplicationTeamById(teamId);
+  //   if (!!existingTeam.deletedAt) {
+  //     throw new NotFoundException(`Can't find team with id ${teamId}`);
+  //   }
 
-    const user = await this.usersService.getUserById(existingTeam.ownerId);
+  //   const user = await this.usersService.getUserById(existingTeam.ownerId);
 
-    const newTeamData = {
-      gender: existingTeam.gender,
-      memberCount: existingTeam.memberCount,
-      memberCounts: existingTeam.memberCounts,
-      teamAvailableDate: existingTeam.teamAvailableDate,
-      areas: existingTeam.areas,
-      teamName: existingTeam.teamName,
-      intro: existingTeam.intro,
-      drink: existingTeam.drink,
-      prefAge: existingTeam.prefAge,
-      prefVibes: existingTeam.prefVibes,
-      kakaoId: existingTeam.kakaoId,
-    };
+  //   const newTeamData = {
+  //     gender: existingTeam.gender,
+  //     memberCount: existingTeam.memberCount,
+  //     memberCounts: existingTeam.memberCounts,
+  //     teamAvailableDate: existingTeam.teamAvailableDate,
+  //     areas: existingTeam.areas,
+  //     teamName: existingTeam.teamName,
+  //     intro: existingTeam.intro,
+  //     drink: existingTeam.drink,
+  //     prefAge: existingTeam.prefAge,
+  //     prefVibes: existingTeam.prefVibes,
+  //     kakaoId: existingTeam.kakaoId,
+  //   };
 
-    // 2. 새로운 팀 생성하기
-    const { teamId: newTeamId } = await this.teamsRepository.createTeam(newTeamData, user);
-    const newTeam = await this.getTeamById(newTeamId);
+  //   // 2. 새로운 팀 생성하기
+  //   const { teamId: newTeamId } = await this.teamsRepository.createTeam(newTeamData, user);
+  //   const newTeam = await this.getTeamById(newTeamId);
 
-    // 팀 멤버 저장
-    const newMembers = existingTeam.members.map((m) => {
-      return { role: m.role, mbti: m.mbti, appearance: m.appearance, age: m.age, university: m.university };
-    });
-    await this.teamsRepository.createTeamMember(newMembers, newTeam);
+  //   // 팀 멤버 저장
+  //   const newMembers = existingTeam.members.map((m) => {
+  //     return { role: m.role, mbti: m.mbti, appearance: m.appearance, age: m.age, university: m.university };
+  //   });
+  //   await this.teamsRepository.createTeamMember(newMembers, newTeam);
 
-    // 3. 기존 팀 삭제하기(soft delete)
-    await this.deleteTeamById(teamId);
+  //   // 3. 기존 팀 삭제하기(soft delete)
+  //   await this.deleteTeamById(teamId);
 
-    // 신청팀 수가 다 찼을 경우 매칭 알고리즘 실행 - 자동화 적용 시 주석 해제하기
-    // this.eventEmitter.emit('team.created');
-  }
+  //   // 신청팀 수가 다 찼을 경우 매칭 알고리즘 실행 - 자동화 적용 시 주석 해제하기
+  //   // this.eventEmitter.emit('team.created');
+  // }
 
-  async getMatchingIdByTeamId(teamId: number): Promise<{ matchingId: number }> {
-    return this.matchingsService.getMatchingIdByTeamId(teamId);
-  }
+  // async getMatchingIdByTeamId(teamId: number): Promise<{ matchingId: number }> {
+  //   return this.matchingsService.getMatchingIdByTeamId(teamId);
+  // }
 
   async getTeamsByStatusAndMembercountAndGender(
     status: MatchingStatus,

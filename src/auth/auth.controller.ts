@@ -104,6 +104,19 @@ export class AuthController {
   }
 
   @ApiOperation({
+    summary: '학교 인증 - 학생증 (🔆new)',
+    description: '이미지 업로드 및 저장',
+  })
+  @ApiBearerAuth()
+  @ApiCreatedResponse({ description: 'Created' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @Post('student-card')
+  @UseGuards(AccessTokenGuard)
+  postAuthStudentCard(): Promise<void> {
+    return;
+  }
+
+  @ApiOperation({
     summary: '로그아웃',
     description: '쿠키에 있는 refresh token을 삭제합니다. access token은 프론트엔드에서 삭제 처리 해주시면 됩니다.',
   })

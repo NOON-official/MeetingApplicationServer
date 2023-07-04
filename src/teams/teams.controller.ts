@@ -34,21 +34,21 @@ import { TeamOwnerGuard } from 'src/auth/guards/team-owner.guard';
 export class TeamsController {
   constructor(private teamsService: TeamsService) {}
 
-  @ApiOperation({
-    summary: '주간 사용자 수 조회',
-    description: '최근 일주일 간 팀 수 * 멤버 수',
-  })
-  @ApiOkResponse({
-    schema: {
-      example: {
-        memberCount: 1000,
-      },
-    },
-  })
-  @Get('members/count/one-week')
-  getTeamsMembersCountOneWeek(): Promise<{ memberCount: number }> {
-    return this.teamsService.getMembersCountOneWeek();
-  }
+  // @ApiOperation({
+  //   summary: '주간 사용자 수 조회',
+  //   description: '최근 일주일 간 팀 수 * 멤버 수',
+  // })
+  // @ApiOkResponse({
+  //   schema: {
+  //     example: {
+  //       memberCount: 1000,
+  //     },
+  //   },
+  // })
+  // @Get('members/count/one-week')
+  // getTeamsMembersCountOneWeek(): Promise<{ memberCount: number }> {
+  //   return this.teamsService.getMembersCountOneWeek();
+  // }
 
   @ApiOperation({
     summary: '누적 사용자 수 조회',
@@ -66,70 +66,70 @@ export class TeamsController {
     return this.teamsService.getMembersCountTotal();
   }
 
-  @ApiOperation({
-    summary: '현재 신청팀 수 조회',
-    description: '매칭 실패 횟수 3회 미만인 팀 포함 \n\n 최소 팀 수: 3, 최대 팀 수: 10',
-  })
-  @ApiOkResponse({
-    schema: {
-      example: {
-        teamsPerRound: 10,
-        '2vs2': {
-          male: 8,
-          female: 6,
-        },
-        '3vs3': {
-          male: 4,
-          female: 5,
-        },
-      },
-    },
-  })
-  @Get('count')
-  async getTeamsCount(): Promise<{
-    teamsPerRound: number;
-    '2vs2': { male: number; female: number };
-    '3vs3': { male: number; female: number };
-  }> {
-    return this.teamsService.getTeamCount();
-  }
+  // @ApiOperation({
+  //   summary: '현재 신청팀 수 조회',
+  //   description: '매칭 실패 횟수 3회 미만인 팀 포함 \n\n 최소 팀 수: 3, 최대 팀 수: 10',
+  // })
+  // @ApiOkResponse({
+  //   schema: {
+  //     example: {
+  //       teamsPerRound: 10,
+  //       '2vs2': {
+  //         male: 8,
+  //         female: 6,
+  //       },
+  //       '3vs3': {
+  //         male: 4,
+  //         female: 5,
+  //       },
+  //     },
+  //   },
+  // })
+  // @Get('count')
+  // async getTeamsCount(): Promise<{
+  //   teamsPerRound: number;
+  //   '2vs2': { male: number; female: number };
+  //   '3vs3': { male: number; female: number };
+  // }> {
+  //   return this.teamsService.getTeamCount();
+  // }
+
+  // @ApiBearerAuth()
+  // @ApiOperation({
+  //   summary: '팀 페이지데이터 가져오기',
+  //   description:
+  //     '성별, 학교, 지역, MBTI, 포지션, 상대팀 학교, 분위기 반환 \n\n 반환 프로퍼티 이름: Genders, Universities, Areas, Mbties, Roles, SameUniversities, Vibes',
+  // })
+  // @ApiOkResponse({
+  //   schema: {
+  //     example: {
+  //       Genders,
+  //       Universities,
+  //       Areas,
+  //       Mbties,
+  //       Roles,
+  //       SameUniversities,
+  //       Vibes,
+  //     },
+  //   },
+  // })
+  // @Get('pagedata')
+  // @UseGuards(AccessTokenGuard)
+  // getTeamsPagedata(): Promise<{
+  //   Genders: teamPagedata[];
+  //   Universities: teamPagedata[];
+  //   Areas: teamPagedata[];
+  //   Mbties: teamPagedata[];
+  //   Roles: teamPagedata[];
+  //   SameUniversities: teamPagedata[];
+  //   Vibes: teamPagedata[];
+  // }> {
+  //   return this.teamsService.getTeamPagedata();
+  // }
 
   @ApiBearerAuth()
   @ApiOperation({
-    summary: '팀 페이지데이터 가져오기',
-    description:
-      '성별, 학교, 지역, MBTI, 포지션, 상대팀 학교, 분위기 반환 \n\n 반환 프로퍼티 이름: Genders, Universities, Areas, Mbties, Roles, SameUniversities, Vibes',
-  })
-  @ApiOkResponse({
-    schema: {
-      example: {
-        Genders,
-        Universities,
-        Areas,
-        Mbties,
-        Roles,
-        SameUniversities,
-        Vibes,
-      },
-    },
-  })
-  @Get('pagedata')
-  @UseGuards(AccessTokenGuard)
-  getTeamsPagedata(): Promise<{
-    Genders: teamPagedata[];
-    Universities: teamPagedata[];
-    Areas: teamPagedata[];
-    Mbties: teamPagedata[];
-    Roles: teamPagedata[];
-    SameUniversities: teamPagedata[];
-    Vibes: teamPagedata[];
-  }> {
-    return this.teamsService.getTeamPagedata();
-  }
-
-  @ApiBearerAuth()
-  @ApiOperation({
-    summary: '매칭 신청 (팀 정보 저장)',
+    summary: '매칭 신청 (팀 정보 저장) (⭕️updated)',
   })
   @ApiCreatedResponse({ description: 'Created' })
   @Post()
@@ -140,7 +140,7 @@ export class TeamsController {
 
   @ApiBearerAuth()
   @ApiOperation({
-    summary: '매칭 신청 정보 수정',
+    summary: '매칭 신청 정보 수정 (⭕️updated)',
     description:
       'request body에 수정이 필요한 프로퍼티만 보내주시면 됩니다 \n\n * ex) members 프로퍼티가 수정된 경우 members 프로퍼티 전체 정보가 필요함 \n\n 이미 매칭 완료된 팀인 경우 OR 매칭 실패한 팀인 경우 수정 불가',
   })
@@ -168,8 +168,8 @@ export class TeamsController {
 
   @ApiBearerAuth()
   @ApiOperation({
-    summary: '매칭 신청 정보 조회',
-    description: '본인팀, 상대팀 ID로만 조회 가능 \n\n startRound, currentRound로 매칭 실패/매칭중 판단 필요',
+    summary: '매칭 신청 정보 조회 (📌is updating)',
+    description: '모든팀 정보 조회 가능',
   })
   @ApiOkResponse({
     type: GetTeamDto,
@@ -183,34 +183,46 @@ export class TeamsController {
 
   @ApiBearerAuth()
   @ApiOperation({
-    summary: '재매칭하기/기존 정보로 매칭 시작하기',
-    description: '기존 팀정보는 delete처리 \n\n 관리자페이지에서 카톡방 생성 여부와는 별개',
+    summary: '팀 연락처 조회 (🔆new)',
+    description: '본인팀 또는 매칭 상호 수락 후 상대팀 연락처 조회 가능',
   })
-  @ApiCreatedResponse({ description: 'Created' })
-  @Post(':teamId/reapply')
+  @ApiOkResponse({})
+  @Get(':teamId/contact')
   @UseGuards(AccessTokenGuard, TeamOwnerGuard)
-  postTeamsTeamIdReapply(@GetUser() _user: PassportUser, @Param('teamId') teamId: number): Promise<void> {
-    return this.teamsService.reapplyTeam(teamId);
+  getTeamsTeamIdContact(): Promise<void> {
+    return;
   }
 
-  @ApiBearerAuth()
-  @ApiOperation({
-    summary: '팀의 매칭ID 조회 (📌is updating)',
-    description: '매칭 정보가 없는 경우 null 반환',
-  })
-  @ApiOkResponse({
-    schema: {
-      example: {
-        matchingId: 1,
-      },
-    },
-  })
-  @Get(':teamId/matching-id')
-  @UseGuards(AccessTokenGuard, TeamOwnerGuard)
-  getTeamsTeamIdMatchingId(
-    @GetUser() _user: PassportUser,
-    @Param('teamId') teamId: number,
-  ): Promise<{ matchingId: number }> {
-    return this.teamsService.getMatchingIdByTeamId(teamId);
-  }
+  // @ApiBearerAuth()
+  // @ApiOperation({
+  //   summary: '재매칭하기/기존 정보로 매칭 시작하기',
+  //   description: '기존 팀정보는 delete처리 \n\n 관리자페이지에서 카톡방 생성 여부와는 별개',
+  // })
+  // @ApiCreatedResponse({ description: 'Created' })
+  // @Post(':teamId/reapply')
+  // @UseGuards(AccessTokenGuard, TeamOwnerGuard)
+  // postTeamsTeamIdReapply(@GetUser() _user: PassportUser, @Param('teamId') teamId: number): Promise<void> {
+  //   return this.teamsService.reapplyTeam(teamId);
+  // }
+
+  // @ApiBearerAuth()
+  // @ApiOperation({
+  //   summary: '팀의 매칭ID 조회 (📌is updating)',
+  //   description: '매칭 정보가 없는 경우 null 반환',
+  // })
+  // @ApiOkResponse({
+  //   schema: {
+  //     example: {
+  //       matchingId: 1,
+  //     },
+  //   },
+  // })
+  // @Get(':teamId/matching-id')
+  // @UseGuards(AccessTokenGuard, TeamOwnerGuard)
+  // getTeamsTeamIdMatchingId(
+  //   @GetUser() _user: PassportUser,
+  //   @Param('teamId') teamId: number,
+  // ): Promise<{ matchingId: number }> {
+  //   return this.teamsService.getMatchingIdByTeamId(teamId);
+  // }
 }
