@@ -33,7 +33,7 @@ export class TeamOwnerGuard implements CanActivate {
       const matching = await this.matchingsService.getMatchingByTeamId(teamId);
 
       if (!!matching) {
-        const ourteamId = matching.maleTeam.id === teamId ? matching.femaleTeam.id : matching.maleTeam.id;
+        const ourteamId = matching.appliedTeam.id === teamId ? matching.receivedTeam.id : matching.appliedTeam.id;
 
         const ourteam = await this.teamsService.getTeamById(ourteamId);
 
