@@ -11,7 +11,7 @@ import { Areas } from './constants/areas';
 import { Genders } from './constants/genders';
 import * as Universities from './constants/universities.json';
 import { AccessTokenGuard } from './../auth/guards/access-token.guard';
-import { Param, Body } from '@nestjs/common/decorators';
+import { Param, Body, Put } from '@nestjs/common/decorators';
 import {
   ApiBearerAuth,
   ApiNotFoundResponse,
@@ -190,6 +190,18 @@ export class TeamsController {
   @Get(':teamId/contact')
   @UseGuards(AccessTokenGuard, TeamOwnerGuard)
   getTeamsTeamIdContact(): Promise<void> {
+    return;
+  }
+
+  @ApiOperation({
+    summary: '매칭 다시 안 보기 (🔆new)',
+    description:
+      '거절 당한 팀ID를 파라미터로 보내주시면 됩니다.\n\n유저 테이블 refusedUserIds에 해당 팀 대표 유저ID 추가 및 이후 추천 안됨',
+  })
+  @ApiOkResponse({ description: 'OK' })
+  @Put(':refusedTeamId')
+  @UseGuards(AccessTokenGuard)
+  putMatchingsAppliedTeamIdReceivedTeamId(): Promise<void> {
     return;
   }
 
