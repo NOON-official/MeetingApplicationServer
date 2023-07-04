@@ -38,7 +38,7 @@ export class User extends BaseEntity {
   @Column({ type: 'varchar', length: 10, nullable: true })
   ageRange: string;
 
-  @Column({ type: 'int', nullable:true })
+  @Column({ type: 'int', nullable: true })
   university: number;
 
   @Column({ type: 'int', nullable: true })
@@ -52,6 +52,9 @@ export class User extends BaseEntity {
 
   @Column({ type: 'json', nullable: true })
   refusedUserIds: number[] | null;
+
+  @Column({ type: 'boolean', default: false })
+  isVerified: boolean;
 
   @Column({ type: 'boolean', default: false })
   isAdmin: boolean;
