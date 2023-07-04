@@ -50,86 +50,86 @@ export class TasksService {
   }
 
   // 매 분(0초)마다 실행
-  @Cron(CronExpression.EVERY_MINUTE)
-  async handlePartnerTeamNotRespondedTeams() {
-    // 상대팀이 무응답하고, 이용권 환불받지 않은 팀 조회
-    const { teams: partnerTeamNotRespondedMaleTeams } = await this.teamsService.getPartnerTeamNotRespondedTeamsByGender(
-      TeamGender.male,
-    );
-    const { teams: partnerTeamNotRespondedFemaleTeams } =
-      await this.teamsService.getPartnerTeamNotRespondedTeamsByGender(TeamGender.female);
+  // @Cron(CronExpression.EVERY_MINUTE)
+  // async handlePartnerTeamNotRespondedTeams() {
+  //   // 상대팀이 무응답하고, 이용권 환불받지 않은 팀 조회
+  //   const { teams: partnerTeamNotRespondedMaleTeams } = await this.teamsService.getPartnerTeamNotRespondedTeamsByGender(
+  //     TeamGender.male,
+  //   );
+  //   const { teams: partnerTeamNotRespondedFemaleTeams } =
+  //     await this.teamsService.getPartnerTeamNotRespondedTeamsByGender(TeamGender.female);
 
-    for await (const maleTeam of partnerTeamNotRespondedMaleTeams) {
-      const matchingPartnerTeamNotRespondedEvent = new MatchingPartnerTeamNotRespondedEvent();
+  //   for await (const maleTeam of partnerTeamNotRespondedMaleTeams) {
+  //     const matchingPartnerTeamNotRespondedEvent = new MatchingPartnerTeamNotRespondedEvent();
 
-      // 1) 이용권 환불
-      await this.ticketsService.refundTicketById(maleTeam.ticketId);
-      await this.matchingsService.deleteTicketInfoByMatchingIdAndGender(maleTeam.matchingId, TeamGender.male);
+  //     // 1) 이용권 환불
+  //     await this.ticketsService.refundTicketById(maleTeam.ticketId);
+  //     await this.matchingsService.deleteTicketInfoByMatchingIdAndGender(maleTeam.matchingId, TeamGender.male);
 
-      // 2) 매칭 거절 당함 문자 보내기
-      matchingPartnerTeamNotRespondedEvent.teamId = maleTeam.teamId;
-      this.eventEmitter.emit('matching.partnerTeamNotResponded', matchingPartnerTeamNotRespondedEvent);
-    }
+  //     // 2) 매칭 거절 당함 문자 보내기
+  //     matchingPartnerTeamNotRespondedEvent.teamId = maleTeam.teamId;
+  //     this.eventEmitter.emit('matching.partnerTeamNotResponded', matchingPartnerTeamNotRespondedEvent);
+  //   }
 
-    for await (const femaleTeam of partnerTeamNotRespondedFemaleTeams) {
-      const matchingPartnerTeamNotRespondedEvent = new MatchingPartnerTeamNotRespondedEvent();
+  //   for await (const femaleTeam of partnerTeamNotRespondedFemaleTeams) {
+  //     const matchingPartnerTeamNotRespondedEvent = new MatchingPartnerTeamNotRespondedEvent();
 
-      // 1) 이용권 환불
-      await this.ticketsService.refundTicketById(femaleTeam.ticketId);
-      await this.matchingsService.deleteTicketInfoByMatchingIdAndGender(femaleTeam.matchingId, TeamGender.female);
+  //     // 1) 이용권 환불
+  //     await this.ticketsService.refundTicketById(femaleTeam.ticketId);
+  //     await this.matchingsService.deleteTicketInfoByMatchingIdAndGender(femaleTeam.matchingId, TeamGender.female);
 
-      // 2) 매칭 거절 당함 문자 보내기
-      matchingPartnerTeamNotRespondedEvent.teamId = femaleTeam.teamId;
-      this.eventEmitter.emit('matching.partnerTeamNotResponded', matchingPartnerTeamNotRespondedEvent);
-    }
-  }
+  //     // 2) 매칭 거절 당함 문자 보내기
+  //     matchingPartnerTeamNotRespondedEvent.teamId = femaleTeam.teamId;
+  //     this.eventEmitter.emit('matching.partnerTeamNotResponded', matchingPartnerTeamNotRespondedEvent);
+  //   }
+  // }
 
   // 매 분(0초)마다 실행
   // 수락/거절 대기자 종료 3시간 전 문자 발송
-  @Cron(CronExpression.EVERY_MINUTE)
-  async handleNotRespondedTeams() {
-    // 수락/거절 대기자 조회
-    const { teams: matchedMaleTwoTeams } = await this.teamsService.getTeamsByStatusAndMembercountAndGender(
-      MatchingStatus.MATCHED,
-      '2',
-      TeamGender.male,
-    );
+  // @Cron(CronExpression.EVERY_MINUTE)
+  // async handleNotRespondedTeams() {
+  //   // 수락/거절 대기자 조회
+  //   const { teams: matchedMaleTwoTeams } = await this.teamsService.getTeamsByStatusAndMembercountAndGender(
+  //     MatchingStatus.MATCHED,
+  //     '2',
+  //     TeamGender.male,
+  //   );
 
-    const { teams: matchedMaleThreeTeams } = await this.teamsService.getTeamsByStatusAndMembercountAndGender(
-      MatchingStatus.MATCHED,
-      '3',
-      TeamGender.male,
-    );
+  //   const { teams: matchedMaleThreeTeams } = await this.teamsService.getTeamsByStatusAndMembercountAndGender(
+  //     MatchingStatus.MATCHED,
+  //     '3',
+  //     TeamGender.male,
+  //   );
 
-    const { teams: matchedFemaleTwoTeams } = await this.teamsService.getTeamsByStatusAndMembercountAndGender(
-      MatchingStatus.MATCHED,
-      '2',
-      TeamGender.female,
-    );
+  //   const { teams: matchedFemaleTwoTeams } = await this.teamsService.getTeamsByStatusAndMembercountAndGender(
+  //     MatchingStatus.MATCHED,
+  //     '2',
+  //     TeamGender.female,
+  //   );
 
-    const { teams: matchedFemaleThreeTeams } = await this.teamsService.getTeamsByStatusAndMembercountAndGender(
-      MatchingStatus.MATCHED,
-      '3',
-      TeamGender.female,
-    );
+  //   const { teams: matchedFemaleThreeTeams } = await this.teamsService.getTeamsByStatusAndMembercountAndGender(
+  //     MatchingStatus.MATCHED,
+  //     '3',
+  //     TeamGender.female,
+  //   );
 
-    const matchedTeams = matchedMaleTwoTeams.concat(
-      matchedMaleThreeTeams,
-      matchedFemaleTwoTeams,
-      matchedFemaleThreeTeams,
-    );
+  //   const matchedTeams = matchedMaleTwoTeams.concat(
+  //     matchedMaleThreeTeams,
+  //     matchedFemaleTwoTeams,
+  //     matchedFemaleThreeTeams,
+  //   );
 
-    for await (const matchedTeam of matchedTeams) {
-      const now = moment(new Date()).format('YYYY-MM-DD HH:mm');
-      const beforeThreeHours = moment(matchedTeam.matchedAt).add(21, 'hours').format('YYYY-MM-DD HH:mm');
+  //   for await (const matchedTeam of matchedTeams) {
+  //     const now = moment(new Date()).format('YYYY-MM-DD HH:mm');
+  //     const beforeThreeHours = moment(matchedTeam.matchedAt).add(21, 'hours').format('YYYY-MM-DD HH:mm');
 
-      if (now === beforeThreeHours) {
-        const matchingOurteamNotRespondedEvent = new MatchingOurteamNotRespondedEvent();
+  //     if (now === beforeThreeHours) {
+  //       const matchingOurteamNotRespondedEvent = new MatchingOurteamNotRespondedEvent();
 
-        // 종료 3시간 전 알림 문자 보내기
-        matchingOurteamNotRespondedEvent.teamId = matchedTeam.teamId;
-        this.eventEmitter.emit('matching.ourteamNotResponded', matchingOurteamNotRespondedEvent);
-      }
-    }
-  }
+  //       // 종료 3시간 전 알림 문자 보내기
+  //       matchingOurteamNotRespondedEvent.teamId = matchedTeam.teamId;
+  //       this.eventEmitter.emit('matching.ourteamNotResponded', matchingOurteamNotRespondedEvent);
+  //     }
+  //   }
+  // }
 }

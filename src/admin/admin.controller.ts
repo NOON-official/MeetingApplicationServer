@@ -31,33 +31,33 @@ import { AdminGetUserDto } from './dtos/admin-get-user.dto';
 export class AdminController {
   constructor(private adminService: AdminService) {}
 
-  @ApiOperation({
-    summary: '현재 신청팀 수 조회',
-    description: '매칭 실패 횟수 3회 미만인 팀 포함',
-  })
-  @ApiOkResponse({
-    schema: {
-      example: {
-        teamsPerRound: 10,
-        '2vs2': {
-          male: 8,
-          female: 6,
-        },
-        '3vs3': {
-          male: 4,
-          female: 5,
-        },
-      },
-    },
-  })
-  @Get('teams/count')
-  async getAdminTeamsCount(): Promise<{
-    teamsPerRound: number;
-    '2vs2': { male: number; female: number };
-    '3vs3': { male: number; female: number };
-  }> {
-    return this.adminService.getAdminTeamCount();
-  }
+  // @ApiOperation({
+  //   summary: '현재 신청팀 수 조회',
+  //   description: '매칭 실패 횟수 3회 미만인 팀 포함',
+  // })
+  // @ApiOkResponse({
+  //   schema: {
+  //     example: {
+  //       teamsPerRound: 10,
+  //       '2vs2': {
+  //         male: 8,
+  //         female: 6,
+  //       },
+  //       '3vs3': {
+  //         male: 4,
+  //         female: 5,
+  //       },
+  //     },
+  //   },
+  // })
+  // @Get('teams/count')
+  // async getAdminTeamsCount(): Promise<{
+  //   teamsPerRound: number;
+  //   '2vs2': { male: number; female: number };
+  //   '3vs3': { male: number; female: number };
+  // }> {
+  //   return this.adminService.getAdminTeamCount();
+  // }
 
   @ApiOperation({
     summary: '유저 전체 조회',
@@ -100,59 +100,59 @@ export class AdminController {
     return this.adminService.getAllUsers();
   }
 
-  @ApiBearerAuth()
-  @ApiOperation({
-    summary: '신청자 조회',
-    description:
-      '관리자페이지 내 사용 \n\n * APPLIED = 신청자 \n\n * MATCHED = 수락/거절 대기자 \n\n * FAILED = 매칭 실패 회원 \n\n * PARTNER_TEAM_REFUSED = 거절 당한 회원 \n\n 아직 매칭되지 않은 경우: partnerTeamId=null, matchedAt=null \n\n 매칭실패하지 않은 경우: failedAt=null \n\n 거절당하지 않은 경우: refusedAt=null',
-  })
-  @ApiQuery({
-    name: 'status',
-    enum: [MatchingStatus.APPLIED, MatchingStatus.MATCHED, MatchingStatus.FAILED, MatchingStatus.PARTNER_TEAM_REFUSED],
-  })
-  @ApiQuery({ name: 'membercount', enum: ['2', '3'] })
-  @ApiQuery({ name: 'gender', enum: TeamGender })
-  @ApiOkResponse({
-    schema: {
-      example: {
-        teams: [
-          {
-            teamId: 2,
-            matchingCount: 0,
-            nickname: '미팅이',
-            intro: '안녕하세요',
-            memberCount: 2,
-            phone: '01012345678',
-            averageAge: 23,
-            prefAge: [23, 27],
-            areas: [1, 3],
-            universities: [1, 42, 345],
-            prefSameUniversity: true,
-            drink: 5,
-            partnerTeamId: 2,
-            appliedAt: '2023-01-20T21:37:26.886Z',
-            matchedAt: '2023-01-20T21:37:26.886Z',
-            failedAt: '2023-01-20T21:37:26.886Z',
-            refusedAt: '2023-01-20T21:37:26.886Z',
-            lastFailReason: 'Date',
-          },
-        ],
-      },
-    },
-  })
-  @Get('teams')
-  getAdminTeamsStatusMembercountGender(
-    @Query('status')
-    status:
-      | MatchingStatus.APPLIED
-      | MatchingStatus.MATCHED
-      | MatchingStatus.FAILED
-      | MatchingStatus.PARTNER_TEAM_REFUSED,
-    @Query('membercount') membercount: '2' | '3',
-    @Query('gender') gender: TeamGender,
-  ): Promise<{ teams: AdminGetTeamDto[] }> {
-    return this.adminService.getTeamsByStatusAndMembercountAndGender(status, membercount, gender);
-  }
+  // @ApiBearerAuth()
+  // @ApiOperation({
+  //   summary: '신청자 조회',
+  //   description:
+  //     '관리자페이지 내 사용 \n\n * APPLIED = 신청자 \n\n * MATCHED = 수락/거절 대기자 \n\n * FAILED = 매칭 실패 회원 \n\n * PARTNER_TEAM_REFUSED = 거절 당한 회원 \n\n 아직 매칭되지 않은 경우: partnerTeamId=null, matchedAt=null \n\n 매칭실패하지 않은 경우: failedAt=null \n\n 거절당하지 않은 경우: refusedAt=null',
+  // })
+  // @ApiQuery({
+  //   name: 'status',
+  //   enum: [MatchingStatus.APPLIED, MatchingStatus.MATCHED, MatchingStatus.FAILED, MatchingStatus.PARTNER_TEAM_REFUSED],
+  // })
+  // @ApiQuery({ name: 'membercount', enum: ['2', '3'] })
+  // @ApiQuery({ name: 'gender', enum: TeamGender })
+  // @ApiOkResponse({
+  //   schema: {
+  //     example: {
+  //       teams: [
+  //         {
+  //           teamId: 2,
+  //           matchingCount: 0,
+  //           nickname: '미팅이',
+  //           intro: '안녕하세요',
+  //           memberCount: 2,
+  //           phone: '01012345678',
+  //           averageAge: 23,
+  //           prefAge: [23, 27],
+  //           areas: [1, 3],
+  //           universities: [1, 42, 345],
+  //           prefSameUniversity: true,
+  //           drink: 5,
+  //           partnerTeamId: 2,
+  //           appliedAt: '2023-01-20T21:37:26.886Z',
+  //           matchedAt: '2023-01-20T21:37:26.886Z',
+  //           failedAt: '2023-01-20T21:37:26.886Z',
+  //           refusedAt: '2023-01-20T21:37:26.886Z',
+  //           lastFailReason: 'Date',
+  //         },
+  //       ],
+  //     },
+  //   },
+  // })
+  // @Get('teams')
+  // getAdminTeamsStatusMembercountGender(
+  //   @Query('status')
+  //   status:
+  //     | MatchingStatus.APPLIED
+  //     | MatchingStatus.MATCHED
+  //     | MatchingStatus.FAILED
+  //     | MatchingStatus.PARTNER_TEAM_REFUSED,
+  //   @Query('membercount') membercount: '2' | '3',
+  //   @Query('gender') gender: TeamGender,
+  // ): Promise<{ teams: AdminGetTeamDto[] }> {
+  //   return this.adminService.getTeamsByStatusAndMembercountAndGender(status, membercount, gender);
+  // }
 
   @ApiBearerAuth()
   @ApiOperation({
