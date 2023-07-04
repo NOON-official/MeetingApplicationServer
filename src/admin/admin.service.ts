@@ -48,13 +48,13 @@ export class AdminService {
     return this.matchingsService.deleteMatchingById(matchingId);
   }
 
-  async getTeamsByStatusAndMembercountAndGender(
-    status: MatchingStatus,
-    membercount: '2' | '3',
-    gender: TeamGender,
-  ): Promise<{ teams: AdminGetTeamDto[] }> {
-    return this.teamsService.getTeamsByStatusAndMembercountAndGender(status, membercount, gender);
-  }
+  // async getTeamsByStatusAndMembercountAndGender(
+  //   status: MatchingStatus,
+  //   membercount: '2' | '3',
+  //   gender: TeamGender,
+  // ): Promise<{ teams: AdminGetTeamDto[] }> {
+  //   return this.teamsService.getTeamsByStatusAndMembercountAndGender(status, membercount, gender);
+  // }
 
   async getOurteamRefusedTeams(): Promise<{ teams: AdminGetOurteamRefusedTeamDto[] }> {
     return this.teamsService.getOurteamRefusedTeams();
@@ -280,49 +280,49 @@ export class AdminService {
   //   });
   // }
 
-  async getAdminTeamCount(): Promise<{
-    teamsPerRound: number;
-    '2vs2': { male: number; female: number };
-    '3vs3': { male: number; female: number };
-  }> {
-    const teamsPerRound = MatchingRound.MAX_TEAM;
+  // async getAdminTeamCount(): Promise<{
+  //   teamsPerRound: number;
+  //   '2vs2': { male: number; female: number };
+  //   '3vs3': { male: number; female: number };
+  // }> {
+  //   const teamsPerRound = MatchingRound.MAX_TEAM;
 
-    const { teamCount: male2 } = await this.teamsService.getTeamCountByStatusAndMembercountAndGender(
-      MatchingStatus.APPLIED,
-      '2',
-      TeamGender.male,
-    );
+  //   const { teamCount: male2 } = await this.teamsService.getTeamCountByStatusAndMembercountAndGender(
+  //     MatchingStatus.APPLIED,
+  //     '2',
+  //     TeamGender.male,
+  //   );
 
-    const { teamCount: female2 } = await this.teamsService.getTeamCountByStatusAndMembercountAndGender(
-      MatchingStatus.APPLIED,
-      '2',
-      TeamGender.female,
-    );
+  //   const { teamCount: female2 } = await this.teamsService.getTeamCountByStatusAndMembercountAndGender(
+  //     MatchingStatus.APPLIED,
+  //     '2',
+  //     TeamGender.female,
+  //   );
 
-    const { teamCount: male3 } = await this.teamsService.getTeamCountByStatusAndMembercountAndGender(
-      MatchingStatus.APPLIED,
-      '3',
-      TeamGender.male,
-    );
+  //   const { teamCount: male3 } = await this.teamsService.getTeamCountByStatusAndMembercountAndGender(
+  //     MatchingStatus.APPLIED,
+  //     '3',
+  //     TeamGender.male,
+  //   );
 
-    const { teamCount: female3 } = await this.teamsService.getTeamCountByStatusAndMembercountAndGender(
-      MatchingStatus.APPLIED,
-      '3',
-      TeamGender.female,
-    );
+  //   const { teamCount: female3 } = await this.teamsService.getTeamCountByStatusAndMembercountAndGender(
+  //     MatchingStatus.APPLIED,
+  //     '3',
+  //     TeamGender.female,
+  //   );
 
-    return {
-      teamsPerRound,
-      '2vs2': {
-        male: male2,
-        female: female2,
-      },
-      '3vs3': {
-        male: male3,
-        female: female3,
-      },
-    };
-  }
+  //   return {
+  //     teamsPerRound,
+  //     '2vs2': {
+  //       male: male2,
+  //       female: female2,
+  //     },
+  //     '3vs3': {
+  //       male: male3,
+  //       female: female3,
+  //     },
+  //   };
+  // }
 
   async createCouponWithUserId(userId: number, createCouponDto: CreateCouponDto): Promise<void> {
     return await this.couponsService.createCouponWithUserId(userId, createCouponDto);

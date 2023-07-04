@@ -112,13 +112,13 @@ export class TeamsService {
     return this.teamsRepository.getMembersCountTotal();
   }
 
-  async getTeamCountByStatusAndMembercountAndGender(
-    status: MatchingStatus.APPLIED,
-    membercount: '2' | '3' | '4',
-    gender: TeamGender,
-  ): Promise<{ teamCount: number }> {
-    return this.teamsRepository.getTeamCountByStatusAndMembercountAndGender(status, membercount, gender);
-  }
+  // async getTeamCountByStatusAndMembercountAndGender(
+  //   status: MatchingStatus.APPLIED,
+  //   membercount: '2' | '3' | '4',
+  //   gender: TeamGender,
+  // ): Promise<{ teamCount: number }> {
+  //   return this.teamsRepository.getTeamCountByStatusAndMembercountAndGender(status, membercount, gender);
+  // }
 
   // async getTeamCount(): Promise<{
   //   teamsPerRound: number;
@@ -344,31 +344,31 @@ export class TeamsService {
   //   return this.matchingsService.getMatchingIdByTeamId(teamId);
   // }
 
-  async getTeamsByStatusAndMembercountAndGender(
-    status: MatchingStatus,
-    membercount: '2' | '3' | '4',
-    gender: TeamGender,
-  ): Promise<{ teams: AdminGetTeamDto[] }> {
-    // 신청자 조회
-    if (status === MatchingStatus.APPLIED) {
-      return this.teamsRepository.getAppliedTeamsByGender(gender);
-    }
+  // async getTeamsByStatusAndMembercountAndGender(
+  //   status: MatchingStatus,
+  //   membercount: '2' | '3' | '4',
+  //   gender: TeamGender,
+  // ): Promise<{ teams: AdminGetTeamDto[] }> {
+  //   // 신청자 조회
+  //   if (status === MatchingStatus.APPLIED) {
+  //     return this.teamsRepository.getAppliedTeamsByGender(gender);
+  //   }
 
-    // 수락/거절 대기자 조회
-    if (status === MatchingStatus.MATCHED) {
-      return this.teamsRepository.getMatchedTeamsByGender(gender);
-    }
+  //   // 수락/거절 대기자 조회
+  //   if (status === MatchingStatus.MATCHED) {
+  //     return this.teamsRepository.getMatchedTeamsByGender(gender);
+  //   }
 
-    // 매칭 실패 회원 조회
-    if (status === MatchingStatus.FAILED) {
-      return this.teamsRepository.getFailedTeamsByMembercountAndGender(gender);
-    }
+  //   // 매칭 실패 회원 조회
+  //   if (status === MatchingStatus.FAILED) {
+  //     return this.teamsRepository.getFailedTeamsByMembercountAndGender(gender);
+  //   }
 
-    // 거절 당한 회원 조회
-    if (status === MatchingStatus.PARTNER_TEAM_REFUSED) {
-      return this.teamsRepository.getPartnerTeamRefusedTeamsByGender(gender);
-    }
-  }
+  //   // 거절 당한 회원 조회
+  //   if (status === MatchingStatus.PARTNER_TEAM_REFUSED) {
+  //     return this.teamsRepository.getPartnerTeamRefusedTeamsByGender(gender);
+  //   }
+  // }
 
   async getOurteamRefusedTeams(): Promise<{ teams: AdminGetOurteamRefusedTeamDto[] }> {
     return this.matchingsService.getMatchingRefuseReasons();
@@ -379,11 +379,11 @@ export class TeamsService {
   }
 
   // 상대팀 무응답이고 아직 환불받지 않은 팀 조회
-  async getPartnerTeamNotRespondedTeamsByGender(
-    gender: TeamGender,
-  ): Promise<{ teams: AdminGetPartnerTeamNotRespondedTeamDto[] }> {
-    return this.teamsRepository.getPartnerTeamNotRespondedTeamsByGender(gender);
-  }
+  // async getPartnerTeamNotRespondedTeamsByGender(
+  //   gender: TeamGender,
+  // ): Promise<{ teams: AdminGetPartnerTeamNotRespondedTeamDto[] }> {
+  //   return this.teamsRepository.getPartnerTeamNotRespondedTeamsByGender(gender);
+  // }
 
   async deleteTeamsByUserId(userId: number): Promise<void> {
     return this.teamsRepository.deleteTeamsByUserId(userId);
