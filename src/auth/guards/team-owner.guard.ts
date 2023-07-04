@@ -28,19 +28,5 @@ export class TeamOwnerGuard implements CanActivate {
     if (team?.user.id === userId) {
       return true;
     }
-    // 2. GET request이고, 매칭 상대팀인 경우 접근 가능
-    else if (req.method === 'GET') {
-      const matching = await this.matchingsService.getMatchingByTeamId(teamId);
-
-      if (!!matching) {
-        const ourteamId = matching.appliedTeam.id === teamId ? matching.receivedTeam.id : matching.appliedTeam.id;
-
-        const ourteam = await this.teamsService.getTeamById(ourteamId);
-
-        if (ourteam.user.id === userId) {
-          return true;
-        }
-      }
-    }
   }
 }
