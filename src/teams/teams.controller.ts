@@ -1,7 +1,7 @@
 import { PassportUser } from './../auth/interfaces/passport-user.interface';
 import { GetUser } from '../common/decorators/get-user.decorator';
 import { TeamsService } from './teams.service';
-import { GetTeamDto } from './dtos/get-team.dto';
+import { GetTeamDetailDto, GetTeamDto } from './dtos/get-team.dto';
 import { CreateTeamDto } from './dtos/create-team.dto';
 import { Vibes } from './constants/vibes';
 import { SameUniversities } from './constants/same-universities';
@@ -168,7 +168,7 @@ export class TeamsController {
 
   @ApiBearerAuth()
   @ApiOperation({
-    summary: '매칭 신청 정보 조회 (📌is updating)',
+    summary: '매칭 신청 정보 조회 (⭕️updated)',
     description: '모든팀 정보 조회 가능',
   })
   @ApiOkResponse({
@@ -183,13 +183,15 @@ export class TeamsController {
 
   @ApiBearerAuth()
   @ApiOperation({
-    summary: '팀 연락처 조회 (🔆new)',
+    summary: '팀 연락처 조회 (📌is updating)',
     description: '본인팀 또는 매칭 상호 수락 후 상대팀 연락처 조회 가능',
   })
-  @ApiOkResponse({})
+  @ApiOkResponse({
+    type: GetTeamDetailDto
+  })
   @Get(':teamId/contact')
   @UseGuards(AccessTokenGuard, TeamOwnerGuard)
-  getTeamsTeamIdContact(): Promise<void> {
+  getTeamsTeamIdContact(@GetUser() _user: PassportUser, @Param('teamId') teamId: number): Promise<GetTeamDetailDto> {
     return;
   }
 

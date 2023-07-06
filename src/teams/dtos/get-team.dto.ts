@@ -151,3 +151,17 @@ export class GetTeamDto {
   })
   deletedAt?: Date;
 }
+
+export class GetTeamDetailDto extends GetTeamDto {
+  @ApiProperty({
+    description: '핸드폰 번호',
+    example: '01012345678',
+  })
+  phone?: string;
+
+  @ApiProperty({
+    description: '카카오 아이디',
+    example: 'kakaoID',
+  })
+  kakaoId?: string;
+}
