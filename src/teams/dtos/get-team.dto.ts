@@ -66,16 +66,16 @@ export class GetTeamDto {
 
   @ApiProperty({
     description: '인원 변경 가능',
-    example: [2,3],
+    example: [2, 3],
   })
   memberCounts?: number[];
 
   @ApiProperty({
     description: '미팅 선호 일정',
-    example: 3,
+    example: [1, 2],
     required: true,
   })
-  teamAvailableDate: number;
+  teamAvailableDate: number[];
 
   @ApiProperty({
     description: '지역',

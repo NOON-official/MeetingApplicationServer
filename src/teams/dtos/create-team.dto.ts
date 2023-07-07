@@ -82,7 +82,7 @@ export class CreateTeamDto {
 
   @ApiProperty({
     description: '인원 변경 가능',
-    example: [2,3],
+    example: [2, 3],
   })
   @IsInt({ each: true })
   @ArrayMaxSize(2)
@@ -90,14 +90,13 @@ export class CreateTeamDto {
 
   @ApiProperty({
     description: '미팅 선호 일정',
-    example: 3,
+    example: [1, 2],
     required: true,
   })
   @IsNotEmpty()
-  @IsInt()
-  @Min(1)
-  @Max(3)
-  readonly teamAvailableDate: number;
+  @IsInt({ each: true })
+  @ArrayMaxSize(2)
+  readonly teamAvailableDate: number[];
 
   @ApiProperty({
     description: '지역',
@@ -187,5 +186,4 @@ export class CreateTeamDto {
   @IsNotEmpty()
   @IsString()
   readonly kakaoId: string;
-
 }
