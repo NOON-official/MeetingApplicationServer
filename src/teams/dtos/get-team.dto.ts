@@ -121,11 +121,11 @@ export class GetTeamDto {
   prefVibes: number[];
 
   @ApiProperty({
-    description: '카카오 아이디',
-    example: 'kiwoong',
+    description: '학교 인증',
+    example: true,
     required: true,
   })
-  readonly kakaoId: string;
+  readonly isVerified: boolean;
 
   @ApiProperty({
     description: '생성일시',
@@ -150,4 +150,18 @@ export class GetTeamDto {
     example: '2023-01-20T21:37:26.886Z',
   })
   deletedAt?: Date;
+}
+
+export class GetTeamDetailDto extends GetTeamDto {
+  @ApiProperty({
+    description: '핸드폰 번호',
+    example: '01012345678',
+  })
+  phone?: string;
+
+  @ApiProperty({
+    description: '카카오 아이디',
+    example: 'kakaoID',
+  })
+  kakaoId?: string;
 }

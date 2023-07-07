@@ -289,13 +289,16 @@ export class TeamsService {
     const team = await this.getTeamById(teamId);
 
     team['ownerId'] = team.user.id;
+    const isVerified = team.user.isVerified;
 
     delete Object.assign(team, { ['members']: team['teamMembers'] })['teamMembers']; // 프로퍼티 이름 변경
     delete team.user;
     delete team.appliedTeamMatching;
     delete team.receivedTeamMatching;
+    delete team.kakaoId
 
     const result = Object.assign(team);
+    result['isVerified'] = isVerified
 
     return result;
   }
