@@ -16,7 +16,7 @@ import {
 import { UsersService } from './users.service';
 import { Controller, Get } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
-import { Body, Patch, Post } from '@nestjs/common/decorators';
+import { Body, Delete, Param, Patch, Post } from '@nestjs/common/decorators';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { PassportUser } from 'src/auth/interfaces/passport-user.interface';
 import { UserOrder } from './interfaces/user-order.interface';
@@ -251,7 +251,28 @@ export class UsersController {
   })
   @ApiOkResponse({
     schema: {
-      example: {},
+      example: {
+        teams: [
+          {
+            id: 1,
+            teamName: '기웅내세요',
+            age: 24,
+            memberCount: 3,
+            intro: '안녕하세요',
+            isVerified: true,
+            appliedAt: '2023-01-20T21:37:26.886Z',
+          },
+          {
+            id: 2,
+            teamName: '아름이와 아이들',
+            age: 27,
+            memberCount: 2,
+            intro: '안녕하세요',
+            isVerified: false,
+            appliedAt: '2023-01-20T21:37:26.886Z',
+          },
+        ],
+      },
     },
   })
   @Get('teams/today')
@@ -266,7 +287,30 @@ export class UsersController {
   })
   @ApiOkResponse({
     schema: {
-      example: {},
+      example: {
+        teams: [
+          {
+            id: 1,
+            matchingId: 1,
+            teamName: '기웅내세요',
+            age: 24,
+            memberCount: 3,
+            intro: '안녕하세요',
+            isVerified: true,
+            appliedAt: '2023-01-20T21:37:26.886Z',
+          },
+          {
+            id: 2,
+            matchingId: 3,
+            teamName: '아름이와 아이들',
+            age: 27,
+            memberCount: 2,
+            intro: '안녕하세요',
+            isVerified: false,
+            appliedAt: '2023-01-20T21:37:26.886Z',
+          },
+        ],
+      },
     },
   })
   @Get('matchings/applied')
@@ -281,7 +325,30 @@ export class UsersController {
   })
   @ApiOkResponse({
     schema: {
-      example: {},
+      example: {
+        teams: [
+          {
+            id: 1,
+            matchingId: 1,
+            teamName: '기웅내세요',
+            age: 24,
+            memberCount: 3,
+            intro: '안녕하세요',
+            isVerified: true,
+            appliedAt: '2023-01-20T21:37:26.886Z',
+          },
+          {
+            id: 2,
+            matchingId: 2,
+            teamName: '아름이와 아이들',
+            age: 27,
+            memberCount: 2,
+            intro: '안녕하세요',
+            isVerified: false,
+            appliedAt: '2023-01-20T21:37:26.886Z',
+          },
+        ],
+      },
     },
   })
   @Get('matchings/received')
@@ -296,12 +363,63 @@ export class UsersController {
   })
   @ApiOkResponse({
     schema: {
-      example: {},
+      example: {
+        teams: [
+          {
+            id: 1,
+            matchingId: 1,
+            teamName: '기웅내세요',
+            age: 24,
+            memberCount: 3,
+            intro: '안녕하세요',
+            isVerified: true,
+            matchedAt: '2023-01-20T21:37:26.886Z',
+          },
+          {
+            id: 2,
+            matchingId: 2,
+            teamName: '아름이와 아이들',
+            age: 27,
+            memberCount: 2,
+            intro: '안녕하세요',
+            isVerified: false,
+            matchedAt: '2023-01-20T21:37:26.886Z',
+          },
+        ],
+      },
     },
   })
   @Get('matchings/succeeded')
   @UseGuards(AccessTokenGuard)
   getUsersMatchingsSucceeded(): Promise<void> {
+    return;
+  }
+
+  @ApiOperation({
+    summary: '유저 신청한 팀 삭제 (내가 신청) (🔆new)',
+    description: '',
+  })
+  @ApiOkResponse({ description: 'OK' })
+  @Delete('matchings/applied/:matchingId')
+  @UseGuards(AccessTokenGuard)
+  deleteUsersMatchingsAppliedMatchingId(
+    @GetUser() user: PassportUser,
+    @Param('matchingId') matchingId: number,
+  ): Promise<void> {
+    return;
+  }
+
+  @ApiOperation({
+    summary: '유저 신청받은 팀 삭제 (남이 신청) (🔆new)',
+    description: '',
+  })
+  @ApiOkResponse({ description: 'OK' })
+  @Delete('matchings/received/:matchingId')
+  @UseGuards(AccessTokenGuard)
+  deleteUsersMatchingsReceivedMatchingId(
+    @GetUser() user: PassportUser,
+    @Param('matchingId') matchingId: number,
+  ): Promise<void> {
     return;
   }
 
