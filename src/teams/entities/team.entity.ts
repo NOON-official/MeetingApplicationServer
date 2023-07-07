@@ -50,11 +50,11 @@ export class Team extends BaseEntity {
   @Column({ type: 'json' })
   prefVibes: number[];
 
-  @Column({ type: 'int', default: 3 })
-  teamAvailableDate: number;
+  @Column({ type: 'json' })
+  teamAvailableDate: number[];
 
-  @Column({ type: 'text' })
-  kakaoId: string;
+  @Column({ type: 'text', nullable: true })
+  kakaoId?: string;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
