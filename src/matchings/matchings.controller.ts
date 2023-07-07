@@ -59,12 +59,15 @@ export class MatchingsController {
   // }
   @ApiOperation({
     summary: '매칭 신청하기 (🔆new)',
-    description: '',
+    description: '매칭 신청하는 팀ID와 신청받는 팀ID를 보내주시면 됩니다.',
   })
-  @ApiOkResponse({ description: 'OK' })
+  @ApiCreatedResponse({ description: 'Created' })
   @Post(':appliedTeamId/:receivedTeamId')
-  @UseGuards(AccessTokenGuard, MatchingOwnerGuard)
-  postMatchingsAppliedTeamIdReceivedTeamId(): Promise<void> {
+  postMatchingsAppliedTeamIdReceivedTeamId(
+    @GetUser() user: PassportUser,
+    @Param('appliedTeamId') appliedTeamId: number,
+    @Param('receivedTeamId') receivedTeamId: number,
+  ): Promise<void> {
     return;
   }
 
