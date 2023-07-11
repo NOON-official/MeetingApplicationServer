@@ -1,7 +1,7 @@
 import { AdminGetPartnerTeamNotRespondedTeamDto } from './../admin/dtos/admin-get-partner-team-not-responded-team.dto';
 import { MatchingStatus } from 'src/matchings/interfaces/matching-status.enum';
 import { MatchingsService } from './../matchings/matchings.service';
-import { GetTeamDto } from './dtos/get-team.dto';
+import { GetTeamDetailDto, GetTeamDto } from './dtos/get-team.dto';
 import { BadRequestException } from '@nestjs/common/exceptions';
 import { MatchingRound } from './../matchings/constants/matching-round';
 import { CreateTeamDto } from './dtos/create-team.dto';
@@ -296,6 +296,23 @@ export class TeamsService {
     delete team.appliedTeamMatching;
     delete team.receivedTeamMatching;
     delete team.kakaoId
+
+    const result = Object.assign(team);
+    result['isVerified'] = isVerified
+
+    return result;
+  }
+
+  async getApplicationTeamDetailById(teamId: number): Promise<GetTeamDetailDto> {
+    const team = await this.getTeamById(teamId);
+
+    team['ownerId'] = team.user.id;
+    const isVerified = team.user.isVerified;
+
+    delete Object.assign(team, { ['members']: team['teamMembers'] })['teamMembers']; // 프로퍼티 이름 변경
+    delete team.user;
+    delete team.appliedTeamMatching;
+    delete team.receivedTeamMatching;
 
     const result = Object.assign(team);
     result['isVerified'] = isVerified

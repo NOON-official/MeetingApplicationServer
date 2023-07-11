@@ -95,6 +95,9 @@ export class CreateTeamDto {
   })
   @IsNotEmpty()
   @IsInt({ each: true })
+  @Min(1, { each: true })
+  @Max(2, { each: true })
+  @ArrayMinSize(1)
   @ArrayMaxSize(2)
   readonly teamAvailableDate: number[];
 
@@ -106,9 +109,9 @@ export class CreateTeamDto {
   @IsNotEmpty()
   @IsInt({ each: true })
   @Min(1, { each: true })
-  @Max(5, { each: true })
+  @Max(14, { each: true })
   @ArrayMinSize(1)
-  @ArrayMaxSize(5)
+  @ArrayMaxSize(6)
   readonly areas: number[];
 
   @ApiProperty({
