@@ -17,6 +17,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TasksModule } from './tasks/tasks.module';
 import { LoggerMiddleware } from './common/middlewares/logger.middleware';
+import { TingsModule } from './tings/tings.module';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { LoggerMiddleware } from './common/middlewares/logger.middleware';
     TicketsModule,
     AdminModule,
     TasksModule,
+    TingsModule,
   ],
 })
 export class AppModule implements NestModule {
