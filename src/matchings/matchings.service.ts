@@ -134,7 +134,8 @@ export class MatchingsService {
   }
 
   async deleteTicketInfoByMatchingIdAndGender(matchingId: number, gender: TeamGender) {
-    return this.matchingsRepository.deleteTicketInfoByMatchingIdAndGender(matchingId, gender);
+    // return this.matchingsRepository.deleteTicketInfoByMatchingIdAndGender(matchingId, gender);
+    return;
   }
 
   async refuseMatchingByTeamId(matchingId: number, teamId: number): Promise<void> {
@@ -275,8 +276,8 @@ export class MatchingsService {
     const appliedTeamIsDeleted = matching?.appliedTeam?.deletedAt;
     const receivedTeamId = matching?.receivedTeam?.id;
     const receivedTeamIsDeleted = matching?.receivedTeam?.deletedAt;
-    const appliedTeamTicketId = matching?.appliedTeamTicket?.id;
-    const receivedTeamTicketId = matching?.receivedTeamTicket?.id;
+    // const appliedTeamTicketId = matching?.appliedTeamTicket?.id;
+    // const receivedTeamTicketId = matching?.receivedTeamTicket?.id;
 
     if (!!appliedTeamId && !appliedTeamIsDeleted) {
       await this.teamsService.deleteTeamById(appliedTeamId);
@@ -286,13 +287,13 @@ export class MatchingsService {
       await this.teamsService.deleteTeamById(receivedTeamId);
     }
 
-    if (!!appliedTeamTicketId) {
-      await this.ticketsService.deleteTicketById(appliedTeamTicketId);
-    }
+    // if (!!appliedTeamTicketId) {
+    //   await this.ticketsService.deleteTicketById(appliedTeamTicketId);
+    // }
 
-    if (!!receivedTeamTicketId) {
-      await this.ticketsService.deleteTicketById(receivedTeamTicketId);
-    }
+    // if (!!receivedTeamTicketId) {
+    //   await this.ticketsService.deleteTicketById(receivedTeamTicketId);
+    // }
   }
 
   async getMatchingsByStatus(status: MatchingStatus): Promise<{ matchings: AdminGetMatchingDto[] }> {
