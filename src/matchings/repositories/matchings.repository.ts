@@ -77,21 +77,21 @@ export class MatchingsRepository extends Repository<Matching> {
     // }
   }
 
-  async deleteTicketInfoByMatchingIdAndGender(matchingId: number, gender: 'male' | 'female'): Promise<void> {
-    if (gender === 'male') {
-      await this.createQueryBuilder()
-        .update(Matching)
-        .set({ appliedTeamTicket: null })
-        .where('id = :matchingId', { matchingId })
-        .execute();
-    } else if (gender === 'female') {
-      await this.createQueryBuilder()
-        .update(Matching)
-        .set({ receivedTeamTicket: null })
-        .where('id = :matchingId', { matchingId })
-        .execute();
-    }
-  }
+  // async deleteTicketInfoByMatchingIdAndGender(matchingId: number, gender: 'male' | 'female'): Promise<void> {
+  //   if (gender === 'male') {
+  //     await this.createQueryBuilder()
+  //       .update(Matching)
+  //       .set({ appliedTeamTicket: null })
+  //       .where('id = :matchingId', { matchingId })
+  //       .execute();
+  //   } else if (gender === 'female') {
+  //     await this.createQueryBuilder()
+  //       .update(Matching)
+  //       .set({ receivedTeamTicket: null })
+  //       .where('id = :matchingId', { matchingId })
+  //       .execute();
+  //   }
+  // }
 
   async deleteMatchingById(matchingId: number): Promise<void> {
     await this.createQueryBuilder('matching')

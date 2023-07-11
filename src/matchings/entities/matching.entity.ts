@@ -49,13 +49,11 @@ export class Matching extends BaseEntity {
   @JoinColumn({ name: 'receivedTeamId' })
   receivedTeam: Team;
 
-  @OneToOne(() => Ticket, (ticket) => ticket.appliedTeamMatching, { onDelete: 'CASCADE' })
-  @JoinColumn()
-  appliedTeamTicket: Ticket;
+  @Column({ type: 'boolean', nullable: true, default: null })
+  appliedTeamIsPaid: boolean;
 
-  @OneToOne(() => Ticket, (ticket) => ticket.receivedTeamMatching, { onDelete: 'CASCADE' })
-  @JoinColumn()
-  receivedTeamTicket: Ticket;
+  @Column({ type: 'boolean', nullable: true, default: null })
+  receivedTeamIsPaid: boolean;
 
   @OneToOne(() => MatchingRefuseReason, { cascade: true })
   matchingRefuseReason: MatchingRefuseReason;
