@@ -19,6 +19,7 @@ import { SmsType } from 'src/common/sms/enums/sms-type.enum';
 import { ContentType } from 'src/common/sms/enums/content-type.enum';
 import { HttpService } from '@nestjs/axios';
 import { catchError, firstValueFrom } from 'rxjs';
+import { SaveStudentCardDto } from './dtos/save-student-card.dto';
 
 export class AuthService {
   constructor(
@@ -219,5 +220,17 @@ export class AuthService {
     await this.cacheManager.del(phone);
 
     return await this.usersService.updateUserPhone(userId, { phone });
+  }
+
+  async postAuthStudentCard(userId: number, saveStudentCardDto: SaveStudentCardDto): Promise<void> {
+    const result = await this.usersService.getMyInfoByUserId(userId);
+
+    if (result.nickname === null) {
+      throw new NotFoundException(`Can't find user with id ${userId}`);
+    }
+    else {
+      this.usersService.updateStudentCard(userId, saveStudentCardDto)
+    }
+
   }
 }
