@@ -197,15 +197,15 @@ export class TeamsController {
   }
 
   @ApiOperation({
-    summary: '매칭 다시 안 보기 (🔆new)',
+    summary: '매칭 다시 안 보기 (📌is updating)',
     description:
       '거절 당한 팀ID를 파라미터로 보내주시면 됩니다.\n\n유저 테이블 refusedUserIds에 해당 팀 대표 유저ID 추가 및 이후 추천 안됨',
   })
   @ApiOkResponse({ description: 'OK' })
   @Put(':refusedTeamId')
   @UseGuards(AccessTokenGuard)
-  putMatchingsAppliedTeamIdReceivedTeamId(): Promise<void> {
-    return;
+  putMatchingsAppliedTeamIdReceivedTeamId(@GetUser() _user: PassportUser, @Param('refusedTeamId') refusedTeamId: number): Promise<void> {
+    return this.teamsService.refusedTeamsByUserId(_user.sub, refusedTeamId);
   }
 
   // @ApiBearerAuth()

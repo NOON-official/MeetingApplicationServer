@@ -117,7 +117,18 @@ export class UsersRepository extends Repository<User> {
     return await this.find();
   }
 
-  async updateRefusedUserIds(userId: number, refusedUserIds: number[]) {
-    await this.update({ id: userId }, { refusedUserIds });
+  async getRefusedUserIds(userId: number): Promise<{ refusedUserIds: number[] }>{
+    const { refusedUserIds } =  await this.createQueryBuilder('user')
+    .select(['user.refusedUserIds'])
+    .where('user.id = :userId', { userId })
+    .getOne();
+
+    return { refusedUserIds };
+  }
+
+  async updateRefusedUserIds(userId: number, refusedUserId: number) {
+    const refusedUsers = await this.getRefusedUserIds(userId);
+
+    await this.update({ id: userId }, { refusedUserIds: [...refusedUsers.refusedUserIds, refusedUserId] });
   }
 }

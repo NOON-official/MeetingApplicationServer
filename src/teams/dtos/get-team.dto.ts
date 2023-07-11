@@ -165,3 +165,11 @@ export class GetTeamDetailDto extends GetTeamDto {
   })
   kakaoId?: string;
 }
+
+export class GetTeamOwnerDto {
+  @ApiProperty({
+    description: '팀 생성 유저아이디',
+    example: 1,
+  })
+  ownerId: number;
+}

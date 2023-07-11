@@ -287,8 +287,8 @@ export class UsersService {
     return await this.invitationsService.getUsersWithInvitationCount();
   }
 
-  async updateRefusedUserIds(userId: number, refusedUserIds: number[]) {
-    return this.usersRepository.updateRefusedUserIds(userId, refusedUserIds);
+  async updateRefusedUserIds(userId: number, refusedUserId: number) {
+    return this.usersRepository.updateRefusedUserIds(userId, refusedUserId);
   }
 
   async updateStudentCard(userId: number, studentCard: SaveStudentCardDto): Promise<void> {
