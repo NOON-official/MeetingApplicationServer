@@ -11,6 +11,7 @@ import { TeamGender } from '../entities/team-gender.enum';
 import { MatchingRound } from 'src/matchings/constants/matching-round';
 import { UpdateTeam } from '../interfaces/update-team.interface';
 import { AdminGetTeamDto } from 'src/admin/dtos/admin-get-team.dto';
+import { GetTeamOwnerDto } from '../dtos/get-team.dto';
 
 @CustomRepository(Team)
 export class TeamsRepository extends Repository<Team> {
@@ -376,5 +377,9 @@ export class TeamsRepository extends Repository<Team> {
 
   async deleteTeamsByUserId(userId: number): Promise<void> {
     await this.createQueryBuilder('team').select().where('team.ownerId = :userId', { userId }).softDelete().execute();
+  }
+
+  async getOwnerId(teamId: number): Promise<GetTeamOwnerDto> {
+    return this.createQueryBuilder('team').select('team.ownerId').where('team.id = :teamId', { teamId }).getOne();
   }
 }

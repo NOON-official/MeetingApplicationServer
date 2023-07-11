@@ -408,4 +408,14 @@ export class TeamsService {
   async deleteTeamsByUserId(userId: number): Promise<void> {
     return this.teamsRepository.deleteTeamsByUserId(userId);
   }
+
+  async refusedTeamsByUserId(userId: number, teamId: number): Promise<void> {
+    const ownerId = this.teamsRepository.getOwnerId(teamId);
+
+    if(!ownerId){
+      throw new NotFoundException(`Can't find team with owner id ${ownerId}`);
+    }
+
+    await this.usersService.updateRefusedUserIds(userId, teamId)
+  }
 }
