@@ -9,10 +9,11 @@ import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { TeamsModule } from 'src/teams/teams.module';
 import { TicketsModule } from 'src/tickets/tickets.module';
+import { UserStudentCardRepository } from './repositories/user-student-card.repository';
 
 @Module({
   imports: [
-    TypeOrmExModule.forCustomRepository([UsersRepository, UserAgreementsRepository]),
+    TypeOrmExModule.forCustomRepository([UsersRepository, UserAgreementsRepository, UserStudentCardRepository]),
     forwardRef(() => InvitationsModule),
     forwardRef(() => TeamsModule),
     forwardRef(() => TicketsModule),

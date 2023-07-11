@@ -22,12 +22,15 @@ import * as moment from 'moment-timezone';
 import { AdminGetUserDto } from 'src/admin/dtos/admin-get-user.dto';
 import { AdminGetInvitationSuccessUserDto } from 'src/admin/dtos/admin-get-invitation-success-user.dto';
 import { UpdateUniversityDto, UpdateUserDto } from './dtos/update-user.dto';
+import { UserStudentCardRepository } from './repositories/user-student-card.repository';
+import { SaveStudentCardDto } from 'src/auth/dtos/save-student-card.dto';
 
 @Injectable()
 export class UsersService {
   constructor(
     private usersRepository: UsersRepository,
     private userAgreementsRepository: UserAgreementsRepository,
+    private userStudentCardRepository: UserStudentCardRepository,
     @Inject(forwardRef(() => InvitationsService))
     private invitationsService: InvitationsService,
     @Inject(forwardRef(() => TeamsService))
@@ -286,5 +289,14 @@ export class UsersService {
 
   async updateRefusedUserIds(userId: number, refusedUserIds: number[]) {
     return this.usersRepository.updateRefusedUserIds(userId, refusedUserIds);
+  }
+
+  async updateStudentCard(userId: number, studentCard: SaveStudentCardDto): Promise<void> {
+    const user = await this.usersRepository.getUserById(userId);
+    if (!user.nickname) {
+      throw new BadRequestException(`user with user id ${userId} is not exists`);
+    }
+
+    return this.userStudentCardRepository.updateUserStudentCard(userId, studentCard);
   }
 }

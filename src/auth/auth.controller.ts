@@ -102,7 +102,7 @@ export class AuthController {
   @UseGuards(AccessTokenGuard)
   postAuthPhoneCode(@GetUser() user: PassportUser, @Body() verifyPhoneCodeDto: VerifyPhoneCodeDto) {
     return this.authService.verifyCodeAndSavePhone(user.sub, verifyPhoneCodeDto);
-  }
+  }  
 
   @ApiOperation({
     summary: '학교 인증 - 학생증 (📌is updating)',
@@ -113,8 +113,8 @@ export class AuthController {
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @Post('student-card')
   @UseGuards(AccessTokenGuard)
-  postAuthStudentCard(@Body() saveStudentCardDto: SaveStudentCardDto): Promise<void> {
-    return;
+  postAuthStudentCard(@GetUser() user: PassportUser, @Body() saveStudentCardDto: SaveStudentCardDto): Promise<void> {
+    return this.authService.postAuthStudentCard(user.sub, saveStudentCardDto);
   }
 
   @ApiOperation({
