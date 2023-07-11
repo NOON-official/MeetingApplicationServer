@@ -26,6 +26,7 @@ import { Controller, Get, Post, Patch, Delete, UseGuards } from '@nestjs/common'
 import { UpdateTeamDto } from './dtos/update-team.dto';
 import { teamPagedata } from './interfaces/team-pagedata.interface';
 import { TeamOwnerGuard } from 'src/auth/guards/team-owner.guard';
+import { MatchingOwnerGuard } from 'src/auth/guards/matching-owner.guard';
 
 @ApiTags('TEAM')
 @ApiUnauthorizedResponse({ description: 'Unauthorized' })
@@ -190,9 +191,9 @@ export class TeamsController {
     type: GetTeamDetailDto
   })
   @Get(':teamId/contact')
-  @UseGuards(AccessTokenGuard, TeamOwnerGuard)
+  @UseGuards(AccessTokenGuard, MatchingOwnerGuard)
   getTeamsTeamIdContact(@GetUser() _user: PassportUser, @Param('teamId') teamId: number): Promise<GetTeamDetailDto> {
-    return;
+    return this.teamsService.getApplicationTeamDetailById(teamId);
   }
 
   @ApiOperation({
