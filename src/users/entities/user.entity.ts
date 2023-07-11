@@ -16,6 +16,7 @@ import {
 } from 'typeorm';
 import { Coupon } from 'src/coupons/entities/coupon.entity';
 import { Ticket } from 'src/tickets/entities/ticket.entity';
+import { Ting } from 'src/tings/entities/ting.entity';
 
 @Entity()
 @Unique(['id', 'kakaoUid', 'referralId', 'refreshToken'])
@@ -88,4 +89,7 @@ export class User extends BaseEntity {
 
   @OneToOne(() => UserAgreement, { cascade: true })
   userAgreement: UserAgreement;
+
+  @OneToOne(() => Ting, { cascade: true })
+  ting: Ting;
 }
