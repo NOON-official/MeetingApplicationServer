@@ -16,6 +16,7 @@ export class AddTingTable1689060190688 implements MigrationInterface {
           {
             name: 'tingCount',
             type: 'int',
+            default: 0,
           },
           {
             name: 'userId',
@@ -34,6 +35,7 @@ export class AddTingTable1689060190688 implements MigrationInterface {
           {
             name: 'deletedAt',
             type: 'timestamp(6)',
+            isNullable: true,
           },
         ],
       }),
