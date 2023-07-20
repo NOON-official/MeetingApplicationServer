@@ -38,9 +38,9 @@ export class Ticket extends BaseEntity {
   @ManyToOne(() => Order, (order) => order.tickets, { onDelete: 'CASCADE' })
   order: Order;
 
-  @OneToOne(() => Matching, (matching) => matching.appliedTeamTicket, { cascade: true })
-  appliedTeamMatching: Matching;
+  // @OneToOne(() => Matching, (matching) => matching.appliedTeamTicket, { cascade: true })
+  // appliedTeamMatching: Matching;
 
-  @OneToOne(() => Matching, (matching) => matching.receivedTeamTicket, { cascade: true })
-  receivedTeamMatching: Matching;
+  // @OneToOne(() => Matching, (matching) => matching.receivedTeamTicket, { cascade: true })
+  // receivedTeamMatching: Matching;
 }
