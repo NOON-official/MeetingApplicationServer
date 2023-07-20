@@ -16,6 +16,8 @@ import { AdminGetMatchingDto } from 'src/admin/dtos/admin-get-matching.dto';
 import { MatchingSucceededEvent } from './events/matching-succeeded.event';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { AdminGetOurteamRefusedTeamDto } from 'src/admin/dtos/admin-get-ourteam-refused-team.dto';
+import { TingsService } from 'src/tings/tings.service';
+import { TingNumberPerAction } from 'src/tings/constants/ting-number-per-action';
 
 @Injectable()
 export class MatchingsService {
@@ -29,7 +31,12 @@ export class MatchingsService {
     @Inject(forwardRef(() => TeamsService))
     private teamsService: TeamsService,
     private eventEmitter: EventEmitter2,
+    private tingsService: TingsService,
   ) {}
+
+  async getMatchingWithDeletedByTeamId(teamId: number): Promise<Matching> {
+    return this.matchingsRepository.getMatchingWithDeletedByTeamId(teamId);
+  }
 
   async getMatchingByTeamId(teamId: number): Promise<Matching> {
     return this.matchingsRepository.getMatchingByTeamId(teamId);
@@ -339,4 +346,62 @@ export class MatchingsService {
 
   //   return { hours, minutes };
   // }
+
+  async createMatchingByAppliedTeamIdAndReceivedTeamId(appliedTeamId: number, receivedTeamId: number): Promise<void> {
+    const appliedTeam = await this.teamsService.getTeamById(appliedTeamId);
+    const receivedTeam = await this.teamsService.getTeamById(receivedTeamId);
+
+    // 해당 팀이 존재하지 않는 경우
+    if (!appliedTeam || !!appliedTeam.deletedAt) {
+      throw new NotFoundException(`Can't find team with id ${appliedTeamId}`);
+    }
+
+    if (!receivedTeam || !!receivedTeam.deletedAt) {
+      throw new NotFoundException(`Can't find team with id ${receivedTeamId}`);
+    }
+
+    // 팀 성별이 같은 경우
+    if (appliedTeam.gender === receivedTeam.gender) {
+      throw new BadRequestException(`invalid team gender`);
+    }
+
+    // 팀 소유자가 같은 경우
+    if (appliedTeam.ownerId === receivedTeam.ownerId) {
+      throw new BadRequestException(`invalid access`);
+    }
+
+    // 이미 매칭 내역이 존재하는 팀인 경우 (삭제된 경우 제외)
+    const existingMatching = await this.getMatchingByTeamId(appliedTeamId);
+
+    if (!!existingMatching) {
+      // 이미 신청한 팀인 경우
+      if (existingMatching.appliedTeamId === appliedTeamId) {
+        throw new BadRequestException(`already applied team`);
+      }
+      // 이미 신청받은 팀인 경우
+      if (existingMatching.receivedTeamId === appliedTeamId) {
+        throw new BadRequestException(`already received team`);
+      }
+    }
+
+    // 보유하고 있는 팅이 모자란 경우
+    const appliedUserId = appliedTeam.ownerId;
+    const { tingCount } = await this.tingsService.getTingCountByUserId(appliedUserId);
+
+    if (tingCount < TingNumberPerAction.APPLY) {
+      throw new BadRequestException(`insufficient ting`);
+    }
+
+    // 매칭 신청하기
+    const matching = new Matching();
+    matching.appliedTeamId = appliedTeamId;
+    matching.receivedTeamId = receivedTeamId;
+    matching.appliedTeamIsAccepted = true;
+    matching.appliedTeamIsPaid = true;
+
+    await this.createMatching(matching);
+
+    // 팅 차감하기
+    await this.tingsService.useTingByUserIdAndTingCount(appliedUserId, TingNumberPerAction.APPLY);
+  }
 }

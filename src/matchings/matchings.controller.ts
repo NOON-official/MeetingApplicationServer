@@ -17,6 +17,7 @@ import { CreateMatchingRefuseReasonDto } from './dtos/create-matching-refuse-rea
 import { MatchingOwnerGuard } from 'src/auth/guards/matching-owner.guard';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { PassportUser } from 'src/auth/interfaces/passport-user.interface';
+import { TeamOwnerGuard } from 'src/auth/guards/team-owner.guard';
 @ApiTags('MATCHING')
 @ApiBearerAuth()
 @ApiUnauthorizedResponse({ description: 'Unauthorized' })
@@ -58,17 +59,18 @@ export class MatchingsController {
   //   return this.matchingsService.getMatchingInfoById(user.sub, matchingId);
   // }
   @ApiOperation({
-    summary: '매칭 신청하기 (🔆new)',
+    summary: '매칭 신청하기 (⭕️updated)',
     description: '매칭 신청하는 팀ID와 신청받는 팀ID를 보내주시면 됩니다.',
   })
   @ApiCreatedResponse({ description: 'Created' })
   @Post(':appliedTeamId/:receivedTeamId')
+  @UseGuards(AccessTokenGuard, TeamOwnerGuard)
   postMatchingsAppliedTeamIdReceivedTeamId(
-    @GetUser() user: PassportUser,
+    @GetUser() _user: PassportUser,
     @Param('appliedTeamId') appliedTeamId: number,
     @Param('receivedTeamId') receivedTeamId: number,
   ): Promise<void> {
-    return;
+    return this.matchingsService.createMatchingByAppliedTeamIdAndReceivedTeamId(appliedTeamId, receivedTeamId);
   }
 
   @ApiOperation({
