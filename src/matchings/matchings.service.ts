@@ -410,6 +410,10 @@ export class MatchingsService {
     return this.matchingsRepository.getAppliedTeamCardsByTeamId(teamId);
   }
 
+  async getRefusedTeamCardsByTeamId(teamId: number): Promise<{ teams: GetTeamCardDto[] }> {
+    return this.matchingsRepository.getRefusedTeamCardsByTeamId(teamId);
+  }
+
   async getReceivedTeamCardsByTeamId(teamId: number): Promise<{ teams: GetTeamCardDto[] }> {
     return this.matchingsRepository.getReceivedTeamCardsByTeamId(teamId);
   }

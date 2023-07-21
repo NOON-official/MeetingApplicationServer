@@ -249,6 +249,40 @@ export class MatchingsRepository extends Repository<Matching> {
     return { teams };
   }
 
+  async getRefusedTeamCardsByTeamId(teamId: number): Promise<{ teams: GetTeamCardDto[] }> {
+    const teams = await this.createQueryBuilder('matching')
+      .select([
+        'receivedTeam.id AS id',
+        'matching.id AS matchingId',
+        'receivedTeam.teamName AS teamName',
+        'CAST(SUM(receivedMembers.age) / receivedTeam.memberCount AS SIGNED) AS age',
+        'receivedTeam.memberCount AS memberCount',
+        'receivedTeam.intro AS intro',
+        'receivedUser.isVerified AS isVerified',
+        'matching.createdAt AS appliedAt',
+      ])
+      .innerJoin('matching.receivedTeam', 'receivedTeam')
+      .leftJoin('matching.appliedTeam', 'appliedTeam')
+      .leftJoin('receivedTeam.user', 'receivedUser')
+      .leftJoin('receivedTeam.teamMembers', 'receivedMembers')
+      // 거절당한 신청 조회
+      .where('matching.appliedTeamId = :teamId', { teamId })
+      .andWhere('matching.id IS NOT NULL')
+      // 상대팀 거절, 우리팀 수락
+      .andWhere(`matching.receivedTeamIsAccepted IS false AND matching.appliedTeamIsAccepted IS true`)
+      // 상대팀 결제 X, 우리팀 결제 O
+      .andWhere(`matching.receivedTeamIsPaid IS NULL AND matching.appliedTeamIsPaid IS true`)
+      .groupBy('matching.id')
+      .getRawMany();
+
+    teams.map((t) => {
+      t.age = Number(t.age);
+      t.isVerified = t.isVerified === 1 ? true : false;
+    });
+
+    return { teams };
+  }
+
   async getReceivedTeamCardsByTeamId(teamId: number): Promise<{ teams: GetTeamCardDto[] }> {
     const teams = await this.createQueryBuilder('matching')
       .select([

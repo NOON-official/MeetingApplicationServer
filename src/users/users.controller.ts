@@ -321,7 +321,7 @@ export class UsersController {
   }
 
   @ApiOperation({
-    summary: '유저 거절당한 팀 조회 (보낸 신청 - 거절됐어요) (🔆new)',
+    summary: '유저 거절당한 팀 조회 (보낸 신청 - 거절됐어요) (⭕️updated)',
     description: '',
   })
   @ApiOkResponse({
@@ -354,8 +354,8 @@ export class UsersController {
   })
   @Get('matchings/refused')
   @UseGuards(AccessTokenGuard)
-  getUsersMatchingsRefused(): Promise<void> {
-    return;
+  getUsersMatchingsRefused(@GetUser() user: PassportUser): Promise<{ teams: GetTeamCardDto[] }> {
+    return this.usersService.getRefusedTeamCardsByUserId(user.sub);
   }
 
   @ApiOperation({
