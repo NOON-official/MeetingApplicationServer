@@ -417,4 +417,8 @@ export class MatchingsService {
   async getReceivedTeamCardsByTeamId(teamId: number): Promise<{ teams: GetTeamCardDto[] }> {
     return this.matchingsRepository.getReceivedTeamCardsByTeamId(teamId);
   }
+
+  async getSucceededTeamCardsByUserId(userId: number): Promise<{ teams: GetTeamCardDto[] }> {
+    return this.matchingsRepository.getSucceededTeamCardsByUserId(userId);
+  }
 }
