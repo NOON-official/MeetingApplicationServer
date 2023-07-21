@@ -283,7 +283,7 @@ export class UsersController {
   }
 
   @ApiOperation({
-    summary: '유저 신청한 팀 조회 (내가 신청) (🔆new)',
+    summary: '유저 신청한 팀 조회 (보낸 신청 - 응답을 기다려요) (⭕️updated)',
     description: '',
   })
   @ApiOkResponse({
@@ -316,12 +316,50 @@ export class UsersController {
   })
   @Get('matchings/applied')
   @UseGuards(AccessTokenGuard)
-  getUsersMatchingsApplied(): Promise<void> {
+  getUsersMatchingsApplied(@GetUser() user: PassportUser): Promise<{ teams: GetTeamCardDto[] }> {
+    return this.usersService.getAppliedTeamCardsByUserId(user.sub);
+  }
+
+  @ApiOperation({
+    summary: '유저 거절당한 팀 조회 (보낸 신청 - 거절됐어요) (🔆new)',
+    description: '',
+  })
+  @ApiOkResponse({
+    schema: {
+      example: {
+        teams: [
+          {
+            id: 1,
+            matchingId: 1,
+            teamName: '기웅내세요',
+            age: 24,
+            memberCount: 3,
+            intro: '안녕하세요',
+            isVerified: true,
+            appliedAt: '2023-01-20T21:37:26.886Z',
+          },
+          {
+            id: 2,
+            matchingId: 3,
+            teamName: '아름이와 아이들',
+            age: 27,
+            memberCount: 2,
+            intro: '안녕하세요',
+            isVerified: false,
+            appliedAt: '2023-01-20T21:37:26.886Z',
+          },
+        ],
+      },
+    },
+  })
+  @Get('matchings/refused')
+  @UseGuards(AccessTokenGuard)
+  getUsersMatchingsRefused(): Promise<void> {
     return;
   }
 
   @ApiOperation({
-    summary: '유저 신청받은 팀 조회 (남이 신청) (⭕️updated)',
+    summary: '유저 신청받은 팀 조회 (받은 신청) (⭕️updated)',
     description: '',
   })
   @ApiOkResponse({

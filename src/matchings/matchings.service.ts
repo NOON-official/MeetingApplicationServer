@@ -406,6 +406,10 @@ export class MatchingsService {
     await this.tingsService.useTingByUserIdAndTingCount(appliedUserId, TingNumberPerAction.APPLY);
   }
 
+  async getAppliedTeamCardsByTeamId(teamId: number): Promise<{ teams: GetTeamCardDto[] }> {
+    return this.matchingsRepository.getAppliedTeamCardsByTeamId(teamId);
+  }
+
   async getReceivedTeamCardsByTeamId(teamId: number): Promise<{ teams: GetTeamCardDto[] }> {
     return this.matchingsRepository.getReceivedTeamCardsByTeamId(teamId);
   }

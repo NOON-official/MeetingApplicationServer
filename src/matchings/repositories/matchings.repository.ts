@@ -215,6 +215,40 @@ export class MatchingsRepository extends Repository<Matching> {
   //   return { averageMatchedSeconds };
   // }
 
+  async getAppliedTeamCardsByTeamId(teamId: number): Promise<{ teams: GetTeamCardDto[] }> {
+    const teams = await this.createQueryBuilder('matching')
+      .select([
+        'receivedTeam.id AS id',
+        'matching.id AS matchingId',
+        'receivedTeam.teamName AS teamName',
+        'CAST(SUM(receivedMembers.age) / receivedTeam.memberCount AS SIGNED) AS age',
+        'receivedTeam.memberCount AS memberCount',
+        'receivedTeam.intro AS intro',
+        'receivedUser.isVerified AS isVerified',
+        'matching.createdAt AS appliedAt',
+      ])
+      .innerJoin('matching.receivedTeam', 'receivedTeam')
+      .leftJoin('matching.appliedTeam', 'appliedTeam')
+      .leftJoin('receivedTeam.user', 'receivedUser')
+      .leftJoin('receivedTeam.teamMembers', 'receivedMembers')
+      // 보낸 신청 조회
+      .where('matching.appliedTeamId = :teamId', { teamId })
+      .andWhere('matching.id IS NOT NULL')
+      // 상대팀 무응답, 우리팀 수락
+      .andWhere(`matching.receivedTeamIsAccepted IS NULL AND matching.appliedTeamIsAccepted IS true`)
+      // 상대팀 결제 X, 우리팀 결제 O
+      .andWhere(`matching.receivedTeamIsPaid IS NULL AND matching.appliedTeamIsPaid IS true`)
+      .groupBy('matching.id')
+      .getRawMany();
+
+    teams.map((t) => {
+      t.age = Number(t.age);
+      t.isVerified = t.isVerified === 1 ? true : false;
+    });
+
+    return { teams };
+  }
+
   async getReceivedTeamCardsByTeamId(teamId: number): Promise<{ teams: GetTeamCardDto[] }> {
     const teams = await this.createQueryBuilder('matching')
       .select([
@@ -236,7 +270,7 @@ export class MatchingsRepository extends Repository<Matching> {
       .andWhere('matching.id IS NOT NULL')
       // 상대팀 수락 O, 우리팀 무응답
       .andWhere(`matching.appliedTeamIsAccepted IS true AND matching.receivedTeamIsAccepted IS NULL`)
-      // 상대팀이 결제 O, 우리팀이 결제 X
+      // 상대팀 결제 O, 우리팀 결제 X
       .andWhere(`matching.appliedTeamIsPaid IS true AND matching.receivedTeamIsPaid IS NULL`)
       .groupBy('matching.id')
       .getRawMany();
