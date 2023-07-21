@@ -8,19 +8,17 @@ export class TeamOwnerGuard implements CanActivate {
   constructor(
     @Inject(forwardRef(() => TeamsService))
     private teamsService: TeamsService,
-    @Inject(forwardRef(() => MatchingsService))
-    private matchingsService: MatchingsService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
 
-    if (!req.user || !req.params?.teamId) {
+    if (!req.user || (!req.params?.teamId && !req.params?.appliedTeamId)) {
       return true;
     }
 
     const userId = req.user.sub;
-    const teamId = Number(req.params.teamId);
+    const teamId = req.params?.teamId ? Number(req.params.teamId) : Number(req.params.appliedTeamId);
 
     const team = await this.teamsService.getTeamById(teamId);
 

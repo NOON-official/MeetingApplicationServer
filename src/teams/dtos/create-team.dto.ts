@@ -13,6 +13,7 @@ import {
   Min,
   Max,
   IsBoolean,
+  Length,
 } from 'class-validator';
 
 export class CreateMemberDto {
@@ -132,6 +133,7 @@ export class CreateTeamDto {
     required: true,
   })
   @IsNotEmpty()
+  @Length(1, 15)
   @IsString()
   readonly teamName: string;
 
@@ -141,6 +143,7 @@ export class CreateTeamDto {
     required: true,
   })
   @IsNotEmpty()
+  @Length(10, 150)
   @IsString()
   readonly intro: string;
 
