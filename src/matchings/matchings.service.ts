@@ -18,6 +18,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { AdminGetOurteamRefusedTeamDto } from 'src/admin/dtos/admin-get-ourteam-refused-team.dto';
 import { TingsService } from 'src/tings/tings.service';
 import { TingNumberPerAction } from 'src/tings/constants/ting-number-per-action';
+import { GetTeamCardDto } from 'src/teams/dtos/get-team-card.dto';
 
 @Injectable()
 export class MatchingsService {
@@ -403,5 +404,9 @@ export class MatchingsService {
 
     // 팅 차감하기
     await this.tingsService.useTingByUserIdAndTingCount(appliedUserId, TingNumberPerAction.APPLY);
+  }
+
+  async getReceivedTeamCardsByTeamId(teamId: number): Promise<{ teams: GetTeamCardDto[] }> {
+    return this.matchingsRepository.getReceivedTeamCardsByTeamId(teamId);
   }
 }

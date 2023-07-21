@@ -21,6 +21,7 @@ import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { PassportUser } from 'src/auth/interfaces/passport-user.interface';
 import { UserOrder } from './interfaces/user-order.interface';
 import { UpdateUniversityDto, UpdateUserDto } from './dtos/update-user.dto';
+import { GetTeamCardDto } from 'src/teams/dtos/get-team-card.dto';
 
 @ApiTags('USER')
 @ApiBearerAuth()
@@ -320,7 +321,7 @@ export class UsersController {
   }
 
   @ApiOperation({
-    summary: '유저 신청받은 팀 조회 (남이 신청) (🔆new)',
+    summary: '유저 신청받은 팀 조회 (남이 신청) (⭕️updated)',
     description: '',
   })
   @ApiOkResponse({
@@ -353,8 +354,8 @@ export class UsersController {
   })
   @Get('matchings/received')
   @UseGuards(AccessTokenGuard)
-  getUsersMatchingsReceived(): Promise<void> {
-    return;
+  getUsersMatchingsReceived(@GetUser() user: PassportUser): Promise<{ teams: GetTeamCardDto[] }> {
+    return this.usersService.getReceivedTeamCardsByUserId(user.sub);
   }
 
   @ApiOperation({

@@ -295,10 +295,10 @@ export class TeamsService {
     delete team.user;
     delete team.appliedTeamMatching;
     delete team.receivedTeamMatching;
-    delete team.kakaoId
+    delete team.kakaoId;
 
     const result = Object.assign(team);
-    result['isVerified'] = isVerified
+    result['isVerified'] = isVerified;
 
     return result;
   }
@@ -315,7 +315,7 @@ export class TeamsService {
     delete team.receivedTeamMatching;
 
     const result = Object.assign(team);
-    result['isVerified'] = isVerified
+    result['isVerified'] = isVerified;
 
     return result;
   }
@@ -412,10 +412,10 @@ export class TeamsService {
   async refusedTeamsByUserId(userId: number, teamId: number): Promise<void> {
     const ownerId = this.teamsRepository.getOwnerId(teamId);
 
-    if(!ownerId){
+    if (!ownerId) {
       throw new NotFoundException(`Can't find team with owner id ${ownerId}`);
     }
 
-    await this.usersService.updateRefusedUserIds(userId, teamId)
+    await this.usersService.updateRefusedUserIds(userId, teamId);
   }
 }

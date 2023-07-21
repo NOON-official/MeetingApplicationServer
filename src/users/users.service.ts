@@ -24,6 +24,8 @@ import { AdminGetInvitationSuccessUserDto } from 'src/admin/dtos/admin-get-invit
 import { UpdateUniversityDto, UpdateUserDto } from './dtos/update-user.dto';
 import { UserStudentCardRepository } from './repositories/user-student-card.repository';
 import { SaveStudentCardDto } from 'src/auth/dtos/save-student-card.dto';
+import { GetTeamCardDto } from 'src/teams/dtos/get-team-card.dto';
+import { MatchingsService } from 'src/matchings/matchings.service';
 
 @Injectable()
 export class UsersService {
@@ -41,6 +43,8 @@ export class UsersService {
     private couponsService: CouponsService,
     @Inject(forwardRef(() => OrdersService))
     private ordersService: OrdersService,
+    @Inject(forwardRef(() => MatchingsService))
+    private matchingsService: MatchingsService,
   ) {}
 
   async getUserByKakaoUid(kakaoUid: number): Promise<User> {
@@ -298,5 +302,12 @@ export class UsersService {
     }
 
     return this.userStudentCardRepository.updateUserStudentCard(userId, studentCard);
+  }
+
+  async getReceivedTeamCardsByUserId(userId: number): Promise<{ teams: GetTeamCardDto[] }> {
+    const { teamId } = await this.getTeamIdByUserId(userId);
+
+    if (!teamId) return { teams: [] };
+    else return await this.matchingsService.getReceivedTeamCardsByTeamId(teamId);
   }
 }

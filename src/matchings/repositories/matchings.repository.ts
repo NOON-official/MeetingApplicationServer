@@ -4,6 +4,7 @@ import { CustomRepository } from 'src/database/typeorm-ex.decorator';
 import { Repository } from 'typeorm';
 import { Ticket } from 'src/tickets/entities/ticket.entity';
 import * as moment from 'moment-timezone';
+import { GetTeamCardDto } from 'src/teams/dtos/get-team-card.dto';
 
 @CustomRepository(Matching)
 export class MatchingsRepository extends Repository<Matching> {
@@ -213,4 +214,38 @@ export class MatchingsRepository extends Repository<Matching> {
 
   //   return { averageMatchedSeconds };
   // }
+
+  async getReceivedTeamCardsByTeamId(teamId: number): Promise<{ teams: GetTeamCardDto[] }> {
+    const teams = await this.createQueryBuilder('matching')
+      .select([
+        'appliedTeam.id AS id',
+        'matching.id AS matchingId',
+        'appliedTeam.teamName AS teamName',
+        'CAST(SUM(appliedMembers.age) / appliedTeam.memberCount AS SIGNED) AS age',
+        'appliedTeam.memberCount AS memberCount',
+        'appliedTeam.intro AS intro',
+        'appliedUser.isVerified AS isVerified',
+        'matching.createdAt AS appliedAt',
+      ])
+      .innerJoin('matching.appliedTeam', 'appliedTeam')
+      .leftJoin('matching.receivedTeam', 'receivedTeam')
+      .leftJoin('appliedTeam.user', 'appliedUser')
+      .leftJoin('appliedTeam.teamMembers', 'appliedMembers')
+      // 받은 신청 조회
+      .where('matching.receivedTeamId = :teamId', { teamId })
+      .andWhere('matching.id IS NOT NULL')
+      // 상대팀 수락 O, 우리팀 무응답
+      .andWhere(`matching.appliedTeamIsAccepted IS true AND matching.receivedTeamIsAccepted IS NULL`)
+      // 상대팀이 결제 O, 우리팀이 결제 X
+      .andWhere(`matching.appliedTeamIsPaid IS true AND matching.receivedTeamIsPaid IS NULL`)
+      .groupBy('matching.id')
+      .getRawMany();
+
+    teams.map((t) => {
+      t.age = Number(t.age);
+      t.isVerified = t.isVerified === 1 ? true : false;
+    });
+
+    return { teams };
+  }
 }
