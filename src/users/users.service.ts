@@ -308,20 +308,24 @@ export class UsersService {
     const { teamId } = await this.getTeamIdByUserId(userId);
 
     if (!teamId) return { teams: [] };
-    else return await this.matchingsService.getAppliedTeamCardsByTeamId(teamId);
+    else return this.matchingsService.getAppliedTeamCardsByTeamId(teamId);
   }
 
   async getRefusedTeamCardsByUserId(userId: number): Promise<{ teams: GetTeamCardDto[] }> {
     const { teamId } = await this.getTeamIdByUserId(userId);
 
     if (!teamId) return { teams: [] };
-    else return await this.matchingsService.getRefusedTeamCardsByTeamId(teamId);
+    else return this.matchingsService.getRefusedTeamCardsByTeamId(teamId);
   }
 
   async getReceivedTeamCardsByUserId(userId: number): Promise<{ teams: GetTeamCardDto[] }> {
     const { teamId } = await this.getTeamIdByUserId(userId);
 
     if (!teamId) return { teams: [] };
-    else return await this.matchingsService.getReceivedTeamCardsByTeamId(teamId);
+    else return this.matchingsService.getReceivedTeamCardsByTeamId(teamId);
+  }
+
+  async getSucceededTeamCardsByUserId(userId: number): Promise<{ teams: GetTeamCardDto[] }> {
+    return this.matchingsService.getSucceededTeamCardsByUserId(userId);
   }
 }
