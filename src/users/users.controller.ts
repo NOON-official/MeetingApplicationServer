@@ -397,8 +397,8 @@ export class UsersController {
   }
 
   @ApiOperation({
-    summary: '유저 상호 수락 팀 조회 (최종 성사) (🔆new)',
-    description: '',
+    summary: '유저 상호 수락 팀 조회 (매칭 완료) (⭕️updated)',
+    description: '상호 수락일 기준 7일 이내 매칭 정보만 조회됩니다.',
   })
   @ApiOkResponse({
     schema: {
@@ -430,8 +430,8 @@ export class UsersController {
   })
   @Get('matchings/succeeded')
   @UseGuards(AccessTokenGuard)
-  getUsersMatchingsSucceeded(): Promise<void> {
-    return;
+  getUsersMatchingsSucceeded(@GetUser() user: PassportUser): Promise<{ teams: GetTeamCardDto[] }> {
+    return this.usersService.getSucceededTeamCardsByUserId(user.sub);
   }
 
   @ApiOperation({

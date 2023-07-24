@@ -268,7 +268,7 @@ export class MatchingsService {
     );
   }
 
-  async deleteMatchingById(matchingId: number): Promise<void> {
+  async deleteMatchingAndTeamByMatchingId(matchingId: number): Promise<void> {
     const matching = await this.getMatchingById(matchingId);
 
     // 해당 매칭 정보가 없는 경우
@@ -307,7 +307,7 @@ export class MatchingsService {
   async getMatchingsByStatus(status: MatchingStatus): Promise<{ matchings: AdminGetMatchingDto[] }> {
     // 수락/거절 대기자 조회
     if (status === MatchingStatus.SUCCEEDED) {
-      return this.matchingsRepository.getSucceededMatchings();
+      return this.matchingsRepository.getAdminSucceededMatchings();
     }
   }
 
@@ -416,5 +416,25 @@ export class MatchingsService {
 
   async getReceivedTeamCardsByTeamId(teamId: number): Promise<{ teams: GetTeamCardDto[] }> {
     return this.matchingsRepository.getReceivedTeamCardsByTeamId(teamId);
+  }
+
+  async getSucceededTeamCardsByUserId(userId: number): Promise<{ teams: GetTeamCardDto[] }> {
+    return this.matchingsRepository.getSucceededTeamCardsByUserId(userId);
+  }
+
+  async getSucceededMatchings(): Promise<{ matchings: Matching[] }> {
+    return this.matchingsRepository.getSucceededMatchings();
+  }
+
+  async deleteMatchingById(matchingId: number): Promise<void> {
+    const matching = await this.getMatchingById(matchingId);
+
+    // 해당 매칭 정보가 없는 경우
+    if (!matching || !!matching.deletedAt) {
+      throw new NotFoundException(`Can't find matching with id ${matchingId}`);
+    }
+
+    // 매칭 soft delete
+    await this.matchingsRepository.deleteMatchingById(matchingId);
   }
 }

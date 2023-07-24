@@ -29,6 +29,9 @@ export class Matching extends BaseEntity {
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 
+  @Column({ type: 'timestamp', nullable: true })
+  matchedAt: Date;
+
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
 

@@ -47,10 +47,8 @@ export class MatchingsRepository extends Repository<Matching> {
   async getMatchingById(matchingId: number): Promise<Matching> {
     const matching = await this.createQueryBuilder('matching')
       .withDeleted()
-      .leftJoinAndSelect('matching.maleTeam', 'maleTeam')
-      .leftJoinAndSelect('matching.femaleTeam', 'femaleTeam')
-      .leftJoinAndSelect('matching.maleTeamTicket', 'maleTeamTicket')
-      .leftJoinAndSelect('matching.femaleTeamTicket', 'femaleTeamTicket')
+      .leftJoinAndSelect('matching.appliedTeam', 'appliedTeam')
+      .leftJoinAndSelect('matching.receivedTeam', 'receivedTeam')
       .where('matching.id = :matchingId', { matchingId })
       .getOne();
 
@@ -114,7 +112,7 @@ export class MatchingsRepository extends Repository<Matching> {
   }
 
   // 관리자페이지 매칭완료자 조회
-  async getSucceededMatchings(): Promise<{ matchings: AdminGetMatchingDto[] }> {
+  async getAdminSucceededMatchings(): Promise<{ matchings: AdminGetMatchingDto[] }> {
     // const matchings = await this.createQueryBuilder('matching')
     //   .select([
     //     'matching.id AS matchingId',
@@ -315,5 +313,89 @@ export class MatchingsRepository extends Repository<Matching> {
     });
 
     return { teams };
+  }
+
+  async getSucceededTeamCardsByUserId(userId: number): Promise<{ teams: GetTeamCardDto[] }> {
+    // 내가 신청한 팀
+    const appliedTeams = await this.createQueryBuilder('matching')
+      .select([
+        'receivedTeam.id AS id',
+        'matching.id AS matchingId',
+        'receivedTeam.teamName AS teamName',
+        'CAST(SUM(receivedMembers.age) / receivedTeam.memberCount AS SIGNED) AS age',
+        'receivedTeam.memberCount AS memberCount',
+        'receivedTeam.intro AS intro',
+        'receivedUser.isVerified AS isVerified',
+        'matching.matchedAt AS matchedAt',
+      ])
+      .withDeleted()
+      .leftJoin('matching.receivedTeam', 'receivedTeam')
+      .leftJoin('matching.appliedTeam', 'appliedTeam')
+      .leftJoin('receivedTeam.user', 'receivedUser')
+      .leftJoin('receivedTeam.teamMembers', 'receivedMembers')
+      // 상호 수락한 매칭 조회
+      .where('appliedTeam.ownerId = :userId', { userId })
+      // 상대팀 수락 O, 우리팀 수락 O
+      .andWhere(`matching.appliedTeamIsAccepted IS true AND matching.receivedTeamIsAccepted IS true`)
+      // 상대팀 결제 O, 우리팀 결제 O
+      .andWhere(`matching.appliedTeamIsPaid IS true AND matching.receivedTeamIsPaid IS true`)
+      // 상호 수락일시 기준 7일 이내 매칭만 조회
+      .andWhere('DATE_ADD(matching.matchedAt, INTERVAL 7 DAY) > NOW()')
+      .groupBy('matching.id')
+      .getRawMany();
+
+    // 내가 신청받은 팀
+    const receivedTeams = await this.createQueryBuilder('matching')
+      .select([
+        'appliedTeam.id AS id',
+        'matching.id AS matchingId',
+        'appliedTeam.teamName AS teamName',
+        'CAST(SUM(appliedMembers.age) / appliedTeam.memberCount AS SIGNED) AS age',
+        'appliedTeam.memberCount AS memberCount',
+        'appliedTeam.intro AS intro',
+        'appliedUser.isVerified AS isVerified',
+        'matching.matchedAt AS matchedAt',
+      ])
+      .withDeleted()
+      .leftJoin('matching.appliedTeam', 'appliedTeam')
+      .leftJoin('matching.receivedTeam', 'receivedTeam')
+      .leftJoin('appliedTeam.user', 'appliedUser')
+      .leftJoin('appliedTeam.teamMembers', 'appliedMembers')
+      // 상호 수락한 매칭 조회
+      .where('receivedTeam.ownerId = :userId', { userId })
+      // 상대팀 수락 O, 우리팀 수락 O
+      .andWhere(`matching.receivedTeamIsAccepted IS true AND matching.appliedTeamIsAccepted IS true`)
+      // 상대팀 결제 O, 우리팀 결제 O
+      .andWhere(`matching.receivedTeamIsPaid IS true AND matching.appliedTeamIsPaid IS true`)
+      // 상호 수락일시 기준 7일 이내 매칭만 조회
+      .andWhere('DATE_ADD(matching.matchedAt, INTERVAL 7 DAY) > NOW()')
+      .groupBy('matching.id')
+      .getRawMany();
+
+    // 매칭 완료 팀 병합 및 내림차순 정렬
+    let teams = appliedTeams.concat(receivedTeams);
+
+    teams.map((t) => {
+      t.age = Number(t.age);
+      t.isVerified = t.isVerified === 1 ? true : false;
+    });
+
+    teams.sort((a, b) => {
+      return b.matchedAt - a.matchedAt;
+    });
+
+    return { teams };
+  }
+
+  async getSucceededMatchings(): Promise<{ matchings: Matching[] }> {
+    const matchings = await this.createQueryBuilder('matching')
+      .select()
+      // 상대팀 수락 O, 우리팀 수락 O
+      .andWhere(`matching.receivedTeamIsAccepted IS true AND matching.appliedTeamIsAccepted IS true`)
+      // 상대팀 결제 O, 우리팀 결제 O
+      .andWhere(`matching.receivedTeamIsPaid IS true AND matching.appliedTeamIsPaid IS true`)
+      .getMany();
+
+    return { matchings };
   }
 }
