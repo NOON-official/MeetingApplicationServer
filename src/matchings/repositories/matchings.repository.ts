@@ -330,6 +330,7 @@ export class MatchingsRepository extends Repository<Matching> {
         'receivedUser.isVerified AS isVerified',
         'matching.matchedAt AS matchedAt',
       ])
+      .withDeleted()
       .leftJoin('matching.receivedTeam', 'receivedTeam')
       .leftJoin('matching.appliedTeam', 'appliedTeam')
       .leftJoin('receivedTeam.user', 'receivedUser')
@@ -342,7 +343,6 @@ export class MatchingsRepository extends Repository<Matching> {
       .andWhere(`matching.appliedTeamIsPaid IS true AND matching.receivedTeamIsPaid IS true`)
       // 상호 수락일시 기준 7일 이내 매칭만 조회
       .andWhere('DATE_ADD(matching.matchedAt, INTERVAL 7 DAY) > NOW()')
-      .withDeleted()
       .groupBy('matching.id')
       .getRawMany();
 
@@ -358,6 +358,7 @@ export class MatchingsRepository extends Repository<Matching> {
         'appliedUser.isVerified AS isVerified',
         'matching.matchedAt AS matchedAt',
       ])
+      .withDeleted()
       .leftJoin('matching.appliedTeam', 'appliedTeam')
       .leftJoin('matching.receivedTeam', 'receivedTeam')
       .leftJoin('appliedTeam.user', 'appliedUser')
@@ -370,7 +371,6 @@ export class MatchingsRepository extends Repository<Matching> {
       .andWhere(`matching.receivedTeamIsPaid IS true AND matching.appliedTeamIsPaid IS true`)
       // 상호 수락일시 기준 7일 이내 매칭만 조회
       .andWhere('DATE_ADD(matching.matchedAt, INTERVAL 7 DAY) > NOW()')
-      .withDeleted()
       .groupBy('matching.id')
       .getRawMany();
 
