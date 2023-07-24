@@ -132,4 +132,20 @@ export class TasksService {
   //     }
   //   }
   // }
+
+  // 매 분(0초)마다 실행
+  @Cron(CronExpression.EVERY_MINUTE)
+  async handleExpiredMatchings() {
+    // 상호 수락 후 7일 경과한 매칭 조회 및 soft delete
+    const { matchings } = await this.matchingsService.getSucceededMatchings();
+
+    for await (const matching of matchings) {
+      const now = moment(new Date()).format('YYYY-MM-DD HH:mm');
+      const afterSevenDays = moment(matching.matchedAt).add(7, 'days').format('YYYY-MM-DD HH:mm');
+
+      if (now > afterSevenDays) {
+        await this.matchingsService.deleteMatchingById(matching.id);
+      }
+    }
+  }
 }

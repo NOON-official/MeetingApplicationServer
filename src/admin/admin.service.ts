@@ -45,7 +45,7 @@ export class AdminService {
   }
 
   async deleteMatchingByMatchingId(matchingId: number): Promise<void> {
-    return this.matchingsService.deleteMatchingById(matchingId);
+    return this.matchingsService.deleteMatchingAndTeamByMatchingId(matchingId);
   }
 
   // async getTeamsByStatusAndMembercountAndGender(

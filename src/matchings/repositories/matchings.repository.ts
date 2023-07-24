@@ -47,10 +47,8 @@ export class MatchingsRepository extends Repository<Matching> {
   async getMatchingById(matchingId: number): Promise<Matching> {
     const matching = await this.createQueryBuilder('matching')
       .withDeleted()
-      .leftJoinAndSelect('matching.maleTeam', 'maleTeam')
-      .leftJoinAndSelect('matching.femaleTeam', 'femaleTeam')
-      .leftJoinAndSelect('matching.maleTeamTicket', 'maleTeamTicket')
-      .leftJoinAndSelect('matching.femaleTeamTicket', 'femaleTeamTicket')
+      .leftJoinAndSelect('matching.appliedTeam', 'appliedTeam')
+      .leftJoinAndSelect('matching.receivedTeam', 'receivedTeam')
       .where('matching.id = :matchingId', { matchingId })
       .getOne();
 
@@ -114,7 +112,7 @@ export class MatchingsRepository extends Repository<Matching> {
   }
 
   // 관리자페이지 매칭완료자 조회
-  async getSucceededMatchings(): Promise<{ matchings: AdminGetMatchingDto[] }> {
+  async getAdminSucceededMatchings(): Promise<{ matchings: AdminGetMatchingDto[] }> {
     // const matchings = await this.createQueryBuilder('matching')
     //   .select([
     //     'matching.id AS matchingId',
@@ -387,5 +385,17 @@ export class MatchingsRepository extends Repository<Matching> {
     });
 
     return { teams };
+  }
+
+  async getSucceededMatchings(): Promise<{ matchings: Matching[] }> {
+    const matchings = await this.createQueryBuilder('matching')
+      .select()
+      // 상대팀 수락 O, 우리팀 수락 O
+      .andWhere(`matching.receivedTeamIsAccepted IS true AND matching.appliedTeamIsAccepted IS true`)
+      // 상대팀 결제 O, 우리팀 결제 O
+      .andWhere(`matching.receivedTeamIsPaid IS true AND matching.appliedTeamIsPaid IS true`)
+      .getMany();
+
+    return { matchings };
   }
 }
