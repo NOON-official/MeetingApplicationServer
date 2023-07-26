@@ -41,7 +41,7 @@ export class OrdersController {
   }
 
   @ApiOperation({
-    summary: '이용권 구매',
+    summary: '팅 충전하기 (📌is updating)',
     description:
       '토스 결제 정보가 없는 경우(구매금액 0원) => toss: null \n\n 사용한 쿠폰이 없는 경우 => couponId: null',
   })
