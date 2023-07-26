@@ -40,6 +40,9 @@ export class AdminService {
     private eventEmitter: EventEmitter2,
   ) {}
 
+  async getAdminTeams(gender: TeamGender): Promise<{ teams: AdminGetTeamDto[] }> {
+    return this.teamsService.getTeamsByGender(gender);
+  }
   async deleteTeamByTeamId(teamId: number): Promise<void> {
     return this.teamsService.deleteTeamById(teamId);
   }

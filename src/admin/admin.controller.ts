@@ -33,14 +33,14 @@ export class AdminController {
 
   @ApiBearerAuth()
   @ApiOperation({
-    summary: '전체 팀 조회 (🔆new)',
+    summary: '전체 팀 조회 (📌is updating)',
     description: '관리자페이지 내 사용',
   })
   @ApiQuery({ name: 'gender', enum: TeamGender })
   @ApiOkResponse({})
   @Get('teams')
   getAdminTeams(@Query('gender') gender: TeamGender): Promise<{ teams: AdminGetTeamDto[] }> {
-    return;
+    return this.adminService.getAdminTeams(gender);
   }
 
   @ApiBearerAuth()

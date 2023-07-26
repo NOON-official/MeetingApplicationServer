@@ -49,10 +49,10 @@ export class AdminGetTeamDto {
   phone: string;
 
   @ApiProperty({
-    description: '우리팀 평균 나이',
+    description: '우리팀 대표자 나이',
     example: 23,
   })
-  averageAge: number;
+  age: number;
 
   @ApiProperty({
     description: '상대방 선호 나이',
@@ -79,34 +79,10 @@ export class AdminGetTeamDto {
   drink: number;
 
   @ApiProperty({
-    description: '상대팀 ID',
-    example: 2,
-  })
-  partnerTeamId?: number;
-
-  @ApiProperty({
     description: '신청일시',
     example: '2023-01-20T21:37:26.886Z',
   })
   appliedAt: Date;
-
-  @ApiProperty({
-    description: '매칭일시',
-    example: '2023-01-20T21:37:26.886Z',
-  })
-  matchedAt?: Date;
-
-  @ApiProperty({
-    description: '매칭 실패일시',
-    example: '2023-01-20T21:37:26.886Z',
-  })
-  failedAt?: Date;
-
-  @ApiProperty({
-    description: '거절당한 일시',
-    example: '2023-01-20T21:37:26.886Z',
-  })
-  refusedAt?: Date;
 
   @ApiProperty({
     description: '회원 ID',
