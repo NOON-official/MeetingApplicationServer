@@ -129,6 +129,8 @@ export class UsersRepository extends Repository<User> {
   async updateRefusedUserIds(userId: number, refusedUserId: number) {
     const refusedUsers = await this.getRefusedUserIds(userId);
 
-    await this.update({ id: userId }, { refusedUserIds: [...refusedUsers.refusedUserIds, refusedUserId] });
+    if(!refusedUsers.refusedUserIds.includes(refusedUserId)){
+      await this.update({ id: userId }, { refusedUserIds: [...refusedUsers.refusedUserIds, refusedUserId] });
+    }
   }
 }
