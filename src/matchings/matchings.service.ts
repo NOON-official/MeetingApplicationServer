@@ -279,11 +279,8 @@ export class MatchingsService {
     return this.matchingsRepository.getAdminMatchingsApplied();
   }
 
-  async getMatchingsByStatus(status: MatchingStatus): Promise<{ matchings: AdminGetMatchingDto[] }> {
-    // 수락/거절 대기자 조회
-    if (status === MatchingStatus.SUCCEEDED) {
-      return this.matchingsRepository.getAdminSucceededMatchings();
-    }
+  async getMatchings(): Promise<{ matchings: AdminGetMatchingDto[] }> {
+    return this.matchingsRepository.getAdminSucceededMatchings();
   }
 
   async saveChatCreatedAtByMatchingId(matchingId: number): Promise<void> {

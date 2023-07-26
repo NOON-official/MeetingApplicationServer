@@ -71,8 +71,8 @@ export class AdminService {
     return this.teamsService.deleteOurteamRefusedTeamByTeamId(teamId);
   }
 
-  async getMatchingsByStatus(status: MatchingStatus): Promise<{ matchings: AdminGetMatchingDto[] }> {
-    return this.matchingsService.getMatchingsByStatus(status);
+  async getMatchings(): Promise<{ matchings: AdminGetMatchingDto[] }> {
+    return this.matchingsService.getMatchings();
   }
 
   async saveChatCreatedAtByMatchingId(matchingId: number): Promise<void> {
