@@ -62,9 +62,6 @@ export class Team extends BaseEntity {
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
 
-  @Column({ type: 'timestamp', nullable: true })
-  modifiedAt: Date;
-
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt: Date;
 
