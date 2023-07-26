@@ -29,4 +29,12 @@ export class TingsRepository extends Repository<Ting> {
       .where('userId = :userId', { userId })
       .execute();
   }
+
+  async refundTingByUserIdAndTingCount(userId: number, tingCount: number): Promise<void> {
+    await this.createQueryBuilder()
+      .update(Ting)
+      .set({ tingCount: () => `tingCount + ${tingCount}` })
+      .where('userId = :userId', { userId })
+      .execute();
+  }
 }

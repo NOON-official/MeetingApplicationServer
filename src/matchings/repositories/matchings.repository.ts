@@ -63,20 +63,12 @@ export class MatchingsRepository extends Repository<Matching> {
     .execute();
   }
 
-  async refuseMatchingByGender(matchingId: number, gender: 'male' | 'female'): Promise<void> {
-    // if (gender === 'male') {
-    //   await this.createQueryBuilder()
-    //     .update(Matching)
-    //     .set({ maleTeamIsAccepted: false })
-    //     .where('id = :matchingId', { matchingId })
-    //     .execute();
-    // } else if (gender === 'female') {
-    //   await this.createQueryBuilder()
-    //     .update(Matching)
-    //     .set({ femaleTeamIsAccepted: false })
-    //     .where('id = :matchingId', { matchingId })
-    //     .execute();
-    // }
+  async refuseMatching(matchingId: number): Promise<void> {
+    await this.createQueryBuilder()
+      .update(Matching)
+      .set({ receivedTeamIsAccepted: false, receivedTeamIsPaid: false })
+      .where('id = :matchingId', { matchingId })
+      .execute();
   }
 
   // async deleteTicketInfoByMatchingIdAndGender(matchingId: number, gender: 'male' | 'female'): Promise<void> {

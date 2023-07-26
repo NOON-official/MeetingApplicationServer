@@ -94,7 +94,7 @@ export class MatchingsService {
 
   async acceptMatchingByTeamId(userId: number, matchingId: number, teamId: number): Promise<void> {
     const matching = await this.getMatchingById(matchingId);
-    
+
     // 해당 매칭 정보가 없는 경우
     if (!matching || !!matching.deletedAt) {
       throw new NotFoundException(`Can't find matching with id ${matchingId}`);
@@ -139,56 +139,33 @@ export class MatchingsService {
   }
 
   async refuseMatchingByTeamId(matchingId: number, teamId: number): Promise<void> {
-    // const matching = await this.getMatchingById(matchingId);
-    // // 해당 매칭 정보가 없는 경우
-    // if (!matching || !!matching.deletedAt) {
-    //   throw new NotFoundException(`Can't find matching with id ${matchingId}`);
-    // }
-    // const gender = matching.maleTeam.id === teamId ? 'male' : 'female';
-    // // 이미 수락 또는 거절한 경우
-    // if (gender === 'male' && (matching.maleTeamIsAccepted === true || matching.maleTeamIsAccepted === false)) {
-    //   throw new BadRequestException(`already responded team`);
-    // }
-    // if (gender === 'female' && (matching.femaleTeamIsAccepted === true || matching.femaleTeamIsAccepted === false)) {
-    //   throw new BadRequestException(`already responded team`);
-    // }
-    // if (gender === 'male') {
-    //   // 상대팀이 이미 수락한 경우
-    //   if (matching.femaleTeamIsAccepted === true) {
-    //     // 1) 상대팀 이용권 환불
-    //     await this.ticketsService.refundTicketById(matching.femaleTeamTicket.id);
-    //     await this.deleteTicketInfoByMatchingIdAndGender(matchingId, TeamGender.female);
-    //     // 2) 상대팀에 매칭 거절 당함 문자 보내기
-    //     const matchingPartnerTeamRefusedEvent = new MatchingPartnerTeamRefusedEvent();
-    //     matchingPartnerTeamRefusedEvent.teamId = matching.femaleTeamId;
-    //     this.eventEmitter.emit('matching.partnerTeamRefused', matchingPartnerTeamRefusedEvent);
-    //   }
-    //   // 거절한 상대를 user 테이블에 기록
-    //   const maleTeamUser = await this.usersService.getUserById(matching.maleTeam.ownerId);
-    //   this.usersService.updateRefusedUserIds(matching.maleTeam.ownerId, [
-    //     ...(maleTeamUser.refusedUserIds?.filter((id) => id !== matching.femaleTeam.ownerId) || []),
-    //     matching.femaleTeam.ownerId,
-    //   ]);
-    // }
-    // if (gender === 'female') {
-    //   // 상대팀이 이미 수락한 경우
-    //   if (matching.maleTeamIsAccepted === true) {
-    //     // 1) 상대팀 이용권 환불
-    //     await this.ticketsService.refundTicketById(matching.maleTeamTicket.id);
-    //     await this.deleteTicketInfoByMatchingIdAndGender(matchingId, TeamGender.male);
-    //     // 2) 상대팀에 매칭 거절 당함 문자 보내기
-    //     const matchingPartnerTeamRefusedEvent = new MatchingPartnerTeamRefusedEvent();
-    //     matchingPartnerTeamRefusedEvent.teamId = matching.maleTeamId;
-    //     this.eventEmitter.emit('matching.partnerTeamRefused', matchingPartnerTeamRefusedEvent);
-    //   }
-    //   // 거절한 상대를 user 테이블에 기록
-    //   const femaleTeamUser = await this.usersService.getUserById(matching.femaleTeam.ownerId);
-    //   this.usersService.updateRefusedUserIds(matching.femaleTeam.ownerId, [
-    //     ...(femaleTeamUser.refusedUserIds?.filter((id) => id !== matching.maleTeam.ownerId) || []),
-    //     matching.maleTeam.ownerId,
-    //   ]);
-    // }
-    // return this.matchingsRepository.refuseMatchingByGender(matchingId, gender);
+    const matching = await this.getMatchingById(matchingId);
+    // 해당 매칭 정보가 없는 경우
+    if (!matching || !!matching.deletedAt) {
+      throw new NotFoundException(`Can't find matching with id ${matchingId}`);
+    }
+
+    const appliedTeam = await this.teamsService.getTeamById(teamId);
+
+    // 해당 팀이 존재하지 않는 경우
+    if (!appliedTeam || !!appliedTeam.deletedAt) {
+      throw new NotFoundException(`Can't find team with id ${teamId}`);
+    }
+
+    // 상대팀 팅 환불
+    const appliedTeamOwnerId = matching.appliedTeam.ownerId
+    await this.tingsService.refundTingByUserIdAndTingCount(appliedTeamOwnerId, TingNumberPerAction.ACCEPT)
+
+    // 매칭 거절 문자 보내기
+    const matchingPartnerTeamRefusedEvent = new MatchingPartnerTeamRefusedEvent();
+    matchingPartnerTeamRefusedEvent.teamId = matching.appliedTeamId;
+    this.eventEmitter.emit('matching.partnerTeamRefused', matchingPartnerTeamRefusedEvent);
+
+    // 거절한 상대를 기록하기
+    this.usersService.updateRefusedUserIds(matching.receivedTeam.ownerId, appliedTeamOwnerId);
+    
+    // 상대방 거절하기
+    return this.matchingsRepository.refuseMatching(matchingId);
   }
 
   async createMatchingRefuseReason(
