@@ -127,20 +127,35 @@ export class UsersController {
   //   return this.usersService.getTeamsByUserId(user.sub);
   // }
 
+  // @ApiOperation({
+  //   summary: '미사용 이용권 개수 조회',
+  // })
+  // @ApiOkResponse({
+  //   schema: {
+  //     example: {
+  //       ticketCount: 5,
+  //     },
+  //   },
+  // })
+  // @Get('tickets/count')
+  // @UseGuards(AccessTokenGuard)
+  // getUsersTicketsCount(@GetUser() user: PassportUser): Promise<{ ticketCount: number }> {
+  //   return this.usersService.getTicketCountByUserId(user.sub);
+  // }
   @ApiOperation({
-    summary: '미사용 이용권 개수 조회',
+    summary: '보유 팅 개수 조회 (🔆new)',
   })
   @ApiOkResponse({
     schema: {
       example: {
-        ticketCount: 5,
+        tingCount: 5,
       },
     },
   })
-  @Get('tickets/count')
+  @Get('tings/count')
   @UseGuards(AccessTokenGuard)
-  getUsersTicketsCount(@GetUser() user: PassportUser): Promise<{ ticketCount: number }> {
-    return this.usersService.getTicketCountByUserId(user.sub);
+  getUsersTicketsCount(@GetUser() user: PassportUser): Promise<{ tingCount: number }> {
+    return;
   }
 
   @ApiOperation({
