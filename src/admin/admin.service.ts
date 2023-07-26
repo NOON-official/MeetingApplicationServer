@@ -9,7 +9,7 @@ import { AdminGetMatchingDto } from './dtos/admin-get-matching.dto';
 import { MatchingsService } from './../matchings/matchings.service';
 import { TeamsService } from './../teams/teams.service';
 import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { AdminGetTeamDto } from './dtos/admin-get-team.dto';
+import { AdminGetAppliedTeamDto, AdminGetTeamDto } from './dtos/admin-get-team.dto';
 import { TeamGender } from 'src/teams/entities/team-gender.enum';
 import { MatchingStatus } from 'src/matchings/interfaces/matching-status.enum';
 import { AdminGetUserDto } from './dtos/admin-get-user.dto';
@@ -45,6 +45,10 @@ export class AdminService {
   }
   async deleteTeamByTeamId(teamId: number): Promise<void> {
     return this.teamsService.deleteTeamById(teamId);
+  }
+
+  async getAdminMatchingsApplied(): Promise<{ matchings: AdminGetAppliedTeamDto[] }> {
+    return this.matchingsService.getAdminMatchingsApplied();
   }
 
   async deleteMatchingByMatchingId(matchingId: number): Promise<void> {

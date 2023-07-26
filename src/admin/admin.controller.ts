@@ -3,7 +3,7 @@ import { CreateCouponDto } from './../coupons/dtos/create-coupon.dto';
 import { AdminGetInvitationSuccessUserDto } from './dtos/admin-get-invitation-success-user.dto';
 import { AdminGetMatchingDto } from './dtos/admin-get-matching.dto';
 import { MatchingStatus } from './../matchings/interfaces/matching-status.enum';
-import { AdminGetTeamDto } from './dtos/admin-get-team.dto';
+import { AdminGetAppliedTeamDto, AdminGetTeamDto } from './dtos/admin-get-team.dto';
 import { AdminService } from './admin.service';
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import {
@@ -55,13 +55,13 @@ export class AdminController {
 
   @ApiBearerAuth()
   @ApiOperation({
-    summary: '신청한/신청받은 팀 조회 (🔆new)',
+    summary: '신청한/신청받은 팀 조회 (📌is updating)',
     description: '관리자페이지 내 사용',
   })
   @ApiOkResponse({})
   @Get('matchings/applied')
-  getAdminMatchingsApplied(): Promise<{ teams: AdminGetTeamDto[] }> {
-    return;
+  getAdminMatchingsApplied(): Promise<{ matchings: AdminGetAppliedTeamDto[] }> {
+    return this.adminService.getAdminMatchingsApplied();
   }
 
   @ApiOperation({

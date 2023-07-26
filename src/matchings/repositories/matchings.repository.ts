@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { Ticket } from 'src/tickets/entities/ticket.entity';
 import * as moment from 'moment-timezone';
 import { GetTeamCardDto } from 'src/teams/dtos/get-team-card.dto';
+import { AdminGetAppliedTeamDto } from 'src/admin/dtos/admin-get-team.dto';
 
 @CustomRepository(Matching)
 export class MatchingsRepository extends Repository<Matching> {
@@ -31,6 +32,30 @@ export class MatchingsRepository extends Repository<Matching> {
 
     return matching;
   }
+
+   // 관리자페이지 신청한/신청받은 팀 조회
+   async getAdminMatchingsApplied(): Promise<{ matchings: AdminGetAppliedTeamDto[] }> {
+    const matchings = await this.createQueryBuilder('matching')
+      .select([
+        'matching.id AS matchingId',
+        'appliedTeam.id AS teamId',
+        'appliedTeamOwner.nickname as nickname',
+        'appliedTeamOwner.phone as phone',
+        'receivedTeam.id AS partnerTeamId',
+        'receivedTeamOwner.nickname as partnerTeamOwnernickname',
+        'receivedTeamOwner.phone as partnerTeamOwnerphone',
+        `IF(matching.updatedAt IS NOT NULL, matching.updatedAt, matching.createdAt) AS appliedAt`,
+      ])
+      .leftJoin(`team.appliedTeam`, 'appliedTeam')
+      .leftJoin(`appliedTeam.user`, 'appliedTeamOwner')
+      .leftJoin('team.receivedTeam', 'receivedTeam')
+      .leftJoin(`receivedTeam.user`, 'receivedTeamOwner')
+      .groupBy('matching.id')
+      .orderBy('COALESCE(matching.updatedAt, matching.createdAt)', 'ASC') // updatedAt이 있는 경우 modifiedAt 기준
+      .getRawMany();
+
+    return { matchings };
+   }
 
   // async getMatchingIdByTeamId(teamId: number): Promise<{ matchingId: number }> {
   //   const result = await this.createQueryBuilder('matching')
