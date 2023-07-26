@@ -172,7 +172,7 @@ export class TeamsRepository extends Repository<Team> {
         'user.university AS university',
         'json_arrayagg(members.university) AS universities',
         'team.drink AS drink',
-        `IF(team.modifiedAt IS NOT NULL, team.modifiedAt, team.createdAt) AS appliedAt`,
+        `team.createdAt AS appliedAt`,
         'user.id AS userId',
         'user.refusedUserIds AS refusedUserIds',
       ])
