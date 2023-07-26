@@ -56,6 +56,9 @@ export class Team extends BaseEntity {
   @Column({ type: 'text', nullable: true })
   kakaoId?: string;
 
+  @Column({ type: 'json', nullable: true })
+  excludedTeamIds: number[] | null;
+
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 
