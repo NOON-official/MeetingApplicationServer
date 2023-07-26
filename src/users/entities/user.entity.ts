@@ -17,6 +17,8 @@ import {
 import { Coupon } from 'src/coupons/entities/coupon.entity';
 import { Ticket } from 'src/tickets/entities/ticket.entity';
 import { Ting } from 'src/tings/entities/ting.entity';
+import { RecommendedTeam } from 'src/teams/entities/recommended-team.entity';
+import { NextRecommendedTeam } from 'src/teams/entities/next-recommended-team.entity';
 
 @Entity()
 @Unique(['id', 'kakaoUid', 'referralId', 'refreshToken'])
@@ -92,4 +94,10 @@ export class User extends BaseEntity {
 
   @OneToOne(() => Ting, { cascade: true })
   ting: Ting;
+
+  @OneToOne(() => RecommendedTeam, { cascade: true })
+  recommendedTeam: RecommendedTeam;
+
+  @OneToOne(() => NextRecommendedTeam, { cascade: true })
+  nextRecommendedTeam: NextRecommendedTeam;
 }
