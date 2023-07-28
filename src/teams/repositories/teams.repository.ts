@@ -382,4 +382,29 @@ export class TeamsRepository extends Repository<Team> {
   async getOwnerId(teamId: number): Promise<GetTeamOwnerDto> {
     return this.createQueryBuilder('team').select('team.ownerId').where('team.id = :teamId', { teamId }).getOne();
   }
+
+  async getExcludedTeamIds(teamId: number): Promise<{ excludedTeamIds: number[] }> {
+    const result = await this.createQueryBuilder('team')
+      .select(['team.excludedTeamIds'])
+      .where('team.id = :teamId', { teamId })
+      .getOne();
+
+    const excludedTeamIds = result?.excludedTeamIds ?? [];
+
+    return { excludedTeamIds };
+  }
+
+  async updateExcludedTeamIds(teamId: number, excludedTeamId: number) {
+    // 거절(다시 안 보기)한 팀과, 거절(다시 안 보기) 당한 팀 모두 excludedTeamIds 업데이트
+    const { excludedTeamIds: firstExcludedTeamIds } = await this.getExcludedTeamIds(teamId);
+    const { excludedTeamIds: secondExcludedTeamIds } = await this.getExcludedTeamIds(excludedTeamId);
+
+    if (!firstExcludedTeamIds.includes(excludedTeamId)) {
+      await this.update({ id: teamId }, { excludedTeamIds: [...firstExcludedTeamIds, excludedTeamId] });
+    }
+
+    if (!secondExcludedTeamIds.includes(teamId)) {
+      await this.update({ id: excludedTeamId }, { excludedTeamIds: [...secondExcludedTeamIds, teamId] });
+    }
+  }
 }

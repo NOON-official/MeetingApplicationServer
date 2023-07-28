@@ -414,13 +414,13 @@ export class TeamsService {
     return this.teamsRepository.deleteTeamsByUserId(userId);
   }
 
-  async refusedTeamsByUserId(userId: number, teamId: number): Promise<void> {
-    const ownerId = this.teamsRepository.getOwnerId(teamId);
+  async updateExcludedTeamsByUserIdAndExcludedTeamId(userId: number, excludedTeamId: number): Promise<void> {
+    const { teamId } = await this.getTeamIdByUserId(userId);
 
-    if (!ownerId) {
-      throw new NotFoundException(`Can't find team with owner id ${ownerId}`);
+    if (!teamId) {
+      throw new NotFoundException(`Can't find team with user id ${userId}`);
     }
 
-    await this.usersService.updateRefusedUserIds(userId, teamId);
+    await this.teamsRepository.updateExcludedTeamIds(teamId, excludedTeamId);
   }
 }
