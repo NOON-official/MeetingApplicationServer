@@ -12,7 +12,6 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { MatchingRefuseReason } from './matching-refuse-reason.entity';
-import { Ticket } from 'src/tickets/entities/ticket.entity';
 
 @Entity()
 @Unique(['id'])
