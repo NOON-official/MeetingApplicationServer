@@ -304,6 +304,13 @@ export class UsersService {
     return this.userStudentCardRepository.updateUserStudentCard(userId, studentCard);
   }
 
+  async getRecommendedTeamCardsByUserId(userId: number): Promise<{ teams: GetTeamCardDto[] }> {
+    const { teamId } = await this.getTeamIdByUserId(userId);
+
+    if (!teamId) return { teams: [] };
+    else return this.matchingsService.getAppliedTeamCardsByTeamId(teamId);
+  }
+
   async getAppliedTeamCardsByUserId(userId: number): Promise<{ teams: GetTeamCardDto[] }> {
     const { teamId } = await this.getTeamIdByUserId(userId);
 

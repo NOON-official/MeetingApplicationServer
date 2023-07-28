@@ -134,13 +134,13 @@ export class TeamsRepository extends Repository<Team> {
   //   return { teamCount };
   // }
 
-  async updateTeam(teamId: number, teamData: UpdateTeam): Promise<void> {
-    await this.createQueryBuilder()
-      .update(Team)
-      .set({ ...teamData, modifiedAt: () => 'NOW()' })
-      .where('id = :teamId', { teamId })
-      .execute();
-  }
+  // async updateTeam(teamId: number, teamData: UpdateTeam): Promise<void> {
+  //   await this.createQueryBuilder()
+  //     .update(Team)
+  //     .set({ ...teamData, modifiedAt: () => 'NOW()' })
+  //     .where('id = :teamId', { teamId })
+  //     .execute();
+  // }
 
   async deleteTeamMemberByTeamId(teamId: number): Promise<void> {
     await this.createQueryBuilder('team-members')

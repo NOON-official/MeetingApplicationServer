@@ -140,12 +140,6 @@ export class GetTeamDto {
   updatedAt: Date;
 
   @ApiProperty({
-    description: '팀 정보 수정일시',
-    example: '2023-01-20T21:37:26.886Z',
-  })
-  modifiedAt?: Date;
-
-  @ApiProperty({
     description: '삭제일시',
     example: '2023-01-20T21:37:26.886Z',
   })

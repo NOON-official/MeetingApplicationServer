@@ -11,7 +11,7 @@ export class GetTeamCardDto {
     description: '매칭 아이디',
     example: 1,
   })
-  matchingId: number;
+  matchingId?: number;
 
   @ApiProperty({
     description: '팀 이름',
@@ -48,5 +48,17 @@ export class GetTeamCardDto {
     description: '신청일시',
     example: '2023-01-20T21:37:26.886Z',
   })
-  appliedAt: Date;
+  createdAt?: Date;
+
+  @ApiProperty({
+    description: '신청일시',
+    example: '2023-01-20T21:37:26.886Z',
+  })
+  appliedAt?: Date;
+
+  @ApiProperty({
+    description: '삭제일시',
+    example: '2023-01-20T21:37:26.886Z',
+  })
+  deletedAt?: Date;
 }

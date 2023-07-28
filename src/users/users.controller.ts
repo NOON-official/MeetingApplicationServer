@@ -263,7 +263,7 @@ export class UsersController {
 
   @ApiOperation({
     summary: '유저 추천팀 조회 (🔆new)',
-    description: '',
+    description: '* 유저의 팀 프로필이 없는 경우 400 에러 반환 \n\n* 추천할 팀이 없는 경우 빈 배열 반환',
   })
   @ApiOkResponse({
     schema: {
@@ -276,7 +276,7 @@ export class UsersController {
             memberCount: 3,
             intro: '안녕하세요',
             isVerified: true,
-            appliedAt: '2023-01-20T21:37:26.886Z',
+            createdAt: '2023-01-20T21:37:26.886Z',
           },
           {
             id: 2,
@@ -285,16 +285,16 @@ export class UsersController {
             memberCount: 2,
             intro: '안녕하세요',
             isVerified: false,
-            appliedAt: '2023-01-20T21:37:26.886Z',
+            createdAt: '2023-01-20T21:37:26.886Z',
           },
         ],
       },
     },
   })
-  @Get('teams/today')
+  @Get('teams/recommended')
   @UseGuards(AccessTokenGuard)
-  getUsersTeamsToday(): Promise<void> {
-    return;
+  getUsersTeamsRecommended(@GetUser() user: PassportUser): Promise<{ teams: GetTeamCardDto[] }> {
+    return this.usersService.getRecommendedTeamCardsByUserId(user.sub);
   }
 
   @ApiOperation({

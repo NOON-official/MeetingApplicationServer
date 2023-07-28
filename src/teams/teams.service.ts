@@ -1,10 +1,10 @@
 import { AdminGetPartnerTeamNotRespondedTeamDto } from './../admin/dtos/admin-get-partner-team-not-responded-team.dto';
 import { MatchingStatus } from 'src/matchings/interfaces/matching-status.enum';
 import { MatchingsService } from './../matchings/matchings.service';
-import { GetTeamDetailDto, GetTeamDto } from './dtos/get-team.dto';
+import { GetTeamDetailDto, GetTeamDto, getMemberDto } from './dtos/get-team.dto';
 import { BadRequestException } from '@nestjs/common/exceptions';
 import { MatchingRound } from './../matchings/constants/matching-round';
-import { CreateTeamDto } from './dtos/create-team.dto';
+import { CreateMemberDto, CreateTeamDto } from './dtos/create-team.dto';
 import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { TeamsRepository } from './repositories/teams.repository';
 import { UsersService } from 'src/users/users.service';
@@ -23,6 +23,7 @@ import { Team } from './entities/team.entity';
 import { AdminGetTeamDto } from 'src/admin/dtos/admin-get-team.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { AdminGetOurteamRefusedTeamDto } from 'src/admin/dtos/admin-get-ourteam-refused-team.dto';
+import { TeamMember } from './entities/team-member.entity';
 
 @Injectable()
 export class TeamsService {
@@ -81,9 +82,6 @@ export class TeamsService {
 
     // 팀 멤버 저장
     await this.teamsRepository.createTeamMember(members, team);
-
-    // 신청팀 수가 다 찼을 경우 매칭 알고리즘 실행 - 자동화 적용 시 주석 해제하기
-    // this.eventEmitter.emit('team.created');
   }
 
   // 신청 내역 조회
@@ -225,16 +223,6 @@ export class TeamsService {
       throw new NotFoundException(`Can't find team with id ${teamId}`);
     }
 
-    // 이미 매칭 완료된 팀인 경우
-    if (!!team.appliedTeamMatching || !!team.receivedTeamMatching) {
-      throw new BadRequestException(`already matched team`);
-    }
-
-    // 이미 매칭 실패한 팀인 경우
-    // if (team.currentRound - team.startRound >= MatchingRound.MAX_TRIAL) {
-    //   throw new BadRequestException(`matching already failed team`);
-    // }
-
     const {
       memberCount,
       memberCounts,
@@ -249,25 +237,42 @@ export class TeamsService {
       kakaoId,
     } = updateTeamDto;
 
-    // Team 테이블 정보 업데이트
-    await this.teamsRepository.updateTeam(teamId, {
-      memberCount,
-      memberCounts,
-      areas,
-      teamAvailableDate,
-      teamName,
-      intro,
-      drink,
-      prefAge,
-      prefVibes,
-      kakaoId,
-    });
+    // 새로 생성할 팀 정보
+    const teamData = {
+      gender: team.gender,
+      memberCount: memberCount ?? team.memberCount,
+      memberCounts: memberCounts ?? team.memberCounts,
+      teamAvailableDate: teamAvailableDate ?? team.teamAvailableDate,
+      areas: areas ?? team.areas,
+      teamName: teamName ?? team.teamName,
+      intro: intro ?? team.intro,
+      drink: drink ?? team.drink,
+      prefAge: prefAge ?? team.prefAge,
+      prefVibes: prefVibes ?? team.prefVibes,
+      kakaoId: kakaoId ?? team.kakaoId,
+    };
 
-    // 팀 멤버 정보 있는 경우 row 삭제 후 다시 생성
-    if (!!members) {
-      await this.teamsRepository.deleteTeamMemberByTeamId(teamId);
-      await this.teamsRepository.createTeamMember(members, team);
+    // 새로운 팀 생성
+    const { teamId: newTeamId } = await this.teamsRepository.createTeam(teamData, team.user);
+    const newTeam = await this.getTeamById(newTeamId);
+
+    // 새로운 멤버 생성
+    let newMembers: CreateMemberDto[] | getMemberDto[];
+
+    if (!members || members?.length === 0) {
+      const existingTeam = await this.getApplicationTeamById(teamId);
+      newMembers = existingTeam.members;
+      newMembers.map((m: TeamMember) => {
+        delete m.id;
+      });
+    } else {
+      newMembers = members;
     }
+
+    await this.teamsRepository.createTeamMember(newMembers, newTeam);
+
+    // 기존 팀 삭제
+    await this.teamsRepository.deleteTeamById(teamId);
   }
 
   async deleteTeamById(teamId: number): Promise<void> {

@@ -8,10 +8,12 @@ import { TypeOrmExModule } from './../database/typeorm-ex.module';
 import { TeamsController } from './teams.controller';
 import { forwardRef, Module } from '@nestjs/common';
 import { TeamsService } from './teams.service';
+import { RecommendedTeam } from './entities/recommended-team.entity';
+import { NextRecommendedTeam } from './entities/next-recommended-team.entity';
 
 @Module({
   imports: [
-    TypeOrmExModule.forCustomRepository([TeamsRepository, TeamMembersRepository]),
+    TypeOrmExModule.forCustomRepository([TeamsRepository, TeamMembersRepository, RecommendedTeam, NextRecommendedTeam]),
     forwardRef(() => UsersModule),
     forwardRef(() => MatchingsModule),
     forwardRef(() => AdminModule),
