@@ -6,6 +6,7 @@ import { CreateAgreementDto } from './dtos/create-agreement.dto';
 import { AccessTokenGuard } from './../auth/guards/access-token.guard';
 import { UseGuards } from '@nestjs/common';
 import {
+  ApiBadRequestResponse,
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiNotFoundResponse,
@@ -263,7 +264,7 @@ export class UsersController {
 
   @ApiOperation({
     summary: '유저 추천팀 조회 (🔆new)',
-    description: '* 유저의 팀 프로필이 없는 경우 400 에러 반환 \n\n* 추천할 팀이 없는 경우 빈 배열 반환',
+    description: '* 유저의 팀 프로필이 없는 경우 400 에러 반환 \n\n* 추천할 팀이 없는 경우 빈 배열([]) 반환',
   })
   @ApiOkResponse({
     schema: {
@@ -291,6 +292,7 @@ export class UsersController {
       },
     },
   })
+  @ApiBadRequestResponse({ description: 'Bad Request' })
   @Get('teams/recommended')
   @UseGuards(AccessTokenGuard)
   getUsersTeamsRecommended(@GetUser() user: PassportUser): Promise<{ teams: GetTeamCardDto[] }> {
