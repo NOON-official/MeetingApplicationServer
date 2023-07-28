@@ -79,14 +79,14 @@ export class MatchingsController {
       '이용권 1개 차감 \n\n 추후 상대팀이 거절한 경우 이용권 환불됨 \n\n 상대팀이 이미 거절한 경우/이용권이 없는 경우 400에러 발생',
   })
   @ApiOkResponse({ description: 'OK' })
-  @Put(':matchingId/teams/:teamId/accept')
+  @Put(':matchingId/teams/:appliedTeamId/accept')
   @UseGuards(AccessTokenGuard, MatchingOwnerGuard)
   putMatchingsMatchingIdTeamsTeamIdAccept(
     @GetUser() user: PassportUser,
     @Param('matchingId') matchingId: number,
-    @Param('teamId') teamId: number,
+    @Param('appliedTeamId') appliedTeamId: number,
   ): Promise<void> {
-    return this.matchingsService.acceptMatchingByTeamId(user.sub, matchingId, teamId);
+    return this.matchingsService.acceptMatchingByTeamId(user.sub, matchingId, appliedTeamId);
   }
 
   @ApiOperation({

@@ -92,7 +92,7 @@ export class MatchingsService {
   //   return result;
   // }
 
-  async acceptMatchingByTeamId(userId: number, matchingId: number, teamId: number): Promise<void> {
+  async acceptMatchingByTeamId(userId: number, matchingId: number, appliedTeamId: number): Promise<void> {
     const matching = await this.getMatchingById(matchingId);
 
     // 해당 매칭 정보가 없는 경우
@@ -100,11 +100,11 @@ export class MatchingsService {
       throw new NotFoundException(`Can't find matching with id ${matchingId}`);
     }
 
-    const appliedTeam = await this.teamsService.getTeamById(teamId);
+    const appliedTeam = await this.teamsService.getTeamById(appliedTeamId);
 
     // 해당 팀이 존재하지 않는 경우
     if (!appliedTeam || !!appliedTeam.deletedAt) {
-      throw new NotFoundException(`Can't find team with id ${teamId}`);
+      throw new NotFoundException(`Can't find team with id ${appliedTeamId}`);
     }
 
     // 보유하고 있는 팅이 모자란 경우
