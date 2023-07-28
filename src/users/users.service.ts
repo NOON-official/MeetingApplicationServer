@@ -303,8 +303,30 @@ export class UsersService {
   async getRecommendedTeamCardsByUserId(userId: number): Promise<{ teams: GetTeamCardDto[] }> {
     const { teamId } = await this.getTeamIdByUserId(userId);
 
-    if (!teamId) return { teams: [] };
-    else return this.matchingsService.getAppliedTeamCardsByTeamId(teamId);
+    // 해당 유저의 팀이 없는 경우 추천팀 조회 불가
+    if (!teamId) {
+      throw new BadRequestException(`team with user id ${userId} is not exists`);
+    }
+
+    const nextRecommendedTeam = await this.teamsService.getNextRecommendedTeamByUserId(userId);
+
+    // 다음 추천팀이 준비됐고, 새로운 추천 시간(오후 11시) 이후인 경우
+    if (nextRecommendedTeam?.nextRecommendedTeamIds?.length > 0) {
+      // 다음 업데이트 시간 === 다음 추천팀 업데이트 날짜의 오후 11시 (UTC 14:00)
+      const nextUpdatedTime = moment(nextRecommendedTeam.updatedAt).format('YYYY-MM-DD 14:00');
+      const now = moment(new Date()).format('YYYY-MM-DD HH:mm');
+
+      // 추천팀 갱신
+      if (now >= nextUpdatedTime) {
+        // 다음 추천팀 데이터를 기존 추천팀 테이블로 이동
+        await this.teamsService.updateRecommendedTeamIdsByUserId(userId);
+
+        // 다음 추천팀 테이블 데이터 삭제
+        await this.teamsService.deleteNextRecommendedTeamIdsByUserId(userId);
+      }
+    }
+    // 추천팀 반환
+    return this.teamsService.getRecommendedTeamCardsByUserId(userId);
   }
 
   async getAppliedTeamCardsByUserId(userId: number): Promise<{ teams: GetTeamCardDto[] }> {
