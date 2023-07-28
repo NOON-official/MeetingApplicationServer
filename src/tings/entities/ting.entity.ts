@@ -17,7 +17,7 @@ export class Ting extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'int', default: 0 })
   tingCount: number;
 
   @CreateDateColumn({ type: 'timestamp' })
