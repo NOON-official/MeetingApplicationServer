@@ -57,10 +57,10 @@ export class MatchingsRepository extends Repository<Matching> {
 
   async acceptMatching(matchingId: number): Promise<void> {
     await this.createQueryBuilder()
-    .update(Matching)
-    .set({ receivedTeamIsAccepted: true, receivedTeamIsPaid: true, matchedAt: Date.now().toString() })
-    .where('id = :matchingId', { matchingId })
-    .execute();
+      .update(Matching)
+      .set({ receivedTeamIsAccepted: true, receivedTeamIsPaid: true, matchedAt: Date.now().toString() })
+      .where('id = :matchingId', { matchingId })
+      .execute();
   }
 
   async refuseMatching(matchingId: number): Promise<void> {
@@ -253,7 +253,7 @@ export class MatchingsRepository extends Repository<Matching> {
       // 상대팀 거절, 우리팀 수락
       .andWhere(`matching.receivedTeamIsAccepted IS false AND matching.appliedTeamIsAccepted IS true`)
       // 상대팀 결제 X, 우리팀 결제 O
-      .andWhere(`matching.receivedTeamIsPaid IS NULL AND matching.appliedTeamIsPaid IS true`)
+      .andWhere(`matching.receivedTeamIsPaid IS false AND matching.appliedTeamIsPaid IS true`)
       .groupBy('matching.id')
       .getRawMany();
 
