@@ -58,7 +58,7 @@ export class MatchingsRepository extends Repository<Matching> {
   async acceptMatching(matchingId: number): Promise<void> {
     await this.createQueryBuilder()
       .update(Matching)
-      .set({ receivedTeamIsAccepted: true, receivedTeamIsPaid: true, matchedAt: Date.now().toString() })
+      .set({ receivedTeamIsAccepted: true, receivedTeamIsPaid: true, matchedAt: () => 'NOW()' })
       .where('id = :matchingId', { matchingId })
       .execute();
   }
