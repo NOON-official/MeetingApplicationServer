@@ -91,16 +91,16 @@ export class MatchingsController {
 
   @ApiOperation({
     summary: '매칭 거절하기 (📌is updating)',
-    description: '상대팀 이용권 환불 필요',
+    description: 'refusedTeamId: 매칭 거절당한 팀 ID',
   })
   @ApiOkResponse({ description: 'OK' })
-  @Put(':matchingId/teams/:teamId/refuse')
+  @Put(':matchingId/teams/:refusedTeamId/refuse')
   @UseGuards(AccessTokenGuard, MatchingOwnerGuard)
   putMatchingsMatchingIdTeamsTeamIdRefuse(
     @Param('matchingId') matchingId: number,
-    @Param('teamId') teamId: number,
+    @Param('refusedTeamId') refusedTeamId: number,
   ): Promise<void> {
-    return this.matchingsService.refuseMatchingByTeamId(matchingId, teamId);
+    return this.matchingsService.refuseMatchingByTeamId(matchingId, refusedTeamId);
   }
 
   @ApiOperation({
