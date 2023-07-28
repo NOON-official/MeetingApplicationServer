@@ -118,5 +118,5 @@ export class AdminGetTeamDto {
     description: '거절한 회원 ID들',
     example: [11, 22, 33],
   })
-  refusedUserIds?: number[] | null;
+  excludedTeamIds?: number[] | null;
 }

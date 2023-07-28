@@ -74,7 +74,9 @@ export class UsersRepository extends Repository<User> {
     return { referralId };
   }
 
-  async getMyInfoByUserId(userId: number): Promise<{ nickname: string; phone: string, gender:string, university:number, birth:number }> {
+  async getMyInfoByUserId(
+    userId: number,
+  ): Promise<{ nickname: string; phone: string; gender: string; university: number; birth: number }> {
     await this.getUserById(userId);
 
     const { nickname, phone, gender, university, birth } = await this.createQueryBuilder('user')
@@ -105,7 +107,7 @@ export class UsersRepository extends Repository<User> {
     }
   }
 
-  async updateUniversity(userId: number, updateUniversity: UpdateUniversityDto){
+  async updateUniversity(userId: number, updateUniversity: UpdateUniversityDto) {
     const result = await this.update({ id: userId }, updateUniversity);
 
     if (result.affected === 0) {
@@ -115,22 +117,5 @@ export class UsersRepository extends Repository<User> {
 
   async getAllUsers(): Promise<User[]> {
     return await this.find();
-  }
-
-  async getRefusedUserIds(userId: number): Promise<{ refusedUserIds: number[] }>{
-    const { refusedUserIds } =  await this.createQueryBuilder('user')
-    .select(['user.refusedUserIds'])
-    .where('user.id = :userId', { userId })
-    .getOne();
-
-    return { refusedUserIds };
-  }
-
-  async updateRefusedUserIds(userId: number, refusedUserId: number) {
-    const refusedUsers = await this.getRefusedUserIds(userId);
-
-    if(!refusedUsers.refusedUserIds.includes(refusedUserId)){
-      await this.update({ id: userId }, { refusedUserIds: [...refusedUsers.refusedUserIds, refusedUserId] });
-    }
   }
 }

@@ -121,9 +121,7 @@ export class MatchingsService {
     await this.matchingsRepository.acceptMatching(matchingId);
 
     // 상대팀이 이미 수락한 경우 두 팀 모두 매칭성공 문자 발송
-    if (
-      matching.appliedTeamIsAccepted === true || matching.receivedTeamIsAccepted === true
-    ) {
+    if (matching.appliedTeamIsAccepted === true || matching.receivedTeamIsAccepted === true) {
       const succeededTeamIds = [matching.appliedTeamId, matching.receivedTeamId];
       succeededTeamIds.forEach((id) => {
         const matchingSucceededEvent = new MatchingSucceededEvent();
@@ -138,23 +136,23 @@ export class MatchingsService {
     return;
   }
 
-  async refuseMatchingByTeamId(matchingId: number, teamId: number): Promise<void> {
+  async refuseMatchingByTeamId(matchingId: number, refusedTeamId: number): Promise<void> {
     const matching = await this.getMatchingById(matchingId);
     // 해당 매칭 정보가 없는 경우
     if (!matching || !!matching.deletedAt) {
       throw new NotFoundException(`Can't find matching with id ${matchingId}`);
     }
 
-    const appliedTeam = await this.teamsService.getTeamById(teamId);
+    const appliedTeam = await this.teamsService.getTeamById(refusedTeamId);
 
     // 해당 팀이 존재하지 않는 경우
     if (!appliedTeam || !!appliedTeam.deletedAt) {
-      throw new NotFoundException(`Can't find team with id ${teamId}`);
+      throw new NotFoundException(`Can't find team with id ${refusedTeamId}`);
     }
 
     // 상대팀 팅 환불
-    const appliedTeamOwnerId = matching.appliedTeam.ownerId
-    await this.tingsService.refundTingByUserIdAndTingCount(appliedTeamOwnerId, TingNumberPerAction.ACCEPT)
+    const appliedTeamOwnerId = matching.appliedTeam.ownerId;
+    await this.tingsService.refundTingByUserIdAndTingCount(appliedTeamOwnerId, TingNumberPerAction.ACCEPT);
 
     // 매칭 거절 문자 보내기
     const matchingPartnerTeamRefusedEvent = new MatchingPartnerTeamRefusedEvent();
@@ -162,8 +160,8 @@ export class MatchingsService {
     this.eventEmitter.emit('matching.partnerTeamRefused', matchingPartnerTeamRefusedEvent);
 
     // 거절한 상대를 기록하기
-    this.usersService.updateRefusedUserIds(matching.receivedTeam.ownerId, appliedTeamOwnerId);
-    
+    await this.teamsService.updateExcludedTeamsByUserIdAndExcludedTeamId(matching.receivedTeam.ownerId, appliedTeam.id);
+
     // 상대방 거절하기
     return this.matchingsRepository.refuseMatching(matchingId);
   }
@@ -345,11 +343,11 @@ export class MatchingsService {
 
     if (!!existingMatching) {
       // 이미 신청한 팀인 경우
-      if (existingMatching.appliedTeamId === appliedTeamId) {
+      if (existingMatching.appliedTeamId === appliedTeamId && existingMatching.receivedTeamId === receivedTeamId) {
         throw new BadRequestException(`already applied team`);
       }
       // 이미 신청받은 팀인 경우
-      if (existingMatching.receivedTeamId === appliedTeamId) {
+      if (existingMatching.receivedTeamId === appliedTeamId && existingMatching.appliedTeamId === receivedTeamId) {
         throw new BadRequestException(`already received team`);
       }
     }
@@ -373,6 +371,9 @@ export class MatchingsService {
 
     // 팅 차감하기
     await this.tingsService.useTingByUserIdAndTingCount(appliedUserId, TingNumberPerAction.APPLY);
+
+    // 상호 제외된 팀 목록에 추가하기
+    await this.teamsService.updateExcludedTeamsByUserIdAndExcludedTeamId(appliedTeam.ownerId, receivedTeamId);
   }
 
   async getAppliedTeamCardsByTeamId(teamId: number): Promise<{ teams: GetTeamCardDto[] }> {

@@ -188,7 +188,7 @@ export class TeamsController {
     description: '본인팀 또는 매칭 상호 수락 후 상대팀 연락처 조회 가능',
   })
   @ApiOkResponse({
-    type: GetTeamDetailDto
+    type: GetTeamDetailDto,
   })
   @Get(':teamId/contact')
   @UseGuards(AccessTokenGuard, MatchingOwnerGuard)
@@ -196,16 +196,20 @@ export class TeamsController {
     return this.teamsService.getApplicationTeamDetailById(teamId);
   }
 
+  @ApiBearerAuth()
   @ApiOperation({
     summary: '매칭 다시 안 보기 (📌is updating)',
     description:
-      '거절 당한 팀ID를 파라미터로 보내주시면 됩니다.\n\n유저 테이블 refusedUserIds에 해당 팀 대표 유저ID 추가 및 이후 추천 안됨',
+      '다시 안 보기 당한 팀ID를 파라미터로 보내주시면 됩니다.\n\n팀 테이블 excludedTeamIds에 상호 팀ID 추가 및 이후 추천 안됨',
   })
   @ApiOkResponse({ description: 'OK' })
-  @Put(':refusedTeamId')
+  @Put(':excludedTeamId')
   @UseGuards(AccessTokenGuard)
-  putMatchingsAppliedTeamIdReceivedTeamId(@GetUser() _user: PassportUser, @Param('refusedTeamId') refusedTeamId: number): Promise<void> {
-    return this.teamsService.refusedTeamsByUserId(_user.sub, refusedTeamId);
+  putMatchingsAppliedTeamIdExcludedTeamId(
+    @GetUser() user: PassportUser,
+    @Param('excludedTeamId') excludedTeamId: number,
+  ): Promise<void> {
+    return this.teamsService.updateExcludedTeamsByUserIdAndExcludedTeamId(user.sub, excludedTeamId);
   }
 
   // @ApiBearerAuth()

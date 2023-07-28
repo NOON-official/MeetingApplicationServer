@@ -291,10 +291,6 @@ export class UsersService {
     return await this.invitationsService.getUsersWithInvitationCount();
   }
 
-  async updateRefusedUserIds(userId: number, refusedUserId: number) {
-    return this.usersRepository.updateRefusedUserIds(userId, refusedUserId);
-  }
-
   async updateStudentCard(userId: number, studentCard: SaveStudentCardDto): Promise<void> {
     const user = await this.usersRepository.getUserById(userId);
     if (!user.nickname) {
