@@ -26,6 +26,6 @@ export class NextRecommendedTeam extends BaseEntity {
   @Column({ type: 'json', nullable: true })
   nextRecommendedTeamIds: number[] | null;
 
-  @UpdateDateColumn({ type: 'timestamp' })
+  @Column({ type: 'timestamp', nullable: true })
   updatedAt: Date;
 }

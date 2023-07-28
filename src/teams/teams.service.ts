@@ -24,11 +24,18 @@ import { AdminGetTeamDto } from 'src/admin/dtos/admin-get-team.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { AdminGetOurteamRefusedTeamDto } from 'src/admin/dtos/admin-get-ourteam-refused-team.dto';
 import { TeamMember } from './entities/team-member.entity';
+import { NextRecommendedTeam } from './entities/next-recommended-team.entity';
+import { NextRecommendedTeamsRepository } from './repositories/next-recommended-team.repository';
+import { RecommendedTeamsRepository } from './repositories/recommended-team.repository';
+import { RecommendedTeam } from './entities/recommended-team.entity';
+import { GetTeamCardDto } from './dtos/get-team-card.dto';
 
 @Injectable()
 export class TeamsService {
   constructor(
     private teamsRepository: TeamsRepository,
+    private recommendedTeamsRepository: RecommendedTeamsRepository,
+    private nextRecommendedTeamsRepository: NextRecommendedTeamsRepository,
     @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
     @Inject(forwardRef(() => MatchingsService))
@@ -422,5 +429,55 @@ export class TeamsService {
     }
 
     await this.teamsRepository.updateExcludedTeamIds(teamId, excludedTeamId);
+  }
+
+  async getRecommendedTeamByUserId(userId: number): Promise<RecommendedTeam> {
+    const recommendedTeam = await this.recommendedTeamsRepository.getRecommendedTeamByUserId(userId);
+
+    return recommendedTeam;
+  }
+
+  async getNextRecommendedTeamByUserId(userId: number): Promise<NextRecommendedTeam> {
+    const nextRecommendedTeam = await this.nextRecommendedTeamsRepository.getNextRecommendedTeamByUserId(userId);
+
+    return nextRecommendedTeam;
+  }
+
+  async updateRecommendedTeamIdsByUserId(userId: number): Promise<void> {
+    const nextRecommendedTeam = await this.getNextRecommendedTeamByUserId(userId);
+    const nextRecommendedTeamIds = nextRecommendedTeam.nextRecommendedTeamIds;
+
+    const recommendedTeam = await this.getRecommendedTeamByUserId(userId);
+
+    // 추천팀 없는 경우 생성 후 저장
+    if (!recommendedTeam) {
+      const user = await this.usersService.getUserById(userId);
+      await this.recommendedTeamsRepository.createRecommendedTeamWithUserAndRecommendedTeamIds(
+        user,
+        nextRecommendedTeamIds,
+      );
+    }
+    // 기존 추천팀 있는 경우 추천팀 ID 업데이트
+    else {
+      await this.recommendedTeamsRepository.updateRecommendedTeamIdsByUserIdAndRecommendedTeamIds(
+        userId,
+        nextRecommendedTeamIds,
+      );
+    }
+  }
+
+  async deleteNextRecommendedTeamIdsByUserId(userId: number): Promise<void> {
+    await this.nextRecommendedTeamsRepository.deleteNextRecommendedTeamIdsByUserId(userId);
+  }
+
+  async getRecommendedTeamCardsByUserId(userId: number): Promise<{ teams: GetTeamCardDto[] }> {
+    const { recommendedTeamIds } = await this.getRecommendedTeamByUserId(userId);
+
+    // 추천팀 데이터가 없는 경우
+    if (!recommendedTeamIds || recommendedTeamIds.length === 0) {
+      return { teams: [] };
+    }
+
+    return this.teamsRepository.getRecommendedTeamCardsByRecommendedTeamIds(recommendedTeamIds);
   }
 }

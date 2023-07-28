@@ -12,6 +12,7 @@ import { MatchingRound } from 'src/matchings/constants/matching-round';
 import { UpdateTeam } from '../interfaces/update-team.interface';
 import { AdminGetTeamDto } from 'src/admin/dtos/admin-get-team.dto';
 import { GetTeamOwnerDto } from '../dtos/get-team.dto';
+import { GetTeamCardDto } from '../dtos/get-team-card.dto';
 
 @CustomRepository(Team)
 export class TeamsRepository extends Repository<Team> {
@@ -406,5 +407,33 @@ export class TeamsRepository extends Repository<Team> {
     if (!secondExcludedTeamIds.includes(teamId)) {
       await this.update({ id: excludedTeamId }, { excludedTeamIds: [...secondExcludedTeamIds, teamId] });
     }
+  }
+
+  async getRecommendedTeamCardsByRecommendedTeamIds(
+    recommendedTeamIds: number[],
+  ): Promise<{ teams: GetTeamCardDto[] }> {
+    const teams = await this.createQueryBuilder('team')
+      .select([
+        'team.id AS id',
+        'team.teamName AS teamName',
+        'CAST(SUM(members.age) / team.memberCount AS SIGNED) AS age',
+        'team.memberCount AS memberCount',
+        'team.intro AS intro',
+        'user.isVerified AS isVerified',
+        'team.createdAt AS createdAt',
+      ])
+      .leftJoin('team.user', 'user')
+      .leftJoin('team.teamMembers', 'members')
+      // 추천팀에 해당하는 팀 정보 조회
+      .where('team.id IN (:...teamIds)', { teamIds: recommendedTeamIds })
+      .groupBy('team.id')
+      .getRawMany();
+
+    teams.map((t) => {
+      t.age = Number(t.age);
+      t.isVerified = t.isVerified === 1 ? true : false;
+    });
+
+    return { teams };
   }
 }
