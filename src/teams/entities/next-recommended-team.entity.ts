@@ -11,7 +11,7 @@ import {
 import { User } from 'src/users/entities/user.entity';
 
 @Entity()
-@Unique(['id'])
+@Unique(['id', 'userId'])
 export class NextRecommendedTeam extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
