@@ -18,6 +18,6 @@ export class RecommendedTeamsRepository extends Repository<RecommendedTeam> {
     userId: number,
     recommendedTeamIds: number[],
   ): Promise<void> {
-    await this.upsert({ userId, recommendedTeamIds }, ['userId']);
+    await this.upsert({ userId, recommendedTeamIds, updatedAt: () => 'NOW()' }, ['userId']);
   }
 }
