@@ -29,6 +29,7 @@ import { NextRecommendedTeamsRepository } from './repositories/next-recommended-
 import { RecommendedTeamsRepository } from './repositories/recommended-team.repository';
 import { RecommendedTeam } from './entities/recommended-team.entity';
 import { GetTeamCardDto } from './dtos/get-team-card.dto';
+import { TeamForMatching } from './interfaces/team-for-matching.interface';
 
 @Injectable()
 export class TeamsService {
@@ -448,7 +449,7 @@ export class TeamsService {
     const nextRecommendedTeam = await this.getNextRecommendedTeamByUserId(userId);
     const nextRecommendedTeamIds = nextRecommendedTeam.nextRecommendedTeamIds;
 
-    // 추천팀 없는 경우 생성 or 업데이트
+    // 추천팀 없는 경우 생성 or 기존 추천팀 업데이트
     await this.recommendedTeamsRepository.upsertRecommendedTeamIdsByUserIdAndRecommendedTeamIds(
       userId,
       nextRecommendedTeamIds,
@@ -468,5 +469,31 @@ export class TeamsService {
     }
 
     return this.teamsRepository.getRecommendedTeamCardsByRecommendedTeamIds(recommendedTeamIds);
+  }
+
+  async getTeamsByGenderForMatching(gender: TeamGender): Promise<{ teams: TeamForMatching[] }> {
+    return this.teamsRepository.getTeamsByGenderForMatching(gender);
+  }
+
+  async upsertRecommendedTeamIdsByUserIdAndRecommendedTeamIds(
+    userId: number,
+    recommendedTeamIds: number[],
+  ): Promise<void> {
+    // 추천팀 없는 경우 생성 or 기존 추천팀 업데이트
+    return this.recommendedTeamsRepository.upsertRecommendedTeamIdsByUserIdAndRecommendedTeamIds(
+      userId,
+      recommendedTeamIds,
+    );
+  }
+
+  async upsertNextRecommendedTeamIdsByUserIdAndNextRecommendedTeamIds(
+    userId: number,
+    nextRecommendedTeamIds: number[],
+  ): Promise<void> {
+    // 다음 추천팀 없는 경우 생성 or 기존 추천팀 업데이트
+    return this.nextRecommendedTeamsRepository.upsertNextRecommendedTeamIdsByUserIdAndRecommendedTeamIds(
+      userId,
+      nextRecommendedTeamIds,
+    );
   }
 }
