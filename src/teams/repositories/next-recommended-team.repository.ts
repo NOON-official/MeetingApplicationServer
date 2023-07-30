@@ -27,4 +27,11 @@ export class NextRecommendedTeamsRepository extends Repository<NextRecommendedTe
   async deleteNextRecommendedTeamIdsByUserId(userId: number): Promise<void> {
     await this.update({ userId }, { nextRecommendedTeamIds: null });
   }
+
+  async upsertNextRecommendedTeamIdsByUserIdAndRecommendedTeamIds(
+    userId: number,
+    nextRecommendedTeamIds: number[],
+  ): Promise<void> {
+    await this.upsert({ userId, nextRecommendedTeamIds, updatedAt: () => 'NOW()' }, ['userId']);
+  }
 }

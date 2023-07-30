@@ -29,6 +29,7 @@ import { NextRecommendedTeamsRepository } from './repositories/next-recommended-
 import { RecommendedTeamsRepository } from './repositories/recommended-team.repository';
 import { RecommendedTeam } from './entities/recommended-team.entity';
 import { GetTeamCardDto } from './dtos/get-team-card.dto';
+import { TeamForMatching } from './interfaces/team-for-matching.interface';
 
 @Injectable()
 export class TeamsService {
@@ -443,27 +444,16 @@ export class TeamsService {
     return nextRecommendedTeam;
   }
 
+  // 다음 추천팀을 추천팀 테이블로 이동
   async updateRecommendedTeamIdsByUserId(userId: number): Promise<void> {
     const nextRecommendedTeam = await this.getNextRecommendedTeamByUserId(userId);
     const nextRecommendedTeamIds = nextRecommendedTeam.nextRecommendedTeamIds;
 
-    const recommendedTeam = await this.getRecommendedTeamByUserId(userId);
-
-    // 추천팀 없는 경우 생성 후 저장
-    if (!recommendedTeam) {
-      const user = await this.usersService.getUserById(userId);
-      await this.recommendedTeamsRepository.createRecommendedTeamWithUserAndRecommendedTeamIds(
-        user,
-        nextRecommendedTeamIds,
-      );
-    }
-    // 기존 추천팀 있는 경우 추천팀 ID 업데이트
-    else {
-      await this.recommendedTeamsRepository.updateRecommendedTeamIdsByUserIdAndRecommendedTeamIds(
-        userId,
-        nextRecommendedTeamIds,
-      );
-    }
+    // 추천팀 없는 경우 생성 or 기존 추천팀 업데이트
+    await this.recommendedTeamsRepository.upsertRecommendedTeamIdsByUserIdAndRecommendedTeamIds(
+      userId,
+      nextRecommendedTeamIds,
+    );
   }
 
   async deleteNextRecommendedTeamIdsByUserId(userId: number): Promise<void> {
@@ -479,5 +469,31 @@ export class TeamsService {
     }
 
     return this.teamsRepository.getRecommendedTeamCardsByRecommendedTeamIds(recommendedTeamIds);
+  }
+
+  async getTeamsByGenderForMatching(gender: TeamGender): Promise<{ teams: TeamForMatching[] }> {
+    return this.teamsRepository.getTeamsByGenderForMatching(gender);
+  }
+
+  async upsertRecommendedTeamIdsByUserIdAndRecommendedTeamIds(
+    userId: number,
+    recommendedTeamIds: number[],
+  ): Promise<void> {
+    // 추천팀 없는 경우 생성 or 기존 추천팀 업데이트
+    return this.recommendedTeamsRepository.upsertRecommendedTeamIdsByUserIdAndRecommendedTeamIds(
+      userId,
+      recommendedTeamIds,
+    );
+  }
+
+  async upsertNextRecommendedTeamIdsByUserIdAndNextRecommendedTeamIds(
+    userId: number,
+    nextRecommendedTeamIds: number[],
+  ): Promise<void> {
+    // 다음 추천팀 없는 경우 생성 or 기존 추천팀 업데이트
+    return this.nextRecommendedTeamsRepository.upsertNextRecommendedTeamIdsByUserIdAndRecommendedTeamIds(
+      userId,
+      nextRecommendedTeamIds,
+    );
   }
 }

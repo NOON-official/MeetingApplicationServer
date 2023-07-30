@@ -5,17 +5,6 @@ import { Repository } from 'typeorm';
 
 @CustomRepository(RecommendedTeam)
 export class RecommendedTeamsRepository extends Repository<RecommendedTeam> {
-  async createRecommendedTeamWithUserAndRecommendedTeamIds(user: User, recommendedTeamIds: number[]): Promise<void> {
-    await this.createQueryBuilder()
-      .insert()
-      .into(RecommendedTeam)
-      .values({
-        recommendedTeamIds,
-        user,
-      })
-      .execute();
-  }
-
   async getRecommendedTeamByUserId(userId: number): Promise<RecommendedTeam> {
     let recommendedTeam = await this.createQueryBuilder('recommended_team')
       .select()
@@ -25,10 +14,10 @@ export class RecommendedTeamsRepository extends Repository<RecommendedTeam> {
     return recommendedTeam;
   }
 
-  async updateRecommendedTeamIdsByUserIdAndRecommendedTeamIds(
+  async upsertRecommendedTeamIdsByUserIdAndRecommendedTeamIds(
     userId: number,
     recommendedTeamIds: number[],
   ): Promise<void> {
-    await this.update({ userId }, { recommendedTeamIds });
+    await this.upsert({ userId, recommendedTeamIds, updatedAt: () => 'NOW()' }, ['userId']);
   }
 }

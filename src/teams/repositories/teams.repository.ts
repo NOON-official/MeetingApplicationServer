@@ -13,6 +13,7 @@ import { UpdateTeam } from '../interfaces/update-team.interface';
 import { AdminGetTeamDto } from 'src/admin/dtos/admin-get-team.dto';
 import { GetTeamOwnerDto } from '../dtos/get-team.dto';
 import { GetTeamCardDto } from '../dtos/get-team-card.dto';
+import { TeamForMatching } from '../interfaces/team-for-matching.interface';
 
 @CustomRepository(Team)
 export class TeamsRepository extends Repository<Team> {
@@ -427,11 +428,44 @@ export class TeamsRepository extends Repository<Team> {
       // 추천팀에 해당하는 팀 정보 조회
       .where('team.id IN (:...teamIds)', { teamIds: recommendedTeamIds })
       .groupBy('team.id')
+      // 주어진 팀 번호 순서 그대로 정렬
+      .orderBy(`FIELD(team.id,${recommendedTeamIds})`)
       .getRawMany();
 
     teams.map((t) => {
       t.age = Number(t.age);
       t.isVerified = t.isVerified === 1 ? true : false;
+    });
+
+    return { teams };
+  }
+
+  async getTeamsByGenderForMatching(gender: TeamGender): Promise<{ teams: TeamForMatching[] }> {
+    const teams = await this.createQueryBuilder('team')
+      .select([
+        'team.id AS id',
+        'team.ownerId AS ownerId',
+        'team.gender AS gender',
+        'CAST(SUM(members.age) / team.memberCount AS SIGNED) AS age',
+        'team.memberCount AS memberCount',
+        'team.memberCounts AS memberCounts',
+        'team.teamAvailableDate AS availableDate',
+        'team.areas AS areas',
+        'team.prefAge AS prefAge',
+        'team.excludedTeamIds AS excludedTeamIds',
+        'team.createdAt AS createdAt',
+      ])
+      .leftJoin('team.teamMembers', 'members')
+      // 성별에 해당하는 팀 정보 조회
+      .where('team.gender = :genderNum', { genderNum: gender === TeamGender.male ? 1 : 2 })
+      .groupBy('team.id')
+      .orderBy('createdAt')
+      .getRawMany();
+
+    teams.map((t) => {
+      t.age = Number(t.age);
+      t.memberCounts = t.memberCounts ?? [];
+      t.excludedTeamIds = t.excludedTeamIds ?? [];
     });
 
     return { teams };
