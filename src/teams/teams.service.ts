@@ -443,27 +443,16 @@ export class TeamsService {
     return nextRecommendedTeam;
   }
 
+  // 다음 추천팀을 추천팀 테이블로 이동
   async updateRecommendedTeamIdsByUserId(userId: number): Promise<void> {
     const nextRecommendedTeam = await this.getNextRecommendedTeamByUserId(userId);
     const nextRecommendedTeamIds = nextRecommendedTeam.nextRecommendedTeamIds;
 
-    const recommendedTeam = await this.getRecommendedTeamByUserId(userId);
-
-    // 추천팀 없는 경우 생성 후 저장
-    if (!recommendedTeam) {
-      const user = await this.usersService.getUserById(userId);
-      await this.recommendedTeamsRepository.createRecommendedTeamWithUserAndRecommendedTeamIds(
-        user,
-        nextRecommendedTeamIds,
-      );
-    }
-    // 기존 추천팀 있는 경우 추천팀 ID 업데이트
-    else {
-      await this.recommendedTeamsRepository.updateRecommendedTeamIdsByUserIdAndRecommendedTeamIds(
-        userId,
-        nextRecommendedTeamIds,
-      );
-    }
+    // 추천팀 없는 경우 생성 or 업데이트
+    await this.recommendedTeamsRepository.upsertRecommendedTeamIdsByUserIdAndRecommendedTeamIds(
+      userId,
+      nextRecommendedTeamIds,
+    );
   }
 
   async deleteNextRecommendedTeamIdsByUserId(userId: number): Promise<void> {
