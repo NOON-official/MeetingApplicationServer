@@ -26,6 +26,7 @@ import { UserStudentCardRepository } from './repositories/user-student-card.repo
 import { SaveStudentCardDto } from 'src/auth/dtos/save-student-card.dto';
 import { GetTeamCardDto } from 'src/teams/dtos/get-team-card.dto';
 import { MatchingsService } from 'src/matchings/matchings.service';
+import { TingsService } from 'src/tings/tings.service';
 
 @Injectable()
 export class UsersService {
@@ -39,6 +40,8 @@ export class UsersService {
     private teamsService: TeamsService,
     @Inject(forwardRef(() => TicketsService))
     private ticketsService: TicketsService,
+    @Inject(forwardRef(() => TingsService))
+    private tingsService: TingsService,
     @Inject(forwardRef(() => CouponsService))
     private couponsService: CouponsService,
     @Inject(forwardRef(() => OrdersService))
@@ -245,18 +248,9 @@ export class UsersService {
     const result = [];
 
     for (const u of users) {
-      const { matchingStatus } = await this.getUserMatchingStatusByUserId(u.id);
-
-      // 유저 매칭 상태
-      let matchingStatusConstant: string;
-      if (matchingStatus === null) {
-        matchingStatusConstant = MatchingStatusConstant.NOT_APPLIED;
-      } else {
-        matchingStatusConstant = MatchingStatusConstant[`${matchingStatus}`];
-      }
 
       // 유저 이용권 개수
-      const { ticketCount } = await this.getTicketCountByUserId(u.id);
+      const { tingCount } = await this.tingsService.getTingCountByUserId(u.id);
 
       // 유저 50% 쿠폰 개수
       const { couponCount: discount50CouponCount } = await this.getCouponCountByTypeIdAndUserId(1, u.id);
@@ -271,11 +265,13 @@ export class UsersService {
       const user = {
         userId: u.id,
         nickname: u.nickname,
-        matchingStatus: matchingStatusConstant,
+        birth: u.birth,
+        university: u.university,
+        gender: u.gender,
         phone: u.phone,
         createdAt: u.createdAt,
         referralId: u.referralId,
-        ticketCount,
+        tingCount,
         discount50CouponCount,
         freeCouponCount,
         userInvitationCount,

@@ -103,7 +103,9 @@ export class AdminController {
           {
             userId: 1,
             nickname: '미팅이1',
-            matchingStatus: '신청대기',
+            birth: 1996,
+            university: '한국외국어대학교',
+            gender: '남자',
             phone: '01012345678',
             createdAt: '2023-01-2023-01-20T21:37:26.886Z',
             referralId: 'LD4GSTO3',
@@ -115,7 +117,9 @@ export class AdminController {
           {
             userId: 2,
             nickname: '미팅이2',
-            matchingStatus: '신청대기',
+            birth: 1998,
+            university: '경희대학교',
+            gender: '여자',
             phone: '01012345678',
             createdAt: '2023-01-2023-01-20T21:37:26.886Z',
             referralId: 'LD4GSTO3',
