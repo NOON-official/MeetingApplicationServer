@@ -90,6 +90,10 @@ export class AdminService {
     return this.tingsService.refundTingByUserIdAndTingCount(userId, tingCount);
   }
 
+  async deleteTingsByUserIdAndTingCount(userId: number, tingCount: number): Promise<void> {
+    return this.tingsService.useTingByUserIdAndTingCount(userId, tingCount);
+  }
+
   async getInvitationSuccessUsers(): Promise<{ users: AdminGetInvitationSuccessUserDto[] }> {
     return this.usersService.getInvitationSuccessUsers();
   }

@@ -157,7 +157,7 @@ export class AdminController {
     @Param('userId') userId: number,
     @Param('tingCount') tingCount: number,
   ): Promise<void> {
-    return this.adminService.deleteTicketsByUserIdAndTicketCount(userId, tingCount);
+    return this.adminService.deleteTingsByUserIdAndTingCount(userId, tingCount);
   }
 
   // @ApiOperation({
