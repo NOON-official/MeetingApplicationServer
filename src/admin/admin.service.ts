@@ -21,6 +21,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { MatchingRound } from 'src/matchings/constants/matching-round';
 import { LoggerService } from 'src/common/utils/logger-service.util';
 import { AdminGetOurteamRefusedTeamDto } from './dtos/admin-get-ourteam-refused-team.dto';
+import { TingsService } from 'src/tings/tings.service';
 
 @Injectable()
 export class AdminService {
@@ -37,6 +38,8 @@ export class AdminService {
     private couponsService: CouponsService,
     @Inject(forwardRef(() => TicketsService))
     private ticketsService: TicketsService,
+    @Inject(forwardRef(() => TingsService))
+    private tingsService: TingsService,
     private eventEmitter: EventEmitter2,
   ) {}
 
@@ -81,6 +84,10 @@ export class AdminService {
 
   async getAllUsers(): Promise<{ users: AdminGetUserDto[] }> {
     return this.usersService.getAllUsers();
+  }
+
+  async updateTingsByUserIdAndTingCount(userId: number, tingCount: number): Promise<void> {
+    return this.tingsService.refundTingByUserIdAndTingCount(userId, tingCount);
   }
 
   async getInvitationSuccessUsers(): Promise<{ users: AdminGetInvitationSuccessUserDto[] }> {

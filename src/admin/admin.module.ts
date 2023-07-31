@@ -9,6 +9,7 @@ import { forwardRef, Module } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { AdminController } from './admin.controller';
 import { MatchingMatchedListener } from 'src/matchings/listeners/matching-matched.listener';
+import { TingsModule } from 'src/tings/tings.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { MatchingMatchedListener } from 'src/matchings/listeners/matching-matche
     forwardRef(() => InvitationsModule),
     forwardRef(() => CouponsModule),
     forwardRef(() => TicketsModule),
+    forwardRef(() => TingsModule),
   ],
   providers: [AdminService, MatchingMatchedListener, MatchingFailedListener],
   controllers: [AdminController],

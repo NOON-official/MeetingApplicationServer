@@ -143,8 +143,8 @@ export class AdminController {
   })
   @ApiOkResponse({ description: 'OK' })
   @Post('users/:userId/tings')
-  postAdminUsersUserIdTings(@Param('userId') userId: number): Promise<void> {
-    return;
+  postAdminUsersUserIdTings(@Param('userId') userId: number, @Body() tingCount: number): Promise<void> {
+    return this.adminService.updateTingsByUserIdAndTingCount(userId, tingCount);
   }
 
   @ApiOperation({
