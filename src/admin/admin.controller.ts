@@ -189,7 +189,7 @@ export class AdminController {
   // }
 
   @ApiOperation({
-    summary: '학생증 인증 신청 내역 조회 (🔆new)',
+    summary: '학생증 인증 신청 내역 조회 (📌is updating)',
     description: '관리자 페이지 내 사용',
   })
   @ApiOkResponse({
@@ -222,23 +222,23 @@ export class AdminController {
   }
 
   @ApiOperation({
-    summary: '유저 학교 인증 승인하기 (🔆new)',
+    summary: '유저 학교 인증 승인하기 (📌is updating)',
     description: '관리자 페이지 내 사용',
   })
-  @ApiOkResponse({})
+  @ApiOkResponse({ description: 'OK' })
   @Put('users/:userId/student-card/verify')
-  putAdminUsersUserIdStudentCardVerify(): Promise<void> {
-    return;
+  putAdminUsersUserIdStudentCardVerify(@Param('userId') userId: number): Promise<void> {
+    return this.adminService.updateUserVerify(userId);
   }
 
   @ApiOperation({
-    summary: '유저 학교 인증 거절하기 (🔆new)',
+    summary: '유저 학교 인증 거절하기 (📌is updating)',
     description: '관리자 페이지 내 사용',
   })
-  @ApiOkResponse({})
+  @ApiOkResponse({ description: 'OK' })
   @Put('users/:userId/student-card/decline')
-  putAdminUsersUserIdVerify(): Promise<void> {
-    return;
+  putAdminUsersUserIdVerify(@Param('userId') userId: number): Promise<void> {
+    return this.adminService.updateUserDeny(userId);
   }
 
   // @ApiBearerAuth()

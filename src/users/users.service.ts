@@ -299,6 +299,24 @@ export class UsersService {
     return this.userStudentCardRepository.updateUserStudentCard(userId, studentCard);
   }
 
+  async verifyUserByStudentCard(userId: number): Promise<void> {
+    const user = await this.usersRepository.getUserById(userId);
+    if (!user.id) {
+      throw new BadRequestException(`user with user id ${userId} is not exists`);
+    }
+
+    return this.usersRepository.verifyUserByStudentCard(userId);
+  }
+
+  async declineUserByStudentCard(userId: number): Promise<void> {
+    const user = await this.usersRepository.getUserById(userId);
+    if (!user.id) {
+      throw new BadRequestException(`user with user id ${userId} is not exists`);
+    }
+
+    return this.usersRepository.declineUserByStudentCard(userId);
+  }
+
   async getRecommendedTeamCardsByUserId(userId: number): Promise<{ teams: GetTeamCardDto[] }> {
     const { teamId } = await this.getTeamIdByUserId(userId);
 

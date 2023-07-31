@@ -135,4 +135,20 @@ export class UsersRepository extends Repository<User> {
 
     return { users };
   }
+
+  async verifyUserByStudentCard(userId: number): Promise<void> {
+    const result = await this.update({ id: userId }, { isVerified: true });
+
+    if (result.affected === 0) {
+      throw new NotFoundException(`Can't find user with id ${userId}`);
+    }
+  }
+
+  async declineUserByStudentCard(userId: number): Promise<void> {
+    const result = await this.update({ id: userId }, { isVerified: false });
+
+    if (result.affected === 0) {
+      throw new NotFoundException(`Can't find user with id ${userId}`);
+    }
+  }
 }

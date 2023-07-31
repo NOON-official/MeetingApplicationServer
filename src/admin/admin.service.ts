@@ -90,6 +90,14 @@ export class AdminService {
     return this.usersService.getAllUsersWithStudentCard();
   }
 
+  async updateUserVerify(userId: number): Promise<void> {
+    return this.usersService.verifyUserByStudentCard(userId);
+  }
+
+  async updateUserDeny(userId: number): Promise<void> {
+    return this.usersService.declineUserByStudentCard(userId);
+  }
+
   async updateTingsByUserIdAndTingCount(userId: number, tingCount: number): Promise<void> {
     return this.tingsService.refundTingByUserIdAndTingCount(userId, tingCount);
   }
