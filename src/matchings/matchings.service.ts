@@ -19,6 +19,7 @@ import { AdminGetOurteamRefusedTeamDto } from 'src/admin/dtos/admin-get-ourteam-
 import { TingsService } from 'src/tings/tings.service';
 import { TingNumberPerAction } from 'src/tings/constants/ting-number-per-action';
 import { GetTeamCardDto } from 'src/teams/dtos/get-team-card.dto';
+import { AdminGetAppliedTeamDto } from 'src/admin/dtos/admin-get-team.dto';
 
 @Injectable()
 export class MatchingsService {
@@ -271,11 +272,13 @@ export class MatchingsService {
     // }
   }
 
-  async getMatchingsByStatus(status: MatchingStatus): Promise<{ matchings: AdminGetMatchingDto[] }> {
-    // 수락/거절 대기자 조회
-    if (status === MatchingStatus.SUCCEEDED) {
-      return this.matchingsRepository.getAdminSucceededMatchings();
-    }
+  // 신청한/신청받은 팀 조회
+  async getAdminMatchingsApplied(): Promise<{ matchings: AdminGetAppliedTeamDto[] }> {
+    return this.matchingsRepository.getAdminMatchingsApplied();
+  }
+
+  async getMatchings(): Promise<{ matchings: AdminGetMatchingDto[] }> {
+    return this.matchingsRepository.getAdminSucceededMatchings();
   }
 
   async saveChatCreatedAtByMatchingId(matchingId: number): Promise<void> {

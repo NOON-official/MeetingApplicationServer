@@ -3,7 +3,7 @@ import { CreateCouponDto } from './../coupons/dtos/create-coupon.dto';
 import { AdminGetInvitationSuccessUserDto } from './dtos/admin-get-invitation-success-user.dto';
 import { AdminGetMatchingDto } from './dtos/admin-get-matching.dto';
 import { MatchingStatus } from './../matchings/interfaces/matching-status.enum';
-import { AdminGetTeamDto } from './dtos/admin-get-team.dto';
+import { AdminGetAppliedTeamDto, AdminGetTeamDto } from './dtos/admin-get-team.dto';
 import { AdminService } from './admin.service';
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import {
@@ -33,14 +33,14 @@ export class AdminController {
 
   @ApiBearerAuth()
   @ApiOperation({
-    summary: '전체 팀 조회 (🔆new)',
+    summary: '전체 팀 조회 (📌is updating)',
     description: '관리자페이지 내 사용',
   })
   @ApiQuery({ name: 'gender', enum: TeamGender })
   @ApiOkResponse({})
   @Get('teams')
   getAdminTeams(@Query('gender') gender: TeamGender): Promise<{ teams: AdminGetTeamDto[] }> {
-    return;
+    return this.adminService.getAdminTeams(gender);
   }
 
   @ApiBearerAuth()
@@ -55,13 +55,13 @@ export class AdminController {
 
   @ApiBearerAuth()
   @ApiOperation({
-    summary: '신청한/신청받은 팀 조회 (🔆new)',
+    summary: '신청한/신청받은 팀 조회 (📌is updating)',
     description: '관리자페이지 내 사용',
   })
   @ApiOkResponse({})
   @Get('matchings/applied')
-  getAdminMatchingsApplied(): Promise<{ teams: AdminGetTeamDto[] }> {
-    return;
+  getAdminMatchingsApplied(): Promise<{ matchings: AdminGetAppliedTeamDto[] }> {
+    return this.adminService.getAdminMatchingsApplied();
   }
 
   @ApiOperation({
@@ -89,7 +89,7 @@ export class AdminController {
   })
   @Get('matchings/succeeded')
   getAdminMatchingsSucceeded(): Promise<{ matchings: AdminGetMatchingDto[] }> {
-    return this.adminService.getMatchingsByStatus(MatchingStatus.SUCCEEDED);
+    return this.adminService.getMatchings();
   }
 
   @ApiOperation({
@@ -103,7 +103,9 @@ export class AdminController {
           {
             userId: 1,
             nickname: '미팅이1',
-            matchingStatus: '신청대기',
+            birth: 1996,
+            university: '한국외국어대학교',
+            gender: '남자',
             phone: '01012345678',
             createdAt: '2023-01-2023-01-20T21:37:26.886Z',
             referralId: 'LD4GSTO3',
@@ -115,7 +117,9 @@ export class AdminController {
           {
             userId: 2,
             nickname: '미팅이2',
-            matchingStatus: '신청대기',
+            birth: 1998,
+            university: '경희대학교',
+            gender: '여자',
             phone: '01012345678',
             createdAt: '2023-01-2023-01-20T21:37:26.886Z',
             referralId: 'LD4GSTO3',
@@ -139,8 +143,8 @@ export class AdminController {
   })
   @ApiOkResponse({ description: 'OK' })
   @Post('users/:userId/tings')
-  postAdminUsersUserIdTings(@Param('userId') userId: number): Promise<void> {
-    return;
+  postAdminUsersUserIdTings(@Param('userId') userId: number, @Body() tingCount: number): Promise<void> {
+    return this.adminService.updateTingsByUserIdAndTingCount(userId, tingCount);
   }
 
   @ApiOperation({
@@ -153,7 +157,7 @@ export class AdminController {
     @Param('userId') userId: number,
     @Param('tingCount') tingCount: number,
   ): Promise<void> {
-    return this.adminService.deleteTicketsByUserIdAndTicketCount(userId, tingCount);
+    return this.adminService.deleteTingsByUserIdAndTingCount(userId, tingCount);
   }
 
   // @ApiOperation({

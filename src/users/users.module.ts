@@ -11,6 +11,7 @@ import { TeamsModule } from 'src/teams/teams.module';
 import { TicketsModule } from 'src/tickets/tickets.module';
 import { UserStudentCardRepository } from './repositories/user-student-card.repository';
 import { MatchingsModule } from 'src/matchings/matchings.module';
+import { TingsModule } from 'src/tings/tings.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { MatchingsModule } from 'src/matchings/matchings.module';
     forwardRef(() => CouponsModule),
     forwardRef(() => OrdersModule),
     forwardRef(() => MatchingsModule),
+    forwardRef(() => TingsModule),
   ],
   controllers: [UsersController],
   providers: [UsersService],

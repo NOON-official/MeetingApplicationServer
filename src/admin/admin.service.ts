@@ -9,7 +9,7 @@ import { AdminGetMatchingDto } from './dtos/admin-get-matching.dto';
 import { MatchingsService } from './../matchings/matchings.service';
 import { TeamsService } from './../teams/teams.service';
 import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { AdminGetTeamDto } from './dtos/admin-get-team.dto';
+import { AdminGetAppliedTeamDto, AdminGetTeamDto } from './dtos/admin-get-team.dto';
 import { TeamGender } from 'src/teams/entities/team-gender.enum';
 import { MatchingStatus } from 'src/matchings/interfaces/matching-status.enum';
 import { AdminGetUserDto } from './dtos/admin-get-user.dto';
@@ -21,6 +21,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { MatchingRound } from 'src/matchings/constants/matching-round';
 import { LoggerService } from 'src/common/utils/logger-service.util';
 import { AdminGetOurteamRefusedTeamDto } from './dtos/admin-get-ourteam-refused-team.dto';
+import { TingsService } from 'src/tings/tings.service';
 
 @Injectable()
 export class AdminService {
@@ -37,11 +38,20 @@ export class AdminService {
     private couponsService: CouponsService,
     @Inject(forwardRef(() => TicketsService))
     private ticketsService: TicketsService,
+    @Inject(forwardRef(() => TingsService))
+    private tingsService: TingsService,
     private eventEmitter: EventEmitter2,
   ) {}
 
+  async getAdminTeams(gender: TeamGender): Promise<{ teams: AdminGetTeamDto[] }> {
+    return this.teamsService.getTeamsByGender(gender);
+  }
   async deleteTeamByTeamId(teamId: number): Promise<void> {
     return this.teamsService.deleteTeamById(teamId);
+  }
+
+  async getAdminMatchingsApplied(): Promise<{ matchings: AdminGetAppliedTeamDto[] }> {
+    return this.matchingsService.getAdminMatchingsApplied();
   }
 
   async deleteMatchingByMatchingId(matchingId: number): Promise<void> {
@@ -64,8 +74,8 @@ export class AdminService {
     return this.teamsService.deleteOurteamRefusedTeamByTeamId(teamId);
   }
 
-  async getMatchingsByStatus(status: MatchingStatus): Promise<{ matchings: AdminGetMatchingDto[] }> {
-    return this.matchingsService.getMatchingsByStatus(status);
+  async getMatchings(): Promise<{ matchings: AdminGetMatchingDto[] }> {
+    return this.matchingsService.getMatchings();
   }
 
   async saveChatCreatedAtByMatchingId(matchingId: number): Promise<void> {
@@ -74,6 +84,14 @@ export class AdminService {
 
   async getAllUsers(): Promise<{ users: AdminGetUserDto[] }> {
     return this.usersService.getAllUsers();
+  }
+
+  async updateTingsByUserIdAndTingCount(userId: number, tingCount: number): Promise<void> {
+    return this.tingsService.refundTingByUserIdAndTingCount(userId, tingCount);
+  }
+
+  async deleteTingsByUserIdAndTingCount(userId: number, tingCount: number): Promise<void> {
+    return this.tingsService.useTingByUserIdAndTingCount(userId, tingCount);
   }
 
   async getInvitationSuccessUsers(): Promise<{ users: AdminGetInvitationSuccessUserDto[] }> {

@@ -92,6 +92,11 @@ export class TeamsService {
     await this.teamsRepository.createTeamMember(members, team);
   }
 
+  // 성별 별로 팀 조회
+  async getTeamsByGender(gender: TeamGender): Promise<{ teams: AdminGetTeamDto[] }> {
+    return this.teamsRepository.getTeamsByGender(gender);
+  }
+
   // 신청 내역 조회
   async getTeamsByUserId(userId: number): Promise<{ teams: UserTeam[] }> {
     const { teamsWithMatching } = await this.teamsRepository.getTeamsByUserId(userId);

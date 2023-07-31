@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { Ticket } from 'src/tickets/entities/ticket.entity';
 import * as moment from 'moment-timezone';
 import { GetTeamCardDto } from 'src/teams/dtos/get-team-card.dto';
+import { AdminGetAppliedTeamDto } from 'src/admin/dtos/admin-get-team.dto';
 
 @CustomRepository(Matching)
 export class MatchingsRepository extends Repository<Matching> {
@@ -31,6 +32,31 @@ export class MatchingsRepository extends Repository<Matching> {
 
     return matching;
   }
+
+   // 관리자페이지 신청한/신청받은 팀 조회
+   async getAdminMatchingsApplied(): Promise<{ matchings: AdminGetAppliedTeamDto[] }> {
+    const matchings = await this.createQueryBuilder('matching')
+      .select([
+        'matching.id AS matchingId',
+        'appliedTeam.id AS teamId',
+        'appliedTeamOwner.nickname as nickname',
+        'appliedTeamOwner.phone as phone',
+        'receivedTeam.id AS partnerTeamId',
+        'receivedTeamOwner.nickname as partnerTeamOwnernickname',
+        'receivedTeamOwner.phone as partnerTeamOwnerphone',
+        `IF(matching.updatedAt IS NOT NULL, matching.updatedAt, matching.createdAt) AS appliedAt`,
+      ])
+      .leftJoin(`matching.appliedTeam`, 'appliedTeam')
+      .leftJoin(`appliedTeam.user`, 'appliedTeamOwner')
+      .leftJoin('matching.receivedTeam', 'receivedTeam')
+      .leftJoin(`receivedTeam.user`, 'receivedTeamOwner')
+      .where('matching.appliedTeamIsAccepted = true AND matching.receivedTeamIsAccepted IS NULL')
+      .groupBy('matching.id')
+      .orderBy('COALESCE(matching.updatedAt, matching.createdAt)', 'ASC') // updatedAt이 있는 경우 modifiedAt 기준
+      .getRawMany();
+
+    return { matchings };
+   }
 
   // async getMatchingIdByTeamId(teamId: number): Promise<{ matchingId: number }> {
   //   const result = await this.createQueryBuilder('matching')
@@ -97,36 +123,30 @@ export class MatchingsRepository extends Repository<Matching> {
 
   // 관리자페이지 매칭완료자 조회
   async getAdminSucceededMatchings(): Promise<{ matchings: AdminGetMatchingDto[] }> {
-    // const matchings = await this.createQueryBuilder('matching')
-    //   .select([
-    //     'matching.id AS matchingId',
-    //     'maleTeam.id AS maleTeamId',
-    //     'maleTeamUser.nickname AS maleTeamNickname',
-    //     'maleTeamUser.phone AS maleTeamPhone',
-    //     'femaleTeam.id AS femaleTeamId',
-    //     'femaleTeamUser.nickname AS femaleTeamNickname',
-    //     'femaleTeamUser.phone AS femaleTeamPhone',
-    //     'matching.createdAt AS matchedAt',
-    //     `IF(matching.chatCreatedAt IS NOT NULL, 'true', 'false') AS chatIsCreated`,
-    //   ])
-    //   // 매칭 그만두기한 팀도 조회해야 하므로 withDeleted 추가
-    //   .withDeleted()
-    //   .leftJoin('matching.maleTeam', 'maleTeam')
-    //   .leftJoin('matching.femaleTeam', 'femaleTeam')
-    //   .leftJoin('maleTeam.user', 'maleTeamUser')
-    //   .leftJoin('femaleTeam.user', 'femaleTeamUser')
-    //   // 매칭 완료자 조회 (상호 수락한 경우)
-    //   .where('matching.maleTeamIsAccepted = true')
-    //   .andWhere('matching.femaleTeamIsAccepted = true')
-    //   // 삭제된 매칭은 조회 X
-    //   .andWhere('matching.deletedAt IS NULL')
-    //   .getRawMany();
+    const matchings = await this.createQueryBuilder('matching')
+      .select([
+        'matching.id AS matchingId',
+        'appliedTeam.id AS teamId',
+        'appliedTeamOwner.nickname as nickname',
+        'appliedTeamOwner.phone as phone',
+        'receivedTeam.id AS partnerTeamId',
+        'receivedTeamOwner.nickname as partnerTeamOwnernickname',
+        'receivedTeamOwner.phone as partnerTeamOwnerphone',
+        'matching.matchedAt AS matchedAt',
+      ])
+      // 매칭 그만두기한 팀도 조회해야 하므로 withDeleted 추가
+      .withDeleted()
+      .leftJoin(`matching.appliedTeam`, 'appliedTeam')
+      .leftJoin(`appliedTeam.user`, 'appliedTeamOwner')
+      .leftJoin('matching.receivedTeam', 'receivedTeam')
+      .leftJoin(`receivedTeam.user`, 'receivedTeamOwner')
+      // 매칭 완료자 조회 (상호 수락한 경우)
+      .where('matching.appliedTeamIsAccepted = true AND matching.receivedTeamIsAccepted = true')
+      // 삭제된 매칭은 조회 X
+      .andWhere('matching.deletedAt IS NULL')
+      .getRawMany();
 
-    // matchings.map((m) => {
-    //   m.chatIsCreated = m.chatIsCreated === 'true' ? true : false;
-    // });
-
-    return { matchings: [] };
+    return { matchings };
   }
 
   async updateChatCreatedAtByMatchingId(matchingId: number): Promise<void> {

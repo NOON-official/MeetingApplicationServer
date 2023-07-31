@@ -49,10 +49,10 @@ export class AdminGetTeamDto {
   phone: string;
 
   @ApiProperty({
-    description: '우리팀 평균 나이',
+    description: '우리팀 대표자 나이',
     example: 23,
   })
-  averageAge: number;
+  age: number;
 
   @ApiProperty({
     description: '상대방 선호 나이',
@@ -79,34 +79,10 @@ export class AdminGetTeamDto {
   drink: number;
 
   @ApiProperty({
-    description: '상대팀 ID',
-    example: 2,
-  })
-  partnerTeamId?: number;
-
-  @ApiProperty({
     description: '신청일시',
     example: '2023-01-20T21:37:26.886Z',
   })
   appliedAt: Date;
-
-  @ApiProperty({
-    description: '매칭일시',
-    example: '2023-01-20T21:37:26.886Z',
-  })
-  matchedAt?: Date;
-
-  @ApiProperty({
-    description: '매칭 실패일시',
-    example: '2023-01-20T21:37:26.886Z',
-  })
-  failedAt?: Date;
-
-  @ApiProperty({
-    description: '거절당한 일시',
-    example: '2023-01-20T21:37:26.886Z',
-  })
-  refusedAt?: Date;
 
   @ApiProperty({
     description: '회원 ID',
@@ -119,4 +95,54 @@ export class AdminGetTeamDto {
     example: [11, 22, 33],
   })
   excludedTeamIds?: number[] | null;
+}
+
+export class AdminGetAppliedTeamDto {
+  @ApiProperty({
+    description: '매칭 ID',
+    example: 1,
+  })
+  matchingId: number;
+
+  @ApiProperty({
+    description: '우리팀 ID',
+    example: 2,
+  })
+  teamId: number;
+
+  @ApiProperty({
+    description: '유저 닉네임',
+    example: '미팅이',
+  })
+  nickname: string;
+
+  @ApiProperty({
+    description: '핸드폰 번호',
+    example: '01012345678',
+  })
+  phone: string;
+
+  @ApiProperty({
+    description: '상대팀 ID',
+    example: 2,
+  })
+  partnerTeamId: number;
+
+  @ApiProperty({
+    description: '상대팀 대표 유저 닉네임',
+    example: '미팅이',
+  })
+  partnerTeamOwner: string;
+
+  @ApiProperty({
+    description: '상대팀 대표 핸드폰 번호',
+    example: '01012345678',
+  })
+  partnerTeamOwnerPhone: string;
+
+  @ApiProperty({
+    description: '신청일시',
+    example: '2023-01-20T21:37:26.886Z',
+  })
+  appliedAt: Date;
 }
