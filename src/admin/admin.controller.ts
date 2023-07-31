@@ -19,7 +19,7 @@ import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 import { TeamGender } from 'src/teams/entities/team-gender.enum';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
-import { AdminGetUserDto } from './dtos/admin-get-user.dto';
+import { AdminGetUserDto, AdminGetUserWithStudentCardDto } from './dtos/admin-get-user.dto';
 
 @ApiTags('ADMIN')
 @ApiBearerAuth()
@@ -138,7 +138,7 @@ export class AdminController {
   }
 
   @ApiOperation({
-    summary: '팅 지급하기 (🔆new)',
+    summary: '팅 지급하기 (📌is updating)',
     description: 'tingCount 수만큼 유저 팅 지급',
   })
   @ApiOkResponse({ description: 'OK' })
@@ -192,10 +192,33 @@ export class AdminController {
     summary: '학생증 인증 신청 내역 조회 (🔆new)',
     description: '관리자 페이지 내 사용',
   })
-  @ApiOkResponse({})
+  @ApiOkResponse({
+    schema: {
+      example: {
+        users: [
+          {
+            userId: 1,
+            nickname: '미팅이1',
+            birth: 1996,
+            university: '한국외국어대학교',
+            gender: '남자',
+            studentCardUrl: 'https://www.meeting.me/image/3adsasd',
+          },
+          {
+            userId: 2,
+            nickname: '미팅이2',
+            birth: 1998,
+            university: '경희대학교',
+            gender: '여자',
+            studentCardUrl: 'https://www.meeting.me/image/3adsasd',
+          },
+        ],
+      },
+    },
+  })
   @Get('users/student-card')
-  getAdminUsersStudentCard(): Promise<void> {
-    return;
+  getAdminUsersStudentCard(): Promise<{ users: AdminGetUserWithStudentCardDto[] }> {
+    return this.adminService.getAllUsersWithStudentCard();
   }
 
   @ApiOperation({
