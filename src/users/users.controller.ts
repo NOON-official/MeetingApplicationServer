@@ -23,6 +23,7 @@ import { PassportUser } from 'src/auth/interfaces/passport-user.interface';
 import { UserOrder } from './interfaces/user-order.interface';
 import { UpdateUniversityDto, UpdateUserDto } from './dtos/update-user.dto';
 import { GetTeamCardDto } from 'src/teams/dtos/get-team-card.dto';
+import { DeleteMatchingDto } from 'src/matchings/dtos/delete-matching.dto';
 
 @ApiTags('USER')
 @ApiBearerAuth()
@@ -458,7 +459,10 @@ export class UsersController {
   @ApiOkResponse({ description: 'OK' })
   @Delete('matchings/applied')
   @UseGuards(AccessTokenGuard)
-  deleteUsersMatchingsAppliedMatchingId(@GetUser() user: PassportUser, @Body() matchingIds: number[]): Promise<void> {
+  deleteUsersMatchingsAppliedMatchingId(
+    @GetUser() user: PassportUser,
+    @Body() matchingIds: DeleteMatchingDto[],
+  ): Promise<void> {
     return this.usersService.deleteMatchingByUserId(user.sub, matchingIds);
   }
 
@@ -469,7 +473,10 @@ export class UsersController {
   @ApiOkResponse({ description: 'OK' })
   @Delete('matchings/received')
   @UseGuards(AccessTokenGuard)
-  deleteUsersMatchingsReceivedMatchingId(@GetUser() user: PassportUser, @Body() matchingIds: number[]): Promise<void> {
+  deleteUsersMatchingsReceivedMatchingId(
+    @GetUser() user: PassportUser,
+    @Body() matchingIds: DeleteMatchingDto[],
+  ): Promise<void> {
     return this.usersService.deleteMatchingByUserId(user.sub, matchingIds);
   }
 
