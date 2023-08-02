@@ -374,7 +374,7 @@ export class UsersService {
   async deleteMatchingByUserId(userId: number, matchingIds: number[]): Promise<void> {
     const user = await this.getUserById(userId);
     if (user) {
-      for (const matchingId of matchingIds) {
+      for (const matchingId of matchingIds['matchingIds']) {
         await this.matchingsService.deleteMatchingAndTeamByMatchingId(matchingId);
       }
     }
