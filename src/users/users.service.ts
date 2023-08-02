@@ -27,6 +27,7 @@ import { SaveStudentCardDto } from 'src/auth/dtos/save-student-card.dto';
 import { GetTeamCardDto } from 'src/teams/dtos/get-team-card.dto';
 import { MatchingsService } from 'src/matchings/matchings.service';
 import { TingsService } from 'src/tings/tings.service';
+import { UserStudentCard } from './entities/user-student-card.entity';
 
 @Injectable()
 export class UsersService {
@@ -290,7 +291,7 @@ export class UsersService {
     return await this.invitationsService.getUsersWithInvitationCount();
   }
 
-  async updateStudentCard(userId: number, studentCard: SaveStudentCardDto): Promise<void> {
+  async updateStudentCard(userId: number, studentCard: SaveStudentCardDto): Promise<UserStudentCard> {
     const user = await this.usersRepository.getUserById(userId);
     if (!user.nickname) {
       throw new BadRequestException(`user with user id ${userId} is not exists`);
