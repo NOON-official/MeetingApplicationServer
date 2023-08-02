@@ -370,4 +370,13 @@ export class UsersService {
   async getSucceededTeamCardsByUserId(userId: number): Promise<{ teams: GetTeamCardDto[] }> {
     return this.matchingsService.getSucceededTeamCardsByUserId(userId);
   }
+
+  async deleteMatchingByUserId(userId: number, matchingIds: number[]): Promise<void> {
+    const user = await this.getUserById(userId);
+    if (user) {
+      for (const matchingId of matchingIds) {
+        await this.matchingsService.deleteMatchingAndTeamByMatchingId(matchingId);
+      }
+    }
+  }
 }
