@@ -33,8 +33,8 @@ export class MatchingsRepository extends Repository<Matching> {
     return matching;
   }
 
-   // 관리자페이지 신청한/신청받은 팀 조회
-   async getAdminMatchingsApplied(): Promise<{ matchings: AdminGetAppliedTeamDto[] }> {
+  // 관리자페이지 신청한/신청받은 팀 조회
+  async getAdminMatchingsApplied(): Promise<{ matchings: AdminGetAppliedTeamDto[] }> {
     const matchings = await this.createQueryBuilder('matching')
       .select([
         'matching.id AS matchingId',
@@ -56,7 +56,7 @@ export class MatchingsRepository extends Repository<Matching> {
       .getRawMany();
 
     return { matchings };
-   }
+  }
 
   // async getMatchingIdByTeamId(teamId: number): Promise<{ matchingId: number }> {
   //   const result = await this.createQueryBuilder('matching')

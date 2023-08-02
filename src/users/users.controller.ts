@@ -452,31 +452,25 @@ export class UsersController {
   }
 
   @ApiOperation({
-    summary: '유저 신청한 팀 삭제 (내가 신청) (🔆new)',
+    summary: '유저 신청한 팀 삭제 (내가 신청) (📌is updating)',
     description: '',
   })
   @ApiOkResponse({ description: 'OK' })
-  @Delete('matchings/applied/:matchingId')
+  @Delete('matchings/applied')
   @UseGuards(AccessTokenGuard)
-  deleteUsersMatchingsAppliedMatchingId(
-    @GetUser() user: PassportUser,
-    @Param('matchingId') matchingId: number,
-  ): Promise<void> {
-    return;
+  deleteUsersMatchingsAppliedMatchingId(@GetUser() user: PassportUser, @Body() matchingIds: number[]): Promise<void> {
+    return this.usersService.deleteMatchingByUserId(user.sub, matchingIds);
   }
 
   @ApiOperation({
-    summary: '유저 신청받은 팀 삭제 (남이 신청) (🔆new)',
+    summary: '유저 신청받은 팀 삭제 (남이 신청) (📌is updating)',
     description: '',
   })
   @ApiOkResponse({ description: 'OK' })
-  @Delete('matchings/received/:matchingId')
+  @Delete('matchings/received')
   @UseGuards(AccessTokenGuard)
-  deleteUsersMatchingsReceivedMatchingId(
-    @GetUser() user: PassportUser,
-    @Param('matchingId') matchingId: number,
-  ): Promise<void> {
-    return;
+  deleteUsersMatchingsReceivedMatchingId(@GetUser() user: PassportUser, @Body() matchingIds: number[]): Promise<void> {
+    return this.usersService.deleteMatchingByUserId(user.sub, matchingIds);
   }
 
   // @ApiOperation({
