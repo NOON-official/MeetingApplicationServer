@@ -27,7 +27,6 @@ import { SaveStudentCardDto } from 'src/auth/dtos/save-student-card.dto';
 import { GetTeamCardDto } from 'src/teams/dtos/get-team-card.dto';
 import { MatchingsService } from 'src/matchings/matchings.service';
 import { TingsService } from 'src/tings/tings.service';
-import { DeleteMatchingDto } from 'src/matchings/dtos/delete-matching.dto';
 
 @Injectable()
 export class UsersService {
@@ -372,11 +371,11 @@ export class UsersService {
     return this.matchingsService.getSucceededTeamCardsByUserId(userId);
   }
 
-  async deleteMatchingByUserId(userId: number, matchingIds: DeleteMatchingDto[]): Promise<void> {
+  async deleteMatchingByUserId(userId: number, matchingIds: number[]): Promise<void> {
     const user = await this.getUserById(userId);
     if (user) {
-      for (const matching of matchingIds) {
-        await this.matchingsService.deleteMatchingAndTeamByMatchingId(matching.matchingId);
+      for (const matchingId of matchingIds) {
+        await this.matchingsService.deleteMatchingAndTeamByMatchingId(matchingId);
       }
     }
   }
