@@ -12,7 +12,7 @@ import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException 
 import { AdminGetAppliedTeamDto, AdminGetTeamDto } from './dtos/admin-get-team.dto';
 import { TeamGender } from 'src/teams/entities/team-gender.enum';
 import { MatchingStatus } from 'src/matchings/interfaces/matching-status.enum';
-import { AdminGetUserDto } from './dtos/admin-get-user.dto';
+import { AdminGetUserDto, AdminGetUserWithStudentCardDto } from './dtos/admin-get-user.dto';
 import { AdminGetInvitationSuccessUserDto } from './dtos/admin-get-invitation-success-user.dto';
 import * as Universities from '../teams/constants/universities.json';
 import { AREA_IGNORE_ID } from 'src/teams/constants/areas';
@@ -84,6 +84,18 @@ export class AdminService {
 
   async getAllUsers(): Promise<{ users: AdminGetUserDto[] }> {
     return this.usersService.getAllUsers();
+  }
+
+  async getAllUsersWithStudentCard(): Promise<{ users: AdminGetUserWithStudentCardDto[] }> {
+    return this.usersService.getAllUsersWithStudentCard();
+  }
+
+  async updateUserVerify(userId: number): Promise<void> {
+    return this.usersService.verifyUserByStudentCard(userId);
+  }
+
+  async updateUserDeny(userId: number): Promise<void> {
+    return this.usersService.declineUserByStudentCard(userId);
   }
 
   async updateTingsByUserIdAndTingCount(userId: number, tingCount: number): Promise<void> {

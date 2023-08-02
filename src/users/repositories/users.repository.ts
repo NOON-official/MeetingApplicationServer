@@ -5,6 +5,7 @@ import { CustomRepository } from 'src/database/typeorm-ex.decorator';
 import { Repository } from 'typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { UpdateUniversityDto, UpdateUserDto } from '../dtos/update-user.dto';
+import { AdminGetUserWithStudentCardDto } from 'src/admin/dtos/admin-get-user.dto';
 
 @CustomRepository(User)
 export class UsersRepository extends Repository<User> {
@@ -117,5 +118,37 @@ export class UsersRepository extends Repository<User> {
 
   async getAllUsers(): Promise<User[]> {
     return await this.find();
+  }
+
+  async getAllUsersWithStudentCard(): Promise<{ users: AdminGetUserWithStudentCardDto[] }> {
+    const users = await this.createQueryBuilder('users')
+      .select([
+        'user.id AS userId',
+        'user.nickname AS nickname',
+        'user.birth AS birth',
+        'user.university AS university',
+        'user.gender AS gender',
+        'userStudentCard.studentCardUrl AS studentCardUrl',
+      ])
+      .leftJoin(`user.userStudentCard`, 'userStudentCard')
+      .getRawMany();
+
+    return { users };
+  }
+
+  async verifyUserByStudentCard(userId: number): Promise<void> {
+    const result = await this.update({ id: userId }, { isVerified: true });
+
+    if (result.affected === 0) {
+      throw new NotFoundException(`Can't find user with id ${userId}`);
+    }
+  }
+
+  async declineUserByStudentCard(userId: number): Promise<void> {
+    const result = await this.update({ id: userId }, { isVerified: false });
+
+    if (result.affected === 0) {
+      throw new NotFoundException(`Can't find user with id ${userId}`);
+    }
   }
 }
