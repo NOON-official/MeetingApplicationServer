@@ -108,7 +108,14 @@ export class UsersService {
 
   async getMyInfoByUserId(
     userId: number,
-  ): Promise<{ nickname: string; phone: string; gender: string; university: number; birth: number }> {
+  ): Promise<{
+    nickname: string;
+    phone: string;
+    gender: string;
+    university: number;
+    birth: number;
+    isVerified: boolean | null;
+  }> {
     return this.usersRepository.getMyInfoByUserId(userId);
   }
 
