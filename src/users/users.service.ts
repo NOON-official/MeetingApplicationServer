@@ -246,6 +246,10 @@ export class UsersService {
     return { matchingStatus: MatchingStatus.APPLIED };
   }
 
+  async getUserTingsCount(userId: number): Promise<{ tingCount: number }> {
+    return this.tingsService.getTingCountByUserId(userId);
+  }
+
   async getCouponCountByTypeIdAndUserId(typeId: number, userId: number): Promise<{ couponCount: number }> {
     return this.couponsService.getCouponCountByTypeIdAndUserId(typeId, userId);
   }

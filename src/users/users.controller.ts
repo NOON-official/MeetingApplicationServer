@@ -146,7 +146,7 @@ export class UsersController {
   //   return this.usersService.getTicketCountByUserId(user.sub);
   // }
   @ApiOperation({
-    summary: '보유 팅 개수 조회 (🔆new)',
+    summary: '보유 팅 개수 조회 (📌is updating)',
   })
   @ApiOkResponse({
     schema: {
@@ -158,7 +158,7 @@ export class UsersController {
   @Get('tings/count')
   @UseGuards(AccessTokenGuard)
   getUsersTicketsCount(@GetUser() user: PassportUser): Promise<{ tingCount: number }> {
-    return;
+    return this.usersService.getUserTingsCount(user.sub);
   }
 
   @ApiOperation({
