@@ -77,6 +77,7 @@ export class UsersController {
         gender: 'male',
         university: 1,
         birth: 1996,
+        isVerified: true,
       },
     },
   })
