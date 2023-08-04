@@ -307,7 +307,12 @@ export class UsersService {
       throw new BadRequestException(`user with user id ${userId} is not exists`);
     }
 
-    await this.usersRepository.applyByUserStudentCard(userId);
+    if (user.isVerified === false) {
+      await this.usersRepository.applyByUserStudentCard(userId);
+    }
+    if (user.isVerified && user.approval === false) {
+      await this.usersRepository.resetApprovalUserStudentCard(userId);
+    }
 
     return this.userStudentCardRepository.updateUserStudentCard(userId, studentCard);
   }
@@ -328,6 +333,15 @@ export class UsersService {
     }
 
     return this.usersRepository.declineUserByStudentCard(userId);
+  }
+
+  async resetApprovalUserStudentCard(userId: number): Promise<void> {
+    const user = await this.usersRepository.getUserById(userId);
+    if (!user.id) {
+      throw new BadRequestException(`user with user id ${userId} is not exists`);
+    }
+
+    return this.usersRepository.resetApprovalUserStudentCard(userId);
   }
 
   async getRecommendedTeamCardsByUserId(userId: number): Promise<{ teams: GetTeamCardDto[] }> {

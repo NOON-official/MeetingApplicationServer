@@ -167,4 +167,12 @@ export class UsersRepository extends Repository<User> {
       throw new NotFoundException(`Can't find user with id ${userId}`);
     }
   }
+
+  async resetApprovalUserStudentCard(userId: number): Promise<void> {
+    const result = await this.update({ id: userId }, { approval: null });
+
+    if (result.affected === 0) {
+      throw new NotFoundException(`Can't find user with id ${userId}`);
+    }
+  }
 }
