@@ -75,21 +75,27 @@ export class UsersRepository extends Repository<User> {
     return { referralId };
   }
 
-  async getMyInfoByUserId(
-    userId: number,
-  ): Promise<{ nickname: string; phone: string; gender: string; university: number; birth: number }> {
+  async getMyInfoByUserId(userId: number): Promise<{
+    nickname: string;
+    phone: string;
+    gender: string;
+    university: number;
+    birth: number;
+    isVerified: boolean | null;
+  }> {
     await this.getUserById(userId);
 
-    const { nickname, phone, gender, university, birth } = await this.createQueryBuilder('user')
+    const { nickname, phone, gender, university, birth, isVerified } = await this.createQueryBuilder('user')
       .select(['user.nickname'])
       .addSelect('user.phone')
       .addSelect('user.gender')
       .addSelect('user.university')
       .addSelect('user.birth')
+      .addSelect('user.isVerified')
       .where('user.id = :userId', { userId })
       .getOne();
 
-    return { nickname, phone, gender, university, birth };
+    return { nickname, phone, gender, university, birth, isVerified };
   }
 
   async updateUserPhone(userId: number, phone: SavePhoneDto): Promise<void> {
