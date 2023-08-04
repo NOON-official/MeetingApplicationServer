@@ -54,8 +54,11 @@ export class User extends BaseEntity {
   @Column({ nullable: true })
   refreshToken: string;
 
-  @Column({ type: 'boolean', nullable: true })
+  @Column({ type: 'boolean', default: false })
   isVerified: boolean;
+
+  @Column({ type: 'boolean', nullable: true })
+  approval: boolean;
 
   @Column({ type: 'boolean', default: false })
   isAdmin: boolean;

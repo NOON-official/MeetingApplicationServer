@@ -106,15 +106,14 @@ export class UsersService {
     return this.usersRepository.getReferralIdByUserId(userId);
   }
 
-  async getMyInfoByUserId(
-    userId: number,
-  ): Promise<{
+  async getMyInfoByUserId(userId: number): Promise<{
     nickname: string;
     phone: string;
     gender: string;
     university: number;
     birth: number;
-    isVerified: boolean | null;
+    isVerified: boolean;
+    approval: boolean | null;
   }> {
     return this.usersRepository.getMyInfoByUserId(userId);
   }
@@ -303,6 +302,8 @@ export class UsersService {
     if (!user.nickname) {
       throw new BadRequestException(`user with user id ${userId} is not exists`);
     }
+
+    await this.usersRepository.applyByUserStudentCard(userId);
 
     return this.userStudentCardRepository.updateUserStudentCard(userId, studentCard);
   }
