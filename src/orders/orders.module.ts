@@ -7,6 +7,7 @@ import { forwardRef, Module } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { HttpModule } from '@nestjs/axios';
 import { UsersModule } from 'src/users/users.module';
+import { TingsModule } from 'src/tings/tings.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { UsersModule } from 'src/users/users.module';
     forwardRef(() => UsersModule),
     forwardRef(() => CouponsModule),
     forwardRef(() => TicketsModule),
+    forwardRef(() => TingsModule),
   ],
   providers: [OrdersService],
   controllers: [OrdersController],

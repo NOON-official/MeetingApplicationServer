@@ -14,6 +14,7 @@ import { ConfigService } from '@nestjs/config';
 import { UsersService } from 'src/users/users.service';
 import * as moment from 'moment-timezone';
 import { UserOrder } from 'src/users/interfaces/user-order.interface';
+import { TingsService } from 'src/tings/tings.service';
 
 @Injectable()
 export class OrdersService {
@@ -27,6 +28,8 @@ export class OrdersService {
     private couponsService: CouponsService,
     @Inject(forwardRef(() => TicketsService))
     private ticketsService: TicketsService,
+    @Inject(forwardRef(() => TingsService))
+    private tingsService: TingsService,
   ) {}
 
   // 토스 결제 승인
@@ -173,15 +176,14 @@ export class OrdersService {
     const user = await this.usersService.getUserById(userId);
 
     // 구매 정보 저장
-    const { orderId } = await this.ordersRepository.createOrder(createOrderData, user, coupon);
+    await this.ordersRepository.createOrder(createOrderData, user, coupon);
 
     // 쿠폰 사용 처리
     if (!!coupon) await this.couponsService.updateUsedAt(createOrderDto.couponId);
 
-    // 이용권 생성 및 저장
-    const order = await this.ordersRepository.getOrderById(orderId);
-    const ticketCount = Products.find((p) => p.id === createOrderDto.productId).ticketCount;
-    await this.ticketsService.createTickets(ticketCount, user, order);
+    //  Ting 저장
+    const tingCount = Products.find((p) => p.id === createOrderDto.productId).tingCount;
+    await this.tingsService.refundTingByUserIdAndTingCount(user.id, tingCount);
   }
 
   async getOrdersByUserId(userId: number): Promise<{ orders: UserOrder[] }> {
