@@ -12,7 +12,7 @@ export class UserStudentCardRepository extends Repository<UserStudentCard> {
       .select()
       .where('user_student_card.userId = :userId', { userId })
       .getOne();
-    if (userStudentCard.id) {
+    if (userStudentCard) {
       return true;
     } else {
       return false;
@@ -26,9 +26,8 @@ export class UserStudentCardRepository extends Repository<UserStudentCard> {
       userStudentCard = this.update({ userId }, { studentCardUrl: studentCard.studentCardUrl });
     } else {
       userStudentCard = this.create({ userId, studentCardUrl: studentCard.studentCardUrl });
+      await this.save(userStudentCard);
     }
-
-    await this.save(userStudentCard);
 
     return userStudentCard;
   }
