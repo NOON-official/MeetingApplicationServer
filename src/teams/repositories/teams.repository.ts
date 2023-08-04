@@ -414,7 +414,7 @@ export class TeamsRepository extends Repository<Team> {
         'CAST(SUM(members.age) / team.memberCount AS SIGNED) AS age',
         'team.memberCount AS memberCount',
         'team.intro AS intro',
-        'user.isVerified AS isVerified',
+        'user.approval AS approval',
         'team.createdAt AS createdAt',
       ])
       .leftJoin('team.user', 'user')
@@ -428,7 +428,7 @@ export class TeamsRepository extends Repository<Team> {
 
     teams.map((t) => {
       t.age = Number(t.age);
-      t.isVerified = t.isVerified === 1 ? true : false;
+      t.approval = t.approval === 1 ? true : t.approval === 0 ? false : null;
     });
 
     return { teams };

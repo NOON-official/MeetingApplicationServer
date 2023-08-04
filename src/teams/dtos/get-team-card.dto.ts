@@ -42,7 +42,7 @@ export class GetTeamCardDto {
     example: true,
     required: true,
   })
-  readonly isVerified: boolean;
+  readonly approval: boolean | null;
 
   @ApiProperty({
     description: '신청일시',

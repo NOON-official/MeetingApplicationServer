@@ -307,7 +307,7 @@ export class TeamsService {
     const team = await this.getTeamById(teamId);
 
     team['ownerId'] = team.user.id;
-    const isVerified = team.user.isVerified;
+    const approval = team.user.approval;
 
     delete Object.assign(team, { ['members']: team['teamMembers'] })['teamMembers']; // 프로퍼티 이름 변경
     delete team.user;
@@ -316,7 +316,7 @@ export class TeamsService {
     delete team.kakaoId;
 
     const result = Object.assign(team);
-    result['isVerified'] = isVerified;
+    result['approval'] = approval;
 
     return result;
   }
@@ -325,7 +325,7 @@ export class TeamsService {
     const team = await this.getTeamById(teamId);
 
     team['ownerId'] = team.user.id;
-    const isVerified = team.user.isVerified;
+    const approval = team.user.approval;
 
     delete Object.assign(team, { ['members']: team['teamMembers'] })['teamMembers']; // 프로퍼티 이름 변경
     delete team.user;
@@ -333,7 +333,7 @@ export class TeamsService {
     delete team.receivedTeamMatching;
 
     const result = Object.assign(team);
-    result['isVerified'] = isVerified;
+    result['approval'] = approval;
 
     return result;
   }

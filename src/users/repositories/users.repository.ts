@@ -81,21 +81,23 @@ export class UsersRepository extends Repository<User> {
     gender: string;
     university: number;
     birth: number;
-    isVerified: boolean | null;
+    isVerified: boolean;
+    approval: boolean | null;
   }> {
     await this.getUserById(userId);
 
-    const { nickname, phone, gender, university, birth, isVerified } = await this.createQueryBuilder('user')
+    const { nickname, phone, gender, university, birth, isVerified, approval } = await this.createQueryBuilder('user')
       .select(['user.nickname'])
       .addSelect('user.phone')
       .addSelect('user.gender')
       .addSelect('user.university')
       .addSelect('user.birth')
       .addSelect('user.isVerified')
+      .addSelect('user.approval')
       .where('user.id = :userId', { userId })
       .getOne();
 
-    return { nickname, phone, gender, university, birth, isVerified };
+    return { nickname, phone, gender, university, birth, isVerified, approval };
   }
 
   async updateUserPhone(userId: number, phone: SavePhoneDto): Promise<void> {
@@ -142,7 +144,7 @@ export class UsersRepository extends Repository<User> {
     return { users };
   }
 
-  async verifyUserByStudentCard(userId: number): Promise<void> {
+  async applyByUserStudentCard(userId: number): Promise<void> {
     const result = await this.update({ id: userId }, { isVerified: true });
 
     if (result.affected === 0) {
@@ -150,8 +152,16 @@ export class UsersRepository extends Repository<User> {
     }
   }
 
+  async verifyUserByStudentCard(userId: number): Promise<void> {
+    const result = await this.update({ id: userId }, { approval: true });
+
+    if (result.affected === 0) {
+      throw new NotFoundException(`Can't find user with id ${userId}`);
+    }
+  }
+
   async declineUserByStudentCard(userId: number): Promise<void> {
-    const result = await this.update({ id: userId }, { isVerified: false });
+    const result = await this.update({ id: userId }, { approval: false });
 
     if (result.affected === 0) {
       throw new NotFoundException(`Can't find user with id ${userId}`);

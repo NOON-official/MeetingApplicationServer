@@ -226,7 +226,7 @@ export class MatchingsRepository extends Repository<Matching> {
         'CAST(SUM(receivedMembers.age) / receivedTeam.memberCount AS SIGNED) AS age',
         'receivedTeam.memberCount AS memberCount',
         'receivedTeam.intro AS intro',
-        'receivedUser.isVerified AS isVerified',
+        'receivedUser.approval AS approval',
         'matching.createdAt AS appliedAt',
       ])
       .innerJoin('matching.receivedTeam', 'receivedTeam')
@@ -245,7 +245,7 @@ export class MatchingsRepository extends Repository<Matching> {
 
     teams.map((t) => {
       t.age = Number(t.age);
-      t.isVerified = t.isVerified === 1 ? true : false;
+      t.approval = t.approval === 1 ? true : t.approval === 0 ? false : null;
     });
 
     return { teams };
@@ -260,7 +260,7 @@ export class MatchingsRepository extends Repository<Matching> {
         'CAST(SUM(receivedMembers.age) / receivedTeam.memberCount AS SIGNED) AS age',
         'receivedTeam.memberCount AS memberCount',
         'receivedTeam.intro AS intro',
-        'receivedUser.isVerified AS isVerified',
+        'receivedUser.approval AS approval',
         'matching.createdAt AS appliedAt',
       ])
       .innerJoin('matching.receivedTeam', 'receivedTeam')
@@ -279,7 +279,7 @@ export class MatchingsRepository extends Repository<Matching> {
 
     teams.map((t) => {
       t.age = Number(t.age);
-      t.isVerified = t.isVerified === 1 ? true : false;
+      t.approval = t.approval === 1 ? true : t.approval === 0 ? false : null;
     });
 
     return { teams };
@@ -294,7 +294,7 @@ export class MatchingsRepository extends Repository<Matching> {
         'CAST(SUM(appliedMembers.age) / appliedTeam.memberCount AS SIGNED) AS age',
         'appliedTeam.memberCount AS memberCount',
         'appliedTeam.intro AS intro',
-        'appliedUser.isVerified AS isVerified',
+        'appliedUser.approval AS approval',
         'matching.createdAt AS appliedAt',
       ])
       .innerJoin('matching.appliedTeam', 'appliedTeam')
@@ -313,7 +313,7 @@ export class MatchingsRepository extends Repository<Matching> {
 
     teams.map((t) => {
       t.age = Number(t.age);
-      t.isVerified = t.isVerified === 1 ? true : false;
+      t.approval = t.approval === 1 ? true : t.approval === 0 ? false : null;
     });
 
     return { teams };
@@ -329,7 +329,7 @@ export class MatchingsRepository extends Repository<Matching> {
         'CAST(SUM(receivedMembers.age) / receivedTeam.memberCount AS SIGNED) AS age',
         'receivedTeam.memberCount AS memberCount',
         'receivedTeam.intro AS intro',
-        'receivedUser.isVerified AS isVerified',
+        'receivedUser.approval AS approval',
         'matching.matchedAt AS matchedAt',
       ])
       .withDeleted()
@@ -357,7 +357,7 @@ export class MatchingsRepository extends Repository<Matching> {
         'CAST(SUM(appliedMembers.age) / appliedTeam.memberCount AS SIGNED) AS age',
         'appliedTeam.memberCount AS memberCount',
         'appliedTeam.intro AS intro',
-        'appliedUser.isVerified AS isVerified',
+        'appliedUser.approval AS approval',
         'matching.matchedAt AS matchedAt',
       ])
       .withDeleted()
@@ -381,7 +381,7 @@ export class MatchingsRepository extends Repository<Matching> {
 
     teams.map((t) => {
       t.age = Number(t.age);
-      t.isVerified = t.isVerified === 1 ? true : false;
+      t.approval = t.approval === 1 ? true : t.approval === 0 ? false : null;
     });
 
     teams.sort((a, b) => {
