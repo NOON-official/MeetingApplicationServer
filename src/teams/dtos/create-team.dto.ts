@@ -13,6 +13,7 @@ import {
   Min,
   Max,
   IsBoolean,
+  Length,
 } from 'class-validator';
 
 export class CreateMemberDto {
@@ -82,7 +83,7 @@ export class CreateTeamDto {
 
   @ApiProperty({
     description: '인원 변경 가능',
-    example: [2,3],
+    example: [2, 3],
   })
   @IsInt({ each: true })
   @ArrayMaxSize(2)
@@ -90,14 +91,16 @@ export class CreateTeamDto {
 
   @ApiProperty({
     description: '미팅 선호 일정',
-    example: 3,
+    example: [1, 2],
     required: true,
   })
   @IsNotEmpty()
-  @IsInt()
-  @Min(1)
-  @Max(3)
-  readonly teamAvailableDate: number;
+  @IsInt({ each: true })
+  @Min(1, { each: true })
+  @Max(2, { each: true })
+  @ArrayMinSize(1)
+  @ArrayMaxSize(2)
+  readonly teamAvailableDate: number[];
 
   @ApiProperty({
     description: '지역',
@@ -107,9 +110,9 @@ export class CreateTeamDto {
   @IsNotEmpty()
   @IsInt({ each: true })
   @Min(1, { each: true })
-  @Max(5, { each: true })
+  @Max(14, { each: true })
   @ArrayMinSize(1)
-  @ArrayMaxSize(5)
+  @ArrayMaxSize(6)
   readonly areas: number[];
 
   @ApiProperty({
@@ -130,6 +133,7 @@ export class CreateTeamDto {
     required: true,
   })
   @IsNotEmpty()
+  @Length(1, 15)
   @IsString()
   readonly teamName: string;
 
@@ -139,6 +143,7 @@ export class CreateTeamDto {
     required: true,
   })
   @IsNotEmpty()
+  @Length(10, 150)
   @IsString()
   readonly intro: string;
 
@@ -187,5 +192,4 @@ export class CreateTeamDto {
   @IsNotEmpty()
   @IsString()
   readonly kakaoId: string;
-
 }

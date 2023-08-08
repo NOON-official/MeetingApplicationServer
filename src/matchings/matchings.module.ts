@@ -9,6 +9,7 @@ import { TypeOrmExModule } from './../database/typeorm-ex.module';
 import { MatchingsController } from './matchings.controller';
 import { forwardRef, Module } from '@nestjs/common';
 import { MatchingsService } from './matchings.service';
+import { TingsModule } from 'src/tings/tings.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { MatchingsService } from './matchings.service';
     forwardRef(() => TeamsModule),
     forwardRef(() => UsersModule),
     forwardRef(() => TicketsModule),
+    forwardRef(() => TingsModule),
   ],
   providers: [MatchingsService, MatchingSucceededListener, MatchingPartnerTeamRefusedListener],
   controllers: [MatchingsController],

@@ -23,7 +23,7 @@ export class InvitationsController {
   constructor(private invitationsService: InvitationsService) {}
 
   @ApiOperation({
-    summary: '회원 초대 코드 입력',
+    summary: '회원 초대 코드 입력 (📌is updating)',
   })
   @ApiCreatedResponse({ description: 'Created' })
   @Post()

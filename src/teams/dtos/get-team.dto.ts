@@ -66,16 +66,16 @@ export class GetTeamDto {
 
   @ApiProperty({
     description: '인원 변경 가능',
-    example: [2,3],
+    example: [2, 3],
   })
   memberCounts?: number[];
 
   @ApiProperty({
     description: '미팅 선호 일정',
-    example: 3,
+    example: [1, 2],
     required: true,
   })
-  teamAvailableDate: number;
+  teamAvailableDate: number[];
 
   @ApiProperty({
     description: '지역',
@@ -121,11 +121,11 @@ export class GetTeamDto {
   prefVibes: number[];
 
   @ApiProperty({
-    description: '카카오 아이디',
-    example: 'kiwoong',
+    description: '학교 인증',
+    example: true,
     required: true,
   })
-  readonly kakaoId: string;
+  readonly approval: boolean | null;
 
   @ApiProperty({
     description: '생성일시',
@@ -140,14 +140,30 @@ export class GetTeamDto {
   updatedAt: Date;
 
   @ApiProperty({
-    description: '팀 정보 수정일시',
-    example: '2023-01-20T21:37:26.886Z',
-  })
-  modifiedAt?: Date;
-
-  @ApiProperty({
     description: '삭제일시',
     example: '2023-01-20T21:37:26.886Z',
   })
   deletedAt?: Date;
+}
+
+export class GetTeamDetailDto extends GetTeamDto {
+  @ApiProperty({
+    description: '핸드폰 번호',
+    example: '01012345678',
+  })
+  phone?: string;
+
+  @ApiProperty({
+    description: '카카오 아이디',
+    example: 'kakaoID',
+  })
+  kakaoId?: string;
+}
+
+export class GetTeamOwnerDto {
+  @ApiProperty({
+    description: '팀 생성 유저아이디',
+    example: 1,
+  })
+  ownerId: number;
 }

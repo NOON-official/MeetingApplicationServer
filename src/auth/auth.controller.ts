@@ -20,6 +20,7 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger/dist/decorators';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
+import { SaveStudentCardDto } from './dtos/save-student-card.dto';
 
 @ApiTags('AUTH')
 @Controller('auth')
@@ -101,6 +102,19 @@ export class AuthController {
   @UseGuards(AccessTokenGuard)
   postAuthPhoneCode(@GetUser() user: PassportUser, @Body() verifyPhoneCodeDto: VerifyPhoneCodeDto) {
     return this.authService.verifyCodeAndSavePhone(user.sub, verifyPhoneCodeDto);
+  }  
+
+  @ApiOperation({
+    summary: '학교 인증 - 학생증 (📌is updating)',
+    description: '이미지 업로드 및 저장',
+  })
+  @ApiBearerAuth()
+  @ApiCreatedResponse({ description: 'Created' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @Post('student-card')
+  @UseGuards(AccessTokenGuard)
+  postAuthStudentCard(@GetUser() user: PassportUser, @Body() saveStudentCardDto: SaveStudentCardDto): Promise<void> {
+    return this.authService.postAuthStudentCard(user.sub, saveStudentCardDto);
   }
 
   @ApiOperation({

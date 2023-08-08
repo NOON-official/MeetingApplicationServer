@@ -12,7 +12,6 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { MatchingRefuseReason } from './matching-refuse-reason.entity';
-import { Ticket } from 'src/tickets/entities/ticket.entity';
 
 @Entity()
 @Unique(['id'])
@@ -21,16 +20,16 @@ export class Matching extends BaseEntity {
   id: number;
 
   @Column({ type: 'boolean', nullable: true })
-  maleTeamIsAccepted: boolean;
+  appliedTeamIsAccepted: boolean;
 
   @Column({ type: 'boolean', nullable: true })
-  femaleTeamIsAccepted: boolean;
-
-  @Column({ type: 'timestamp', nullable: true })
-  chatCreatedAt: Date;
+  receivedTeamIsAccepted: boolean;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
+
+  @Column({ type: 'timestamp', nullable: true })
+  matchedAt: Date;
 
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
@@ -39,26 +38,24 @@ export class Matching extends BaseEntity {
   deletedAt: Date;
 
   @Column({ type: 'int' })
-  maleTeamId: number;
+  appliedTeamId: number;
 
-  @OneToOne(() => Team, (team) => team.maleTeamMatching, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'maleTeamId' })
-  maleTeam: Team;
+  @OneToOne(() => Team, (team) => team.appliedTeamMatching, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'appliedTeamId' })
+  appliedTeam: Team;
 
   @Column({ type: 'int' })
-  femaleTeamId: number;
+  receivedTeamId: number;
 
-  @OneToOne(() => Team, (team) => team.femaleTeamMatching, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'femaleTeamId' })
-  femaleTeam: Team;
+  @OneToOne(() => Team, (team) => team.receivedTeamMatching, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'receivedTeamId' })
+  receivedTeam: Team;
 
-  @OneToOne(() => Ticket, (ticket) => ticket.maleTeamMatching, { onDelete: 'CASCADE' })
-  @JoinColumn()
-  maleTeamTicket: Ticket;
+  @Column({ type: 'boolean', nullable: true, default: null })
+  appliedTeamIsPaid: boolean;
 
-  @OneToOne(() => Ticket, (ticket) => ticket.femaleTeamMatching, { onDelete: 'CASCADE' })
-  @JoinColumn()
-  femaleTeamTicket: Ticket;
+  @Column({ type: 'boolean', nullable: true, default: null })
+  receivedTeamIsPaid: boolean;
 
   @OneToOne(() => MatchingRefuseReason, { cascade: true })
   matchingRefuseReason: MatchingRefuseReason;

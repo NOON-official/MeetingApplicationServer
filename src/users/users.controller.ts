@@ -6,6 +6,7 @@ import { CreateAgreementDto } from './dtos/create-agreement.dto';
 import { AccessTokenGuard } from './../auth/guards/access-token.guard';
 import { UseGuards } from '@nestjs/common';
 import {
+  ApiBadRequestResponse,
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiNotFoundResponse,
@@ -16,11 +17,12 @@ import {
 import { UsersService } from './users.service';
 import { Controller, Get } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
-import { Body, Patch, Post } from '@nestjs/common/decorators';
+import { Body, Delete, Param, Patch, Post } from '@nestjs/common/decorators';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { PassportUser } from 'src/auth/interfaces/passport-user.interface';
 import { UserOrder } from './interfaces/user-order.interface';
 import { UpdateUniversityDto, UpdateUserDto } from './dtos/update-user.dto';
+import { GetTeamCardDto } from 'src/teams/dtos/get-team-card.dto';
 
 @ApiTags('USER')
 @ApiBearerAuth()
@@ -75,6 +77,8 @@ export class UsersController {
         gender: 'male',
         university: 1,
         birth: 1996,
+        isVerified: true,
+        approval: true,
       },
     },
   })
@@ -106,40 +110,55 @@ export class UsersController {
     return this.usersService.updateUniversity(user.sub, updateUniversity);
   }
 
-  @ApiOperation({
-    summary: '신청 내역 조회 (📌is updating)',
-    description: '인원수, 신청날짜 반환 \n\n chatCreatedAt이 null이 아닌 경우 "매칭 완료"로 표시해주세요.',
-  })
-  @ApiOkResponse({
-    schema: {
-      example: {
-        teams: [
-          { id: 1, memberCount: 2, createdAt: '2023-01-20T21:37:26.886Z', chatCreatedAt: '2023-01-20T21:37:26.886Z' },
-          { id: 4, memberCount: 3, createdAt: '2023-01-20T21:37:26.886Z', chatCreatedAt: null },
-        ],
-      },
-    },
-  })
-  @Get('teams')
-  @UseGuards(AccessTokenGuard)
-  getUsersTeams(@GetUser() user: PassportUser): Promise<{ teams: UserTeam[] }> {
-    return this.usersService.getTeamsByUserId(user.sub);
-  }
+  // @ApiOperation({
+  //   summary: '신청 내역 조회',
+  //   description: '인원수, 신청날짜 반환 \n\n chatCreatedAt이 null이 아닌 경우 "매칭 완료"로 표시해주세요.',
+  // })
+  // @ApiOkResponse({
+  //   schema: {
+  //     example: {
+  //       teams: [
+  //         { id: 1, memberCount: 2, createdAt: '2023-01-20T21:37:26.886Z', chatCreatedAt: '2023-01-20T21:37:26.886Z' },
+  //         { id: 4, memberCount: 3, createdAt: '2023-01-20T21:37:26.886Z', chatCreatedAt: null },
+  //       ],
+  //     },
+  //   },
+  // })
+  // @Get('teams')
+  // @UseGuards(AccessTokenGuard)
+  // getUsersTeams(@GetUser() user: PassportUser): Promise<{ teams: UserTeam[] }> {
+  //   return this.usersService.getTeamsByUserId(user.sub);
+  // }
 
+  // @ApiOperation({
+  //   summary: '미사용 이용권 개수 조회',
+  // })
+  // @ApiOkResponse({
+  //   schema: {
+  //     example: {
+  //       ticketCount: 5,
+  //     },
+  //   },
+  // })
+  // @Get('tickets/count')
+  // @UseGuards(AccessTokenGuard)
+  // getUsersTicketsCount(@GetUser() user: PassportUser): Promise<{ ticketCount: number }> {
+  //   return this.usersService.getTicketCountByUserId(user.sub);
+  // }
   @ApiOperation({
-    summary: '미사용 이용권 개수 조회',
+    summary: '보유 팅 개수 조회 (📌is updating)',
   })
   @ApiOkResponse({
     schema: {
       example: {
-        ticketCount: 5,
+        tingCount: 5,
       },
     },
   })
-  @Get('tickets/count')
+  @Get('tings/count')
   @UseGuards(AccessTokenGuard)
-  getUsersTicketsCount(@GetUser() user: PassportUser): Promise<{ ticketCount: number }> {
-    return this.usersService.getTicketCountByUserId(user.sub);
+  getUsersTicketsCount(@GetUser() user: PassportUser): Promise<{ tingCount: number }> {
+    return this.usersService.getUserTingsCount(user.sub);
   }
 
   @ApiOperation({
@@ -246,57 +265,268 @@ export class UsersController {
   }
 
   @ApiOperation({
-    summary: '유저 매칭 상태 조회 (📌is updating)',
-    description:
-      '매칭 신청 전인 경우 matchingStatus: null \n\n matchingStatus: APPLIED / FAILED / MATCHED / OURTEAM_ACCEPTED / SUCCEEDED / PARTNER_TEAM_REFUSED / OURTEAM_REFUSED / NOT_RESPONDED',
+    summary: '유저 추천팀 조회 (🔆new)',
+    description: '* 유저의 팀 프로필이 없는 경우 400 에러 반환 \n\n* 추천할 팀이 없는 경우 빈 배열([]) 반환',
   })
   @ApiOkResponse({
-    content: {
-      'application/json': {
-        examples: {
-          '매칭 신청 전': {
-            value: { matchingStatus: null },
-            description: '페이지: 매칭조회2',
+    schema: {
+      example: {
+        teams: [
+          {
+            id: 1,
+            teamName: '기웅내세요',
+            age: 24,
+            memberCount: 3,
+            intro: '안녕하세요',
+            approval: true,
+            createdAt: '2023-01-20T21:37:26.886Z',
           },
-          '매칭 신청 완료': {
-            value: { matchingStatus: MatchingStatus.APPLIED },
-            description: '페이지: 매칭조회3',
+          {
+            id: 2,
+            teamName: '아름이와 아이들',
+            age: 27,
+            memberCount: 2,
+            intro: '안녕하세요',
+            approval: false,
+            createdAt: '2023-01-20T21:37:26.886Z',
           },
-          '매칭 실패': {
-            value: { matchingStatus: MatchingStatus.FAILED },
-            description: '페이지: 매칭조회4',
-          },
-          '매칭 완료': {
-            value: { matchingStatus: MatchingStatus.MATCHED },
-            description: '페이지: 매칭조회5',
-          },
-          '우리팀 수락': {
-            value: { matchingStatus: MatchingStatus.OURTEAM_ACCEPTED },
-            description: '페이지: 매칭조회6',
-          },
-          '매칭 성공 (상호 수락)': {
-            value: { matchingStatus: MatchingStatus.SUCCEEDED },
-            description: '페이지: 매칭조회7',
-          },
-          '상대팀 거절': {
-            value: { matchingStatus: MatchingStatus.PARTNER_TEAM_REFUSED },
-            description: '페이지: 매칭조회8',
-          },
-          '우리팀 거절': {
-            value: { matchingStatus: MatchingStatus.OURTEAM_REFUSED },
-            description: '페이지: 매칭조회11',
-          },
-          무응답: {
-            value: { matchingStatus: MatchingStatus.NOT_RESPONDED },
-            description: '페이지: 매칭조회12',
-          },
-        },
+        ],
       },
     },
   })
-  @Get('matchings/status')
+  @ApiBadRequestResponse({ description: 'Bad Request' })
+  @Get('teams/recommended')
   @UseGuards(AccessTokenGuard)
-  getUsersMatchingStatus(@GetUser() user: PassportUser): Promise<{ matchingStatus: MatchingStatus }> {
-    return this.usersService.getUserMatchingStatusByUserId(user.sub);
+  getUsersTeamsRecommended(@GetUser() user: PassportUser): Promise<{ teams: GetTeamCardDto[] }> {
+    return this.usersService.getRecommendedTeamCardsByUserId(user.sub);
   }
+
+  @ApiOperation({
+    summary: '유저 신청한 팀 조회 (보낸 신청 - 응답을 기다려요) (⭕️updated)',
+    description: '',
+  })
+  @ApiOkResponse({
+    schema: {
+      example: {
+        teams: [
+          {
+            id: 1,
+            matchingId: 1,
+            teamName: '기웅내세요',
+            age: 24,
+            memberCount: 3,
+            intro: '안녕하세요',
+            approval: true,
+            appliedAt: '2023-01-20T21:37:26.886Z',
+          },
+          {
+            id: 2,
+            matchingId: 3,
+            teamName: '아름이와 아이들',
+            age: 27,
+            memberCount: 2,
+            intro: '안녕하세요',
+            approval: false,
+            appliedAt: '2023-01-20T21:37:26.886Z',
+          },
+        ],
+      },
+    },
+  })
+  @Get('matchings/applied')
+  @UseGuards(AccessTokenGuard)
+  getUsersMatchingsApplied(@GetUser() user: PassportUser): Promise<{ teams: GetTeamCardDto[] }> {
+    return this.usersService.getAppliedTeamCardsByUserId(user.sub);
+  }
+
+  @ApiOperation({
+    summary: '유저 거절당한 팀 조회 (보낸 신청 - 거절됐어요) (⭕️updated)',
+    description: '',
+  })
+  @ApiOkResponse({
+    schema: {
+      example: {
+        teams: [
+          {
+            id: 1,
+            matchingId: 1,
+            teamName: '기웅내세요',
+            age: 24,
+            memberCount: 3,
+            intro: '안녕하세요',
+            approval: true,
+            appliedAt: '2023-01-20T21:37:26.886Z',
+          },
+          {
+            id: 2,
+            matchingId: 3,
+            teamName: '아름이와 아이들',
+            age: 27,
+            memberCount: 2,
+            intro: '안녕하세요',
+            approval: false,
+            appliedAt: '2023-01-20T21:37:26.886Z',
+          },
+        ],
+      },
+    },
+  })
+  @Get('matchings/refused')
+  @UseGuards(AccessTokenGuard)
+  getUsersMatchingsRefused(@GetUser() user: PassportUser): Promise<{ teams: GetTeamCardDto[] }> {
+    return this.usersService.getRefusedTeamCardsByUserId(user.sub);
+  }
+
+  @ApiOperation({
+    summary: '유저 신청받은 팀 조회 (받은 신청) (⭕️updated)',
+    description: '',
+  })
+  @ApiOkResponse({
+    schema: {
+      example: {
+        teams: [
+          {
+            id: 1,
+            matchingId: 1,
+            teamName: '기웅내세요',
+            age: 24,
+            memberCount: 3,
+            intro: '안녕하세요',
+            approval: true,
+            appliedAt: '2023-01-20T21:37:26.886Z',
+          },
+          {
+            id: 2,
+            matchingId: 2,
+            teamName: '아름이와 아이들',
+            age: 27,
+            memberCount: 2,
+            intro: '안녕하세요',
+            approval: false,
+            appliedAt: '2023-01-20T21:37:26.886Z',
+          },
+        ],
+      },
+    },
+  })
+  @Get('matchings/received')
+  @UseGuards(AccessTokenGuard)
+  getUsersMatchingsReceived(@GetUser() user: PassportUser): Promise<{ teams: GetTeamCardDto[] }> {
+    return this.usersService.getReceivedTeamCardsByUserId(user.sub);
+  }
+
+  @ApiOperation({
+    summary: '유저 상호 수락 팀 조회 (매칭 완료) (⭕️updated)',
+    description: '상호 수락일 기준 7일 이내 매칭 정보만 조회됩니다.',
+  })
+  @ApiOkResponse({
+    schema: {
+      example: {
+        teams: [
+          {
+            id: 1,
+            matchingId: 1,
+            teamName: '기웅내세요',
+            age: 24,
+            memberCount: 3,
+            intro: '안녕하세요',
+            approval: true,
+            matchedAt: '2023-01-20T21:37:26.886Z',
+          },
+          {
+            id: 2,
+            matchingId: 2,
+            teamName: '아름이와 아이들',
+            age: 27,
+            memberCount: 2,
+            intro: '안녕하세요',
+            approval: false,
+            matchedAt: '2023-01-20T21:37:26.886Z',
+          },
+        ],
+      },
+    },
+  })
+  @Get('matchings/succeeded')
+  @UseGuards(AccessTokenGuard)
+  getUsersMatchingsSucceeded(@GetUser() user: PassportUser): Promise<{ teams: GetTeamCardDto[] }> {
+    return this.usersService.getSucceededTeamCardsByUserId(user.sub);
+  }
+
+  @ApiOperation({
+    summary: '유저 신청한 팀 삭제 (내가 신청) (📌is updating)',
+    description: '',
+  })
+  @ApiOkResponse({ description: 'OK' })
+  @Delete('matchings/applied')
+  @UseGuards(AccessTokenGuard)
+  deleteUsersMatchingsAppliedMatchingId(@GetUser() user: PassportUser, @Body() matchingIds: number[]): Promise<void> {
+    return this.usersService.deleteMatchingByUserId(user.sub, matchingIds);
+  }
+
+  @ApiOperation({
+    summary: '유저 신청받은 팀 삭제 (남이 신청) (📌is updating)',
+    description: '',
+  })
+  @ApiOkResponse({ description: 'OK' })
+  @Delete('matchings/received')
+  @UseGuards(AccessTokenGuard)
+  deleteUsersMatchingsReceivedMatchingId(@GetUser() user: PassportUser, @Body() matchingIds: number[]): Promise<void> {
+    return this.usersService.deleteMatchingByUserId(user.sub, matchingIds);
+  }
+
+  // @ApiOperation({
+  //   summary: '유저 매칭 상태 조회 (📌is updating)',
+  //   description:
+  //     '매칭 신청 전인 경우 matchingStatus: null \n\n matchingStatus: APPLIED / FAILED / MATCHED / OURTEAM_ACCEPTED / SUCCEEDED / PARTNER_TEAM_REFUSED / OURTEAM_REFUSED / NOT_RESPONDED',
+  // })
+  // @ApiOkResponse({
+  //   content: {
+  //     'application/json': {
+  //       examples: {
+  //         '매칭 신청 전': {
+  //           value: { matchingStatus: null },
+  //           description: '페이지: 매칭조회2',
+  //         },
+  //         '매칭 신청 완료': {
+  //           value: { matchingStatus: MatchingStatus.APPLIED },
+  //           description: '페이지: 매칭조회3',
+  //         },
+  //         '매칭 실패': {
+  //           value: { matchingStatus: MatchingStatus.FAILED },
+  //           description: '페이지: 매칭조회4',
+  //         },
+  //         '매칭 완료': {
+  //           value: { matchingStatus: MatchingStatus.MATCHED },
+  //           description: '페이지: 매칭조회5',
+  //         },
+  //         '우리팀 수락': {
+  //           value: { matchingStatus: MatchingStatus.OURTEAM_ACCEPTED },
+  //           description: '페이지: 매칭조회6',
+  //         },
+  //         '매칭 성공 (상호 수락)': {
+  //           value: { matchingStatus: MatchingStatus.SUCCEEDED },
+  //           description: '페이지: 매칭조회7',
+  //         },
+  //         '상대팀 거절': {
+  //           value: { matchingStatus: MatchingStatus.PARTNER_TEAM_REFUSED },
+  //           description: '페이지: 매칭조회8',
+  //         },
+  //         '우리팀 거절': {
+  //           value: { matchingStatus: MatchingStatus.OURTEAM_REFUSED },
+  //           description: '페이지: 매칭조회11',
+  //         },
+  //         무응답: {
+  //           value: { matchingStatus: MatchingStatus.NOT_RESPONDED },
+  //           description: '페이지: 매칭조회12',
+  //         },
+  //       },
+  //     },
+  //   },
+  // })
+  // @Get('matchings/status')
+  // @UseGuards(AccessTokenGuard)
+  // getUsersMatchingStatus(@GetUser() user: PassportUser): Promise<{ matchingStatus: MatchingStatus }> {
+  //   return this.usersService.getUserMatchingStatusByUserId(user.sub);
+  // }
 }

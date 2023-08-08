@@ -9,10 +9,10 @@ import { AdminGetMatchingDto } from './dtos/admin-get-matching.dto';
 import { MatchingsService } from './../matchings/matchings.service';
 import { TeamsService } from './../teams/teams.service';
 import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { AdminGetTeamDto } from './dtos/admin-get-team.dto';
+import { AdminGetAppliedTeamDto, AdminGetTeamDto } from './dtos/admin-get-team.dto';
 import { TeamGender } from 'src/teams/entities/team-gender.enum';
 import { MatchingStatus } from 'src/matchings/interfaces/matching-status.enum';
-import { AdminGetUserDto } from './dtos/admin-get-user.dto';
+import { AdminGetUserDto, AdminGetUserWithStudentCardDto } from './dtos/admin-get-user.dto';
 import { AdminGetInvitationSuccessUserDto } from './dtos/admin-get-invitation-success-user.dto';
 import * as Universities from '../teams/constants/universities.json';
 import { AREA_IGNORE_ID } from 'src/teams/constants/areas';
@@ -21,6 +21,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { MatchingRound } from 'src/matchings/constants/matching-round';
 import { LoggerService } from 'src/common/utils/logger-service.util';
 import { AdminGetOurteamRefusedTeamDto } from './dtos/admin-get-ourteam-refused-team.dto';
+import { TingsService } from 'src/tings/tings.service';
 
 @Injectable()
 export class AdminService {
@@ -37,24 +38,33 @@ export class AdminService {
     private couponsService: CouponsService,
     @Inject(forwardRef(() => TicketsService))
     private ticketsService: TicketsService,
+    @Inject(forwardRef(() => TingsService))
+    private tingsService: TingsService,
     private eventEmitter: EventEmitter2,
   ) {}
 
+  async getAdminTeams(gender: TeamGender): Promise<{ teams: AdminGetTeamDto[] }> {
+    return this.teamsService.getTeamsByGender(gender);
+  }
   async deleteTeamByTeamId(teamId: number): Promise<void> {
     return this.teamsService.deleteTeamById(teamId);
   }
 
-  async deleteMatchingByMatchingId(matchingId: number): Promise<void> {
-    return this.matchingsService.deleteMatchingById(matchingId);
+  async getAdminMatchingsApplied(): Promise<{ matchings: AdminGetAppliedTeamDto[] }> {
+    return this.matchingsService.getAdminMatchingsApplied();
   }
 
-  async getTeamsByStatusAndMembercountAndGender(
-    status: MatchingStatus,
-    membercount: '2' | '3',
-    gender: TeamGender,
-  ): Promise<{ teams: AdminGetTeamDto[] }> {
-    return this.teamsService.getTeamsByStatusAndMembercountAndGender(status, membercount, gender);
+  async deleteMatchingByMatchingId(matchingId: number): Promise<void> {
+    return this.matchingsService.deleteMatchingAndTeamByMatchingId(matchingId);
   }
+
+  // async getTeamsByStatusAndMembercountAndGender(
+  //   status: MatchingStatus,
+  //   membercount: '2' | '3',
+  //   gender: TeamGender,
+  // ): Promise<{ teams: AdminGetTeamDto[] }> {
+  //   return this.teamsService.getTeamsByStatusAndMembercountAndGender(status, membercount, gender);
+  // }
 
   async getOurteamRefusedTeams(): Promise<{ teams: AdminGetOurteamRefusedTeamDto[] }> {
     return this.teamsService.getOurteamRefusedTeams();
@@ -64,8 +74,8 @@ export class AdminService {
     return this.teamsService.deleteOurteamRefusedTeamByTeamId(teamId);
   }
 
-  async getMatchingsByStatus(status: MatchingStatus): Promise<{ matchings: AdminGetMatchingDto[] }> {
-    return this.matchingsService.getMatchingsByStatus(status);
+  async getMatchings(): Promise<{ matchings: AdminGetMatchingDto[] }> {
+    return this.matchingsService.getMatchings();
   }
 
   async saveChatCreatedAtByMatchingId(matchingId: number): Promise<void> {
@@ -74,6 +84,26 @@ export class AdminService {
 
   async getAllUsers(): Promise<{ users: AdminGetUserDto[] }> {
     return this.usersService.getAllUsers();
+  }
+
+  async getAllUsersWithStudentCard(): Promise<{ users: AdminGetUserWithStudentCardDto[] }> {
+    return this.usersService.getAllUsersWithStudentCard();
+  }
+
+  async updateUserVerify(userId: number): Promise<void> {
+    return this.usersService.verifyUserByStudentCard(userId);
+  }
+
+  async updateUserDeny(userId: number): Promise<void> {
+    return this.usersService.declineUserByStudentCard(userId);
+  }
+
+  async updateTingsByUserIdAndTingCount(userId: number, tingCount: number): Promise<void> {
+    return this.tingsService.refundTingByUserIdAndTingCount(userId, tingCount);
+  }
+
+  async deleteTingsByUserIdAndTingCount(userId: number, tingCount: number): Promise<void> {
+    return this.tingsService.useTingByUserIdAndTingCount(userId, tingCount);
   }
 
   async getInvitationSuccessUsers(): Promise<{ users: AdminGetInvitationSuccessUserDto[] }> {
@@ -280,49 +310,49 @@ export class AdminService {
   //   });
   // }
 
-  async getAdminTeamCount(): Promise<{
-    teamsPerRound: number;
-    '2vs2': { male: number; female: number };
-    '3vs3': { male: number; female: number };
-  }> {
-    const teamsPerRound = MatchingRound.MAX_TEAM;
+  // async getAdminTeamCount(): Promise<{
+  //   teamsPerRound: number;
+  //   '2vs2': { male: number; female: number };
+  //   '3vs3': { male: number; female: number };
+  // }> {
+  //   const teamsPerRound = MatchingRound.MAX_TEAM;
 
-    const { teamCount: male2 } = await this.teamsService.getTeamCountByStatusAndMembercountAndGender(
-      MatchingStatus.APPLIED,
-      '2',
-      TeamGender.male,
-    );
+  //   const { teamCount: male2 } = await this.teamsService.getTeamCountByStatusAndMembercountAndGender(
+  //     MatchingStatus.APPLIED,
+  //     '2',
+  //     TeamGender.male,
+  //   );
 
-    const { teamCount: female2 } = await this.teamsService.getTeamCountByStatusAndMembercountAndGender(
-      MatchingStatus.APPLIED,
-      '2',
-      TeamGender.female,
-    );
+  //   const { teamCount: female2 } = await this.teamsService.getTeamCountByStatusAndMembercountAndGender(
+  //     MatchingStatus.APPLIED,
+  //     '2',
+  //     TeamGender.female,
+  //   );
 
-    const { teamCount: male3 } = await this.teamsService.getTeamCountByStatusAndMembercountAndGender(
-      MatchingStatus.APPLIED,
-      '3',
-      TeamGender.male,
-    );
+  //   const { teamCount: male3 } = await this.teamsService.getTeamCountByStatusAndMembercountAndGender(
+  //     MatchingStatus.APPLIED,
+  //     '3',
+  //     TeamGender.male,
+  //   );
 
-    const { teamCount: female3 } = await this.teamsService.getTeamCountByStatusAndMembercountAndGender(
-      MatchingStatus.APPLIED,
-      '3',
-      TeamGender.female,
-    );
+  //   const { teamCount: female3 } = await this.teamsService.getTeamCountByStatusAndMembercountAndGender(
+  //     MatchingStatus.APPLIED,
+  //     '3',
+  //     TeamGender.female,
+  //   );
 
-    return {
-      teamsPerRound,
-      '2vs2': {
-        male: male2,
-        female: female2,
-      },
-      '3vs3': {
-        male: male3,
-        female: female3,
-      },
-    };
-  }
+  //   return {
+  //     teamsPerRound,
+  //     '2vs2': {
+  //       male: male2,
+  //       female: female2,
+  //     },
+  //     '3vs3': {
+  //       male: male3,
+  //       female: female3,
+  //     },
+  //   };
+  // }
 
   async createCouponWithUserId(userId: number, createCouponDto: CreateCouponDto): Promise<void> {
     return await this.couponsService.createCouponWithUserId(userId, createCouponDto);

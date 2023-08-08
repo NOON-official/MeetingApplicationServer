@@ -16,6 +16,10 @@ import {
 } from 'typeorm';
 import { Coupon } from 'src/coupons/entities/coupon.entity';
 import { Ticket } from 'src/tickets/entities/ticket.entity';
+import { Ting } from 'src/tings/entities/ting.entity';
+import { RecommendedTeam } from 'src/teams/entities/recommended-team.entity';
+import { NextRecommendedTeam } from 'src/teams/entities/next-recommended-team.entity';
+import { UserStudentCard } from './user-student-card.entity';
 
 @Entity()
 @Unique(['id', 'kakaoUid', 'referralId', 'refreshToken'])
@@ -38,7 +42,7 @@ export class User extends BaseEntity {
   @Column({ type: 'varchar', length: 10, nullable: true })
   ageRange: string;
 
-  @Column({ type: 'int', nullable:true })
+  @Column({ type: 'int', nullable: true })
   university: number;
 
   @Column({ type: 'int', nullable: true })
@@ -50,8 +54,11 @@ export class User extends BaseEntity {
   @Column({ nullable: true })
   refreshToken: string;
 
-  @Column({ type: 'json', nullable: true })
-  refusedUserIds: number[] | null;
+  @Column({ type: 'boolean', default: false })
+  isVerified: boolean;
+
+  @Column({ type: 'boolean', nullable: true })
+  approval: boolean;
 
   @Column({ type: 'boolean', default: false })
   isAdmin: boolean;
@@ -83,6 +90,18 @@ export class User extends BaseEntity {
   @OneToMany(() => Team, (team) => team.user, { cascade: true })
   teams: Team[];
 
+  @OneToOne(() => UserStudentCard, { cascade: true })
+  userStudentCard: UserStudentCard;
+
   @OneToOne(() => UserAgreement, { cascade: true })
   userAgreement: UserAgreement;
+
+  @OneToOne(() => Ting, { cascade: true })
+  ting: Ting;
+
+  @OneToOne(() => RecommendedTeam, { cascade: true })
+  recommendedTeam: RecommendedTeam;
+
+  @OneToOne(() => NextRecommendedTeam, { cascade: true })
+  nextRecommendedTeam: NextRecommendedTeam;
 }
