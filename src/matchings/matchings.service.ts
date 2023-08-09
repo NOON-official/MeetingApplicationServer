@@ -246,30 +246,6 @@ export class MatchingsService {
 
     // 매칭 soft delete
     await this.matchingsRepository.deleteMatchingById(matchingId);
-
-    // 관련 데이터 soft delete
-    const appliedTeamId = matching?.appliedTeam?.id;
-    const appliedTeamIsDeleted = matching?.appliedTeam?.deletedAt;
-    const receivedTeamId = matching?.receivedTeam?.id;
-    const receivedTeamIsDeleted = matching?.receivedTeam?.deletedAt;
-    // const appliedTeamTicketId = matching?.appliedTeamTicket?.id;
-    // const receivedTeamTicketId = matching?.receivedTeamTicket?.id;
-
-    if (!!appliedTeamId && !appliedTeamIsDeleted) {
-      await this.teamsService.deleteTeamById(appliedTeamId);
-    }
-
-    if (!!receivedTeamId && !receivedTeamIsDeleted) {
-      await this.teamsService.deleteTeamById(receivedTeamId);
-    }
-
-    // if (!!appliedTeamTicketId) {
-    //   await this.ticketsService.deleteTicketById(appliedTeamTicketId);
-    // }
-
-    // if (!!receivedTeamTicketId) {
-    //   await this.ticketsService.deleteTicketById(receivedTeamTicketId);
-    // }
   }
 
   // 신청한/신청받은 팀 조회
