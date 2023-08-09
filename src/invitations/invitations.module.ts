@@ -7,12 +7,14 @@ import { forwardRef, Module } from '@nestjs/common';
 import { InvitationsService } from './invitations.service';
 import { UsersModule } from 'src/users/users.module';
 import { InvitationCreatedListener } from './listeners/invitation-created.listener';
+import { TingsModule } from 'src/tings/tings.module';
 
 @Module({
   imports: [
     TypeOrmExModule.forCustomRepository([InvitationsRepository]),
     forwardRef(() => UsersModule),
     forwardRef(() => CouponsModule),
+    forwardRef(() => TingsModule),
   ],
   providers: [InvitationsService, InvitationCreatedListener, InvitationSucceededListener],
   controllers: [InvitationsController],

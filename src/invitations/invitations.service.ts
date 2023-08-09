@@ -7,7 +7,8 @@ import { UsersService } from 'src/users/users.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InvitationCreatedEvent } from './events/invitation-created.event';
 import { AdminGetInvitationSuccessUserDto } from 'src/admin/dtos/admin-get-invitation-success-user.dto';
-import { INVITATION_SUCCESS_COUNT } from './constants/invitation-success-count.constant';
+import { INVITATION_SUCCESS_COUNT, INVITATION_TINGS_COUNT } from './constants/invitation-success-count.constant';
+import { TingsService } from 'src/tings/tings.service';
 
 @Injectable()
 export class InvitationsService {
@@ -16,6 +17,8 @@ export class InvitationsService {
     private eventEmitter: EventEmitter2,
     @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
+    @Inject(forwardRef(() => TingsService))
+    private tingsService: TingsService,
   ) {}
 
   async createInvitation(userId: number, createInvitationDto: CreateInvitationDto): Promise<void> {
@@ -36,23 +39,19 @@ export class InvitationsService {
       throw new BadRequestException('already invited user');
     }
 
-    // 회원 코드 입력한 유저에게 1회 이용권 50% 할인 쿠폰 발급
+    // 회원을 초대한 유저에게 팅 3개 지급
     const invitationCreatedEvent = new InvitationCreatedEvent();
     invitationCreatedEvent.inviteeId = invitee.id;
     this.eventEmitter.emit('invitation.created', invitationCreatedEvent);
 
+    await this.tingsService.refundTingByUserIdAndTingCount(inviter.id, INVITATION_TINGS_COUNT);
+
     // 초대 내역 저장
     await this.invitationsRepository.createInvitation(inviter, invitee);
 
-    // 초대자가 친구 초대 4회 달성한 경우 1회 이용권 쿠폰 발급
-    const { invitationCount } = await this.getInvitationCountByUserId(inviter.id);
-
-    // 초대횟수가 4의 배수인 경우
-    if (invitationCount !== 0 && invitationCount % 4 === 0) {
-      const invitationSucceededEvent = new InvitationSucceededEvent();
-      invitationSucceededEvent.inviterId = inviter.id;
-      this.eventEmitter.emit('invitation.succeeded', invitationSucceededEvent);
-    }
+    const invitationSucceededEvent = new InvitationSucceededEvent();
+    invitationSucceededEvent.inviterId = inviter.id;
+    this.eventEmitter.emit('invitation.succeeded', invitationSucceededEvent);
   }
 
   async getInvitationCountByUserId(userId: number): Promise<{ invitationCount: number }> {
