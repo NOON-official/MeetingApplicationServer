@@ -176,7 +176,6 @@ export class TeamsRepository extends Repository<Team> {
         'team.drink AS drink',
         `team.createdAt AS appliedAt`,
         'user.id AS userId',
-        'user.refusedUserIds AS refusedUserIds',
       ])
       .leftJoin(`team.user`, 'user')
       .leftJoin('team.teamMembers', 'members')

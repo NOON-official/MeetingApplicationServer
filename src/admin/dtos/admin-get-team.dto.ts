@@ -89,12 +89,6 @@ export class AdminGetTeamDto {
     example: 1,
   })
   userId: number;
-
-  @ApiProperty({
-    description: '거절한 회원 ID들',
-    example: [11, 22, 33],
-  })
-  excludedTeamIds?: number[] | null;
 }
 
 export class AdminGetAppliedTeamDto {

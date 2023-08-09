@@ -37,7 +37,31 @@ export class AdminController {
     description: '관리자페이지 내 사용',
   })
   @ApiQuery({ name: 'gender', enum: TeamGender })
-  @ApiOkResponse({})
+  @ApiOkResponse({
+    schema: {
+      example: {
+        teams: [
+          {
+            teamId: 1,
+            nickname: '미팅이',
+            userId: 1,
+            kakaoId: '카카오 아이디',
+            teamName: '한솔이와 친구들',
+            intro: '안녕하세요',
+            memberCount: 2,
+            memberCounts: [3],
+            phone: '01012345678',
+            age: 23,
+            prefAge: [23, 27],
+            areas: [1, 3],
+            universities: [1, 4, 100],
+            drink: 5,
+            applidAt: '2023-01-20T21:37:26.886Z',
+          },
+        ],
+      },
+    },
+  })
   @Get('teams')
   getAdminTeams(@Query('gender') gender: TeamGender): Promise<{ teams: AdminGetTeamDto[] }> {
     return this.adminService.getAdminTeams(gender);
