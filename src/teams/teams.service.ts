@@ -435,6 +435,26 @@ export class TeamsService {
     }
 
     await this.teamsRepository.updateExcludedTeamIds(teamId, excludedTeamId);
+
+    // 해당 팀이 추천팀에 포함되는 경우 추천팀에서 삭제
+    let { recommendedTeamIds } = (await this.getRecommendedTeamByUserId(userId)) || {};
+
+    const excludedRecommendedTeamIndex = recommendedTeamIds?.indexOf(excludedTeamId);
+    if (excludedRecommendedTeamIndex !== undefined && excludedRecommendedTeamIndex !== -1) {
+      recommendedTeamIds?.splice(excludedRecommendedTeamIndex, 1);
+
+      await this.updateRecommendedTeamIdsByUserIdAndRecommendedTeamIds(userId, recommendedTeamIds);
+    }
+
+    // 해당 팀이 다음 추천팀에 포함되는 경우 추천팀에서 삭제
+    let { nextRecommendedTeamIds } = (await this.getNextRecommendedTeamByUserId(userId)) || {};
+
+    const excludedNextRecommendedTeamIndex = nextRecommendedTeamIds?.indexOf(excludedTeamId);
+    if (excludedNextRecommendedTeamIndex !== undefined && excludedNextRecommendedTeamIndex !== -1) {
+      nextRecommendedTeamIds?.splice(excludedNextRecommendedTeamIndex, 1);
+
+      await this.updateNextRecommendedTeamIdsByUserIdAndNextRecommendedTeamIds(userId, nextRecommendedTeamIds);
+    }
   }
 
   async getRecommendedTeamByUserId(userId: number): Promise<RecommendedTeam> {
@@ -497,6 +517,26 @@ export class TeamsService {
   ): Promise<void> {
     // 다음 추천팀 없는 경우 생성 or 기존 추천팀 업데이트
     return this.nextRecommendedTeamsRepository.upsertNextRecommendedTeamIdsByUserIdAndRecommendedTeamIds(
+      userId,
+      nextRecommendedTeamIds,
+    );
+  }
+
+  async updateRecommendedTeamIdsByUserIdAndRecommendedTeamIds(
+    userId: number,
+    recommendedTeamIds: number[],
+  ): Promise<void> {
+    return this.recommendedTeamsRepository.updateRecommendedTeamIdsByUserIdAndRecommendedTeamIds(
+      userId,
+      recommendedTeamIds,
+    );
+  }
+
+  async updateNextRecommendedTeamIdsByUserIdAndNextRecommendedTeamIds(
+    userId: number,
+    nextRecommendedTeamIds: number[],
+  ): Promise<void> {
+    return this.nextRecommendedTeamsRepository.updateNextRecommendedTeamIdsByUserIdAndNextRecommendedTeamIds(
       userId,
       nextRecommendedTeamIds,
     );

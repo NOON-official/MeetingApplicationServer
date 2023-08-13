@@ -20,4 +20,11 @@ export class RecommendedTeamsRepository extends Repository<RecommendedTeam> {
   ): Promise<void> {
     await this.upsert({ userId, recommendedTeamIds, updatedAt: () => 'NOW()' }, ['userId']);
   }
+
+  async updateRecommendedTeamIdsByUserIdAndRecommendedTeamIds(
+    userId: number,
+    recommendedTeamIds: number[],
+  ): Promise<void> {
+    await this.upsert({ userId, recommendedTeamIds }, ['userId']);
+  }
 }

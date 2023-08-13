@@ -353,6 +353,68 @@ export class MatchingsService {
 
     // 상호 제외된 팀 목록에 추가하기
     await this.teamsService.updateExcludedTeamsByUserIdAndExcludedTeamId(appliedTeam.ownerId, receivedTeamId);
+
+    // 해당 팀이 신청한 팀의 추천팀에 포함되는 경우 추천팀에서 삭제
+    let { recommendedTeamIds: appliedTeamRecommendedTeamIds } =
+      (await this.teamsService.getRecommendedTeamByUserId(appliedUserId)) || {};
+
+    const appliedTeamExcludedRecommendedTeamIndex = appliedTeamRecommendedTeamIds?.indexOf(receivedTeamId);
+    if (appliedTeamExcludedRecommendedTeamIndex !== undefined && appliedTeamExcludedRecommendedTeamIndex !== -1) {
+      appliedTeamRecommendedTeamIds?.splice(appliedTeamExcludedRecommendedTeamIndex, 1);
+
+      await this.teamsService.updateRecommendedTeamIdsByUserIdAndRecommendedTeamIds(
+        appliedUserId,
+        appliedTeamRecommendedTeamIds,
+      );
+    }
+
+    // 해당 팀이 신청한 팀의 다음 추천팀에 포함되는 경우 추천팀에서 삭제
+    let { nextRecommendedTeamIds: appliedTeamNextRecommendedTeamIds } =
+      (await this.teamsService.getNextRecommendedTeamByUserId(appliedUserId)) || {};
+
+    const appliedTeamExcludedNextRecommendedTeamIndex = appliedTeamNextRecommendedTeamIds?.indexOf(receivedTeamId);
+    if (
+      appliedTeamExcludedNextRecommendedTeamIndex !== undefined &&
+      appliedTeamExcludedNextRecommendedTeamIndex !== -1
+    ) {
+      appliedTeamNextRecommendedTeamIds?.splice(appliedTeamExcludedNextRecommendedTeamIndex, 1);
+
+      await this.teamsService.updateNextRecommendedTeamIdsByUserIdAndNextRecommendedTeamIds(
+        appliedUserId,
+        appliedTeamNextRecommendedTeamIds,
+      );
+    }
+
+    // 해당 팀이 신청받은 팀의 추천팀에 포함되는 경우 추천팀에서 삭제
+    let { recommendedTeamIds: receivedTeamRecommendedTeamIds } =
+      (await this.teamsService.getRecommendedTeamByUserId(receivedTeam.ownerId)) || {};
+
+    const receivedTeamExcludedRecommendedTeamIndex = receivedTeamRecommendedTeamIds?.indexOf(appliedTeamId);
+    if (receivedTeamExcludedRecommendedTeamIndex !== undefined && receivedTeamExcludedRecommendedTeamIndex !== -1) {
+      receivedTeamRecommendedTeamIds?.splice(receivedTeamExcludedRecommendedTeamIndex, 1);
+
+      await this.teamsService.updateRecommendedTeamIdsByUserIdAndRecommendedTeamIds(
+        receivedTeam.ownerId,
+        receivedTeamRecommendedTeamIds,
+      );
+    }
+
+    // 해당 팀이 신청받은 팀의 다음 추천팀에 포함되는 경우 추천팀에서 삭제
+    let { nextRecommendedTeamIds: receivedTeamNextRecommendedTeamIds } =
+      (await this.teamsService.getNextRecommendedTeamByUserId(receivedTeam.ownerId)) || {};
+
+    const receivedTeamExcludedNextRecommendedTeamIndex = receivedTeamNextRecommendedTeamIds?.indexOf(appliedTeamId);
+    if (
+      receivedTeamExcludedNextRecommendedTeamIndex !== undefined &&
+      receivedTeamExcludedNextRecommendedTeamIndex !== -1
+    ) {
+      receivedTeamNextRecommendedTeamIds?.splice(receivedTeamExcludedNextRecommendedTeamIndex, 1);
+
+      await this.teamsService.updateNextRecommendedTeamIdsByUserIdAndNextRecommendedTeamIds(
+        receivedTeam.ownerId,
+        receivedTeamNextRecommendedTeamIds,
+      );
+    }
   }
 
   async getAppliedTeamCardsByTeamId(teamId: number): Promise<{ teams: GetTeamCardDto[] }> {
