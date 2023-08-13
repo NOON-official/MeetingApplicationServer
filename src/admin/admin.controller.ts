@@ -184,33 +184,36 @@ export class AdminController {
     return this.adminService.deleteTingsByUserIdAndTingCount(userId, tingCount);
   }
 
-  // @ApiOperation({
-  //   summary: '현재 신청팀 수 조회',
-  //   description: '매칭 실패 횟수 3회 미만인 팀 포함',
-  // })
-  // @ApiOkResponse({
-  //   schema: {
-  //     example: {
-  //       teamsPerRound: 10,
-  //       '2vs2': {
-  //         male: 8,
-  //         female: 6,
-  //       },
-  //       '3vs3': {
-  //         male: 4,
-  //         female: 5,
-  //       },
-  //     },
-  //   },
-  // })
-  // @Get('teams/count')
-  // async getAdminTeamsCount(): Promise<{
-  //   teamsPerRound: number;
-  //   '2vs2': { male: number; female: number };
-  //   '3vs3': { male: number; female: number };
-  // }> {
-  //   return this.adminService.getAdminTeamCount();
-  // }
+  @ApiOperation({
+    summary: '현재 신청팀 수 조회',
+    description: '매칭 실패 횟수 3회 미만인 팀 포함',
+  })
+  @ApiOkResponse({
+    schema: {
+      example: {
+        '2vs2': {
+          male: 8,
+          female: 6,
+        },
+        '3vs3': {
+          male: 4,
+          female: 5,
+        },
+        '4vs4': {
+          male: 4,
+          female: 5,
+        },
+      },
+    },
+  })
+  @Get('teams/count')
+  async getAdminTeamsCount(): Promise<{
+    '2vs2': { male: number; female: number };
+    '3vs3': { male: number; female: number };
+    '4vs4': { male: number; female: number };
+  }> {
+    return this.adminService.getAdminTeamCount();
+  }
 
   @ApiOperation({
     summary: '학생증 인증 신청 내역 조회 (📌is updating)',

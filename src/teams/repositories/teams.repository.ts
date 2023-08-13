@@ -113,28 +113,18 @@ export class TeamsRepository extends Repository<Team> {
     return { memberCount };
   }
 
-  // async getTeamCountByStatusAndMembercountAndGender(
-  //   status: MatchingStatus.APPLIED,
-  //   membercount: '2' | '3' | '4',
-  //   gender: TeamGender,
-  // ): Promise<{ teamCount: number }> {
-  //   const qb = this.createQueryBuilder('team');
+  async getTeamCountByMembercountAndGender(
+    membercount: '2' | '3' | '4',
+    gender: TeamGender,
+  ): Promise<{ teamCount: number }> {
+    const teamCount = await this.createQueryBuilder('team')
+      .select('team.id')
+      .where('memberCount = :membercount', { membercount })
+      .andWhere('team.gender = :genderNum', { genderNum: gender === TeamGender.male ? 1 : 2 })
+      .getCount();
 
-  //   // 인원수 & 성별 필터링
-  //   qb.leftJoinAndSelect(`team.${gender}TeamMatching`, 'matching')
-  //     .where('memberCount = :membercount', { membercount })
-  //     .andWhere('team.gender = :genderNum', { genderNum: gender === TeamGender.male ? 1 : 2 });
-
-  //   // 매칭 신청자인 경우
-  //   if (status === MatchingStatus.APPLIED) {
-  //     // 매칭 정보 X
-  //     qb.andWhere('matching.id IS NULL');
-  //   }
-
-  //   const teamCount = await qb.getCount();
-
-  //   return { teamCount };
-  // }
+    return { teamCount };
+  }
 
   // async updateTeam(teamId: number, teamData: UpdateTeam): Promise<void> {
   //   await this.createQueryBuilder()
@@ -168,7 +158,7 @@ export class TeamsRepository extends Repository<Team> {
         'team.memberCount AS memberCount',
         'team.memberCounts AS memberCounts',
         'user.phone AS phone',
-        'user.age',
+        'user.birth AS age',
         'team.prefAge AS prefAge',
         'team.areas AS areas',
         'user.university AS university',
@@ -183,7 +173,7 @@ export class TeamsRepository extends Repository<Team> {
       .where('team.gender = :genderNum', { genderNum: gender === TeamGender.male ? 1 : 2 })
       //  신청자 조회 (매칭 내역 X & 매칭 최대 횟수 미만)
       .groupBy('team.id')
-      .orderBy('COALESCE(team.modifiedAt, team.createdAt)', 'ASC') // modifiedAt이 있는 경우 modifiedAt 기준
+      .orderBy('team.createdAt', 'ASC') // modifiedAt이 있는 경우 modifiedAt 기준
       .getRawMany();
 
     teams.map((t) => {
