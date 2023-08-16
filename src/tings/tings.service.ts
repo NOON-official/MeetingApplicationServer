@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { TingsRepository } from './repositories/tings.repository';
+import { Ting } from './entities/ting.entity';
+import { CreateTingDto } from './dtos/create-ting.dto';
 
 @Injectable()
 export class TingsService {
@@ -15,5 +17,9 @@ export class TingsService {
 
   async refundTingByUserIdAndTingCount(userId: number, tingCount: number): Promise<void> {
     await this.tingsRepository.refundTingByUserIdAndTingCount(userId, tingCount);
+  }
+
+  async createTingByUserId(createTingDto: CreateTingDto): Promise<Ting> {
+    return this.tingsRepository.createTingByUserId(createTingDto);
   }
 }

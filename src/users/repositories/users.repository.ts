@@ -118,7 +118,6 @@ export class UsersRepository extends Repository<User> {
 
   async updateUniversity(userId: number, updateUniversity: UpdateUniversityDto) {
     const result = await this.update({ id: userId }, updateUniversity);
-
     if (result.affected === 0) {
       throw new NotFoundException(`Can't find user with id ${userId}`);
     }

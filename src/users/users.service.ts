@@ -28,6 +28,7 @@ import { GetTeamCardDto } from 'src/teams/dtos/get-team-card.dto';
 import { MatchingsService } from 'src/matchings/matchings.service';
 import { TingsService } from 'src/tings/tings.service';
 import { UserStudentCard } from './entities/user-student-card.entity';
+import { FemaleSignUp, MaleSignUp } from './constants/sigin-up.constant';
 
 @Injectable()
 export class UsersService {
@@ -131,7 +132,18 @@ export class UsersService {
   }
 
   async updateUniversity(userId: number, updateUniversity: UpdateUniversityDto) {
-    return this.usersRepository.updateUniversity(userId, updateUniversity);
+    await this.usersRepository.updateUniversity(userId, updateUniversity);
+    const user = await this.usersRepository.getUserById(userId);
+    if (user && user.deletedAt === null) {
+      if (user.gender === 'male') {
+        const createTingDto = { userId: user.id, tingCount: MaleSignUp };
+        const ting = await this.tingsService.createTingByUserId(createTingDto);
+        console.log(ting);
+      } else if (user.gender === 'female') {
+        const createTingDto = { userId: user.id, tingCount: FemaleSignUp };
+        await this.tingsService.createTingByUserId(createTingDto);
+      }
+    }
   }
 
   async getTicketCountByUserId(userId: number): Promise<{ ticketCount: number }> {
