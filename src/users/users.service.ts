@@ -138,7 +138,6 @@ export class UsersService {
       if (user.gender === 'male') {
         const createTingDto = { userId: user.id, tingCount: MaleSignUp };
         const ting = await this.tingsService.createTingByUserId(createTingDto);
-        console.log(ting);
       } else if (user.gender === 'female') {
         const createTingDto = { userId: user.id, tingCount: FemaleSignUp };
         await this.tingsService.createTingByUserId(createTingDto);
