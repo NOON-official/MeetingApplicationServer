@@ -22,12 +22,12 @@ export class UpdateUserDto {
 }
 
 export class UpdateUniversityDto {
-    @ApiProperty({
-        description: '대학교',
-        example: '1',
-        required: true,
-      })
-      @IsNotEmpty()
-      @IsNumber()
-      readonly university: number;
+  @ApiProperty({
+    description: '대학교',
+    example: '1',
+    required: true,
+  })
+  @IsNotEmpty()
+  @IsNumber()
+  readonly university: number;
 }
