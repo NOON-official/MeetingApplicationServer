@@ -30,6 +30,8 @@ import { RecommendedTeamsRepository } from './repositories/recommended-team.repo
 import { RecommendedTeam } from './entities/recommended-team.entity';
 import { GetTeamCardDto } from './dtos/get-team-card.dto';
 import { TeamForMatching } from './interfaces/team-for-matching.interface';
+import { concat, difference, intersection, take, uniq } from 'lodash';
+import { TEAM_LIMIT } from 'src/teams/constants/recommended_team.constant';
 
 @Injectable()
 export class TeamsService {
@@ -90,6 +92,26 @@ export class TeamsService {
 
     // 팀 멤버 저장
     await this.teamsRepository.createTeamMember(members, team);
+
+    // 추천팀 업데이트
+    const matchingTeam: TeamForMatching = {
+      id: team.id,
+      ownerId: team.ownerId,
+      gender: gender === 1 ? TeamGender.male : TeamGender.female,
+      age: Math.round(members.reduce((total, member) => total + member.age, 0) / members.length),
+      memberCount,
+      memberCounts,
+      availableDate: teamAvailableDate,
+      areas,
+      prefAge,
+      excludedTeamIds: team.excludedTeamIds,
+      createdAt: team.createdAt,
+    };
+
+    const { teams: matchedTeams } = await this.getTeamsByGenderForMatching(
+      gender === 1 ? TeamGender.female : TeamGender.male,
+    );
+    await this.matchTeam(matchingTeam, matchedTeams, false);
   }
 
   // 성별 별로 팀 조회
@@ -539,5 +561,124 @@ export class TeamsService {
       userId,
       nextRecommendedTeamIds,
     );
+  }
+
+  // 추천팀 찾은 후 업데이트
+  // matchingTeam: 추천팀 정보 업데이트하려는 팀, matchedTeams: 매칭 대상이 되는 팀들
+  async matchTeam(matchingTeam: TeamForMatching, matchedTeams: TeamForMatching[], next: boolean = true) {
+    // 0. 예외 처리 된 팀 제외하기
+    const availableTeams = matchedTeams.filter((matchedTeam) => {
+      return (
+        !matchedTeam.excludedTeamIds?.includes(matchingTeam.id) &&
+        !matchingTeam.excludedTeamIds?.includes(matchedTeam.id)
+      );
+    });
+
+    // 1. 지역 일치하는 팀 조회
+    const areaSameTeamIds = matchedTeams
+      .filter((matchedTeam) => {
+        return matchingTeam.areas.some((a) => matchedTeam.areas.includes(a));
+      })
+      .map((t) => t.id);
+
+    // 지역 일치하는 팀 수가 최대 추천팀 수(4명) 이하인 경우 바로 저장 및 중단
+    if (areaSameTeamIds.length <= TEAM_LIMIT.MAX_RECOMMENDED_TEAM) {
+      // next flag가 true인 경우, 다음 추천팀 정보 저장
+      if (next) {
+        await this.upsertNextRecommendedTeamIdsByUserIdAndNextRecommendedTeamIds(matchingTeam.ownerId, areaSameTeamIds);
+      }
+      // next flag가 false인 경우, 추천팀 정보 저장
+      else if (!next) {
+        await this.upsertRecommendedTeamIdsByUserIdAndRecommendedTeamIds(matchingTeam.ownerId, areaSameTeamIds);
+      }
+      return;
+    }
+
+    // 2. 인원 일치하는 팀 조회
+    matchingTeam.memberCounts?.push(matchingTeam.memberCount);
+    const memberCountsSameTeamIds = availableTeams
+      .filter((availableTeam) => {
+        availableTeam.memberCounts?.push(availableTeam.memberCount);
+        return matchingTeam.memberCounts?.some((m) => availableTeam.memberCounts?.includes(m));
+      })
+      .map((t) => t.id);
+
+    // 3. 나이 일치하는 팀 조회
+    const ageSameTeamIds = availableTeams
+      .filter((availableTeam) => {
+        return (
+          matchingTeam.prefAge[0] <= availableTeam.age &&
+          availableTeam.age <= matchingTeam.prefAge[1] &&
+          availableTeam.prefAge[0] <= matchingTeam.age &&
+          matchingTeam.age <= availableTeam.prefAge[1]
+        );
+      })
+      .map((t) => t.id);
+
+    // 4. 일정 일치하는 팀 조회
+    const dateSameTeamIds = availableTeams
+      .filter((availableTeam) => {
+        return matchingTeam.availableDate?.some((a) => availableTeam.availableDate?.includes(a));
+      })
+      .map((t) => t.id);
+
+    // [가장 잘 맞는 팀 조회]
+    // 1순위: 지역 + 인원 + 나이 + 일정
+    // 2순위: 지역 + 인원 + 나이
+    // 3순위: 지역 + 인원
+    // 4순위: 지역만
+    const areaMemberCountsSameTeamIds = intersection(areaSameTeamIds, memberCountsSameTeamIds);
+    const areaMemberCountsAgeSameTeamIds = intersection(areaMemberCountsSameTeamIds, ageSameTeamIds);
+    const areaMemberCountsAgeDateSameTeamIds = intersection(areaMemberCountsAgeSameTeamIds, dateSameTeamIds);
+
+    // 가장 잘 맞는 팀 2팀 조회
+    const bestRecommendedTeamIds = take(
+      uniq(
+        concat(
+          areaMemberCountsAgeDateSameTeamIds,
+          areaMemberCountsAgeSameTeamIds,
+          areaMemberCountsSameTeamIds,
+          areaSameTeamIds,
+        ),
+      ),
+      TEAM_LIMIT.BEST_RECOMMENDED_TEAM,
+    );
+
+    // [덜 맞는 팀 조회]
+    // 1순위: 지역만
+    // 2순위: 지역 + 인원만
+    // 3순위: 지역 + 인원 + 나이만
+    // 4순위: 지역 + 인원 + 나이 + 일정
+    const onlyAreaSameTeams = difference(areaSameTeamIds, memberCountsSameTeamIds, ageSameTeamIds, dateSameTeamIds);
+    const onlyAreaMemberCountsSameTeams = difference(areaSameTeamIds, ageSameTeamIds, dateSameTeamIds);
+    const onlyAreaMemberCountsAgeSameTeams = difference(areaSameTeamIds, dateSameTeamIds);
+    const onlyAreaMemberCountsAgeDateSameTeams = areaSameTeamIds;
+
+    // 덜 맞는 팀 2팀 조회
+    const otherRecommendedTeamIds = take(
+      uniq(
+        concat(
+          onlyAreaSameTeams,
+          onlyAreaMemberCountsSameTeams,
+          onlyAreaMemberCountsAgeSameTeams,
+          onlyAreaMemberCountsAgeDateSameTeams,
+        ),
+      ),
+      TEAM_LIMIT.OTHER_RECOMMENDED_TEAM,
+    );
+
+    // next flag가 true인 경우, 다음 추천팀(가장 잘 맞는팀 + 덜 맞는 팀) 정보 저장
+    if (next) {
+      const nextRecommendedTeamIds = uniq(concat(bestRecommendedTeamIds, otherRecommendedTeamIds));
+      await this.upsertNextRecommendedTeamIdsByUserIdAndNextRecommendedTeamIds(
+        matchingTeam.ownerId,
+        nextRecommendedTeamIds,
+      );
+    }
+    // next flag가 false인 경우, 추천팀(가장 잘 맞는팀 + 덜 맞는 팀) 정보 저장
+    else if (!next) {
+      const recommendedTeamIds = uniq(concat(bestRecommendedTeamIds, otherRecommendedTeamIds));
+      await this.upsertRecommendedTeamIdsByUserIdAndRecommendedTeamIds(matchingTeam.ownerId, recommendedTeamIds);
+    }
   }
 }

@@ -4,9 +4,25 @@ import { CustomRepository } from 'src/database/typeorm-ex.decorator';
 import { Repository } from 'typeorm';
 import { UserStudentCard } from '../entities/user-student-card.entity';
 import { SaveStudentCardDto } from 'src/auth/dtos/save-student-card.dto';
+import { AdminGetUserWithStudentCardDto } from 'src/admin/dtos/admin-get-user.dto';
 
 @CustomRepository(UserStudentCard)
 export class UserStudentCardRepository extends Repository<UserStudentCard> {
+  async getAllUsersWithStudentCard(): Promise<{ users: AdminGetUserWithStudentCardDto[] }> {
+    const users = await this.createQueryBuilder('user_student_card')
+      .select([
+        'user.id AS userId',
+        'user.nickname AS nickname',
+        'user.birth AS birth',
+        'user.university AS university',
+        'user.gender AS gender',
+        'user_student_card.studentCardUrl AS studentCardUrl',
+      ])
+      .leftJoin(`user_student_card.user`, 'user')
+      .getRawMany();
+    return { users };
+  }
+
   async checkUserStudentCardByUserId(userId: number): Promise<Boolean> {
     const userStudentCard = await this.createQueryBuilder('user_student_card')
       .select()
