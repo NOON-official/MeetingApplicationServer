@@ -50,7 +50,7 @@ export class AdminService {
     return this.teamsService.deleteTeamById(teamId);
   }
 
-  async getAdminMatchingsApplied(): Promise<{ matchings: AdminGetAppliedTeamDto[] }> {
+  async getAdminMatchingsApplied(): Promise<{ appliedandreceiveds: AdminGetAppliedTeamDto[] }> {
     return this.matchingsService.getAdminMatchingsApplied();
   }
 

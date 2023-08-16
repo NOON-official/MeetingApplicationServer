@@ -249,7 +249,7 @@ export class MatchingsService {
   }
 
   // 신청한/신청받은 팀 조회
-  async getAdminMatchingsApplied(): Promise<{ matchings: AdminGetAppliedTeamDto[] }> {
+  async getAdminMatchingsApplied(): Promise<{ appliedandreceiveds: AdminGetAppliedTeamDto[] }> {
     return this.matchingsRepository.getAdminMatchingsApplied();
   }
 

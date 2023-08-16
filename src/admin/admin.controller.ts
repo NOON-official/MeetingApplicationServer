@@ -84,7 +84,7 @@ export class AdminController {
   })
   @ApiOkResponse({})
   @Get('matchings/applied')
-  getAdminMatchingsApplied(): Promise<{ matchings: AdminGetAppliedTeamDto[] }> {
+  getAdminMatchingsApplied(): Promise<{ appliedandreceiveds: AdminGetAppliedTeamDto[] }> {
     return this.adminService.getAdminMatchingsApplied();
   }
 
