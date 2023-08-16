@@ -127,22 +127,6 @@ export class UsersRepository extends Repository<User> {
     return await this.find();
   }
 
-  async getAllUsersWithStudentCard(): Promise<{ users: AdminGetUserWithStudentCardDto[] }> {
-    const users = await this.createQueryBuilder('users')
-      .select([
-        'user.id AS userId',
-        'user.nickname AS nickname',
-        'user.birth AS birth',
-        'user.university AS university',
-        'user.gender AS gender',
-        'userStudentCard.studentCardUrl AS studentCardUrl',
-      ])
-      .leftJoin(`user.userStudentCard`, 'userStudentCard')
-      .getRawMany();
-
-    return { users };
-  }
-
   async applyByUserStudentCard(userId: number): Promise<void> {
     const result = await this.update({ id: userId }, { isVerified: true });
 

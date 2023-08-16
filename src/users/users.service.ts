@@ -306,7 +306,7 @@ export class UsersService {
   }
 
   async getAllUsersWithStudentCard(): Promise<{ users: AdminGetUserWithStudentCardDto[] }> {
-    return this.usersRepository.getAllUsersWithStudentCard();
+    return this.userStudentCardRepository.getAllUsersWithStudentCard();
   }
 
   async getInvitationSuccessUsers(): Promise<{ users: AdminGetInvitationSuccessUserDto[] }> {
