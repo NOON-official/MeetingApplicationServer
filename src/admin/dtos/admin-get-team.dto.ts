@@ -89,12 +89,6 @@ export class AdminGetTeamDto {
     example: 1,
   })
   userId: number;
-
-  @ApiProperty({
-    description: '거절한 회원 ID들',
-    example: [11, 22, 33],
-  })
-  excludedTeamIds?: number[] | null;
 }
 
 export class AdminGetAppliedTeamDto {
@@ -132,13 +126,13 @@ export class AdminGetAppliedTeamDto {
     description: '상대팀 대표 유저 닉네임',
     example: '미팅이',
   })
-  partnerTeamOwner: string;
+  partnerTeamOwnernickname: string;
 
   @ApiProperty({
     description: '상대팀 대표 핸드폰 번호',
     example: '01012345678',
   })
-  partnerTeamOwnerPhone: string;
+  partnerTeamOwnerphone: string;
 
   @ApiProperty({
     description: '신청일시',

@@ -1,6 +1,7 @@
 import { CustomRepository } from 'src/database/typeorm-ex.decorator';
 import { Ting } from '../entities/ting.entity';
 import { Repository } from 'typeorm';
+import { CreateTingDto } from '../dtos/create-ting.dto';
 
 @CustomRepository(Ting)
 export class TingsRepository extends Repository<Ting> {
@@ -36,5 +37,13 @@ export class TingsRepository extends Repository<Ting> {
       .set({ tingCount: () => `tingCount + ${tingCount}` })
       .where('userId = :userId', { userId })
       .execute();
+  }
+
+  async createTingByUserId(createTingDto: CreateTingDto): Promise<Ting> {
+    const ting = this.create(createTingDto);
+
+    await this.save(ting);
+
+    return ting;
   }
 }
