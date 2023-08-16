@@ -123,13 +123,12 @@ export class TeamsService {
     return this.teamsRepository.getMembersCountTotal();
   }
 
-  // async getTeamCountByStatusAndMembercountAndGender(
-  //   status: MatchingStatus.APPLIED,
-  //   membercount: '2' | '3' | '4',
-  //   gender: TeamGender,
-  // ): Promise<{ teamCount: number }> {
-  //   return this.teamsRepository.getTeamCountByStatusAndMembercountAndGender(status, membercount, gender);
-  // }
+  async getTeamCountByMembercountAndGender(
+    membercount: '2' | '3' | '4',
+    gender: TeamGender,
+  ): Promise<{ teamCount: number }> {
+    return this.teamsRepository.getTeamCountByMembercountAndGender(membercount, gender);
+  }
 
   // async getTeamCount(): Promise<{
   //   teamsPerRound: number;
