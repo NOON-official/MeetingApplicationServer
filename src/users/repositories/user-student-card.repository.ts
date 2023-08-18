@@ -16,9 +16,11 @@ export class UserStudentCardRepository extends Repository<UserStudentCard> {
         'user.birth AS birth',
         'user.university AS university',
         'user.gender AS gender',
+        'user.approval AS approval',
         'user_student_card.studentCardUrl AS studentCardUrl',
       ])
       .leftJoin(`user_student_card.user`, 'user')
+      .where('user.approval IS NULL')
       .getRawMany();
     return { users };
   }
