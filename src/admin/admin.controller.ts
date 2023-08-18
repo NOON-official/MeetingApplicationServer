@@ -230,6 +230,7 @@ export class AdminController {
             university: '한국외국어대학교',
             gender: '남자',
             studentCardUrl: 'https://www.meeting.me/image/3adsasd',
+            approval: null,
           },
           {
             userId: 2,
@@ -238,6 +239,7 @@ export class AdminController {
             university: '경희대학교',
             gender: '여자',
             studentCardUrl: 'https://www.meeting.me/image/3adsasd',
+            approval: null,
           },
         ],
       },
@@ -264,7 +266,7 @@ export class AdminController {
   })
   @ApiOkResponse({ description: 'OK' })
   @Put('users/:userId/student-card/decline')
-  putAdminUsersUserIdVerify(@Param('userId') userId: number): Promise<void> {
+  putAdminUsersUserIdStudentCardDecline(@Param('userId') userId: number): Promise<void> {
     return this.adminService.updateUserDeny(userId);
   }
 
