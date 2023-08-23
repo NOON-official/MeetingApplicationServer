@@ -48,8 +48,8 @@ export class TeamsService {
     const {
       memberCount,
       memberCounts,
-      teamAvailableDate,
       areas,
+      teamAvailableDate,
       teamName,
       intro,
       drink,
@@ -59,37 +59,69 @@ export class TeamsService {
       kakaoId,
     } = createTeamDto;
 
-    // 이미 매칭중인 팀이 있는 경우
-    const existingTeam = await this.teamsRepository.getTeamIdByUserId(userId);
-    if (!!existingTeam.teamId) {
-      throw new BadRequestException('team is already exists');
-    }
-
     const user = await this.usersService.getUserById(userId);
-    const gender = user.gender === 'male' ? 1 : 2;
+    const team = await this.teamsRepository.getTeamIdByUserId(userId);
 
-    // 팀 정보 저장
-    const { teamId } = await this.teamsRepository.createTeam(
-      {
-        gender,
-        memberCount,
-        teamAvailableDate,
-        areas,
-        teamName,
-        intro,
-        drink,
-        prefAge,
-        prefVibes,
-        memberCounts,
-        kakaoId,
-      },
-      user,
-    );
+    if (team.teamId !== null) {
+      const existingTeam = await this.getTeamById(team.teamId);
+      const teamData = {
+        gender: existingTeam.gender,
+        memberCount: memberCount ?? existingTeam.memberCount,
+        memberCounts: memberCounts ?? existingTeam.memberCounts,
+        teamAvailableDate: teamAvailableDate ?? existingTeam.teamAvailableDate,
+        areas: areas ?? existingTeam.areas,
+        teamName: teamName ?? existingTeam.teamName,
+        intro: intro ?? existingTeam.intro,
+        drink: drink ?? existingTeam.drink,
+        prefAge: prefAge ?? existingTeam.prefAge,
+        prefVibes: prefVibes ?? existingTeam.prefVibes,
+        kakaoId: kakaoId ?? existingTeam.kakaoId,
+      };
 
-    const team = await this.getTeamById(teamId);
+      const { teamId: newTeamId } = await this.teamsRepository.createTeam(teamData, user);
+      const newTeam = await this.getTeamById(newTeamId);
 
-    // 팀 멤버 저장
-    await this.teamsRepository.createTeamMember(members, team);
+      let newMembers: CreateMemberDto[] | getMemberDto[];
+
+      if (!members || members?.length === 0) {
+        const existedTeam = await this.getApplicationTeamById(existingTeam.id);
+        newMembers = existedTeam.members;
+        newMembers.map((m: TeamMember) => {
+          delete m.id;
+        });
+      } else {
+        newMembers = members;
+      }
+      await this.teamsRepository.createTeamMember(newMembers, newTeam);
+
+      await this.teamsRepository.deleteTeamById(existingTeam.id);
+    } else {
+      const gender = user.gender === 'male' ? 1 : 2;
+      console.log(user);
+
+      // 팀 정보 저장
+      const { teamId } = await this.teamsRepository.createTeam(
+        {
+          gender,
+          memberCount,
+          teamAvailableDate,
+          areas,
+          teamName,
+          intro,
+          drink,
+          prefAge,
+          prefVibes,
+          memberCounts,
+          kakaoId,
+        },
+        user,
+      );
+
+      const team = await this.getTeamById(teamId);
+
+      // 팀 멤버 저장
+      await this.teamsRepository.createTeamMember(members, team);
+    }
   }
 
   // 성별 별로 팀 조회
