@@ -3,6 +3,7 @@ import { MatchingsService } from './matchings.service';
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { ApiOperation } from '@nestjs/swagger';
 import {
+  ApiBadRequestResponse,
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiNotFoundResponse,
@@ -63,6 +64,27 @@ export class MatchingsController {
     description: '매칭 신청하는 팀ID와 신청받는 팀ID를 보내주시면 됩니다.',
   })
   @ApiCreatedResponse({ description: 'Created' })
+  @ApiBadRequestResponse({
+    schema: {
+      example: 'insufficient ting',
+      anyOf: [
+        { description: 'invalid team gender' },
+        { description: 'invalid access' },
+        { description: 'already applied team' },
+        { description: 'already received team' },
+        { description: 'insufficient ting' },
+      ],
+    },
+  })
+  @ApiNotFoundResponse({
+    schema: {
+      example: "Can't find team with id ${appliedTeamId}",
+      anyOf: [
+        { description: "Can't find team with id ${appliedTeamId}" },
+        { description: "Can't find team with id ${receivedTeamId}" },
+      ],
+    },
+  })
   @Post(':appliedTeamId/:receivedTeamId')
   @UseGuards(AccessTokenGuard, TeamOwnerGuard)
   postMatchingsAppliedTeamIdReceivedTeamId(
