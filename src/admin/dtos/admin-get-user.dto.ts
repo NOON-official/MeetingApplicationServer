@@ -110,4 +110,10 @@ export class AdminGetUserWithStudentCardDto {
     example: 'https://www.meeting.me/image/3adsasd',
   })
   studentCardUrl: string;
+
+  @ApiProperty({
+    description: '유저 인증 여부',
+    example: null,
+  })
+  aprroval: boolean | null;
 }
