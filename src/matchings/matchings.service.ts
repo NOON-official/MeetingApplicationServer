@@ -320,8 +320,6 @@ export class MatchingsService {
     // 이미 매칭 내역이 존재하는 팀인 경우 (삭제된 경우 제외)
     const existingMatching = await this.getMatchingByTeamId(appliedTeamId);
 
-    console.log(existingMatching);
-
     if (!!existingMatching) {
       // 이미 신청한 팀인 경우
       if (existingMatching.appliedTeamId === appliedTeamId && existingMatching.receivedTeamId === receivedTeamId) {
