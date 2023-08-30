@@ -66,6 +66,8 @@ export class TeamsService {
 
     if (team.teamId !== null) {
       const existingTeam = await this.getTeamById(team.teamId);
+
+      // 업데이트 팀 정보
       const teamData = {
         gender: existingTeam.gender,
         memberCount: memberCount ?? existingTeam.memberCount,
@@ -80,23 +82,15 @@ export class TeamsService {
         kakaoId: kakaoId ?? existingTeam.kakaoId,
       };
 
-      const { teamId: newTeamId } = await this.teamsRepository.createTeam(teamData, user);
-      const newTeam = await this.getTeamById(newTeamId);
+      await this.teamsRepository.updateTeam(existingTeam.id, teamData);
 
-      let newMembers: CreateMemberDto[] | getMemberDto[];
-
-      if (!members || members?.length === 0) {
-        const existedTeam = await this.getApplicationTeamById(existingTeam.id);
-        newMembers = existedTeam.members;
-        newMembers.map((m: TeamMember) => {
-          delete m.id;
+      if (members || members?.length !== 0) {
+        const alreadyTeam = await this.getApplicationTeamById(existingTeam.id);
+        const newMembers = alreadyTeam.members;
+        newMembers.map(async (newMember: TeamMember, index: number) => {
+          await this.teamsRepository.updateTeamMember(newMember.id, members[index]);
         });
-      } else {
-        newMembers = members;
       }
-      await this.teamsRepository.createTeamMember(newMembers, newTeam);
-
-      await this.teamsRepository.deleteTeamById(existingTeam.id);
     } else {
       const gender = user.gender === 'male' ? 1 : 2;
 
