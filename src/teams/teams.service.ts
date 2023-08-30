@@ -282,7 +282,7 @@ export class TeamsService {
       kakaoId,
     } = updateTeamDto;
 
-    // 새로 생성할 팀 정보
+    // 업데이트 팀 정보
     const teamData = {
       gender: team.gender,
       memberCount: memberCount ?? team.memberCount,
@@ -297,27 +297,17 @@ export class TeamsService {
       kakaoId: kakaoId ?? team.kakaoId,
     };
 
-    // 새로운 팀 생성
-    const { teamId: newTeamId } = await this.teamsRepository.createTeam(teamData, team.user);
-    const newTeam = await this.getTeamById(newTeamId);
+    await this.teamsRepository.updateTeam(teamId, teamData);
 
-    // 새로운 멤버 생성
-    let newMembers: CreateMemberDto[] | getMemberDto[];
-
-    if (!members || members?.length === 0) {
+    if (members || members?.length !== 0) {
       const existingTeam = await this.getApplicationTeamById(teamId);
-      newMembers = existingTeam.members;
+      const newMembers = existingTeam.members;
       newMembers.map((m: TeamMember) => {
         delete m.id;
       });
-    } else {
-      newMembers = members;
+
+      await this.teamsRepository.createTeamMember(members, team);
     }
-
-    await this.teamsRepository.createTeamMember(newMembers, newTeam);
-
-    // 기존 팀 삭제
-    await this.teamsRepository.deleteTeamById(teamId);
   }
 
   async deleteTeamById(teamId: number): Promise<void> {
