@@ -6,6 +6,8 @@ import {
   DeleteDateColumn,
   Entity,
   JoinColumn,
+  ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   Unique,
@@ -40,14 +42,14 @@ export class Matching extends BaseEntity {
   @Column({ type: 'int' })
   appliedTeamId: number;
 
-  @OneToOne(() => Team, (team) => team.appliedTeamMatching, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Team, (team) => team.appliedTeamMatching, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'appliedTeamId' })
   appliedTeam: Team;
 
   @Column({ type: 'int' })
   receivedTeamId: number;
 
-  @OneToOne(() => Team, (team) => team.receivedTeamMatching, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Team, (team) => team.receivedTeamMatching, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'receivedTeamId' })
   receivedTeam: Team;
 
