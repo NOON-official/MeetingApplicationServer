@@ -65,6 +65,16 @@ export class TeamsRepository extends Repository<Team> {
       .execute();
   }
 
+  async updateTeamMember(id: number, teamMemberData: CreateMemberDto) {
+    await this.createQueryBuilder()
+      .update(TeamMember)
+      .set({
+        ...teamMemberData,
+      })
+      .where('id = :id', { id })
+      .execute();
+  }
+
   // 유저 신청 내역 조회
   async getTeamsByUserId(userId: number): Promise<{ teamsWithMatching: Team[] }> {
     // // 팀 성별 가져오기
