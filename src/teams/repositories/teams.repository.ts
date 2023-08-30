@@ -11,9 +11,10 @@ import { TeamGender } from '../entities/team-gender.enum';
 import { MatchingRound } from 'src/matchings/constants/matching-round';
 import { UpdateTeam } from '../interfaces/update-team.interface';
 import { AdminGetTeamDto } from 'src/admin/dtos/admin-get-team.dto';
-import { GetTeamOwnerDto } from '../dtos/get-team.dto';
+import { GetTeamOwnerDto, getMemberDto } from '../dtos/get-team.dto';
 import { GetTeamCardDto } from '../dtos/get-team-card.dto';
 import { TeamForMatching } from '../interfaces/team-for-matching.interface';
+import { UpdateTeamDto } from '../dtos/update-team.dto';
 
 @CustomRepository(Team)
 export class TeamsRepository extends Repository<Team> {
@@ -51,6 +52,16 @@ export class TeamsRepository extends Repository<Team> {
           return { ...m, team };
         }),
       )
+      .execute();
+  }
+
+  async updateTeam(id: number, teamData: CreateTeam) {
+    await this.createQueryBuilder()
+      .update(Team)
+      .set({
+        ...teamData,
+      })
+      .where('id = :id', { id })
       .execute();
   }
 
