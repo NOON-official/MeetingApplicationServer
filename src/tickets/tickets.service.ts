@@ -3,6 +3,7 @@ import { User } from './../users/entities/user.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { TicketsRepository } from './repositories/tickets.repository';
 import { Ticket } from './entities/ticket.entity';
+import { GetTicketDto } from './dtos/get-ticket.dto';
 
 @Injectable()
 export class TicketsService {
@@ -50,5 +51,9 @@ export class TicketsService {
 
   async deleteTicketsByUserId(userId: number): Promise<void> {
     return this.ticketsRepository.deleteTicketsByUserId(userId);
+  }
+
+  async getAllTickets(): Promise<{ tickets: GetTicketDto[] }> {
+    return this.ticketsRepository.getAllTickets();
   }
 }

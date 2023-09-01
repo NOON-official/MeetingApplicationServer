@@ -116,6 +116,25 @@ export class TeamsService {
 
       // 팀 멤버 저장
       await this.teamsRepository.createTeamMember(members, team);
+
+      const matchingTeam: TeamForMatching = {
+        id: team.id,
+        ownerId: team.ownerId,
+        gender: gender === 1 ? TeamGender.male : TeamGender.female,
+        age: Math.round(members.reduce((total, member) => total + member.age, 0) / members.length),
+        memberCount,
+        memberCounts,
+        availableDate: teamAvailableDate,
+        areas,
+        prefAge,
+        excludedTeamIds: team.excludedTeamIds,
+        createdAt: team.createdAt,
+      };
+
+      const { teams: matchedTeams } = await this.getTeamsByGenderForMatching(
+        gender === 1 ? TeamGender.female : TeamGender.male,
+      );
+      await this.matchTeam(matchingTeam, matchedTeams, false);
     }
   }
 

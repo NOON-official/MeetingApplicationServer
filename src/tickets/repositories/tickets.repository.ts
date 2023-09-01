@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { Order } from 'src/orders/entities/order.entity';
 import * as moment from 'moment-timezone';
+import { GetTicketDto } from '../dtos/get-ticket.dto';
 
 @CustomRepository(Ticket)
 export class TicketsRepository extends Repository<Ticket> {
@@ -84,5 +85,15 @@ export class TicketsRepository extends Repository<Ticket> {
       .where('ticket.userId = :userId', { userId })
       .softDelete()
       .execute();
+  }
+
+  async getAllTickets(): Promise<{ tickets: GetTicketDto[] }> {
+    const tickets = await this.createQueryBuilder('ticket')
+      .select('ticket.userId AS userId')
+      .addSelect('COUNT(*) AS ticketCount')
+      .where('ticket.usedAt IS NULL')
+      .groupBy('userId')
+      .getRawMany();
+    return { tickets };
   }
 }

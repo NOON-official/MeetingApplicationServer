@@ -270,6 +270,16 @@ export class AdminController {
     return this.adminService.updateUserDeny(userId);
   }
 
+  @ApiOperation({
+    summary: '티켓 전부 팅으로 교환',
+    description: '일회용',
+  })
+  @ApiOkResponse({ description: 'OK' })
+  @Post('users/ting')
+  postAdminChangeTicketToTing(): Promise<void> {
+    return this.adminService.changeTicketToTing();
+  }
+
   // @ApiBearerAuth()
   // @ApiOperation({
   //   summary: '신청자 조회',
