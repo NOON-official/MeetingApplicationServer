@@ -135,12 +135,21 @@ export class UsersService {
     await this.usersRepository.updateUniversity(userId, updateUniversity);
     const user = await this.usersRepository.getUserById(userId);
     if (user && user.deletedAt === null) {
+      const ting = await this.tingsService.getTingCountByUserId(userId);
       if (user.gender === 'male') {
-        const createTingDto = { userId: user.id, tingCount: MaleSignUp };
-        const ting = await this.tingsService.createTingByUserId(createTingDto);
+        if (ting.tingCount === -1) {
+          const createTingDto = { userId: user.id, tingCount: MaleSignUp };
+          await this.tingsService.createTingByUserId(createTingDto);
+        } else {
+          await this.tingsService.refundTingByUserIdAndTingCount(user.id, MaleSignUp);
+        }
       } else if (user.gender === 'female') {
-        const createTingDto = { userId: user.id, tingCount: FemaleSignUp };
-        await this.tingsService.createTingByUserId(createTingDto);
+        if (ting.tingCount === -1) {
+          const createTingDto = { userId: user.id, tingCount: FemaleSignUp };
+          await this.tingsService.createTingByUserId(createTingDto);
+        } else {
+          await this.tingsService.refundTingByUserIdAndTingCount(user.id, FemaleSignUp);
+        }
       }
     }
   }

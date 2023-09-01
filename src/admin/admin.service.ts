@@ -427,4 +427,18 @@ export class AdminService {
     // 이용권 개수만큼 삭제
     return this.ticketsService.deleteTicketsByUserIdAndDeleteLimit(userId, ticketCount);
   }
+
+  async changeTicketToTing(): Promise<void> {
+    const tickets = await this.ticketsService.getAllTickets();
+    tickets.tickets.map(async (ticket) => {
+      const addTing = ticket.ticketCount * 10;
+      const tingCount = await this.tingsService.getTingCountByUserId(ticket.userId);
+      if (tingCount.tingCount === -1) {
+        const createTingData = { userId: ticket.userId, tingCount: addTing };
+        await this.tingsService.createTingByUserId(createTingData);
+      } else {
+        await this.tingsService.refundTingByUserIdAndTingCount(ticket.userId, addTing);
+      }
+    });
+  }
 }
