@@ -589,7 +589,7 @@ export class TeamsService {
     });
 
     // 1. 지역 일치하는 팀 조회
-    const areaSameTeamIds = matchedTeams
+    const areaSameTeamIds = availableTeams
       .filter((matchedTeam) => {
         return matchingTeam.areas.some((a) => matchedTeam.areas.includes(a));
       })
