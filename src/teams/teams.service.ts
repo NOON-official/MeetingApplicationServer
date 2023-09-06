@@ -695,4 +695,14 @@ export class TeamsService {
       await this.upsertRecommendedTeamIdsByUserIdAndRecommendedTeamIds(matchingTeam.ownerId, recommendedTeamIds);
     }
   }
+
+  async getAllNextRecommendedTeams(): Promise<{ teams: NextRecommendedTeam[] }> {
+    const teams = await this.nextRecommendedTeamsRepository.getAllNextRecommendedTeams();
+    return { teams };
+  }
+
+  async getAllTeams(): Promise<{ teams: Team[] }> {
+    const teams = await this.teamsRepository.getAllTeams();
+    return { teams };
+  }
 }

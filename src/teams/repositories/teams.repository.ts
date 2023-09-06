@@ -31,6 +31,10 @@ export class TeamsRepository extends Repository<Team> {
     return { teamId: result.identifiers[0].id };
   }
 
+  async getAllTeams(): Promise<Team[]> {
+    return await this.find();
+  }
+
   // 팀 정보 조회
   async getTeamById(teamId: number): Promise<Team> {
     const team = this.findOne({
