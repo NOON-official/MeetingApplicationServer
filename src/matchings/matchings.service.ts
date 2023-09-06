@@ -120,16 +120,6 @@ export class MatchingsService {
 
     // 매칭 수락하기
     await this.matchingsRepository.acceptMatching(matchingId);
-
-    // 상대팀이 이미 수락한 경우 두 팀 모두 매칭성공 문자 발송
-    if (matching.appliedTeamIsAccepted === true || matching.receivedTeamIsAccepted === true) {
-      const succeededTeamIds = [matching.appliedTeamId, matching.receivedTeamId];
-      succeededTeamIds.forEach((id) => {
-        const matchingSucceededEvent = new MatchingSucceededEvent();
-        matchingSucceededEvent.teamId = id;
-        this.eventEmitter.emit('matching.succeeded', matchingSucceededEvent);
-      });
-    }
   }
 
   async deleteTicketInfoByMatchingIdAndGender(matchingId: number, gender: TeamGender) {
@@ -150,15 +140,6 @@ export class MatchingsService {
     if (!appliedTeam || !!appliedTeam.deletedAt) {
       throw new NotFoundException(`Can't find team with id ${refusedTeamId}`);
     }
-
-    // 상대팀 팅 환불
-    const appliedTeamOwnerId = matching.appliedTeam.ownerId;
-    await this.tingsService.refundTingByUserIdAndTingCount(appliedTeamOwnerId, TingNumberPerAction.ACCEPT);
-
-    // 매칭 거절 문자 보내기
-    const matchingPartnerTeamRefusedEvent = new MatchingPartnerTeamRefusedEvent();
-    matchingPartnerTeamRefusedEvent.teamId = matching.appliedTeamId;
-    this.eventEmitter.emit('matching.partnerTeamRefused', matchingPartnerTeamRefusedEvent);
 
     // 거절한 상대를 기록하기
     await this.teamsService.updateExcludedTeamsByUserIdAndExcludedTeamId(matching.receivedTeam.ownerId, appliedTeam.id);

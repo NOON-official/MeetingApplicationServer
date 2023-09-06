@@ -589,7 +589,7 @@ export class TeamsService {
     });
 
     // 1. 지역 일치하는 팀 조회
-    const areaSameTeamIds = matchedTeams
+    const areaSameTeamIds = availableTeams
       .filter((matchedTeam) => {
         return matchingTeam.areas.some((a) => matchedTeam.areas.includes(a));
       })
@@ -694,5 +694,15 @@ export class TeamsService {
       const recommendedTeamIds = uniq(concat(bestRecommendedTeamIds, otherRecommendedTeamIds));
       await this.upsertRecommendedTeamIdsByUserIdAndRecommendedTeamIds(matchingTeam.ownerId, recommendedTeamIds);
     }
+  }
+
+  async getAllNextRecommendedTeams(): Promise<{ teams: NextRecommendedTeam[] }> {
+    const teams = await this.nextRecommendedTeamsRepository.getAllNextRecommendedTeams();
+    return { teams };
+  }
+
+  async getAllTeams(): Promise<{ teams: Team[] }> {
+    const teams = await this.teamsRepository.getAllTeams();
+    return { teams };
   }
 }

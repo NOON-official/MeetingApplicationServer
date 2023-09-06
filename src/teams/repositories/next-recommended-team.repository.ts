@@ -41,4 +41,8 @@ export class NextRecommendedTeamsRepository extends Repository<NextRecommendedTe
   ): Promise<void> {
     await this.upsert({ userId, nextRecommendedTeamIds }, ['userId']);
   }
+
+  async getAllNextRecommendedTeams(): Promise<NextRecommendedTeam[]> {
+    return await this.find();
+  }
 }

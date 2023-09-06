@@ -10,6 +10,7 @@ import { LoggerService } from 'src/common/utils/logger-service.util';
 import { MatchingStatus } from 'src/matchings/interfaces/matching-status.enum';
 import * as moment from 'moment-timezone';
 import { MatchingOurteamNotRespondedEvent } from 'src/matchings/events/matching-ourteam-not-responded.event';
+import { NextRecommendedTeamUpdatedEvent } from 'src/teams/events/next-recommended-team-updated.event';
 
 @Injectable()
 export class TasksService {
@@ -163,6 +164,20 @@ export class TasksService {
     // 여자팀의 추천팀 업데이트
     for (const femaleTeam of femaleTeams) {
       await this.teamsService.matchTeam(femaleTeam, maleTeams);
+    }
+  }
+
+  // 매일 오후 11:00에 실행 (UTC 14:00)
+  // 프로필이 있는 유저에게 알림 문자 발송
+  @Cron('0 14 * * *')
+  async handleNextRecommendedTeamUpdatedTeams() {
+    const { teams } = await this.teamsService.getAllTeams();
+    for await (const team of teams) {
+      const nextRecommendedTeamUpdatedEvent = new NextRecommendedTeamUpdatedEvent();
+
+      // 추천팀 업데이트 알림 문자 보내기
+      nextRecommendedTeamUpdatedEvent.user = team.user;
+      this.eventEmitter.emit('next-recommended-team.updated', nextRecommendedTeamUpdatedEvent);
     }
   }
 }
