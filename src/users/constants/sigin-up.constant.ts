@@ -1,2 +1,2 @@
-export const MaleSignUp = 6;
-export const FemaleSignUp = 20;
+export const MaleSignUp = 5;
+export const FemaleSignUp = 30;
