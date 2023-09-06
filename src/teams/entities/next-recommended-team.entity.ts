@@ -19,7 +19,7 @@ export class NextRecommendedTeam extends BaseEntity {
   @Column({ type: 'int' })
   userId: number;
 
-  @OneToOne(() => User, (user) => user.nextRecommendedTeam, { onDelete: 'CASCADE' })
+  @OneToOne(() => User, (user) => user.nextRecommendedTeam, { onDelete: 'CASCADE', eager: true })
   @JoinColumn({ name: 'userId' })
   user: User;
 

@@ -99,9 +99,9 @@ export class User extends BaseEntity {
   @OneToOne(() => Ting, { cascade: true })
   ting: Ting;
 
-  @OneToOne(() => RecommendedTeam, { cascade: true })
+  @OneToOne(() => RecommendedTeam, (recommendedTeam) => recommendedTeam.user, { cascade: true })
   recommendedTeam: RecommendedTeam;
 
-  @OneToOne(() => NextRecommendedTeam, { cascade: true })
+  @OneToOne(() => NextRecommendedTeam, (nextRecommendedTeam) => nextRecommendedTeam.user, { cascade: true })
   nextRecommendedTeam: NextRecommendedTeam;
 }
