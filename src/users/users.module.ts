@@ -13,6 +13,7 @@ import { UserStudentCardRepository } from './repositories/user-student-card.repo
 import { MatchingsModule } from 'src/matchings/matchings.module';
 import { TingsModule } from 'src/tings/tings.module';
 import { StudentCardVerifiedListener } from './listeners/student-card-verified.listener';
+import { StudentCardDeclinedListener } from './listeners/student-card-declined.listener';
 
 @Module({
   imports: [
@@ -26,7 +27,7 @@ import { StudentCardVerifiedListener } from './listeners/student-card-verified.l
     forwardRef(() => TingsModule),
   ],
   controllers: [UsersController],
-  providers: [UsersService, StudentCardVerifiedListener],
+  providers: [UsersService, StudentCardVerifiedListener, StudentCardDeclinedListener],
   exports: [UsersService],
 })
 export class UsersModule {}

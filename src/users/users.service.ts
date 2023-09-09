@@ -31,6 +31,7 @@ import { UserStudentCard } from './entities/user-student-card.entity';
 import { FemaleSignUp, MaleSignUp } from './constants/sigin-up.constant';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { StudentCardVerifiedEvent } from './events/student-card-verified.event';
+import { StudentCardDeclinedEvent } from './events/student-card-declined.event';
 
 @Injectable()
 export class UsersService {
@@ -360,7 +361,12 @@ export class UsersService {
       throw new BadRequestException(`user with user id ${userId} is not exists`);
     }
 
-    return this.usersRepository.declineUserByStudentCard(userId);
+    await this.usersRepository.declineUserByStudentCard(userId);
+
+    // 학생증 인증 거절 결과 문자 발송
+    const studentCardDeclinedEvent = new StudentCardDeclinedEvent();
+    studentCardDeclinedEvent.user = user;
+    this.eventEmitter.emit('student-card.declined', studentCardDeclinedEvent);
   }
 
   async resetApprovalUserStudentCard(userId: number): Promise<void> {
