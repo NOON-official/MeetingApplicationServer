@@ -120,6 +120,11 @@ export class MatchingsService {
 
     // 매칭 수락하기
     await this.matchingsRepository.acceptMatching(matchingId);
+
+    // 매칭 수락받은 유저에게 문자 발송
+    const matchingSucceededEvent = new MatchingSucceededEvent();
+    matchingSucceededEvent.user = appliedTeam.user;
+    this.eventEmitter.emit('matching.succeeded', matchingSucceededEvent);
   }
 
   async deleteTicketInfoByMatchingIdAndGender(matchingId: number, gender: TeamGender) {
