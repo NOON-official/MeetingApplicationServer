@@ -3,14 +3,14 @@ import { Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { SmsType } from 'src/common/sms/enums/sms-type.enum';
 import { ContentType } from 'src/common/sms/enums/content-type.enum';
-import { MatchingSucceededEvent } from '../events/matching-succeeded.event';
-import { MatchingSucceededContentConstant } from 'src/common/sms/constants/matching-succeeded-content.constant';
+import { MatchingReceivedEvent } from '../events/matching-received.event';
+import { MatchingReceivedContentConstant } from 'src/common/sms/constants/matching-received-content.constant';
 
 @Injectable()
-export class MatchingSucceededListener {
-  // 매칭 수락받은 유저에게 문자 보내기
-  @OnEvent('matching.succeeded', { async: true })
-  async handleMatchingSucceededEvent(event: MatchingSucceededEvent) {
+export class MatchingReceivedListener {
+  // 매칭 신청받은 유저에게 문자 보내기
+  @OnEvent('matching.received', { async: true })
+  async handleMatchingReceivedEvent(event: MatchingReceivedEvent) {
     const user = event.user;
 
     !user.deletedAt && // 회원 탈퇴한 경우 제외
@@ -18,8 +18,8 @@ export class MatchingSucceededListener {
         SmsType.LMS,
         ContentType.COMM,
         user.phone,
-        MatchingSucceededContentConstant.CONTENT,
-        MatchingSucceededContentConstant.SUBJECT,
+        MatchingReceivedContentConstant.CONTENT,
+        MatchingReceivedContentConstant.SUBJECT,
       );
   }
 }
