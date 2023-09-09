@@ -12,7 +12,7 @@ export class NextRecommendedTeamUpdatedListener {
   @OnEvent('next-recommended-team.updated', { async: true })
   async handleNextRecommendedTeamUpdatedEvent(event: NextRecommendedTeamUpdatedEvent) {
     const user = event.user;
-    console.log(user.phone);
+
     !user.deletedAt && // 회원 탈퇴한 경우 제외
       postNaverCloudSMS(
         SmsType.LMS,
