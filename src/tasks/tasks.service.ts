@@ -168,16 +168,28 @@ export class TasksService {
   }
 
   // 매일 오후 11:00에 실행 (UTC 14:00)
-  // 프로필이 있는 유저에게 알림 문자 발송
+  // 추천팀이 업데이트된 유저에게 알림 문자 발송
   @Cron('0 14 * * *')
   async handleNextRecommendedTeamUpdatedTeams() {
-    const { teams } = await this.teamsService.getAllTeams();
-    for await (const team of teams) {
-      const nextRecommendedTeamUpdatedEvent = new NextRecommendedTeamUpdatedEvent();
+    const { teams: nextRecommendedTeams } = await this.teamsService.getAllNextRecommendedTeams();
+    for await (const team of nextRecommendedTeams) {
+      const nextRecommendedTeamIds = team.nextRecommendedTeamIds;
+      const userId = team.userId;
+      const user = team.user;
 
-      // 추천팀 업데이트 알림 문자 보내기
-      nextRecommendedTeamUpdatedEvent.user = team.user;
-      this.eventEmitter.emit('next-recommended-team.updated', nextRecommendedTeamUpdatedEvent);
+      // (1) 다음 추천팀이 존재하고,
+      if (nextRecommendedTeamIds?.length > 0) {
+        const recommendedTeam = await this.teamsService.getRecommendedTeamByUserId(userId);
+        const recommendedTeamIds = recommendedTeam?.recommendedTeamIds;
+
+        // (2) 기존 추천팀 외에 새로운 추천팀이 존재하는 경우
+        if (!nextRecommendedTeamIds.every((nr) => recommendedTeamIds?.includes(nr))) {
+          const nextRecommendedTeamUpdatedEvent = new NextRecommendedTeamUpdatedEvent();
+          // 추천팀 업데이트 알림 문자 보내기
+          nextRecommendedTeamUpdatedEvent.user = user;
+          this.eventEmitter.emit('next-recommended-team.updated', nextRecommendedTeamUpdatedEvent);
+        }
+      }
     }
   }
 }
