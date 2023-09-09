@@ -29,6 +29,8 @@ import { MatchingsService } from 'src/matchings/matchings.service';
 import { TingsService } from 'src/tings/tings.service';
 import { UserStudentCard } from './entities/user-student-card.entity';
 import { FemaleSignUp, MaleSignUp } from './constants/sigin-up.constant';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { StudentCardVerifiedEvent } from './events/student-card-verified.event';
 
 @Injectable()
 export class UsersService {
@@ -50,6 +52,7 @@ export class UsersService {
     private ordersService: OrdersService,
     @Inject(forwardRef(() => MatchingsService))
     private matchingsService: MatchingsService,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async getUserByKakaoUid(kakaoUid: number): Promise<User> {
@@ -343,7 +346,12 @@ export class UsersService {
       throw new BadRequestException(`user with user id ${userId} is not exists`);
     }
 
-    return this.usersRepository.verifyUserByStudentCard(userId);
+    await this.usersRepository.verifyUserByStudentCard(userId);
+
+    // 학생증 인증 승인 결과 문자 발송
+    const studentCardVerifiedEvent = new StudentCardVerifiedEvent();
+    studentCardVerifiedEvent.user = user;
+    this.eventEmitter.emit('student-card.verified', studentCardVerifiedEvent);
   }
 
   async declineUserByStudentCard(userId: number): Promise<void> {

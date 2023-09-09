@@ -12,6 +12,7 @@ import { TicketsModule } from 'src/tickets/tickets.module';
 import { UserStudentCardRepository } from './repositories/user-student-card.repository';
 import { MatchingsModule } from 'src/matchings/matchings.module';
 import { TingsModule } from 'src/tings/tings.module';
+import { StudentCardVerifiedListener } from './listeners/student-card-verified.listener';
 
 @Module({
   imports: [
@@ -25,7 +26,7 @@ import { TingsModule } from 'src/tings/tings.module';
     forwardRef(() => TingsModule),
   ],
   controllers: [UsersController],
-  providers: [UsersService],
+  providers: [UsersService, StudentCardVerifiedListener],
   exports: [UsersService],
 })
 export class UsersModule {}
