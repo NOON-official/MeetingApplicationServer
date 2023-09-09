@@ -20,6 +20,7 @@ import { TingsService } from 'src/tings/tings.service';
 import { TingNumberPerAction } from 'src/tings/constants/ting-number-per-action';
 import { GetTeamCardDto } from 'src/teams/dtos/get-team-card.dto';
 import { AdminGetAppliedTeamDto } from 'src/admin/dtos/admin-get-team.dto';
+import { MatchingReceivedEvent } from './events/matching-received.event';
 
 @Injectable()
 export class MatchingsService {
@@ -401,6 +402,11 @@ export class MatchingsService {
         receivedTeamNextRecommendedTeamIds,
       );
     }
+
+    // 매칭 신청받은 유저에게 문자 발송
+    const matchingReceivedEvent = new MatchingReceivedEvent();
+    matchingReceivedEvent.user = receivedTeam.user;
+    this.eventEmitter.emit('matching.received', matchingReceivedEvent);
   }
 
   async getAppliedTeamCardsByTeamId(teamId: number): Promise<{ teams: GetTeamCardDto[] }> {

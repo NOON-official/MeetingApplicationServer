@@ -10,6 +10,7 @@ import { MatchingsController } from './matchings.controller';
 import { forwardRef, Module } from '@nestjs/common';
 import { MatchingsService } from './matchings.service';
 import { TingsModule } from 'src/tings/tings.module';
+import { MatchingReceivedListener } from './listeners/matching-received.listener';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { TingsModule } from 'src/tings/tings.module';
     forwardRef(() => TicketsModule),
     forwardRef(() => TingsModule),
   ],
-  providers: [MatchingsService, MatchingSucceededListener, MatchingPartnerTeamRefusedListener],
+  providers: [MatchingsService, MatchingSucceededListener, MatchingReceivedListener],
   controllers: [MatchingsController],
   exports: [MatchingsService],
 })
