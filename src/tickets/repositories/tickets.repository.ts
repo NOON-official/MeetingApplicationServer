@@ -92,6 +92,7 @@ export class TicketsRepository extends Repository<Ticket> {
       .select('ticket.userId AS userId')
       .addSelect('COUNT(*) AS ticketCount')
       .where('ticket.usedAt IS NULL')
+      .andWhere('ticket.deletedAt IS NULL')
       .groupBy('userId')
       .getRawMany();
     return { tickets };
