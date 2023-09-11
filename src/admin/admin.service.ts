@@ -436,6 +436,7 @@ export class AdminService {
       if (tingCount === 0) {
         const createTingData = { userId: ticket.userId, tingCount: addTing };
         await this.tingsService.createTingByUserId(createTingData);
+        await this.ticketsService.deleteTicketsByUserId(ticket.userId);
       } else {
         await this.tingsService.refundTingByUserIdAndTingCount(ticket.userId, addTing);
       }
