@@ -429,11 +429,11 @@ export class AdminService {
   }
 
   async changeTicketToTing(): Promise<void> {
-    const tickets = await this.ticketsService.getAllTickets();
-    tickets.tickets.map(async (ticket) => {
+    const { tickets } = await this.ticketsService.getAllTickets();
+    tickets.map(async (ticket) => {
       const addTing = ticket.ticketCount * 10;
-      const tingCount = await this.tingsService.getTingCountByUserId(ticket.userId);
-      if (tingCount.tingCount === -1) {
+      const { tingCount } = await this.tingsService.getTingCountByUserId(ticket.userId);
+      if (tingCount === 0) {
         const createTingData = { userId: ticket.userId, tingCount: addTing };
         await this.tingsService.createTingByUserId(createTingData);
       } else {
