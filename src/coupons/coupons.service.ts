@@ -118,6 +118,13 @@ export class CouponsService {
       createCouponDto.couponCode,
       createCouponDto.expiresAt,
     );
+
+    // 쿠폰 발급된 유저에게 알림 문자 보내기
+    const couponCreatedEvent = new CouponCreatedEvent();
+    couponCreatedEvent.userId = user.id;
+    couponCreatedEvent.couponTypeId = createCouponDto.couponTypeId;
+
+    this.eventEmitter.emit('coupon.created', couponCreatedEvent);
   }
 
   async getCouponCountByTypeIdAndUserId(typeId: number, userId: number): Promise<{ couponCount: number }> {
