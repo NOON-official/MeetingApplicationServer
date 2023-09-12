@@ -20,6 +20,13 @@ export class getMemberDto {
   mbti: number;
 
   @ApiProperty({
+    description: '대학교',
+    example: 1,
+    required: true,
+  })
+  university: number;
+
+  @ApiProperty({
     description: '닮은꼴',
     example: '차은우',
   })
@@ -58,16 +65,17 @@ export class GetTeamDto {
   memberCount: number;
 
   @ApiProperty({
-    description: '대학교',
-    example: [1, 42, 345],
+    description: '인원 변경 가능',
+    example: [2, 3],
   })
-  universities?: number[];
+  memberCounts?: number[];
 
   @ApiProperty({
-    description: '미팅 선호 날짜',
-    example: ['2023-01-22', '2023-01-23', '2023-01-24'],
+    description: '미팅 선호 일정',
+    example: [1, 2],
+    required: true,
   })
-  availableDates: Date[];
+  teamAvailableDate: number[];
 
   @ApiProperty({
     description: '지역',
@@ -82,6 +90,13 @@ export class GetTeamDto {
   members: getMemberDto[];
 
   @ApiProperty({
+    description: '팀명',
+    example: '기웅내세요',
+    required: true,
+  })
+  teamName: string;
+
+  @ApiProperty({
     description: '한 줄 소개',
     example: '안녕하세요',
   })
@@ -92,12 +107,6 @@ export class GetTeamDto {
     example: 5,
   })
   drink: number;
-
-  @ApiProperty({
-    description: '상대방 학교',
-    example: true,
-  })
-  prefSameUniversity: boolean;
 
   @ApiProperty({
     description: '상대방 선호 나이',
@@ -112,22 +121,11 @@ export class GetTeamDto {
   prefVibes: number[];
 
   @ApiProperty({
-    description: '시작 라운드',
-    example: 1,
+    description: '학교 인증',
+    example: true,
+    required: true,
   })
-  startRound: number;
-
-  @ApiProperty({
-    description: '현재 라운드',
-    example: 2,
-  })
-  currentRound: number;
-
-  @ApiProperty({
-    description: '마지막 실패 이유',
-    example: 'Date',
-  })
-  lastFailReason?: string;
+  readonly approval: boolean | null;
 
   @ApiProperty({
     description: '생성일시',
@@ -142,14 +140,30 @@ export class GetTeamDto {
   updatedAt: Date;
 
   @ApiProperty({
-    description: '팀 정보 수정일시',
-    example: '2023-01-20T21:37:26.886Z',
-  })
-  modifiedAt?: Date;
-
-  @ApiProperty({
     description: '삭제일시',
     example: '2023-01-20T21:37:26.886Z',
   })
   deletedAt?: Date;
+}
+
+export class GetTeamDetailDto extends GetTeamDto {
+  @ApiProperty({
+    description: '핸드폰 번호',
+    example: '01012345678',
+  })
+  phone?: string;
+
+  @ApiProperty({
+    description: '카카오 아이디',
+    example: 'kakaoID',
+  })
+  kakaoId?: string;
+}
+
+export class GetTeamOwnerDto {
+  @ApiProperty({
+    description: '팀 생성 유저아이디',
+    example: 1,
+  })
+  ownerId: number;
 }

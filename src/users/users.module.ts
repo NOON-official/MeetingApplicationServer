@@ -9,18 +9,25 @@ import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { TeamsModule } from 'src/teams/teams.module';
 import { TicketsModule } from 'src/tickets/tickets.module';
+import { UserStudentCardRepository } from './repositories/user-student-card.repository';
+import { MatchingsModule } from 'src/matchings/matchings.module';
+import { TingsModule } from 'src/tings/tings.module';
+import { StudentCardVerifiedListener } from './listeners/student-card-verified.listener';
+import { StudentCardDeclinedListener } from './listeners/student-card-declined.listener';
 
 @Module({
   imports: [
-    TypeOrmExModule.forCustomRepository([UsersRepository, UserAgreementsRepository]),
+    TypeOrmExModule.forCustomRepository([UsersRepository, UserAgreementsRepository, UserStudentCardRepository]),
     forwardRef(() => InvitationsModule),
     forwardRef(() => TeamsModule),
     forwardRef(() => TicketsModule),
     forwardRef(() => CouponsModule),
     forwardRef(() => OrdersModule),
+    forwardRef(() => MatchingsModule),
+    forwardRef(() => TingsModule),
   ],
   controllers: [UsersController],
-  providers: [UsersService],
+  providers: [UsersService, StudentCardVerifiedListener, StudentCardDeclinedListener],
   exports: [UsersService],
 })
 export class UsersModule {}

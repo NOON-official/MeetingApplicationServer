@@ -14,10 +14,22 @@ export class AdminGetUserDto {
   nickname: string;
 
   @ApiProperty({
-    description: '매칭 상태',
-    example: '진행중',
+    description: '유저 닉네임',
+    example: 1996,
   })
-  matchingStatus: string;
+  birth: number;
+
+  @ApiProperty({
+    description: '유저 대학교',
+    example: '한국외국어대학교',
+  })
+  university: string;
+
+  @ApiProperty({
+    description: '유저 성별',
+    example: '남자',
+  })
+  gender: string;
 
   @ApiProperty({
     description: '핸드폰 번호',
@@ -38,10 +50,10 @@ export class AdminGetUserDto {
   referralId: string;
 
   @ApiProperty({
-    description: '이용권 개수',
+    description: '팅 개수',
     example: 5,
   })
-  ticketCount: number;
+  tingCount: number;
 
   @ApiProperty({
     description: '50% 쿠폰 개수',
@@ -60,4 +72,48 @@ export class AdminGetUserDto {
     example: 1,
   })
   userInvitaionCount: number;
+}
+
+export class AdminGetUserWithStudentCardDto {
+  @ApiProperty({
+    description: '유저 ID',
+    example: 1,
+  })
+  userId: number;
+
+  @ApiProperty({
+    description: '유저 닉네임',
+    example: '미팅이',
+  })
+  nickname: string;
+
+  @ApiProperty({
+    description: '유저 닉네임',
+    example: 1996,
+  })
+  birth: number;
+
+  @ApiProperty({
+    description: '유저 대학교',
+    example: '한국외국어대학교',
+  })
+  university: string;
+
+  @ApiProperty({
+    description: '유저 성별',
+    example: '남자',
+  })
+  gender: string;
+
+  @ApiProperty({
+    description: '유저 학생증 utl',
+    example: 'https://www.meeting.me/image/3adsasd',
+  })
+  studentCardUrl: string;
+
+  @ApiProperty({
+    description: '유저 인증 여부',
+    example: null,
+  })
+  aprroval: boolean | null;
 }

@@ -3,6 +3,7 @@ import { MatchingsService } from './matchings.service';
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { ApiOperation } from '@nestjs/swagger';
 import {
+  ApiBadRequestResponse,
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiNotFoundResponse,
@@ -17,6 +18,7 @@ import { CreateMatchingRefuseReasonDto } from './dtos/create-matching-refuse-rea
 import { MatchingOwnerGuard } from 'src/auth/guards/matching-owner.guard';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { PassportUser } from 'src/auth/interfaces/passport-user.interface';
+import { TeamOwnerGuard } from 'src/auth/guards/team-owner.guard';
 @ApiTags('MATCHING')
 @ApiBearerAuth()
 @ApiUnauthorizedResponse({ description: 'Unauthorized' })
@@ -25,67 +27,102 @@ import { PassportUser } from 'src/auth/interfaces/passport-user.interface';
 export class MatchingsController {
   constructor(private matchingsService: MatchingsService) {}
 
+  // @ApiOperation({
+  //   summary: '주간 평균 매칭 시간 조회',
+  // })
+  // @ApiOkResponse({
+  //   schema: {
+  //     example: {
+  //       hours: 1,
+  //       minutes: 30,
+  //     },
+  //   },
+  // })
+  // @Get('average-time/one-week')
+  // getMatchingsAverageTimeOneWeek(): Promise<{ hours: number; minutes: number }> {
+  //   return this.matchingsService.getAverageTimeOneWeek();
+  // }
+
+  // @ApiOperation({
+  //   summary: '매칭 정보 조회',
+  //   description:
+  //     '매칭 정보가 없는 경우 null 반환 \n\n createdAt 기준 24시간 이상 초과 & 상대팀 무응답인 경우 -> 거절당함 페이지 \n\n createdAt 기준 24시간 이상 초과 & 상대팀 거절인 경우 -> 거절당함 페이지',
+  // })
+  // @ApiOkResponse({
+  //   type: GetMatchingDto,
+  // })
+  // @Get(':matchingId')
+  // @UseGuards(AccessTokenGuard, MatchingOwnerGuard)
+  // getMatchingsMatchingId(
+  //   @GetUser() user: PassportUser,
+  //   @Param('matchingId') matchingId: number,
+  // ): Promise<GetMatchingDto> {
+  //   return this.matchingsService.getMatchingInfoById(user.sub, matchingId);
+  // }
   @ApiOperation({
-    summary: '주간 평균 매칭 시간 조회',
+    summary: '매칭 신청하기 (⭕️updated)',
+    description: '매칭 신청하는 팀ID와 신청받는 팀ID를 보내주시면 됩니다.',
   })
-  @ApiOkResponse({
+  @ApiCreatedResponse({ description: 'Created' })
+  @ApiBadRequestResponse({
     schema: {
-      example: {
-        hours: 1,
-        minutes: 30,
-      },
+      example: 'insufficient ting',
+      anyOf: [
+        { description: 'invalid team gender' },
+        { description: 'invalid access' },
+        { description: 'already applied team' },
+        { description: 'already received team' },
+        { description: 'insufficient ting' },
+      ],
     },
   })
-  @Get('average-time/one-week')
-  getMatchingsAverageTimeOneWeek(): Promise<{ hours: number; minutes: number }> {
-    return this.matchingsService.getAverageTimeOneWeek();
+  @ApiNotFoundResponse({
+    schema: {
+      example: "Can't find team with id ${appliedTeamId}",
+      anyOf: [
+        { description: "Can't find team with id ${appliedTeamId}" },
+        { description: "Can't find team with id ${receivedTeamId}" },
+      ],
+    },
+  })
+  @Post(':appliedTeamId/:receivedTeamId')
+  @UseGuards(AccessTokenGuard, TeamOwnerGuard)
+  postMatchingsAppliedTeamIdReceivedTeamId(
+    @GetUser() _user: PassportUser,
+    @Param('appliedTeamId') appliedTeamId: number,
+    @Param('receivedTeamId') receivedTeamId: number,
+  ): Promise<void> {
+    return this.matchingsService.createMatchingByAppliedTeamIdAndReceivedTeamId(appliedTeamId, receivedTeamId);
   }
 
   @ApiOperation({
-    summary: '매칭 정보 조회',
-    description:
-      '매칭 정보가 없는 경우 null 반환 \n\n createdAt 기준 24시간 이상 초과 & 상대팀 무응답인 경우 -> 거절당함 페이지 \n\n createdAt 기준 24시간 이상 초과 & 상대팀 거절인 경우 -> 거절당함 페이지',
-  })
-  @ApiOkResponse({
-    type: GetMatchingDto,
-  })
-  @Get(':matchingId')
-  @UseGuards(AccessTokenGuard, MatchingOwnerGuard)
-  getMatchingsMatchingId(
-    @GetUser() user: PassportUser,
-    @Param('matchingId') matchingId: number,
-  ): Promise<GetMatchingDto> {
-    return this.matchingsService.getMatchingInfoById(user.sub, matchingId);
-  }
-
-  @ApiOperation({
-    summary: '매칭 수락하기',
+    summary: '매칭 수락하기 (📌is updating)',
     description:
       '이용권 1개 차감 \n\n 추후 상대팀이 거절한 경우 이용권 환불됨 \n\n 상대팀이 이미 거절한 경우/이용권이 없는 경우 400에러 발생',
   })
   @ApiOkResponse({ description: 'OK' })
-  @Put(':matchingId/teams/:teamId/accept')
+  @Put(':matchingId/teams/:appliedTeamId/accept')
   @UseGuards(AccessTokenGuard, MatchingOwnerGuard)
   putMatchingsMatchingIdTeamsTeamIdAccept(
     @GetUser() user: PassportUser,
     @Param('matchingId') matchingId: number,
-    @Param('teamId') teamId: number,
+    @Param('appliedTeamId') appliedTeamId: number,
   ): Promise<void> {
-    return this.matchingsService.acceptMatchingByTeamId(user.sub, matchingId, teamId);
+    return this.matchingsService.acceptMatchingByTeamId(user.sub, matchingId, appliedTeamId);
   }
 
   @ApiOperation({
-    summary: '매칭 거절하기',
-    description: '상대팀 이용권 환불 필요',
+    summary: '매칭 거절하기 (📌is updating)',
+    description: 'refusedTeamId: 매칭 거절당한 팀 ID',
   })
   @ApiOkResponse({ description: 'OK' })
-  @Put(':matchingId/teams/:teamId/refuse')
+  @Put(':matchingId/teams/:refusedTeamId/refuse')
   @UseGuards(AccessTokenGuard, MatchingOwnerGuard)
   putMatchingsMatchingIdTeamsTeamIdRefuse(
     @Param('matchingId') matchingId: number,
-    @Param('teamId') teamId: number,
+    @Param('refusedTeamId') refusedTeamId: number,
   ): Promise<void> {
-    return this.matchingsService.refuseMatchingByTeamId(matchingId, teamId);
+    return this.matchingsService.refuseMatchingByTeamId(matchingId, refusedTeamId);
   }
 
   @ApiOperation({
