@@ -433,7 +433,7 @@ export class AdminService {
     tickets.map(async (ticket) => {
       const addTing = ticket.ticketCount * 10;
       const { tingCount } = await this.tingsService.getTingCountByUserId(ticket.userId);
-      if (tingCount === 0) {
+      if (tingCount === -1) {
         const createTingData = { userId: ticket.userId, tingCount: addTing };
         await this.tingsService.createTingByUserId(createTingData);
         await this.ticketsService.deleteTicketsByUserId(ticket.userId);

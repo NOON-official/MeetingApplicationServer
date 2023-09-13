@@ -16,7 +16,7 @@ export class TingsRepository extends Repository<Ting> {
     let tingCount: number;
 
     if (!ting) {
-      tingCount = 0;
+      tingCount = -1;
     } else {
       tingCount = ting.tingCount;
     }
