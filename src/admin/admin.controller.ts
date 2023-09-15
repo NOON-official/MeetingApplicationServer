@@ -133,6 +133,8 @@ export class AdminController {
             phone: '01012345678',
             createdAt: '2023-01-2023-01-20T21:37:26.886Z',
             referralId: 'LD4GSTO3',
+            approval: 1,
+            isVerified: 1,
             ticketCount: 5,
             discount50CouponCount: 1,
             freeCouponCount: 0,
