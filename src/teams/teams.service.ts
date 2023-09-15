@@ -89,14 +89,6 @@ export class TeamsService {
 
       //teamMember 재생성
       await this.teamsRepository.createTeamMember(members, existingTeam);
-
-      if (members || members?.length !== 0) {
-        const alreadyTeam = await this.getApplicationTeamById(existingTeam.id);
-        const newMembers = alreadyTeam.members;
-        newMembers.map(async (newMember: TeamMember, index: number) => {
-          await this.teamsRepository.updateTeamMember(newMember.id, members[index]);
-        });
-      }
     } else {
       const gender = user.gender === 'male' ? 1 : 2;
 
