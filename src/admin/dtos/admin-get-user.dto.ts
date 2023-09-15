@@ -50,6 +50,18 @@ export class AdminGetUserDto {
   referralId: string;
 
   @ApiProperty({
+    description: '관리자가 인증했는지 여부',
+    example: 1,
+  })
+  approval: boolean;
+
+  @ApiProperty({
+    description: '유저가 학생증 신청을 했는지 확인 여부',
+    example: 1,
+  })
+  isVerified: boolean;
+
+  @ApiProperty({
     description: '팅 개수',
     example: 5,
   })

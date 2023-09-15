@@ -305,6 +305,8 @@ export class UsersService {
         phone: u.phone,
         createdAt: u.createdAt,
         referralId: u.referralId,
+        approval: u.approval,
+        isVerified: u.isVerified,
         tingCount,
         discount50CouponCount,
         freeCouponCount,
