@@ -668,13 +668,17 @@ export class TeamsService {
 
     // 덜 맞는 팀 2팀 조회
     const otherRecommendedTeamIds = take(
-      uniq(
-        concat(
-          onlyAreaSameTeams,
-          onlyAreaMemberCountsSameTeams,
-          onlyAreaMemberCountsAgeSameTeams,
-          onlyAreaMemberCountsAgeDateSameTeams,
+      difference(
+        uniq(
+          concat(
+            onlyAreaSameTeams,
+            onlyAreaMemberCountsSameTeams,
+            onlyAreaMemberCountsAgeSameTeams,
+            onlyAreaMemberCountsAgeDateSameTeams,
+          ),
         ),
+        // 이미 선택된 가장 잘 맞는 팀은 후보에서 제외
+        bestRecommendedTeamIds,
       ),
       TEAM_LIMIT.OTHER_RECOMMENDED_TEAM,
     );
