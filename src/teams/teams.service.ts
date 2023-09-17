@@ -84,13 +84,11 @@ export class TeamsService {
 
       await this.teamsRepository.updateTeam(existingTeam.id, teamData);
 
-      if (members || members?.length !== 0) {
-        const alreadyTeam = await this.getApplicationTeamById(existingTeam.id);
-        const newMembers = alreadyTeam.members;
-        newMembers.map(async (newMember: TeamMember, index: number) => {
-          await this.teamsRepository.updateTeamMember(newMember.id, members[index]);
-        });
-      }
+      //teamMember 삭제
+      await this.teamsRepository.deleteTeamMemberByTeamId(existingTeam.id);
+
+      //teamMember 재생성
+      await this.teamsRepository.createTeamMember(members, existingTeam);
     } else {
       const gender = user.gender === 'male' ? 1 : 2;
 
@@ -135,6 +133,56 @@ export class TeamsService {
         gender === 1 ? TeamGender.female : TeamGender.male,
       );
       await this.matchTeam(matchingTeam, matchedTeams, false);
+    }
+  }
+
+  async updateTeam(teamId: number, updateTeamDto: UpdateTeamDto): Promise<void> {
+    const team = await this.getTeamById(teamId);
+
+    // 해당 팀 정보가 없는 경우
+    if (!team || !!team.deletedAt) {
+      throw new NotFoundException(`Can't find team with id ${teamId}`);
+    }
+
+    const {
+      memberCount,
+      memberCounts,
+      areas,
+      teamAvailableDate,
+      teamName,
+      intro,
+      drink,
+      prefAge,
+      prefVibes,
+      members,
+      kakaoId,
+    } = updateTeamDto;
+
+    // 업데이트 팀 정보
+    const teamData = {
+      gender: team.gender,
+      memberCount: memberCount ?? team.memberCount,
+      memberCounts: memberCounts ?? team.memberCounts,
+      teamAvailableDate: teamAvailableDate ?? team.teamAvailableDate,
+      areas: areas ?? team.areas,
+      teamName: teamName ?? team.teamName,
+      intro: intro ?? team.intro,
+      drink: drink ?? team.drink,
+      prefAge: prefAge ?? team.prefAge,
+      prefVibes: prefVibes ?? team.prefVibes,
+      kakaoId: kakaoId ?? team.kakaoId,
+    };
+
+    await this.teamsRepository.updateTeam(teamId, teamData);
+
+    if (members || members?.length !== 0) {
+      const existingTeam = await this.getApplicationTeamById(teamId);
+      const newMembers = existingTeam.members;
+      newMembers.map((m: TeamMember) => {
+        delete m.id;
+      });
+
+      await this.teamsRepository.createTeamMember(members, team);
     }
   }
 
@@ -272,56 +320,6 @@ export class TeamsService {
   // }> {
   //   return { Genders, Universities, Areas, Mbties, Roles, SameUniversities, Vibes };
   // }
-
-  async updateTeam(teamId: number, updateTeamDto: UpdateTeamDto): Promise<void> {
-    const team = await this.getTeamById(teamId);
-
-    // 해당 팀 정보가 없는 경우
-    if (!team || !!team.deletedAt) {
-      throw new NotFoundException(`Can't find team with id ${teamId}`);
-    }
-
-    const {
-      memberCount,
-      memberCounts,
-      areas,
-      teamAvailableDate,
-      teamName,
-      intro,
-      drink,
-      prefAge,
-      prefVibes,
-      members,
-      kakaoId,
-    } = updateTeamDto;
-
-    // 업데이트 팀 정보
-    const teamData = {
-      gender: team.gender,
-      memberCount: memberCount ?? team.memberCount,
-      memberCounts: memberCounts ?? team.memberCounts,
-      teamAvailableDate: teamAvailableDate ?? team.teamAvailableDate,
-      areas: areas ?? team.areas,
-      teamName: teamName ?? team.teamName,
-      intro: intro ?? team.intro,
-      drink: drink ?? team.drink,
-      prefAge: prefAge ?? team.prefAge,
-      prefVibes: prefVibes ?? team.prefVibes,
-      kakaoId: kakaoId ?? team.kakaoId,
-    };
-
-    await this.teamsRepository.updateTeam(teamId, teamData);
-
-    if (members || members?.length !== 0) {
-      const existingTeam = await this.getApplicationTeamById(teamId);
-      const newMembers = existingTeam.members;
-      newMembers.map((m: TeamMember) => {
-        delete m.id;
-      });
-
-      await this.teamsRepository.createTeamMember(members, team);
-    }
-  }
 
   async deleteTeamById(teamId: number): Promise<void> {
     const team = await this.getTeamById(teamId);
@@ -670,13 +668,17 @@ export class TeamsService {
 
     // 덜 맞는 팀 2팀 조회
     const otherRecommendedTeamIds = take(
-      uniq(
-        concat(
-          onlyAreaSameTeams,
-          onlyAreaMemberCountsSameTeams,
-          onlyAreaMemberCountsAgeSameTeams,
-          onlyAreaMemberCountsAgeDateSameTeams,
+      difference(
+        uniq(
+          concat(
+            onlyAreaSameTeams,
+            onlyAreaMemberCountsSameTeams,
+            onlyAreaMemberCountsAgeSameTeams,
+            onlyAreaMemberCountsAgeDateSameTeams,
+          ),
         ),
+        // 이미 선택된 가장 잘 맞는 팀은 후보에서 제외
+        bestRecommendedTeamIds,
       ),
       TEAM_LIMIT.OTHER_RECOMMENDED_TEAM,
     );
