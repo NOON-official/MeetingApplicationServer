@@ -24,6 +24,7 @@ import * as fs from 'fs';
 import { MakeUpHash } from './constants/make-up-hash';
 import { getCurrentDate, makeOrderId, makeSignatureData } from './utils/functions';
 import axios from 'axios';
+import { decodeURIComponentCharset } from 'decode-uri-component-charset';
 
 export class AuthService {
   constructor(
@@ -293,5 +294,71 @@ export class AuthService {
       kcp_merchant_time: res_data.data.kcp_merchant_time,
       kcp_cert_lib_ver: res_data.data.kcp_cert_lib_ver,
     };
+  }
+
+  async resHash(req, res) {
+    const target_URL = 'https://spl.kcp.co.kr/std/certpass'; // 운영계
+    const kcp_cert_info = fs
+      .readFileSync('./src/certificate/KCP_AUTH_AJOAD_CERT.pem', 'utf-8')
+      .toString()
+      .split('\r\n')
+      .join('');
+    const site_cd = req.body.site_cd;
+    const cert_no = req.body.cert_no;
+    const dn_hash = req.body.dn_hash;
+    let ct_type = 'CHK';
+    const sbParam = req.body;
+
+    const dnhash_data = site_cd + '^' + ct_type + '^' + cert_no + '^' + dn_hash; //dn_hash 검증 서명 데이터
+    let kcp_sign_data = makeSignatureData(dnhash_data); //서명 데이터(무결성 검증)
+
+    const req_data_1 = {
+      kcp_cert_info: kcp_cert_info,
+      site_cd: site_cd,
+      ordr_idxx: req.body.ordr_idxx,
+      cert_no: cert_no,
+      dn_hash: dn_hash,
+      ct_type: ct_type,
+      kcp_sign_data: kcp_sign_data,
+    };
+
+    // 본인인증 API URL
+    // 개발 : https://stg-spl.kcp.co.kr/std/certpass
+    // 운영 : https://spl.kcp.co.kr/std/certpass
+    const me = await axios.post(target_URL, req_data_1);
+    const dn_res_cd = me.data.res_cd;
+
+    ct_type = 'DEC';
+
+    const decrypt_data = site_cd + '^' + ct_type + '^' + cert_no; //데이터 복호화 검증 서명 데이터
+    kcp_sign_data = makeSignatureData(decrypt_data); //서명 데이터(무결성 검증)
+
+    const req_data_2 = {
+      kcp_cert_info: kcp_cert_info,
+      site_cd: site_cd,
+      ordr_idxx: req.body.ordr_idxx,
+      cert_no: cert_no,
+      ct_type: ct_type,
+      enc_cert_Data: req.body.enc_cert_data2,
+      kcp_sign_data: kcp_sign_data,
+    };
+
+    //dn _hash 검증데이터가 정상일 때, 복호화 요청 함
+    if (dn_res_cd === '0000') {
+      const result = await axios.post(target_URL, req_data_2);
+      // API RES
+      const enc_res_msg = sbParam.res_msg;
+      const dec_res_msg = decodeURIComponentCharset(enc_res_msg, 'euc-kr');
+
+      const enc_user_name = sbParam.user_name;
+      const dec_user_name = decodeURIComponentCharset(enc_user_name, 'euc-kr');
+      sbParam.res_msg = dec_res_msg;
+      sbParam.user_name = dec_user_name;
+      console.log({ ...result, ...sbParam });
+
+      return { ...result, ...sbParam };
+    } else {
+      console.log('dn_hash 변조 위험있음'); //dn_hash 검증에 실패했을 때, console 출력
+    }
   }
 }
