@@ -177,7 +177,7 @@ export class AuthController {
     },
   })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @Post('/up-hash')
+  @Get('/up-hash')
   // @UseGuards(AccessTokenGuard)
   makeUpHash(): Promise<{
     res_cd: string;
