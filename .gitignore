@@ -40,3 +40,6 @@ lerna-debug.log*
 .env.production(stage)
 
 deploy.sh
+
+#pass certificate
+/src/certificate

@@ -19,7 +19,7 @@ async function bootstrap() {
   const clientUrlWithWWW = configService.get<string>('CLIENT_URL_WITH_WWW') ?? null;
   const adminUrl = configService.get<string>('ADMIN_URL') ?? null;
 
-  const corsOrigins = [clientUrl];
+  const corsOrigins = [clientUrl, 'https://cert.kcp.co.kr/kcp_cert/cert_view.jsp'];
   if (clientUrlWithWWW) {
     corsOrigins.push(clientUrlWithWWW);
   }
