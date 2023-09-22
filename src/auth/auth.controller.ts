@@ -21,11 +21,12 @@ import {
 } from '@nestjs/swagger/dist/decorators';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { SaveStudentCardDto } from './dtos/save-student-card.dto';
+import { ConfigService } from '@nestjs/config';
 
 @ApiTags('AUTH')
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private configService: ConfigService) {}
 
   @ApiOperation({
     summary: '카카오 로그인',
@@ -207,8 +208,9 @@ export class AuthController {
   @ApiOkResponse({ description: 'OK' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @Post('/hash')
-  @Redirect(`http://localhost:3000/apply/university`)
-  saveUserWithPass(@Req() req: Request, @Res() res: Response): Promise<void> {
-    return this.authService.saveUserWithPass(req, res);
+  @Redirect()
+  async saveUserWithPass(@Req() req: Request, @Res() res: Response): Promise<{ url: string }> {
+    await this.authService.saveUserWithPass(req, res);
+    return { url: `${this.configService.get<string>('CLIENT_URL')}/apply/university` };
   }
 }
