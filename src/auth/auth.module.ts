@@ -13,7 +13,6 @@ import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 import { HttpModule } from '@nestjs/axios';
-import { PassStrategy } from './strategies/pass.strategy';
 
 @Module({
   imports: [
@@ -27,7 +26,7 @@ import { PassStrategy } from './strategies/pass.strategy';
     forwardRef(() => CouponsModule),
     forwardRef(() => InvitationsModule),
   ],
-  providers: [AuthService, KakaoStrategy, AccessTokenStrategy, RefreshTokenStrategy, PassStrategy],
+  providers: [AuthService, KakaoStrategy, AccessTokenStrategy, RefreshTokenStrategy],
   controllers: [AuthController],
 })
 export class AuthModule {}
