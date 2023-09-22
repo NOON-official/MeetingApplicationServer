@@ -25,6 +25,7 @@ import { MakeUpHash } from './constants/make-up-hash';
 import { getCurrentDate, makeOrderId, makeSignatureData } from './utils/functions';
 import axios from 'axios';
 import { decodeURIComponentCharset } from 'decode-uri-component-charset';
+import { GetPassDto } from './dtos/get-pass.dto';
 
 export class AuthService {
   constructor(
@@ -237,7 +238,7 @@ export class AuthService {
     }
   }
 
-  async makeUpHash(): Promise<{
+  async makeUpHash(userId: number): Promise<{
     res_cd: string;
     res_msg: string;
     site_cd: string;
@@ -251,6 +252,7 @@ export class AuthService {
     cert_enc_use_ext: string;
     kcp_merchant_time: string;
     kcp_cert_lib_ver: string;
+    param_opt_1: number;
   }> {
     const kcp_cert_info = fs
       .readFileSync('./src/certificate/KCP_AUTH_AJOAD_CERT.pem', 'utf-8')
@@ -274,10 +276,7 @@ export class AuthService {
       make_req_dt: make_req_dt,
       kcp_sign_data: kcp_sign_data,
     };
-
     const res_data = await axios.post('https://spl.kcp.co.kr/std/certpass', req_data);
-
-    console.log(res_data);
 
     return {
       res_cd: res_data.data.res_cd,
@@ -293,10 +292,11 @@ export class AuthService {
       cert_enc_use_ext: 'Y',
       kcp_merchant_time: res_data.data.kcp_merchant_time,
       kcp_cert_lib_ver: res_data.data.kcp_cert_lib_ver,
+      param_opt_1: userId,
     };
   }
 
-  async resHash(req, res) {
+  async saveUserWithPass(req: Request, res: Response) {
     const target_URL = 'https://spl.kcp.co.kr/std/certpass'; // 운영계
     const kcp_cert_info = fs
       .readFileSync('./src/certificate/KCP_AUTH_AJOAD_CERT.pem', 'utf-8')
@@ -306,8 +306,8 @@ export class AuthService {
     const site_cd = req.body.site_cd;
     const cert_no = req.body.cert_no;
     const dn_hash = req.body.dn_hash;
+    const userId = req.body.param_opt_1;
     let ct_type = 'CHK';
-    const sbParam = req.body;
 
     const dnhash_data = site_cd + '^' + ct_type + '^' + cert_no + '^' + dn_hash; //dn_hash 검증 서명 데이터
     let kcp_sign_data = makeSignatureData(dnhash_data); //서명 데이터(무결성 검증)
@@ -322,9 +322,6 @@ export class AuthService {
       kcp_sign_data: kcp_sign_data,
     };
 
-    // 본인인증 API URL
-    // 개발 : https://stg-spl.kcp.co.kr/std/certpass
-    // 운영 : https://spl.kcp.co.kr/std/certpass
     const me = await axios.post(target_URL, req_data_1);
     const dn_res_cd = me.data.res_cd;
 
@@ -347,18 +344,17 @@ export class AuthService {
     if (dn_res_cd === '0000') {
       const result = await axios.post(target_URL, req_data_2);
       // API RES
-      const enc_res_msg = sbParam.res_msg;
-      const dec_res_msg = decodeURIComponentCharset(enc_res_msg, 'euc-kr');
-
-      const enc_user_name = sbParam.user_name;
-      const dec_user_name = decodeURIComponentCharset(enc_user_name, 'euc-kr');
-      sbParam.res_msg = dec_res_msg;
-      sbParam.user_name = dec_user_name;
-      console.log({ ...result, ...sbParam });
-
-      return { ...result, ...sbParam };
+      const data: GetPassDto = result.data;
+      const { res_cd, res_msg, user_name, phone_no, birth_day, sex_code } = data;
+      const birth = Number(birth_day.slice(0, 4));
+      const gender = sex_code === '01' ? 'male' : 'female';
+      if (res_cd === '0000') {
+        await this.usersService.updateUserInfo(userId, { nickname: user_name, birth, gender, phone: phone_no });
+      } else {
+        throw new BadRequestException(`Error: ${res_msg}`);
+      }
     } else {
-      console.log('dn_hash 변조 위험있음'); //dn_hash 검증에 실패했을 때, console 출력
+      throw new BadRequestException('dn_hash 변조 위험있음');
     }
   }
 }

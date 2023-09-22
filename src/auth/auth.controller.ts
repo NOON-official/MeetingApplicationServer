@@ -173,50 +173,42 @@ export class AuthController {
         cert_enc_use_ext: 'Y',
         kcp_merchant_time: '20230920143407299',
         kcp_cert_lib_ver: 'KCP_CERT_API_1_0',
+        param_opt_1: 50,
       },
     },
   })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @Get('/up-hash')
-  // @UseGuards(AccessTokenGuard)
-  makeUpHash(): Promise<{
+  @UseGuards(AccessTokenGuard)
+  makeUpHash(@GetUser() user: PassportUser): Promise<{
     res_cd: string;
     res_msg: string;
     site_cd: string;
     ordr_idxx: string;
-    web_siteid: string;
+    req_tx: string;
+    cert_method: string;
+    up_hash: string;
+    cert_otp_use: string;
     web_siteid_hashYN: string;
+    web_siteid: string;
+    cert_enc_use_ext: string;
+    kcp_merchant_time: string;
+    kcp_cert_lib_ver: string;
+    param_opt_1: number;
   }> {
-    return this.authService.makeUpHash();
+    return this.authService.makeUpHash(user.sub);
   }
 
   @ApiOperation({
-    summary: 'up-hash 발급',
-    description: '인증 코드(6자리)를 서버에서 검증한 후 성공/실패에 따라 응답 반환 및 전화번호 저장',
+    summary: 'pass 인증 후 유저 정보 저장',
+    description: 'pass 인증을 통해 유저의 유효성을 검사해, 이름, 전화번호, 나이, 성별 내용 저장',
   })
   @ApiBearerAuth()
-  @ApiOkResponse({
-    schema: {
-      example: {
-        res_cd: '0000',
-        site_cd: 'AJOAD',
-        ordr_idxx: '202309201695188047157',
-        req_tx: 'CERT',
-        cert_method: '01',
-        up_hash: 'DEB4AAE64DC446CBA288EFA5B12FF110E6D94671',
-        cert_otp_use: 'Y',
-        web_siteid_hashYN: 'Y',
-        web_siteid: 'J23090509721',
-        cert_enc_use_ext: 'Y',
-        kcp_merchant_time: '20230920143407299',
-        kcp_cert_lib_ver: 'KCP_CERT_API_1_0',
-      },
-    },
-  })
+  @ApiOkResponse({ description: 'OK' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @Post('/hash')
-  // @UseGuards(AccessTokenGuard)
-  resHash(@Req() req: Request, @Res() res: Response) {
-    return this.authService.resHash(req, res);
+  @Redirect(`http://localhost:3000/apply/university`)
+  saveUserWithPass(@Req() req: Request, @Res() res: Response): Promise<void> {
+    return this.authService.saveUserWithPass(req, res);
   }
 }
