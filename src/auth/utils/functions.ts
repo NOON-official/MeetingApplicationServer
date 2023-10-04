@@ -45,7 +45,7 @@ export function getCurrentDate(): string {
 }
 
 export function makeSignatureData(data: string) {
-  var key_file = fs.readFileSync(__dirname + '/../../src/certificate/KCP_AUTH_AJOAD_PRIKEY.pem', 'utf-8').toString();
+  var key_file = fs.readFileSync('src/certificate/KCP_AUTH_AJOAD_PRIKEY.pem', 'utf-8').toString();
   var password = 'Noon20210701!';
   // 서명데이터생성
   return crypto.createSign('sha256').update(data).sign(
