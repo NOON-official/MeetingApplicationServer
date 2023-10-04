@@ -37,6 +37,16 @@ export class MatchingsRepository extends Repository<Matching> {
     return matching;
   }
 
+  async getReceivedMatchingsByTeamId(teamId: number): Promise<{ matchings: Matching[] }> {
+    const matchings = await this.createQueryBuilder('matching')
+      .leftJoinAndSelect('matching.receivedTeam', 'receivedTeam')
+      .where('matching.receivedTeam = :teamId', { teamId })
+      .andWhere('matching.appliedTeamIsAccepted = true AND matching.receivedTeamIsAccepted IS NULL')
+      .getMany();
+
+    return { matchings };
+  }
+
   // 관리자페이지 신청한/신청받은 팀 조회
   async getAdminMatchingsApplied(): Promise<{ appliedandreceiveds: AdminGetAppliedTeamDto[] }> {
     const appliedandreceiveds = await this.createQueryBuilder('matching')
@@ -267,6 +277,8 @@ export class MatchingsRepository extends Repository<Matching> {
         'receivedUser.approval AS approval',
         'matching.createdAt AS appliedAt',
       ])
+      // soft delete 팀 포함
+      .withDeleted()
       .innerJoin('matching.receivedTeam', 'receivedTeam')
       .leftJoin('matching.appliedTeam', 'appliedTeam')
       .leftJoin('receivedTeam.user', 'receivedUser')

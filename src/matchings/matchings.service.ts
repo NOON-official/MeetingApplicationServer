@@ -49,6 +49,10 @@ export class MatchingsService {
     return this.matchingsRepository.getMatchingByTeamId(teamId);
   }
 
+  async getReceivedMatchingsByTeamId(teamId: number): Promise<{ matchings: Matching[] }> {
+    return this.matchingsRepository.getReceivedMatchingsByTeamId(teamId);
+  }
+
   // async getMatchingIdByTeamId(teamId: number): Promise<{ matchingId: number }> {
   //   return this.matchingsRepository.getMatchingIdByTeamId(teamId);
   // }

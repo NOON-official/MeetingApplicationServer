@@ -164,7 +164,7 @@ export class TeamsController {
   @Delete(':teamId')
   @UseGuards(AccessTokenGuard, TeamOwnerGuard)
   deleteTeamsTeamId(@GetUser() _user: PassportUser, @Param('teamId') teamId: number): Promise<void> {
-    return this.teamsService.deleteTeamById(teamId);
+    return this.teamsService.stopMatchingByTeamId(teamId);
   }
 
   @ApiBearerAuth()
