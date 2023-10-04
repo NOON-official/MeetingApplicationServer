@@ -26,7 +26,6 @@ import { getCurrentDate, makeOrderId, makeSignatureData } from './utils/function
 import axios from 'axios';
 import { decodeURIComponentCharset } from 'decode-uri-component-charset';
 import { GetPassDto } from './dtos/get-pass.dto';
-import path from 'path';
 
 export class AuthService {
   constructor(
@@ -256,7 +255,7 @@ export class AuthService {
     param_opt_1: number;
   }> {
     const kcp_cert_info = fs
-      .readFileSync(path.resolve(__dirname, './src/certificate/KCP_AUTH_AJOAD_CERT.pem'), 'utf-8')
+      .readFileSync(__dirname + '/../../src/certificate/KCP_AUTH_AJOAD_CERT.pem', 'utf-8')
       .toString()
       .split('\r\n')
       .join('');
@@ -300,7 +299,7 @@ export class AuthService {
   async saveUserWithPass(req: Request, res: Response) {
     const target_URL = 'https://spl.kcp.co.kr/std/certpass'; // 운영계
     const kcp_cert_info = fs
-      .readFileSync(path.resolve(__dirname, './src/certificate/KCP_AUTH_AJOAD_CERT.pem'), 'utf-8')
+      .readFileSync(__dirname + '/../../src/certificate/KCP_AUTH_AJOAD_CERT.pem', 'utf-8')
       .toString()
       .split('\r\n')
       .join('');
