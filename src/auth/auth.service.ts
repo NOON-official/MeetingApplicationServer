@@ -257,7 +257,8 @@ export class AuthService {
     const kcp_cert_info = fs
       .readFileSync('src/certificate/KCP_AUTH_AJOAD_CERT.pem', 'utf-8')
       .toString()
-      .replace(/\n|\r|\s*/g, '');
+      .split('\r\n')
+      .join('');
     const { CT_TYPE, SITE_CD, TAX_NO, WEB_SITEID, WEB_SITE_HASHYN } = MakeUpHash;
     const ordr_idxx = makeOrderId();
     const make_req_dt = getCurrentDate();
@@ -276,7 +277,6 @@ export class AuthService {
       kcp_sign_data: kcp_sign_data,
     };
     const res_data = await axios.post('https://spl.kcp.co.kr/std/certpass', req_data);
-
     return {
       res_cd: res_data.data.res_cd,
       res_msg: res_data.data.res_mes,
@@ -300,7 +300,8 @@ export class AuthService {
     const kcp_cert_info = fs
       .readFileSync('src/certificate/KCP_AUTH_AJOAD_CERT.pem', 'utf-8')
       .toString()
-      .replace(/\n|\r|\s*/g, '');
+      .split('\r\n')
+      .join('');
     const site_cd = req.body.site_cd;
     const cert_no = req.body.cert_no;
     const dn_hash = req.body.dn_hash;
