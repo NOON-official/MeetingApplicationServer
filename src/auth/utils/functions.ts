@@ -11,6 +11,8 @@ export function makeOrderId(): string {
 
   if (month < 10) {
     monthST = '0' + month;
+  } else {
+    monthST = String(month);
   }
 
   const result = year + '' + monthST + '' + date + '' + time;
