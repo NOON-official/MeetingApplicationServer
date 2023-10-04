@@ -263,7 +263,7 @@ export class AuthService {
     const ordr_idxx = makeOrderId();
     const make_req_dt = getCurrentDate();
     const hash_data = SITE_CD + '^' + CT_TYPE + '^' + TAX_NO + '^' + make_req_dt; //up_hash 생성 서명 데이터
-    const kcp_sign_data = makeSignatureData(hash_data); //서명 데이터(무결성 검증)
+    const kcp_sign_data = makeSignatureData(hash_data).split('\r\n').join(''); //서명 데이터(무결성 검증)
 
     // up_hash 생성 REQ DATA
     const req_data = {
@@ -279,7 +279,7 @@ export class AuthService {
     const res_data = await axios.post('https://spl.kcp.co.kr/std/certpass', req_data);
     return {
       res_cd: res_data.data.res_cd,
-      res_msg: res_data.data.res_mes,
+      res_msg: res_data.data.res_msg,
       site_cd: SITE_CD,
       ordr_idxx,
       req_tx: 'CERT',
@@ -309,7 +309,7 @@ export class AuthService {
     let ct_type = 'CHK';
 
     const dnhash_data = site_cd + '^' + ct_type + '^' + cert_no + '^' + dn_hash; //dn_hash 검증 서명 데이터
-    let kcp_sign_data = makeSignatureData(dnhash_data); //서명 데이터(무결성 검증)
+    let kcp_sign_data = makeSignatureData(dnhash_data).split('\r\n').join(''); //서명 데이터(무결성 검증)
 
     const req_data_1 = {
       kcp_cert_info: kcp_cert_info,
