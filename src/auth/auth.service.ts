@@ -257,8 +257,7 @@ export class AuthService {
     const kcp_cert_info = fs
       .readFileSync('src/certificate/KCP_AUTH_AJOAD_CERT.pem', 'utf-8')
       .toString()
-      .split('\r\n')
-      .join('');
+      .replace(/\n|\r|\s*/g, '');
     const { CT_TYPE, SITE_CD, TAX_NO, WEB_SITEID, WEB_SITE_HASHYN } = MakeUpHash;
     const ordr_idxx = makeOrderId();
     const make_req_dt = getCurrentDate();
@@ -301,8 +300,7 @@ export class AuthService {
     const kcp_cert_info = fs
       .readFileSync('src/certificate/KCP_AUTH_AJOAD_CERT.pem', 'utf-8')
       .toString()
-      .split('\r\n')
-      .join('');
+      .replace(/\n|\r|\s*/g, '');
     const site_cd = req.body.site_cd;
     const cert_no = req.body.cert_no;
     const dn_hash = req.body.dn_hash;
