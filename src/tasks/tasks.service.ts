@@ -51,39 +51,21 @@ export class TasksService {
   }
 
   // 매 분(0초)마다 실행
-  // @Cron(CronExpression.EVERY_MINUTE)
-  // async handlePartnerTeamNotRespondedTeams() {
-  //   // 상대팀이 무응답하고, 이용권 환불받지 않은 팀 조회
-  //   const { teams: partnerTeamNotRespondedMaleTeams } = await this.teamsService.getPartnerTeamNotRespondedTeamsByGender(
-  //     TeamGender.male,
-  //   );
-  //   const { teams: partnerTeamNotRespondedFemaleTeams } =
-  //     await this.teamsService.getPartnerTeamNotRespondedTeamsByGender(TeamGender.female);
+  @Cron(CronExpression.EVERY_10_SECONDS)
+  async handlePartnerTeamNotRespondedTeams() {
+    const matchings = await this.matchingsService.getMatchings();
 
-  //   for await (const maleTeam of partnerTeamNotRespondedMaleTeams) {
-  //     const matchingPartnerTeamNotRespondedEvent = new MatchingPartnerTeamNotRespondedEvent();
+    for await (const matching of matchings) {
+      const now = moment(new Date()).format('YYYY-MM-DD HH:mm');
+      const afterTwoDays = moment(matching.createdAt).add(2, 'days').format('YYYY-MM-DD HH:mm');
 
-  //     // 1) 이용권 환불
-  //     await this.ticketsService.refundTicketById(maleTeam.ticketId);
-  //     await this.matchingsService.deleteTicketInfoByMatchingIdAndGender(maleTeam.matchingId, TeamGender.male);
-
-  //     // 2) 매칭 거절 당함 문자 보내기
-  //     matchingPartnerTeamNotRespondedEvent.teamId = maleTeam.teamId;
-  //     this.eventEmitter.emit('matching.partnerTeamNotResponded', matchingPartnerTeamNotRespondedEvent);
-  //   }
-
-  //   for await (const femaleTeam of partnerTeamNotRespondedFemaleTeams) {
-  //     const matchingPartnerTeamNotRespondedEvent = new MatchingPartnerTeamNotRespondedEvent();
-
-  //     // 1) 이용권 환불
-  //     await this.ticketsService.refundTicketById(femaleTeam.ticketId);
-  //     await this.matchingsService.deleteTicketInfoByMatchingIdAndGender(femaleTeam.matchingId, TeamGender.female);
-
-  //     // 2) 매칭 거절 당함 문자 보내기
-  //     matchingPartnerTeamNotRespondedEvent.teamId = femaleTeam.teamId;
-  //     this.eventEmitter.emit('matching.partnerTeamNotResponded', matchingPartnerTeamNotRespondedEvent);
-  //   }
-  // }
+      // 48시간 이상 무응답인 경우
+      if (now >= afterTwoDays && matching.receivedTeamIsAccepted === null && matching.appliedTeamIsAccepted === true) {
+        // 매칭 거절 처리
+        await this.matchingsService.refuseMatching(matching.id);
+      }
+    }
+  }
 
   // 매 분(0초)마다 실행
   // 수락/거절 대기자 종료 3시간 전 문자 발송

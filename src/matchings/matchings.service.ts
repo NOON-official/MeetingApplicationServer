@@ -37,12 +37,20 @@ export class MatchingsService {
     private tingsService: TingsService,
   ) {}
 
+  async getMatchings(): Promise<Matching[]> {
+    return this.matchingsRepository.getMatchings();
+  }
+
   async getMatchingWithDeletedByTeamId(teamId: number): Promise<Matching> {
     return this.matchingsRepository.getMatchingWithDeletedByTeamId(teamId);
   }
 
   async getMatchingByTeamId(teamId: number): Promise<Matching> {
     return this.matchingsRepository.getMatchingByTeamId(teamId);
+  }
+
+  async getReceivedMatchingsByTeamId(teamId: number): Promise<{ matchings: Matching[] }> {
+    return this.matchingsRepository.getReceivedMatchingsByTeamId(teamId);
   }
 
   // async getMatchingIdByTeamId(teamId: number): Promise<{ matchingId: number }> {
@@ -154,6 +162,17 @@ export class MatchingsService {
     return this.matchingsRepository.refuseMatching(matchingId);
   }
 
+  async refuseMatching(matchingId: number): Promise<void> {
+    const matching = await this.getMatchingById(matchingId);
+    // 해당 매칭 정보가 없는 경우
+    if (!matching || !!matching.deletedAt) {
+      throw new NotFoundException(`Can't find matching with id ${matchingId}`);
+    }
+
+    // 상대방 거절하기
+    return this.matchingsRepository.refuseMatching(matchingId);
+  }
+
   async createMatchingRefuseReason(
     matchingId: number,
     teamId: number,
@@ -240,7 +259,7 @@ export class MatchingsService {
     return this.matchingsRepository.getAdminMatchingsApplied();
   }
 
-  async getMatchings(): Promise<{ matchings: AdminGetMatchingDto[] }> {
+  async getAdminMatchingsSucceeded(): Promise<{ matchings: AdminGetMatchingDto[] }> {
     return this.matchingsRepository.getAdminSucceededMatchings();
   }
 

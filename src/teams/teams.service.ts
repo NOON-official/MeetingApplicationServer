@@ -332,6 +332,33 @@ export class TeamsService {
     await this.teamsRepository.deleteTeamById(teamId);
   }
 
+  async softDeleteTeamById(teamId: number): Promise<void> {
+    const team = await this.getTeamById(teamId);
+
+    // 해당 팀 정보가 없는 경우
+    if (!team || !!team.deletedAt) {
+      throw new NotFoundException(`Can't find team with id ${teamId}`);
+    }
+
+    await this.teamsRepository.softDeleteTeamById(teamId);
+  }
+
+  async stopMatchingByTeamId(teamId: number): Promise<void> {
+    // 무응답 상태인 받은신청 조회
+    const { matchings } = await this.matchingsService.getReceivedMatchingsByTeamId(teamId);
+
+    for await (const matching of matchings) {
+      // 받은신청 거절 처리
+      await this.matchingsService.refuseMatching(matching.id);
+
+      // 해당 매칭 삭제 처리
+      await this.matchingsService.deleteMatchingById(matching.id);
+    }
+
+    // 팀 soft delete 처리
+    await this.teamsRepository.softDeleteTeamById(teamId);
+  }
+
   async getTeamById(teamId: number): Promise<Team> {
     return this.teamsRepository.getTeamById(teamId);
   }
