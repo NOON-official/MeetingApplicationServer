@@ -9,6 +9,10 @@ import { AdminGetAppliedTeamDto } from 'src/admin/dtos/admin-get-team.dto';
 
 @CustomRepository(Matching)
 export class MatchingsRepository extends Repository<Matching> {
+  async getMatchings(): Promise<Matching[]> {
+    return await this.find();
+  }
+
   // 매칭 정보 조회(삭제된 팀 정보 포함)
   async getMatchingWithDeletedByTeamId(teamId: number): Promise<Matching> {
     const matching = await this.createQueryBuilder('matching')
