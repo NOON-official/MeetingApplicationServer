@@ -8,15 +8,11 @@ export function makeOrderId(): string {
   let month = today.getMonth() + 1;
   let date = today.getDate();
   let time = today.getTime();
-  let monthST: string;
 
-  if (month < 10) {
-    monthST = '0' + month;
-  } else {
-    monthST = String(month);
-  }
+  let monthStr = month < 10 ? '0' + month.toString() : month.toString();
+  let dayStr = date < 10 ? '0' + date.toString() : date.toString();
 
-  const result = year + '' + monthST + '' + date + '' + time;
+  const result = year + '' + monthStr + '' + dayStr + '' + time;
 
   return result;
 }
