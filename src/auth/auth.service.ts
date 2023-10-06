@@ -258,13 +258,13 @@ export class AuthService {
     const kcp_cert_info = fs
       .readFileSync(join(__dirname, '../../src/certificate/KCP_AUTH_AJOAD_CERT.pem'), 'utf-8')
       .toString()
-      .split('\r\n')
+      .split('\n')
       .join('');
     const { CT_TYPE, SITE_CD, TAX_NO, WEB_SITEID, WEB_SITE_HASHYN } = MakeUpHash;
     const ordr_idxx = makeOrderId();
     const make_req_dt = getCurrentDate();
     const hash_data = SITE_CD + '^' + CT_TYPE + '^' + TAX_NO + '^' + make_req_dt; //up_hash 생성 서명 데이터
-    const kcp_sign_data = makeSignatureData(hash_data).split('\r\n').join(''); //서명 데이터(무결성 검증)
+    const kcp_sign_data = makeSignatureData(hash_data); //서명 데이터(무결성 검증)
 
     // up_hash 생성 REQ DATA
     const req_data = {
@@ -301,7 +301,7 @@ export class AuthService {
     const kcp_cert_info = fs
       .readFileSync(join(__dirname, '../../src/certificate/KCP_AUTH_AJOAD_CERT.pem'), 'utf-8')
       .toString()
-      .split('\r\n')
+      .split('\n')
       .join('');
     const site_cd = req.body.site_cd;
     const cert_no = req.body.cert_no;
@@ -310,7 +310,7 @@ export class AuthService {
     let ct_type = 'CHK';
 
     const dnhash_data = site_cd + '^' + ct_type + '^' + cert_no + '^' + dn_hash; //dn_hash 검증 서명 데이터
-    let kcp_sign_data = makeSignatureData(dnhash_data).split('\r\n').join(''); //서명 데이터(무결성 검증)
+    let kcp_sign_data = makeSignatureData(dnhash_data); //서명 데이터(무결성 검증)
 
     const req_data_1 = {
       kcp_cert_info: kcp_cert_info,
