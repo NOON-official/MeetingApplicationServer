@@ -156,8 +156,6 @@ export class MatchingsRepository extends Repository<Matching> {
       .leftJoin(`receivedTeam.user`, 'receivedTeamOwner')
       // 매칭 완료자 조회 (상호 수락한 경우)
       .where('matching.appliedTeamIsAccepted = true AND matching.receivedTeamIsAccepted = true')
-      // 삭제된 매칭은 조회 X
-      .andWhere('matching.deletedAt IS NULL')
       .getRawMany();
 
     return { matchings };
