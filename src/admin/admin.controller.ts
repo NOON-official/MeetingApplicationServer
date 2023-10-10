@@ -113,7 +113,7 @@ export class AdminController {
   })
   @Get('matchings/succeeded')
   getAdminMatchingsSucceeded(): Promise<{ matchings: AdminGetMatchingDto[] }> {
-    return this.adminService.getMatchings();
+    return this.adminService.getAdminMatchingsSucceeded();
   }
 
   @ApiOperation({

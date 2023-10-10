@@ -171,6 +171,10 @@ export class TeamsRepository extends Repository<Team> {
     await this.createQueryBuilder('team').delete().from(Team).where('id = :teamId', { teamId }).execute();
   }
 
+  async softDeleteTeamById(teamId: number): Promise<void> {
+    await this.createQueryBuilder('team').softDelete().from(Team).where('id = :teamId', { teamId }).execute();
+  }
+
   //관리자페이지 성별을 기준으로 모든 팀 조회
   async getTeamsByGender(gender: TeamGender): Promise<{ teams: AdminGetTeamDto[] }> {
     const teams = await this.createQueryBuilder('team')

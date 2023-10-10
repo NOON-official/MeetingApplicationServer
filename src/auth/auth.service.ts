@@ -20,6 +20,13 @@ import { ContentType } from 'src/common/sms/enums/content-type.enum';
 import { HttpService } from '@nestjs/axios';
 import { catchError, firstValueFrom } from 'rxjs';
 import { SaveStudentCardDto } from './dtos/save-student-card.dto';
+import * as fs from 'fs';
+import { MakeUpHash } from './constants/make-up-hash';
+import { getCurrentDate, makeOrderId, makeSignatureData } from './utils/functions';
+import axios from 'axios';
+import { decodeURIComponentCharset } from 'decode-uri-component-charset';
+import { GetPassDto } from './dtos/get-pass.dto';
+import { join } from 'path';
 
 export class AuthService {
   constructor(
@@ -227,10 +234,127 @@ export class AuthService {
 
     if (result.nickname === null) {
       throw new NotFoundException(`Can't find user with id ${userId}`);
+    } else {
+      this.usersService.updateStudentCard(userId, saveStudentCardDto);
     }
-    else {
-      this.usersService.updateStudentCard(userId, saveStudentCardDto)
-    }
+  }
 
+  async makeUpHash(userId: number): Promise<{
+    res_cd: string;
+    res_msg: string;
+    site_cd: string;
+    ordr_idxx: string;
+    req_tx: string;
+    cert_method: string;
+    up_hash: string;
+    cert_otp_use: string;
+    web_siteid_hashYN: string;
+    web_siteid: string;
+    cert_enc_use_ext: string;
+    kcp_merchant_time: string;
+    kcp_cert_lib_ver: string;
+    param_opt_1: number;
+  }> {
+    const kcp_cert_info = fs
+      .readFileSync(join(__dirname, '../../src/certificate/KCP_AUTH_AJOAD_CERT.pem'), 'utf-8')
+      .toString()
+      .split('\n')
+      .join('');
+    const { CT_TYPE, SITE_CD, TAX_NO, WEB_SITEID, WEB_SITE_HASHYN } = MakeUpHash;
+    const ordr_idxx = makeOrderId();
+    const make_req_dt = getCurrentDate();
+    const hash_data = SITE_CD + '^' + CT_TYPE + '^' + TAX_NO + '^' + make_req_dt; //up_hash 생성 서명 데이터
+    const kcp_sign_data = makeSignatureData(hash_data); //서명 데이터(무결성 검증)
+
+    // up_hash 생성 REQ DATA
+    const req_data = {
+      site_cd: SITE_CD,
+      kcp_cert_info: kcp_cert_info,
+      ct_type: CT_TYPE,
+      ordr_idxx: ordr_idxx,
+      web_siteid: WEB_SITEID,
+      tax_no: TAX_NO,
+      make_req_dt: make_req_dt,
+      kcp_sign_data: kcp_sign_data,
+    };
+    const res_data = await axios.post('https://spl.kcp.co.kr/std/certpass', req_data);
+    return {
+      res_cd: res_data.data.res_cd,
+      res_msg: res_data.data.res_msg,
+      site_cd: SITE_CD,
+      ordr_idxx,
+      req_tx: 'CERT',
+      cert_method: '01',
+      up_hash: res_data.data.up_hash,
+      cert_otp_use: 'Y',
+      web_siteid_hashYN: WEB_SITE_HASHYN,
+      web_siteid: WEB_SITEID,
+      cert_enc_use_ext: 'Y',
+      kcp_merchant_time: res_data.data.kcp_merchant_time,
+      kcp_cert_lib_ver: res_data.data.kcp_cert_lib_ver,
+      param_opt_1: userId,
+    };
+  }
+
+  async saveUserWithPass(req: Request, res: Response) {
+    const target_URL = 'https://spl.kcp.co.kr/std/certpass'; // 운영계
+    const kcp_cert_info = fs
+      .readFileSync(join(__dirname, '../../src/certificate/KCP_AUTH_AJOAD_CERT.pem'), 'utf-8')
+      .toString()
+      .split('\n')
+      .join('');
+    const site_cd = req.body.site_cd;
+    const cert_no = req.body.cert_no;
+    const dn_hash = req.body.dn_hash;
+    const userId = req.body.param_opt_1;
+    let ct_type = 'CHK';
+
+    const dnhash_data = site_cd + '^' + ct_type + '^' + cert_no + '^' + dn_hash; //dn_hash 검증 서명 데이터
+    let kcp_sign_data = makeSignatureData(dnhash_data); //서명 데이터(무결성 검증)
+
+    const req_data_1 = {
+      kcp_cert_info: kcp_cert_info,
+      site_cd: site_cd,
+      ordr_idxx: req.body.ordr_idxx,
+      cert_no: cert_no,
+      dn_hash: dn_hash,
+      ct_type: ct_type,
+      kcp_sign_data: kcp_sign_data,
+    };
+
+    const me = await axios.post(target_URL, req_data_1);
+    const dn_res_cd = me.data.res_cd;
+
+    ct_type = 'DEC';
+
+    const decrypt_data = site_cd + '^' + ct_type + '^' + cert_no; //데이터 복호화 검증 서명 데이터
+    kcp_sign_data = makeSignatureData(decrypt_data); //서명 데이터(무결성 검증)
+
+    const req_data_2 = {
+      kcp_cert_info: kcp_cert_info,
+      site_cd: site_cd,
+      ordr_idxx: req.body.ordr_idxx,
+      cert_no: cert_no,
+      ct_type: ct_type,
+      enc_cert_Data: req.body.enc_cert_data2,
+      kcp_sign_data: kcp_sign_data,
+    };
+
+    //dn _hash 검증데이터가 정상일 때, 복호화 요청 함
+    if (dn_res_cd === '0000') {
+      const result = await axios.post(target_URL, req_data_2);
+      // API RES
+      const data: GetPassDto = result.data;
+      const { res_cd, res_msg, user_name, phone_no, birth_day, sex_code } = data;
+      const birth = Number(birth_day.slice(0, 4));
+      const gender = sex_code === '01' ? 'male' : 'female';
+      if (res_cd === '0000') {
+        await this.usersService.updateUserInfo(userId, { nickname: user_name, birth, gender, phone: phone_no });
+      } else {
+        throw new BadRequestException(`Error: ${res_msg}`);
+      }
+    } else {
+      throw new BadRequestException('dn_hash 변조 위험있음');
+    }
   }
 }
