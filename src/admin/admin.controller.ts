@@ -170,8 +170,11 @@ export class AdminController {
     description: 'tingCount 수만큼 유저 팅 지급',
   })
   @ApiOkResponse({ description: 'OK' })
-  @Post('users/:userId/tings')
-  postAdminUsersUserIdTings(@Param('userId') userId: number, @Body() tingCount: number): Promise<void> {
+  @Post('users/:userId/tings/:tingCount')
+  postAdminUsersUserIdTingsTingCount(
+    @Param('userId') userId: number,
+    @Param('tingCount') tingCount: number,
+  ): Promise<void> {
     return this.adminService.updateTingsByUserIdAndTingCount(userId, tingCount);
   }
 
