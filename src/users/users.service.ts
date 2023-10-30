@@ -32,6 +32,7 @@ import { FemaleSignUp, MaleSignUp } from './constants/sigin-up.constant';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { StudentCardVerifiedEvent } from './events/student-card-verified.event';
 import { StudentCardDeclinedEvent } from './events/student-card-declined.event';
+import { GetUserTingHistoryDto } from './dtos/get-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -441,5 +442,9 @@ export class UsersService {
         await this.matchingsService.deleteMatchingAndTeamByMatchingId(matchingId);
       }
     }
+  }
+
+  async getUsersTingsHistrory(userId: number): Promise<{ tingHistories: GetUserTingHistoryDto[] }> {
+    return await this.tingsService.getUsersTingsHistrory(userId);
   }
 }

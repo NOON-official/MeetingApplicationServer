@@ -20,6 +20,7 @@ import { Ting } from 'src/tings/entities/ting.entity';
 import { RecommendedTeam } from 'src/teams/entities/recommended-team.entity';
 import { NextRecommendedTeam } from 'src/teams/entities/next-recommended-team.entity';
 import { UserStudentCard } from './user-student-card.entity';
+import { TingHistory } from 'src/tings/entities/tingHistroy.entity';
 
 @Entity()
 @Unique(['id', 'kakaoUid', 'referralId', 'refreshToken'])
@@ -104,4 +105,7 @@ export class User extends BaseEntity {
 
   @OneToOne(() => NextRecommendedTeam, (nextRecommendedTeam) => nextRecommendedTeam.user, { cascade: true })
   nextRecommendedTeam: NextRecommendedTeam;
+
+  @OneToMany(() => TingHistory, (tingHistory) => tingHistory.user, { cascade: true })
+  tingHistories: TingHistory[];
 }
