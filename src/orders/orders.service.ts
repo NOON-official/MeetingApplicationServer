@@ -15,6 +15,8 @@ import { UsersService } from 'src/users/users.service';
 import * as moment from 'moment-timezone';
 import { UserOrder } from 'src/users/interfaces/user-order.interface';
 import { TingsService } from 'src/tings/tings.service';
+import { CreateTingHistoryDto } from 'src/tings/dtos/create-ting-history.dto';
+import { TingHistoryConstant } from 'src/tings/constants/ting-history.constant';
 
 @Injectable()
 export class OrdersService {
@@ -184,6 +186,12 @@ export class OrdersService {
     //  Ting 저장
     const tingCount = Products.find((p) => p.id === createOrderDto.productId).tingCount;
     await this.tingsService.refundTingByUserIdAndTingCount(user.id, tingCount);
+    const createTingHistoryDto: CreateTingHistoryDto = {
+      userId,
+      case: TingHistoryConstant.PURCHASE,
+      usingTing: tingCount,
+    };
+    await this.tingsService.recordUsingTingByUserId(createTingHistoryDto);
   }
 
   async getOrdersByUserId(userId: number): Promise<{ orders: UserOrder[] }> {

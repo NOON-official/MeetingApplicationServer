@@ -33,6 +33,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { StudentCardVerifiedEvent } from './events/student-card-verified.event';
 import { StudentCardDeclinedEvent } from './events/student-card-declined.event';
 import { GetUserTingHistoryDto } from './dtos/get-user.dto';
+import { TingHistoryConstant } from 'src/tings/constants/ting-history.constant';
 
 @Injectable()
 export class UsersService {
@@ -148,6 +149,11 @@ export class UsersService {
         } else {
           await this.tingsService.refundTingByUserIdAndTingCount(user.id, MaleSignUp);
         }
+        await this.tingsService.recordUsingTingByUserId({
+          userId: user.id,
+          case: TingHistoryConstant.SIGNUP,
+          usingTing: MaleSignUp,
+        });
       } else if (user.gender === 'female') {
         if (ting.tingCount === -1) {
           const createTingDto = { userId: user.id, tingCount: FemaleSignUp };
@@ -155,6 +161,11 @@ export class UsersService {
         } else {
           await this.tingsService.refundTingByUserIdAndTingCount(user.id, FemaleSignUp);
         }
+        await this.tingsService.recordUsingTingByUserId({
+          userId: user.id,
+          case: TingHistoryConstant.SIGNUP,
+          usingTing: FemaleSignUp,
+        });
       }
     }
   }
