@@ -45,6 +45,7 @@ export class InvitationsService {
     this.eventEmitter.emit('invitation.created', invitationCreatedEvent);
 
     await this.tingsService.refundTingByUserIdAndTingCount(inviter.id, INVITATION_TINGS_COUNT);
+    await this.tingsService.refundTingByUserIdAndTingCount(invitee.id, INVITATION_TINGS_COUNT);
 
     // 초대 내역 저장
     await this.invitationsRepository.createInvitation(inviter, invitee);
