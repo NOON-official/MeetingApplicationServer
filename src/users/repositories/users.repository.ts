@@ -5,7 +5,6 @@ import { CustomRepository } from 'src/database/typeorm-ex.decorator';
 import { Repository } from 'typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { UpdateUniversityDto, UpdateUserDto } from '../dtos/update-user.dto';
-import { AdminGetUserWithStudentCardDto } from 'src/admin/dtos/admin-get-user.dto';
 
 @CustomRepository(User)
 export class UsersRepository extends Repository<User> {

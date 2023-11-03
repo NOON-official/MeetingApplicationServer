@@ -9,6 +9,8 @@ import { InvitationCreatedEvent } from './events/invitation-created.event';
 import { AdminGetInvitationSuccessUserDto } from 'src/admin/dtos/admin-get-invitation-success-user.dto';
 import { INVITATION_SUCCESS_COUNT, INVITATION_TINGS_COUNT } from './constants/invitation-success-count.constant';
 import { TingsService } from 'src/tings/tings.service';
+import { CreateTingHistoryDto } from 'src/tings/dtos/create-ting-history.dto';
+import { TingHistoryConstant } from 'src/tings/constants/ting-history.constant';
 
 @Injectable()
 export class InvitationsService {
@@ -45,6 +47,17 @@ export class InvitationsService {
     this.eventEmitter.emit('invitation.created', invitationCreatedEvent);
 
     await this.tingsService.refundTingByUserIdAndTingCount(inviter.id, INVITATION_TINGS_COUNT);
+    await this.tingsService.refundTingByUserIdAndTingCount(invitee.id, INVITATION_TINGS_COUNT);
+    await this.tingsService.recordUsingTingByUserId({
+      userId: inviter.id,
+      case: TingHistoryConstant.INVITATION,
+      usingTing: INVITATION_TINGS_COUNT,
+    });
+    await this.tingsService.recordUsingTingByUserId({
+      userId: invitee.id,
+      case: TingHistoryConstant.INVITATION,
+      usingTing: INVITATION_TINGS_COUNT,
+    });
 
     // 초대 내역 저장
     await this.invitationsRepository.createInvitation(inviter, invitee);

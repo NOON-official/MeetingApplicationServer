@@ -21,6 +21,7 @@ import { TingNumberPerAction } from 'src/tings/constants/ting-number-per-action'
 import { GetTeamCardDto } from 'src/teams/dtos/get-team-card.dto';
 import { AdminGetAppliedTeamDto } from 'src/admin/dtos/admin-get-team.dto';
 import { MatchingReceivedEvent } from './events/matching-received.event';
+import { TingHistoryConstant } from 'src/tings/constants/ting-history.constant';
 
 @Injectable()
 export class MatchingsService {
@@ -126,6 +127,11 @@ export class MatchingsService {
 
     // 팅 차감하기
     await this.tingsService.useTingByUserIdAndTingCount(userId, TingNumberPerAction.ACCEPT);
+    await this.tingsService.recordUsingTingByUserId({
+      userId,
+      case: TingHistoryConstant.ACCEPTED,
+      usingTing: -TingNumberPerAction.ACCEPT,
+    });
 
     // 매칭 수락하기
     await this.matchingsRepository.acceptMatching(matchingId);
@@ -356,6 +362,11 @@ export class MatchingsService {
 
     // 팅 차감하기
     await this.tingsService.useTingByUserIdAndTingCount(appliedUserId, TingNumberPerAction.APPLY);
+    await this.tingsService.recordUsingTingByUserId({
+      userId: appliedUserId,
+      case: TingHistoryConstant.APPLICATION,
+      usingTing: -TingNumberPerAction.APPLY,
+    });
 
     // 상호 제외된 팀 목록에 추가하기
     await this.teamsService.updateExcludedTeamsByUserIdAndExcludedTeamId(appliedTeam.ownerId, receivedTeamId);
