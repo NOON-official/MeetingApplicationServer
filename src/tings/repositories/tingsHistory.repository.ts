@@ -10,7 +10,7 @@ import { GetUserTingHistoryDto } from 'src/users/dtos/get-user.dto';
 export class TingsHistoryRepository extends Repository<TingHistory> {
   async getUsersTingsHistrory(userId: number): Promise<{ tingHistories: GetUserTingHistoryDto[] }> {
     const tingHistories = await this.createQueryBuilder('ting_history')
-      .select(['ting_history.id', 'ting_history.case', 'ting_history.usingTing'])
+      .select(['ting_history.id', 'ting_history.case', 'ting_history.usingTing', 'ting_history.createdAt'])
       .where('ting_history.userId = :userId', { userId })
       .orderBy('ting_history.createdAt', 'ASC')
       .getMany();
