@@ -157,4 +157,15 @@ export class UsersRepository extends Repository<User> {
       throw new NotFoundException(`Can't find user with id ${userId}`);
     }
   }
+
+  async getUsersCountTotal(): Promise<{ userCount: number }> {
+    let { userCount } = await this.createQueryBuilder('user')
+      .select('COUNT(user.id) AS userCount')
+      .withDeleted()
+      .getRawOne();
+
+    userCount ? (userCount = Number(userCount) * 3 + 4000) : (userCount = 4000);
+
+    return { userCount };
+  }
 }

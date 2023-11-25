@@ -213,8 +213,9 @@ export class TeamsService {
   //   return this.teamsRepository.getMembersCountOneWeek();
   // }
 
-  async getMembersCountTotal(): Promise<{ memberCount: number }> {
-    return this.teamsRepository.getMembersCountTotal();
+  async getMembersCountTotal(): Promise<{ userCount: number }> {
+    const { userCount } = await this.usersService.getUsersCountTotal();
+    return { userCount };
   }
 
   async getTeamCountByMembercountAndGender(

@@ -458,4 +458,8 @@ export class UsersService {
   async getUsersTingsHistrory(userId: number): Promise<{ tingHistories: GetUserTingHistoryDto[] }> {
     return await this.tingsService.getUsersTingsHistrory(userId);
   }
+
+  async getUsersCountTotal(): Promise<{ userCount: number }> {
+    return this.usersRepository.getUsersCountTotal();
+  }
 }
