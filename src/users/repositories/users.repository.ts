@@ -5,7 +5,6 @@ import { CustomRepository } from 'src/database/typeorm-ex.decorator';
 import { Repository } from 'typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { UpdateUniversityDto, UpdateUserDto } from '../dtos/update-user.dto';
-import { AdminGetUserWithStudentCardDto } from 'src/admin/dtos/admin-get-user.dto';
 
 @CustomRepository(User)
 export class UsersRepository extends Repository<User> {
@@ -157,5 +156,16 @@ export class UsersRepository extends Repository<User> {
     if (result.affected === 0) {
       throw new NotFoundException(`Can't find user with id ${userId}`);
     }
+  }
+
+  async getUsersCountTotal(): Promise<{ userCount: number }> {
+    let { userCount } = await this.createQueryBuilder('user')
+      .select('COUNT(user.id) AS userCount')
+      .withDeleted()
+      .getRawOne();
+
+    userCount ? (userCount = Number(userCount) * 3 + 4000) : (userCount = 4000);
+
+    return { userCount };
   }
 }

@@ -63,7 +63,7 @@ export class TeamsController {
     },
   })
   @Get('members/count/total')
-  getTeamsMembersCountTotal(): Promise<{ memberCount: number }> {
+  getTeamsMembersCountTotal(): Promise<{ userCount: number }> {
     return this.teamsService.getMembersCountTotal();
   }
 

@@ -25,14 +25,7 @@ export class CouponCreatedListener {
       CONTENT: string;
     };
 
-    // 미팅학개론 50% 할인 쿠폰
-    if (event.couponTypeId == 1) {
-      smsContent = discount50CouponCreatedContentConstant;
-    }
-    // 미팅학개론 1회 무료 이용 쿠폰
-    else if (event.couponTypeId == 2) {
-      smsContent = freeCouponCreatedContentConstant;
-    }
+    smsContent = freeCouponCreatedContentConstant;
 
     !user.deletedAt && // 회원 탈퇴한 경우 제외
       user.phone &&

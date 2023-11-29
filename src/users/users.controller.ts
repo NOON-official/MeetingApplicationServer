@@ -23,6 +23,7 @@ import { PassportUser } from 'src/auth/interfaces/passport-user.interface';
 import { UserOrder } from './interfaces/user-order.interface';
 import { UpdateUniversityDto, UpdateUserDto } from './dtos/update-user.dto';
 import { GetTeamCardDto } from 'src/teams/dtos/get-team-card.dto';
+import { GetUserTingHistoryDto } from './dtos/get-user.dto';
 
 @ApiTags('USER')
 @ApiBearerAuth()
@@ -473,6 +474,34 @@ export class UsersController {
   @UseGuards(AccessTokenGuard)
   deleteUsersMatchingsReceivedMatchingId(@GetUser() user: PassportUser, @Body() matchingIds: number[]): Promise<void> {
     return this.usersService.deleteMatchingByUserId(user.sub, matchingIds);
+  }
+
+  @ApiOperation({
+    summary: '유저 팅 지급 내역',
+    description: '유저의 팅 사용내역 밑 지급내역 확인.',
+  })
+  @ApiOkResponse({
+    schema: {
+      example: {
+        tingHistoty: [
+          {
+            id: 1,
+            case: '회원가입',
+            usingTing: 20,
+          },
+          {
+            id: 2,
+            case: '미팅 수락',
+            usingTing: -2,
+          },
+        ],
+      },
+    },
+  })
+  @Get('tings/history')
+  @UseGuards(AccessTokenGuard)
+  getUsersTingsHistrory(@GetUser() user: PassportUser): Promise<{ tingHistories: GetUserTingHistoryDto[] }> {
+    return this.usersService.getUsersTingsHistrory(user.sub);
   }
 
   // @ApiOperation({
