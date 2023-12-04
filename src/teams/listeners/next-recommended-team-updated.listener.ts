@@ -13,13 +13,13 @@ export class NextRecommendedTeamUpdatedListener {
   async handleNextRecommendedTeamUpdatedEvent(event: NextRecommendedTeamUpdatedEvent) {
     const user = event.user;
 
-    !user.deletedAt && // 회원 탈퇴한 경우 제외
-      postNaverCloudSMS(
-        SmsType.LMS,
-        ContentType.COMM,
-        user.phone,
-        NextRecommendedTeamUpdatedContentConstant.CONTENT,
-        NextRecommendedTeamUpdatedContentConstant.SUBJECT,
-      );
+    // !user.deletedAt && // 회원 탈퇴한 경우 제외
+    //   postNaverCloudSMS(
+    //     SmsType.LMS,
+    //     ContentType.COMM,
+    //     user.phone,
+    //     NextRecommendedTeamUpdatedContentConstant.CONTENT,
+    //     NextRecommendedTeamUpdatedContentConstant.SUBJECT,
+    //   );
   }
 }
