@@ -1,11 +1,9 @@
-import { AdminGetOurteamRefusedTeamDto } from './dtos/admin-get-ourteam-refused-team.dto';
-import { CreateCouponDto } from './../coupons/dtos/create-coupon.dto';
-import { AdminGetInvitationSuccessUserDto } from './dtos/admin-get-invitation-success-user.dto';
-import { AdminGetMatchingDto } from './dtos/admin-get-matching.dto';
-import { MatchingStatus } from './../matchings/interfaces/matching-status.enum';
-import { AdminGetAppliedTeamDto, AdminGetTeamDto } from './dtos/admin-get-team.dto';
-import { AdminService } from './admin.service';
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { TeamGender } from 'src/teams/entities/team-gender.enum';
+
+import { Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiNotFoundResponse,
@@ -15,10 +13,10 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
-import { TeamGender } from 'src/teams/entities/team-gender.enum';
-import { Roles } from 'src/common/decorators/roles.decorator';
-import { RolesGuard } from 'src/auth/guards/roles.guard';
+
+import { AdminService } from './admin.service';
+import { AdminGetMatchingDto } from './dtos/admin-get-matching.dto';
+import { AdminGetAppliedTeamDto, AdminGetTeamDto } from './dtos/admin-get-team.dto';
 import { AdminGetUserDto, AdminGetUserWithStudentCardDto } from './dtos/admin-get-user.dto';
 
 @ApiTags('ADMIN')
@@ -33,7 +31,7 @@ export class AdminController {
 
   @ApiBearerAuth()
   @ApiOperation({
-    summary: '전체 팀 조회 (📌is updating)',
+    summary: '전체 팀 조회',
     description: '관리자페이지 내 사용',
   })
   @ApiQuery({ name: 'gender', enum: TeamGender })
@@ -79,7 +77,7 @@ export class AdminController {
 
   @ApiBearerAuth()
   @ApiOperation({
-    summary: '신청한/신청받은 팀 조회 (📌is updating)',
+    summary: '신청한/신청받은 팀 조회',
     description: '관리자페이지 내 사용',
   })
   @ApiOkResponse({})
@@ -89,7 +87,7 @@ export class AdminController {
   }
 
   @ApiOperation({
-    summary: '매칭 완료 팀 조회 (📌is updating)',
+    summary: '매칭 완료 팀 조회',
     description: '',
   })
   @ApiOkResponse({
@@ -117,7 +115,7 @@ export class AdminController {
   }
 
   @ApiOperation({
-    summary: '유저 전체 조회 (📌is updating)',
+    summary: '유저 전체 조회',
     description: '관리자 페이지 - 전체 회원',
   })
   @ApiOkResponse({
@@ -166,7 +164,7 @@ export class AdminController {
   }
 
   @ApiOperation({
-    summary: '팅 지급하기 (📌is updating)',
+    summary: '팅 지급하기',
     description: 'tingCount 수만큼 유저 팅 지급',
   })
   @ApiOkResponse({ description: 'OK' })
@@ -179,7 +177,7 @@ export class AdminController {
   }
 
   @ApiOperation({
-    summary: '팅 삭제하기 (📌is updating)',
+    summary: '팅 삭제하기',
     description: 'tingCount 수만큼 유저 팅 차감',
   })
   @ApiOkResponse({ description: 'OK' })
@@ -223,7 +221,7 @@ export class AdminController {
   }
 
   @ApiOperation({
-    summary: '학생증 인증 신청 내역 조회 (📌is updating)',
+    summary: '학생증 인증 신청 내역 조회',
     description: '관리자 페이지 내 사용',
   })
   @ApiOkResponse({
@@ -258,7 +256,7 @@ export class AdminController {
   }
 
   @ApiOperation({
-    summary: '유저 학교 인증 승인하기 (📌is updating)',
+    summary: '유저 학교 인증 승인하기',
     description: '관리자 페이지 내 사용',
   })
   @ApiOkResponse({ description: 'OK' })
@@ -268,7 +266,7 @@ export class AdminController {
   }
 
   @ApiOperation({
-    summary: '유저 학교 인증 거절하기 (📌is updating)',
+    summary: '유저 학교 인증 거절하기',
     description: '관리자 페이지 내 사용',
   })
   @ApiOkResponse({ description: 'OK' })
@@ -435,7 +433,7 @@ export class AdminController {
   // }
 
   // @ApiOperation({
-  //   summary: '채팅방 생성 여부 저장 (📌is updating)',
+  //   summary: '채팅방 생성 여부 저장',
   //   description: '매칭 완료자 조회 페이지에서 체크 박스 선택 시 해당 API 호출해서 저장해주시면 됩니다',
   // })
   // @ApiOkResponse({ description: 'OK' })

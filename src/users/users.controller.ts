@@ -1,10 +1,10 @@
-import { MatchingStatus } from './../matchings/interfaces/matching-status.enum';
-import { UserAgreement } from './entities/user-agreement.entity';
-import { UserCoupon } from './interfaces/user-coupon.interface';
-import { UserTeam } from './interfaces/user-team.interface';
-import { CreateAgreementDto } from './dtos/create-agreement.dto';
-import { AccessTokenGuard } from './../auth/guards/access-token.guard';
-import { UseGuards } from '@nestjs/common';
+import { PassportUser } from 'src/auth/interfaces/passport-user.interface';
+import { GetUser } from 'src/common/decorators/get-user.decorator';
+import { GetTeamCardDto } from 'src/teams/dtos/get-team-card.dto';
+
+import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Body, Delete, Patch, Post } from '@nestjs/common/decorators';
+import { ApiOperation } from '@nestjs/swagger';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
@@ -14,16 +14,15 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger/dist';
-import { UsersService } from './users.service';
-import { Controller, Get } from '@nestjs/common';
-import { ApiOperation } from '@nestjs/swagger';
-import { Body, Delete, Param, Patch, Post } from '@nestjs/common/decorators';
-import { GetUser } from 'src/common/decorators/get-user.decorator';
-import { PassportUser } from 'src/auth/interfaces/passport-user.interface';
-import { UserOrder } from './interfaces/user-order.interface';
-import { UpdateUniversityDto, UpdateUserDto } from './dtos/update-user.dto';
-import { GetTeamCardDto } from 'src/teams/dtos/get-team-card.dto';
+
+import { AccessTokenGuard } from '../auth/guards/access-token.guard';
+import { CreateAgreementDto } from './dtos/create-agreement.dto';
 import { GetUserTingHistoryDto } from './dtos/get-user.dto';
+import { UpdateUniversityDto, UpdateUserDto } from './dtos/update-user.dto';
+import { UserAgreement } from './entities/user-agreement.entity';
+import { UserCoupon } from './interfaces/user-coupon.interface';
+import { UserOrder } from './interfaces/user-order.interface';
+import { UsersService } from './users.service';
 
 @ApiTags('USER')
 @ApiBearerAuth()
@@ -147,7 +146,7 @@ export class UsersController {
   //   return this.usersService.getTicketCountByUserId(user.sub);
   // }
   @ApiOperation({
-    summary: '보유 팅 개수 조회 (📌is updating)',
+    summary: '보유 팅 개수 조회',
   })
   @ApiOkResponse({
     schema: {
@@ -266,7 +265,7 @@ export class UsersController {
   }
 
   @ApiOperation({
-    summary: '유저 추천팀 조회 (🔆new)',
+    summary: '유저 추천팀 조회',
     description: '* 유저의 팀 프로필이 없는 경우 400 에러 반환 \n\n* 추천할 팀이 없는 경우 빈 배열([]) 반환',
   })
   @ApiOkResponse({
@@ -303,7 +302,7 @@ export class UsersController {
   }
 
   @ApiOperation({
-    summary: '유저 신청한 팀 조회 (보낸 신청 - 응답을 기다려요) (⭕️updated)',
+    summary: '유저 신청한 팀 조회 (보낸 신청 - 응답을 기다려요)',
     description: '',
   })
   @ApiOkResponse({
@@ -341,7 +340,7 @@ export class UsersController {
   }
 
   @ApiOperation({
-    summary: '유저 거절당한 팀 조회 (보낸 신청 - 거절됐어요) (⭕️updated)',
+    summary: '유저 거절당한 팀 조회 (보낸 신청 - 거절됐어요)',
     description: '',
   })
   @ApiOkResponse({
@@ -379,7 +378,7 @@ export class UsersController {
   }
 
   @ApiOperation({
-    summary: '유저 신청받은 팀 조회 (받은 신청) (⭕️updated)',
+    summary: '유저 신청받은 팀 조회 (받은 신청)',
     description: '',
   })
   @ApiOkResponse({
@@ -417,7 +416,7 @@ export class UsersController {
   }
 
   @ApiOperation({
-    summary: '유저 상호 수락 팀 조회 (매칭 완료) (⭕️updated)',
+    summary: '유저 상호 수락 팀 조회 (매칭 완료)',
     description: '상호 수락일 기준 7일 이내 매칭 정보만 조회됩니다.',
   })
   @ApiOkResponse({
@@ -455,7 +454,7 @@ export class UsersController {
   }
 
   @ApiOperation({
-    summary: '유저 신청한 팀 삭제 (내가 신청) (📌is updating)',
+    summary: '유저 신청한 팀 삭제 (내가 신청)',
     description: '',
   })
   @ApiOkResponse({ description: 'OK' })
@@ -466,7 +465,7 @@ export class UsersController {
   }
 
   @ApiOperation({
-    summary: '유저 신청받은 팀 삭제 (남이 신청) (📌is updating)',
+    summary: '유저 신청받은 팀 삭제 (남이 신청)',
     description: '',
   })
   @ApiOkResponse({ description: 'OK' })
@@ -505,7 +504,7 @@ export class UsersController {
   }
 
   // @ApiOperation({
-  //   summary: '유저 매칭 상태 조회 (📌is updating)',
+  //   summary: '유저 매칭 상태 조회',
   //   description:
   //     '매칭 신청 전인 경우 matchingStatus: null \n\n matchingStatus: APPLIED / FAILED / MATCHED / OURTEAM_ACCEPTED / SUCCEEDED / PARTNER_TEAM_REFUSED / OURTEAM_REFUSED / NOT_RESPONDED',
   // })
