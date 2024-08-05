@@ -1,32 +1,26 @@
-import { PassportUser } from './../auth/interfaces/passport-user.interface';
-import { GetUser } from '../common/decorators/get-user.decorator';
-import { TeamsService } from './teams.service';
-import { GetTeamDetailDto, GetTeamDto } from './dtos/get-team.dto';
-import { CreateTeamDto } from './dtos/create-team.dto';
-import { Vibes } from './constants/vibes';
-import { SameUniversities } from './constants/same-universities';
-import { Roles } from './constants/roles';
-import { Mbties } from './constants/mbties';
-import { Areas } from './constants/areas';
-import { Genders } from './constants/genders';
-import * as Universities from './constants/universities.json';
-import { AccessTokenGuard } from './../auth/guards/access-token.guard';
-import { Param, Body, Put } from '@nestjs/common/decorators';
+import { MatchingOwnerGuard } from 'src/auth/guards/matching-owner.guard';
+import { TeamOwnerGuard } from 'src/auth/guards/team-owner.guard';
+
+import { Controller, Delete, Get, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Param, Put } from '@nestjs/common/decorators';
+import { ApiOperation } from '@nestjs/swagger';
 import {
   ApiBearerAuth,
-  ApiNotFoundResponse,
-  ApiUnauthorizedResponse,
-  ApiOkResponse,
   ApiCreatedResponse,
   ApiForbiddenResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger/dist';
-import { ApiOperation } from '@nestjs/swagger';
-import { ApiTags } from '@nestjs/swagger/dist';
-import { Controller, Get, Post, Patch, Delete, UseGuards } from '@nestjs/common';
+
+import { AccessTokenGuard } from '../auth/guards/access-token.guard';
+import { PassportUser } from '../auth/interfaces/passport-user.interface';
+import { GetUser } from '../common/decorators/get-user.decorator';
+import { CreateTeamDto } from './dtos/create-team.dto';
+import { GetTeamDetailDto, GetTeamDto } from './dtos/get-team.dto';
 import { UpdateTeamDto } from './dtos/update-team.dto';
-import { teamPagedata } from './interfaces/team-pagedata.interface';
-import { TeamOwnerGuard } from 'src/auth/guards/team-owner.guard';
-import { MatchingOwnerGuard } from 'src/auth/guards/matching-owner.guard';
+import { TeamsService } from './teams.service';
 
 @ApiTags('TEAM')
 @ApiUnauthorizedResponse({ description: 'Unauthorized' })
@@ -130,7 +124,7 @@ export class TeamsController {
 
   @ApiBearerAuth()
   @ApiOperation({
-    summary: '매칭 신청 (팀 정보 저장) (⭕️updated)',
+    summary: '매칭 신청 (팀 정보 저장)',
   })
   @ApiCreatedResponse({ description: 'Created' })
   @Post()
@@ -141,7 +135,7 @@ export class TeamsController {
 
   @ApiBearerAuth()
   @ApiOperation({
-    summary: '매칭 신청 정보 수정 (⭕️updated)',
+    summary: '매칭 신청 정보 수정',
     description:
       'request body에 수정이 필요한 프로퍼티만 보내주시면 됩니다 \n\n * ex) members 프로퍼티가 수정된 경우 members 프로퍼티 전체 정보가 필요함 \n\n 이미 매칭 완료된 팀인 경우 OR 매칭 실패한 팀인 경우 수정 불가',
   })
@@ -169,7 +163,7 @@ export class TeamsController {
 
   @ApiBearerAuth()
   @ApiOperation({
-    summary: '매칭 신청 정보 조회 (⭕️updated)',
+    summary: '매칭 신청 정보 조회',
     description: '모든팀 정보 조회 가능',
   })
   @ApiOkResponse({
@@ -184,7 +178,7 @@ export class TeamsController {
 
   @ApiBearerAuth()
   @ApiOperation({
-    summary: '팀 연락처 조회 (📌is updating)',
+    summary: '팀 연락처 조회',
     description: '본인팀 또는 매칭 상호 수락 후 상대팀 연락처 조회 가능',
   })
   @ApiOkResponse({
@@ -198,7 +192,7 @@ export class TeamsController {
 
   @ApiBearerAuth()
   @ApiOperation({
-    summary: '매칭 다시 안 보기 (📌is updating)',
+    summary: '매칭 다시 안 보기',
     description:
       '다시 안 보기 당한 팀ID를 파라미터로 보내주시면 됩니다.\n\n팀 테이블 excludedTeamIds에 상호 팀ID 추가 및 이후 추천 안됨',
   })
@@ -226,7 +220,7 @@ export class TeamsController {
 
   // @ApiBearerAuth()
   // @ApiOperation({
-  //   summary: '팀의 매칭ID 조회 (📌is updating)',
+  //   summary: '팀의 매칭ID 조회',
   //   description: '매칭 정보가 없는 경우 null 반환',
   // })
   // @ApiOkResponse({
