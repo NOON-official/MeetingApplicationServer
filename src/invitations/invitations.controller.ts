@@ -1,5 +1,7 @@
-import { PassportUser } from './../auth/interfaces/passport-user.interface';
-import { InvitationsService } from './invitations.service';
+import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
+import { GetUser } from 'src/common/decorators/get-user.decorator';
+
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { ApiOperation } from '@nestjs/swagger';
 import {
@@ -9,10 +11,10 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger/dist';
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
-import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
+
+import { PassportUser } from '../auth/interfaces/passport-user.interface';
 import { CreateInvitationDto } from './dtos/create-invitation.dto';
-import { GetUser } from 'src/common/decorators/get-user.decorator';
+import { InvitationsService } from './invitations.service';
 
 @ApiTags('INVITATION')
 @ApiBearerAuth()
@@ -23,7 +25,7 @@ export class InvitationsController {
   constructor(private invitationsService: InvitationsService) {}
 
   @ApiOperation({
-    summary: '회원 초대 코드 입력 (📌is updating)',
+    summary: '회원 초대 코드 입력',
   })
   @ApiCreatedResponse({ description: 'Created' })
   @Post()

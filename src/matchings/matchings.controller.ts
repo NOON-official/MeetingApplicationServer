@@ -1,5 +1,10 @@
-import { UpdateMatchingRefuseReasonDto } from './dtos/update-matching-refuse-reason.dto';
-import { MatchingsService } from './matchings.service';
+import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
+import { MatchingOwnerGuard } from 'src/auth/guards/matching-owner.guard';
+import { TeamOwnerGuard } from 'src/auth/guards/team-owner.guard';
+import { PassportUser } from 'src/auth/interfaces/passport-user.interface';
+import { GetUser } from 'src/common/decorators/get-user.decorator';
+
+import { Body, Controller, Param, Patch, Post, Put, UseGuards } from '@nestjs/common';
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { ApiOperation } from '@nestjs/swagger';
 import {
@@ -11,14 +16,11 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger/dist';
-import { Body, Controller, Get, Param, Post, Put, UseGuards, Patch } from '@nestjs/common';
-import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
-import { GetMatchingDto } from './dtos/get-matching.dto';
+
 import { CreateMatchingRefuseReasonDto } from './dtos/create-matching-refuse-reason.dto';
-import { MatchingOwnerGuard } from 'src/auth/guards/matching-owner.guard';
-import { GetUser } from 'src/common/decorators/get-user.decorator';
-import { PassportUser } from 'src/auth/interfaces/passport-user.interface';
-import { TeamOwnerGuard } from 'src/auth/guards/team-owner.guard';
+import { UpdateMatchingRefuseReasonDto } from './dtos/update-matching-refuse-reason.dto';
+import { MatchingsService } from './matchings.service';
+
 @ApiTags('MATCHING')
 @ApiBearerAuth()
 @ApiUnauthorizedResponse({ description: 'Unauthorized' })
@@ -60,7 +62,7 @@ export class MatchingsController {
   //   return this.matchingsService.getMatchingInfoById(user.sub, matchingId);
   // }
   @ApiOperation({
-    summary: '매칭 신청하기 (⭕️updated)',
+    summary: '매칭 신청하기',
     description: '매칭 신청하는 팀ID와 신청받는 팀ID를 보내주시면 됩니다.',
   })
   @ApiCreatedResponse({ description: 'Created' })
@@ -96,7 +98,7 @@ export class MatchingsController {
   }
 
   @ApiOperation({
-    summary: '매칭 수락하기 (📌is updating)',
+    summary: '매칭 수락하기',
     description:
       '이용권 1개 차감 \n\n 추후 상대팀이 거절한 경우 이용권 환불됨 \n\n 상대팀이 이미 거절한 경우/이용권이 없는 경우 400에러 발생',
   })
@@ -112,7 +114,7 @@ export class MatchingsController {
   }
 
   @ApiOperation({
-    summary: '매칭 거절하기 (📌is updating)',
+    summary: '매칭 거절하기',
     description: 'refusedTeamId: 매칭 거절당한 팀 ID',
   })
   @ApiOkResponse({ description: 'OK' })

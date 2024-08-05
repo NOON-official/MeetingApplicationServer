@@ -1,13 +1,9 @@
-import { VerifyPhoneCodeDto } from './dtos/verify-phone-code.dto';
-import { SavePhoneDto } from './dtos/save-phone.dto';
-import { PassportUser } from './interfaces/passport-user.interface';
-import { AccessTokenGuard } from './guards/access-token.guard';
-import { RefreshTokenGuard } from './guards/refresh-token.guard';
-import { AuthService } from './auth.service';
-import { KakaoUser } from './interfaces/kakao-user.interface';
-import { Controller, Get, HttpStatus, UseGuards, Res, Redirect, Delete, Post, Body, Req } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
+import { GetUser } from 'src/common/decorators/get-user.decorator';
+
+import { Body, Controller, Delete, Get, HttpStatus, Post, Redirect, Req, Res, UseGuards } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger/dist';
 import {
   ApiCookieAuth,
@@ -19,9 +15,15 @@ import {
   ApiResponse,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger/dist/decorators';
-import { GetUser } from 'src/common/decorators/get-user.decorator';
+
+import { AuthService } from './auth.service';
+import { SavePhoneDto } from './dtos/save-phone.dto';
 import { SaveStudentCardDto } from './dtos/save-student-card.dto';
-import { ConfigService } from '@nestjs/config';
+import { VerifyPhoneCodeDto } from './dtos/verify-phone-code.dto';
+import { AccessTokenGuard } from './guards/access-token.guard';
+import { RefreshTokenGuard } from './guards/refresh-token.guard';
+import { KakaoUser } from './interfaces/kakao-user.interface';
+import { PassportUser } from './interfaces/passport-user.interface';
 
 @ApiTags('AUTH')
 @Controller('auth')
@@ -106,7 +108,7 @@ export class AuthController {
   }
 
   @ApiOperation({
-    summary: '학교 인증 - 학생증 (📌is updating)',
+    summary: '학교 인증 - 학생증',
     description: '이미지 업로드 및 저장',
   })
   @ApiBearerAuth()

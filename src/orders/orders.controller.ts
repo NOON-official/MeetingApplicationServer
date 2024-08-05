@@ -1,5 +1,7 @@
-import { PassportUser } from './../auth/interfaces/passport-user.interface';
-import { Body, Get } from '@nestjs/common';
+import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
+import { GetUser } from 'src/common/decorators/get-user.decorator';
+
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 import {
   ApiBearerAuth,
@@ -9,11 +11,10 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger/dist';
-import { Controller, Post, UseGuards } from '@nestjs/common';
-import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
+
+import { PassportUser } from '../auth/interfaces/passport-user.interface';
 import { Products, ProductType } from './constants/products';
 import { CreateOrderDto } from './dtos/create-order.dto';
-import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { OrdersService } from './orders.service';
 
 @ApiTags('ORDER')
@@ -41,7 +42,7 @@ export class OrdersController {
   }
 
   @ApiOperation({
-    summary: '팅 충전하기 (📌is updating)',
+    summary: '팅 충전하기',
     description:
       '토스 결제 정보가 없는 경우(구매금액 0원) => toss: null \n\n 사용한 쿠폰이 없는 경우 => couponId: null',
   })
